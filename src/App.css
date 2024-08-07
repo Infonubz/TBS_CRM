@@ -1,10 +1,594 @@
-.App {
-  text-align: center;
+/* Define the style for odd rows */
+.ant-table-tbody > tr:nth-child(odd) > td {
+  background-color: #e9edf2; /* Replace with your desired color */
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Define the style for odd rows in the table header */
+.custom-table .ant-table-thead > tr.ant-table-row-selected > th,
+.custom-table .ant-table-thead > tr:hover:not(.ant-table-row-selected) > th {
+  background-color: #1f4b7f; /* Header background color */
+}
+
+/* Define the hover style for the sorted column header */
+.custom-table .ant-table-thead > tr > th:hover {
+  background-color: green; /* Change to your desired hover color */
+}
+
+/* Ensure the background color alternation in header even after sorting */
+.custom-table .ant-table-tbody > tr:hover > td {
+  background-color: #1f4b7f; /* Body cell background color on hover */
+  height: 6.5vh;
+}
+
+/* Additional styles for the table header */
+.custom-table .ant-table-thead > tr > th {
+  background-color: #1f4b7f; /* Header background color */
+  color: white; /* Header text color */
+  transition: none; /* Disable transitions to prevent height changes */
+}
+
+/* Ensure no additional height on hover */
+.custom-table .ant-table-thead > tr:hover > th {
+  height: auto; /* Ensure height remains auto */
+}
+
+/* Remove border and padding on hover for sort icons */
+.custom-table .ant-table-column-sorters:hover {
+  background-color: #1f4b7f; /* Maintain header background color on hover */
+  border: none; /* Remove border */
+  padding: 0; /* Remove padding */
+}
+
+/* Additional styles to ensure no padding and background for the inner elements */
+.custom-table .ant-table-column-sorters .ant-table-column-sorter-inner:hover {
+  background-color: transparent;
+  padding: 0;
+}
+
+/* Ensuring no background color and border on hover for icons */
+.custom-table .ant-table-column-sorters:hover .anticon,
+.custom-table .ant-table-column-sorters:hover .ant-table-column-sorter-up,
+.custom-table .ant-table-column-sorters:hover .ant-table-column-sorter-down {
+  background-color: transparent;
+}
+
+/* Ensuring no border or shadow effect on the sortable header */
+.custom-table .ant-table-column-sorters:hover {
+  box-shadow: none;
+  outline: none;
+}
+
+/* Remove border from the header when hovering */
+.custom-table .ant-table-thead > tr > th:hover {
+  border: none;
+  box-shadow: none;
+  outline: none;
+}
+
+/* Specific styles for the sort icon container */
+.custom-table .ant-table-column-sorters {
+  background-color: #1f4b7f; /* Ensure the background color is consistent */
+  border: none;
+}
+
+/* Additional styles */
+:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper .ant-table-cell,
+:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper
+  .ant-table-thead
+  > tr
+  > th,
+:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper
+  .ant-table-tbody
+  > tr
+  > th,
+:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper
+  .ant-table-tbody
+  > tr
+  > td,
+:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper tfoot > tr > th,
+:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper tfoot > tr > td {
+  padding: 0.4vw;
+}
+
+:where(.css-dev-only-do-not-override-zg0ahe).ant-pagination
+  .ant-pagination-prev,
+:where(.css-dev-only-do-not-override-zg0ahe).ant-pagination
+  .ant-pagination-next {
+  background-color: #1f4b7f;
+  color: white;
+}
+
+.anticon svg {
+  color: white;
+}
+
+:where(.css-dev-only-do-not-override-zg0ahe).ant-pagination
+  .ant-pagination-item-active {
+  background-color: #1f4b7f;
+  color: white;
+}
+
+:where(.css-dev-only-do-not-override-zg0ahe).ant-pagination
+  .ant-pagination-item-active {
+  border: none;
+}
+
+:where(.css-dev-only-do-not-override-zg0ahe).ant-pagination
+  .ant-pagination-item-active
+  a {
+  color: white;
+  background-color: #1f4b7f;
+  border-radius: "0.2vw";
+}
+
+:where(.css-dev-only-do-not-override-zg0ahe).ant-pagination
+  .ant-pagination-item {
+  background-color: white;
+  color: #1f4b7f;
+  border: none;
+}
+
+:where(.css-dev-only-do-not-override-zg0ahe).ant-pagination
+  .ant-pagination-item {
+  border: none;
+}
+
+:where(.css-dev-only-do-not-override-zg0ahe).ant-upload-wrapper
+  .ant-upload-drag {
+  border-left: 0.1vw solid;
+  border-top: 0.1vw solid;
+  border-right: 0.3vw solid;
+  border-bottom: 0.3vw solid;
+  border-radius: 0.5vw;
+  border-color: #1f4b7f;
+  margin-top: 0.5vw;
+}
+
+.dragger {
+  height: 7.5vw;
+  border: 1px solid;
+  transition: border-color 0.3s ease;
+}
+
+.dragger:hover {
+  border-color: #1f4b7f;
+}
+
+.ant-collapse-large
+  > .ant-collapse-item
+  > .ant-collapse-content
+  > .ant-collapse-content-box {
+  padding: 0px;
+}
+
+.ant-collapse .ant-collapse-item:last-child > .ant-collapse-content {
+  border-radius: 0 0 1rem 1rem;
+}
+
+.ant-table-wrapper
+  .ant-table-container
+  table
+  > thead
+  > tr:first-child
+  > *:last-child {
+  border-start-end-radius: 2px;
+}
+
+:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper
+  .ant-table.ant-table-middle
+  .ant-table-title,
+:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper
+  .ant-table.ant-table-middle
+  .ant-table-footer,
+:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper
+  .ant-table.ant-table-middle
+  .ant-table-cell,
+:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper
+  .ant-table.ant-table-middle
+  .ant-table-thead
+  > tr
+  > th,
+:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper
+  .ant-table.ant-table-middle
+  .ant-table-tbody
+  > tr
+  > th,
+:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper
+  .ant-table.ant-table-middle
+  .ant-table-tbody
+  > tr
+  > td,
+:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper
+  .ant-table.ant-table-middle
+  tfoot
+  > tr
+  > th,
+:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper
+  .ant-table.ant-table-middle
+  tfoot
+  > tr
+  > td {
+  padding: 0.5vw;
+}
+
+.text-lg {
+  font-size: 1vw;
+}
+
+.ant-collapse-large
+  > .ant-collapse-item
+  > .ant-collapse-content
+  > .ant-collapse-content-box {
+  padding: 0px;
+}
+
+.ant-collapse .ant-collapse-item:last-child > .ant-collapse-content {
+  border-radius: 0 0 1rem 1rem;
+}
+
+.ant-table-wrapper
+  .ant-table-container
+  table
+  > thead
+  > tr:first-child
+  > *:last-child {
+  border-start-end-radius: 2px;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+}
+
+.ant-input-search
+  > .ant-input-group
+  > .ant-input-group-addon:last-child
+  .ant-input-search-button {
+  display: none;
+}
+
+.ant-input-affix-wrapper {
+  line-height: 2.5714285714285714;
+  color: #1f4b7f;
+}
+
+.ant-input-search .ant-input-group .ant-input-affix-wrapper:not(:last-child) {
+  border-radius: 0.6rem;
+  border-bottom-color: #1f4b7f;
+  border-top-color: #1f4b7f;
+  border-left-color: #f4faff;
+  border-right-color: #1f4b7f;
+  box-shadow: 3px 3px;
+}
+
+.underline {
+  position: relative;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.shadow-xl {
+  box-shadow: 0 10px 9px rgba(0, 0, 0, 0.25);
+}
+
+.ant-collapse-large > .ant-collapse-item > .ant-collapse-header {
+  padding: 0.5vw 1vw;
+  padding-inline-start: 16px;
+}
+
+.ant-input::placeholder {
+  color: #1f4b7f !important;
+  font-size: 1vw !important;
+  text-align: center !important;
+}
+
+.scrollable-container {
+  max-height: 70vh;
+  overflow-y: auto;
+  padding-bottom: 1rem;
+}
+
+.ant-table-cell {
+  padding: 0.4vw !important; /* Adjust the value as needed */
+}
+
+:where(.css-dev-only-do-not-override-m4timi).ant-pagination
+  .ant-pagination-prev
+  .ant-pagination-item-link,
+:where(.css-dev-only-do-not-override-m4timi).ant-pagination
+  .ant-pagination-next
+  .ant-pagination-item-link {
+  background-color: #1f4b7f;
+}
+
+:where(.css-dev-only-do-not-override-m4timi).ant-pagination
+  .ant-pagination-item-active
+  a {
+  background-color: #1f4b7f;
+  color: white;
+  border: none;
+}
+
+:where(.css-dev-only-do-not-override-m4timi).ant-pagination
+  .ant-pagination-item {
+  background-color: white;
+  color: #1f4b7f;
+  border: none;
+}
+
+:where(.css-dev-only-do-not-override-m4timi).ant-pagination
+  .ant-pagination-item-active {
+  border: none;
+}
+
+.custom-dragger {
+  border-top: 0.1vw solid #1f4b7f;
+  border-left: 0.1vw solid #1f4b7f;
+  border-right: 0.3vw solid #1f4b7f;
+  border-bottom: 0.3vw solid #1f4b7f;
+  border-radius: 0.5vw;
+}
+
+/* Add this CSS to your stylesheet */
+.no-zoom {
+  touch-action: none;
+  -ms-touch-action: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.custom-table {
+  border-radius: 1vw; /* Adjust the value as needed */
+  overflow: hidden; /* This is important to ensure the rounded corners are visible */
+  border-top: 0.1vw solid #1f4b7f;
+  border-left: 0.1vw solid #1f4b7f;
+  border-right: 0.3vw solid #1f4b7f;
+  border-bottom: 0.3vw solid #1f4b7f;
+}
+
+.custom-table .ant-table-content {
+  border-radius: 1vw; /* Ensure the table content follows the border radius */
+}
+
+.custom-table .ant-table-thead > tr > th {
+  background-color: #1f4b7f;
+  color: white; /* Adjust the text color as needed */
+}
+
+:where(.css-dev-only-do-not-override-m4timi)
+  .ant-table-wrapper
+  .ant-table-column-sorters::after {
+  padding: 0 !important; /* Remove padding */
+  margin: 0 !important; /* Optionally remove margin */
+  background: none !important; /* Ensure no background color */
+  border: none !important; /* Ensure no border */
+}
+
+/* Remove background color and border on hover for the sort icon */
+.custom-table .ant-table-column-sorters:hover {
+  background-color: #1f4b7f; /* Maintain header background color on hover */
+  border: none; /* Remove border */
+}
+
+/* Additional styles to ensure no padding and background for the inner elements */
+.custom-table .ant-table-column-sorters .ant-table-column-sorter-inner:hover {
+  background-color: transparent;
+  padding: 0;
+}
+
+/* Ensuring no background color and border on hover for icons */
+.custom-table .ant-table-column-sorters:hover .anticon,
+.custom-table .ant-table-column-sorters:hover .ant-table-column-sorter-up,
+.custom-table .ant-table-column-sorters:hover .ant-table-column-sorter-down {
+  background-color: transparent;
+}
+
+/* Ensuring no border or shadow effect on the sortable header */
+.custom-table .ant-table-column-sorters:hover {
+  box-shadow: none;
+  outline: none;
+}
+
+/* Remove border from the header when hovering */
+.custom-table .ant-table-thead > tr > th:hover {
+  border: none;
+  box-shadow: none;
+  outline: none;
+}
+
+/* Specific styles for the sort icon container */
+.custom-table .ant-table-column-sorters {
+  background-color: #1f4b7f; /* Ensure the background color is consistent */
+  border: none;
+}
+
+/* In your CSS file */
+iframe {
+  touch-action: none; /* Disables double-tap zoom */
+}
+
+html {
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
+  -ms-content-zooming: none;
+  -ms-user-select: none;
+  overflow: hidden; /* Prevents scrolling */
+}
+.ant-table-cell {
+  padding: 0.3vw !important;
+}
+.ant-table-row .ant-table-row-level-0 {
+  height: 6.5vh;
+}
+
+/* Example CSS */
+.ant-table thead th {
+  height: 6.5vh; /* Adjust height as per your requirement */
+}
+
+/* Example CSS */
+.ant-table-tbody > tr > td {
+  height: 6.5vh; /* Adjust height as per your requirement */
+}
+
+.custom-table .ant-table-thead > tr > th:hover {
+  height: 6.5vh; /* Ensure header height remains consistent */
+}
+.hover-img:hover {
+  border-radius: 0.5vw;
+  border-top: 0.1vw solid #1f4b7f;
+  border-left: 0.1vw solid #1f4b7f;
+  border-right: 0.2vw solid #1f4b7f;
+  border-bottom: 0.2vw solid #1f4b7f;
+}
+/* styles.css (or Pagination.module.css if using CSS Modules) */
+
+.pagination .page-item .page-link {
+  color: #1f4b7f;
+  border: 0.1vw solid #1f4b7f;
+  background-color: white;
+  height: 1vw;
+  border-radius: 0.2vw;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #1f4b7f;
+  /* border-color: #00bfff; */
+  color: white;
+}
+::-webkit-scrollbar {
+  width: 0.3vw; /* Set the width of the scrollbar */
+  border-radius: 0.5vw;
+  padding: 0 0.5vw;
+}
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Color of the track (background behind the scrollbar) */
+  border-radius: 0.5vw;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #1f487c; /* Color of the scrollbar handle */
+  border-radius: 0.5vw;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #1f487c; /* Color of the scrollbar handle when hovered */
+}
+:where(.css-dev-only-do-not-override-m4timi).ant-pagination
+  .ant-pagination-prev
+  .ant-pagination-item-link,
+:where(.css-dev-only-do-not-override-m4timi).ant-pagination
+  .ant-pagination-next
+  .ant-pagination-item-link {
+  /* height: 2.5vw;
+    width: 2.5vw; */
+  height: 4vh;
+  width: 2vw;
+}
+
+/* pagination */
+
+.pagination {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  border-color: #7ab300;
+}
+
+/* .pagination li {
+  margin: 0 5px;
+  cursor: pointer;
+} */
+
+/* .pagination li a {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  color: #007bff;
+  text-decoration: none;
+}
+
+.pagination li.active a {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+} */
+.page-link {
+  cursor: pointer;
+  color: #043e13;
+  border: 1px solid #dee2e6;
+  padding: 0.5vw 0.8vw;
+  margin-left: -1px;
+  height: 1vw;
+  background-color: #fff;
+  &:hover {
+    z-index: 2;
+    color: #7ab300;
+    text-decoration: none;
+    background-color: #e9ecef;
+    border-color: #dee2e6;
+  }
+}
+.page-link.active {
+  background-color: red;
+  border-color: red;
+  color: white;
+}
+.ant-select-outlined:not(.ant-select-customize-input) .ant-select-selector {
+  background: white;
+}
+.ant-collapse-large > .ant-collapse-item > .ant-collapse-header {
+  height: 7.5vh;
+}
+.custom-dropdown {
+  max-height: 15vh;
+  overflow-y: auto;
+}
+.input-otp__field .ant-input {
+  height: 1vw;
+}
+/* .custom-otp-input .ant-input {
+  height: 1vw; 
+  line-height: 1vw; 
+} */
+
+.crop-image::before {
+  content: "";
+  display: inline-block;
+  width: 17px;
+  height: 18px;
+  background-color: #fff;
+  position: absolute;
+  right: 0px;
+  border-radius: 0px 50px 0px 0px;
+  transform: rotate(180deg);
+  top: -1px;
+}
+.crop-image::after {
+  content: "";
+  display: inline-block;
+  width: 19px;
+  height: 21px;
+  background-color: #fff;
+  position: absolute;
+  right: -3px;
+  border-radius: 0px 50px 0px 0px;
+  transform: rotate(-90deg);
+  bottom: -3px;
+}
+/* Dashboard.css */
+
+.reportClass {
+  height: 200px;
+  width: 200px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -21,18 +605,41 @@
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
 }
 
 .App-link {
   color: #61dafb;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.reqman {
+  .anticon svg {
+    color: #1f4b7f;
   }
-  to {
-    transform: rotate(360deg);
+}
+
+.filterdate {
+  color: black;
+}
+
+.react-player-wrapper {
+  position: relative;
+  padding-top: 56.25%;
+  /* border-radius: 1.7vw; */
+  overflow: hidden;
+  object-fit: fill;
+}
+
+.react-player {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: "auto" !important;
+  object-fit: fill;
+  object-position: center;
+}
+.bmail {
+  .ant-select-outlined:not(.ant-select-customize-input) .ant-select-selector {
+    border: none;
   }
 }
