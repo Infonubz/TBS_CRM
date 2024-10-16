@@ -430,7 +430,7 @@ export default function AddBusinessDetails({
                         Back
                       </button>
                       <button
-                        className="bg-[#1F487C] font-semibold rounded-full w-[10vw] h-[2vw] text-[1vw] text-white"
+                        className="bg-[#1F487C] font-semibold rounded-full w-[11vw] h-[2vw] text-[1vw] text-white"
                         type="submit"
                         // onClick={() => setCurrentpage(4)}
                       >

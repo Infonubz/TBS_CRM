@@ -1,6 +1,8 @@
 import axios from "axios";
 import { toast } from "react-toastify";
 import {
+  GET_REQ_ADS,
+  REQ_MAN_OFFERS,
   REQ_MANAGEMENT_DATE_FILTER,
   REQ_PROMOTION_DATA,
   REQUEST_MANAGEMENT_DATA,
@@ -43,6 +45,7 @@ export const statuschange = async (valueid, value, currentid) => {
     req_status: value,
     req_status_id: valueid,
   };
+  console.log(value, valueid, "in the api");
 
   const url = `${apiUrl}/request-management/${currentid}`;
   const method = "put";
@@ -97,10 +100,13 @@ export const ReqPromoStatusChange = async (valueid, value, currentid) => {
     return null;
   }
 };
-export const userStatusActivate = async (valuedata, currentid) => {
+export const userStatusActivate = async (valuedata, currentid, dispatch) => {
+  console.log("call 2", valuedata, currentid);
   const payload = {
     user_status: valuedata,
+    user_status_id: valuedata == "inactive" ? 2 : 1,
   };
+  console.log("call 3", payload);
 
   const url = `${apiUrl}/operators-status/${currentid}`;
   const method = "put";
@@ -114,7 +120,9 @@ export const userStatusActivate = async (valuedata, currentid) => {
         "Content-Type": "application/json",
       },
     });
+    toast.success("Status Updated");
     console.log(response, "responseresponse");
+    GetOperatorData(dispatch);
     return response.data;
   } catch (error) {
     handleError(error);
@@ -168,16 +176,16 @@ export const GetReqPromotionData = async (dispatch, promofilter) => {
     const response = await api.get(
       `${apiUrl}/promo-status/${
         promofilter == "All"
-          ? 4
-          : promofilter == "Pending"
-          ? 0
-          : promofilter == "Approved"
-          ? 1
-          : promofilter == "Rejected"
-          ? 2
-          : promofilter == "Under Review"
-          ? 3
-          : 4
+        ? 4
+        : promofilter == "Pending"
+        ? 0
+        : promofilter == "Approved"
+        ? 2
+        : promofilter == "Rejected"
+        ? 3
+        : promofilter == "Under Review"
+        ? 1
+        : 4
       }`
     );
 
@@ -286,7 +294,192 @@ export const SearchRequestPromotion = async (e, dispatch) => {
     console.log("error in search", err);
   }
 };
+export const GetAllReqManOffers = async (dispatch, filter) => {
+  console.log(filter, "fillllll");
+  try {
+    const responce = await api.get(
+      `${apiUrl}/request-offerStatus/${
+        filter == "All"
+          ? 6
+          : filter == "Pending"
+          ? 1
+          : filter == "Approved"
+          ? 3
+          : filter == "Under Review"
+          ? 4
+          : filter == "Rejected"
+          ? 5
+          : 6
+      }`
+    );
+    dispatch({ type: REQ_MAN_OFFERS, payload: responce.data });
+    console.log(responce.data, "Ressssssssssssssssssssssss");
+  } catch (err) {
+    console.log(err);
+  }
+};
 
+// const dispatch = useDispatch()
+export const ReqManStatusChange = async (
+  updateData,
+  statusid,
+  status,
+  dispatch
+) => {
+  const payload = {
+    status: status,
+    status_id: statusid,
+    req_status:
+      status == "Under Review"
+        ? "Under Review"
+        : status == "Approved"
+        ? "Active"
+        : "Rejected",
+
+    req_status_id: statusid == 2 ? 4 : statusid == 3 ? 3 : 5,
+  };
+  console.log(payload, "loadddddddddddddddddddddd");
+  try {
+    const responce = await api.put(
+      `${apiUrl}/request-management-offer/${updateData}`,
+      payload
+    );
+    // console.log(responce.data,"hellocon");
+    // toast.success(responce.data)
+    GetAllReqManOffers(dispatch);
+    return responce.data;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const ReqManOffersSearch = async (value, dispatch) => {
+  try {
+    if (value) {
+      const responce = await api.get(
+        `${apiUrl}/request-management-offerSearch/${value}`
+      );
+      dispatch({ type: REQ_MAN_OFFERS, payload: responce.data });
+    } else {
+      GetAllReqManOffers(dispatch);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const ReqManOffersDateFilter = async (dispatch, fdate, tdate) => {
+  const payloaddata = {
+    from: fdate,
+    to: tdate,
+  };
+  try {
+    const responce = await api.post(
+      `${apiUrl}/filter-by-dateOffer`,
+      payloaddata
+    );
+    dispatch({ type: REQ_MAN_OFFERS, payload: responce.data });
+  } catch (err) {
+    console.log(err);
+  }
+};
+export const GetRequestAdsData = async (dispatch, adfilter) => {
+  try {
+    const response = await api.get(
+      `${apiUrl}/request-adStatus/${
+        adfilter == "all"
+          ? 6
+          : adfilter == "pending"
+          ? 1
+          : adfilter == "verified"
+          ? 3
+          : adfilter == "under_review"
+          ? 2
+          : adfilter == "rejected"
+          ? 5
+          : 6
+      }`
+    );
+    dispatch({ type: GET_REQ_ADS, payload: response.data });
+    console.log(response, "getAdvertisementlis");
+    return response.data;
+  } catch (error) {
+    handleError(error);
+    return null;
+  }
+};
+export const SearchReqAdvertisement = async (e, dispatch) => {
+  try {
+    if (e) {
+      const responce = await axios.get(`${apiUrl}/request-management-adSearch/${e}`);
+      dispatch({ type: GET_REQ_ADS, payload: responce.data });
+    } else {
+      GetRequestAdsData(dispatch);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+export const ReqAdsStatusChange = async (valueid, valuedata, adId, dispatch) => {
+  const payload = {
+    req_status_id: valueid,
+    req_status: valuedata ,
+    status_id: valueid == 1 ? 2 : valueid == 2 ? 4 : valueid == 3 ? 3 : valueid == 5 ? 5 : 1,
+        status: valuedata == "Approved"
+        ? "Active"
+        : valuedata == "Rejected"
+        ? "Rejected"
+        : valuedata == "Under Review"
+        ? "Pending"
+        : "Requested",
+  };
+
+  const url = `${apiUrl}/request-management-ad/${adId}`;
+  const method = "put";
+
+  try {
+    const response = await api({
+      method,
+      url,
+      data: payload,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    GetRequestAdsData(dispatch);
+    console.log(response, "responseresponse");
+    return response.data;
+  } catch (error) {
+    handleError(error);
+    return null;
+  }
+};
+
+
+
+export const GetReqAdsByDate = async (dispatch, startDate, endDate) => {
+  console.log("hello testing");
+
+  try {
+    const response = await axios.post(
+      `${apiUrl}/filter-by-dateAd`,
+      {
+        from: startDate,
+        to: endDate,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    dispatch({ type: GET_REQ_ADS, payload: response.data });
+
+    console.log(response.data, "hello this is res");
+  } catch (err) {
+    console.log(err, "this is the error");
+  }
+};
 const handleError = (error) => {
   console.error("Error details:", error);
   let errorMessage = "An error occurred";

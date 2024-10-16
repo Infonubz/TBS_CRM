@@ -3,7 +3,7 @@ import Backdrop from "../../asserts/CRMbg.png";
 import { BsPlusLg } from "react-icons/bs";
 import { PiUpload } from "react-icons/pi";
 import { Table, Pagination, Tooltip } from "antd";
-import { IoSearch } from "react-icons/io5";
+import { IoGrid, IoSearch } from "react-icons/io5";
 import ModalPopup from "../Common/Modal/Modal";
 import Ad_Advertisement from "./Add_Advertisement";
 import axios from "axios";
@@ -31,6 +31,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import ReactPlayer from "react-player";
 import "../../App.css";
+import { IoMdMenu } from "react-icons/io";
 
 export default function Advertisement() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -45,7 +46,6 @@ export default function Advertisement() {
   const [deleteData, SetDeleteData] = useState();
   const [tabType, setTabType] = useState("Web");
   const apiUrl = process.env.REACT_APP_API_URL;
-
   const getadlist = useSelector((state) => state.crm.ad_list);
   const getMobileadlist = useSelector((state) => state.crm.mobile_adsList);
 
@@ -56,11 +56,12 @@ export default function Advertisement() {
     }));
   };
 
-  const handleEdit = (adId) => {
+  const handleEdit = (tbs_ad_id) => {
     setIsModalOpen(true);
-    SetUpdateData(adId);
+    SetUpdateData(tbs_ad_id);
+    console.log(tbs_ad_id, "aaaadddddiiiiidddddd");
     // Close popover
-    togglePopover(adId);
+    togglePopover(tbs_ad_id);
   };
 
   const Search = (e) => {
@@ -73,13 +74,13 @@ export default function Advertisement() {
 
   const handleMbleEdit = (tbs_mobad_id) => {
     setIsModalOpen(true);
-    SetMbleUpdateData(tbs_mobad_id);
+    SetUpdateData(tbs_mobad_id);
     togglePopover(tbs_mobad_id);
   };
 
   const closeMbleModal = () => {
     setIsModalOpen(false);
-    SetMbleUpdateData(null);
+    SetUpdateData(null);
     setAdsData("");
   };
 
@@ -114,6 +115,19 @@ export default function Advertisement() {
   }, []);
 
   const webColumns = [
+    // {
+    //   title: (
+    //     <span className="flex justify-center">
+    //       <h1 className="text-[1.2vw] font-semibold">S.No</h1>
+    //     </span>
+    //   ),
+    //   width: "5vw",
+    //   render: (row, rowdta, index) => (
+    //     <div className="flex justify-center ">
+    //       <h1 className="pl-[1vw] text-[1vw] justify-center">{index + 1}</h1>
+    //     </div>
+    //   ),
+    // },
     {
       title: (
         <span className="flex justify-center">
@@ -121,11 +135,15 @@ export default function Advertisement() {
         </span>
       ),
       width: "5vw",
-      render: (row, rowdta, index) => (
-        <div className="flex justify-center ">
-          <h1 className="pl-[1vw] text-[1vw] justify-center">{index + 1}</h1>
-        </div>
-      ),
+      render: (row, rowdta, index) => {
+        // Calculate the serial number based on current page
+        const serialNumber = (activePage - 1) * itemsPerPage + (index + 1);
+        return (
+          <div className="flex justify-center">
+            <h1 className="pl-[1vw] text-[1vw] justify-center">{serialNumber}</h1>
+          </div>
+        );
+      },
     },
     {
       title: (
@@ -248,15 +266,14 @@ export default function Advertisement() {
           </div>
           <div>
             <button
-              className={`${
-                row.status_id == 3
-                  ? "bg-[#34AE2A]"
-                  : row.status_id == 1
+              className={`${row.status_id == 3
+                ? "bg-[#34AE2A]"
+                : row.status_id == 1
                   ? "bg-[#FD3434]"
                   : row.status_id == 2
-                  ? "bg-[#FF9900]"
-                  : "bg-[#FF9900]"
-              } rounded-[0.5vw] text-[1.1vw] mt-[0.5vw] font-semibold text-white w-[9vw] py-[0.2vw]`}
+                    ? "bg-[#FF9900]"
+                    : "bg-[#FF9900]"
+                } rounded-[0.5vw] text-[1.1vw] mt-[0.5vw] font-semibold text-white w-[9vw] py-[0.2vw]`}
             >
               {capitalizeFirstLetter(row.status)}
             </button>
@@ -308,6 +325,19 @@ export default function Advertisement() {
   ];
 
   const mobileColumns = [
+    // {
+    //   title: (
+    //     <span className="flex justify-center">
+    //       <h1 className="text-[1.2vw] font-semibold">S.No</h1>
+    //     </span>
+    //   ),
+    //   width: "5vw",
+    //   render: (row, rowdta, index) => (
+    //     <div className="flex justify-center ">
+    //       <h1 className="pl-[1vw] text-[1vw] justify-center">{index + 1}</h1>
+    //     </div>
+    //   ),
+    // },
     {
       title: (
         <span className="flex justify-center">
@@ -315,11 +345,15 @@ export default function Advertisement() {
         </span>
       ),
       width: "5vw",
-      render: (row, rowdta, index) => (
-        <div className="flex justify-center ">
-          <h1 className="pl-[1vw] text-[1vw] justify-center">{index + 1}</h1>
-        </div>
-      ),
+      render: (row, rowdta, index) => {
+        // Calculate the serial number based on current page
+        const serialNumber = (mble_activePage - 1) * mbleItemsPerPage + (index + 1);
+        return (
+          <div className="flex justify-center">
+            <h1 className="pl-[1vw] text-[1vw] justify-center">{serialNumber}</h1>
+          </div>
+        );
+      },
     },
     {
       title: (
@@ -445,15 +479,14 @@ export default function Advertisement() {
           </div>
           <div>
             <button
-              className={`${
-                row.status_id == 3
-                  ? "bg-[#34AE2A]"
-                  : row.status_id == 1
+              className={`${row.status_id == 3
+                ? "bg-[#34AE2A]"
+                : row.status_id == 1
                   ? "bg-[#FD3434]"
                   : row.status_id == 2
-                  ? "bg-[#FF9900]"
-                  : "bg-[#FF9900]"
-              } rounded-[0.5vw] text-[1.1vw] mt-[0.5vw] font-semibold text-white w-[9vw] py-[0.2vw]`}
+                    ? "bg-[#FF9900]"
+                    : "bg-[#FF9900]"
+                } rounded-[0.5vw] text-[1.1vw] mt-[0.5vw] font-semibold text-white w-[9vw] py-[0.2vw]`}
             >
               {capitalizeFirstLetter(row.status)}
             </button>
@@ -483,26 +516,26 @@ export default function Advertisement() {
                 }}
               />
             ) : (
-                  <div className="react-player-wrapper">
-                    <ReactPlayer
-                      playing
-                      loop
-                      muted
-                      width="100%"
-                      height="auto"
-                      style={{
-                        objectFit: "cover",
-                        objectPosition: "center",
-                      }}
-                      url={`http://192.168.90.47:4000${row.mobad_vdo}`}
-                      className="react-player"
-                    />
-                  </div>
-                  // <video>
-                  //   <source
-                  //     src={`http://192.168.90.47:4000${row.mobad_vdo}`}
-                  //   ></source>
-                  // </video>
+              <div className="react-player-wrapper">
+                <ReactPlayer
+                  playing
+                  loop
+                  muted
+                  width="100%"
+                  height="auto"
+                  style={{
+                    objectFit: "cover",
+                    objectPosition: "center",
+                  }}
+                  url={`http://192.168.90.47:4000${row.mobad_vdo}`}
+                  className="react-player"
+                />
+              </div>
+              // <video>
+              //   <source
+              //     src={`http://192.168.90.47:4000${row.mobad_vdo}`}
+              //   ></source>
+              // </video>
             )}
           </div>
         );
@@ -529,6 +562,7 @@ export default function Advertisement() {
   const mobileAds =
     getMobileadlist?.length > 0 &&
     getMobileadlist?.slice(indexOfFirst, indexOfLast);
+  console.log(mobileAds, 'mobileads')
 
   const AdsList = tabType === "Web" ? currentItems : mobileAds;
   const columns = tabType === "Web" ? webColumns : mobileColumns;
@@ -581,7 +615,7 @@ export default function Advertisement() {
                     color="#1F4B7F"
                   />
                 </div>
-                <div className="flex ml-[3vw]">
+                {/* <div className="flex ml-[3vw]">
                   <div
                     className={`cursor-pointer ${
                       tabType == "Web"
@@ -606,9 +640,56 @@ export default function Advertisement() {
                       Mobile
                     </p>
                   </div>
-                </div>
+                </div> */}
               </div>
-              <div>
+              <div className="flex">
+
+                <div className="flex mr-[3vw] border-[#1F4B7F] h-[5vh] border-l-[0.1vw] border-t-[0.1vw] rounded-l-[0.5vw] rounded-r-[0.5vw] border-r-[0.2vw] border-b-[0.2vw]">
+                  <button
+                    className={`${tabType == "Web" ? "bg-[#1F4B7F]" : "bg-white"
+                      } flex px-[1vw] justify-center gap-[0.5vw] items-center rounded-tl-[0.4vw]   rounded-bl-[0.3vw] `}
+                    style={{
+                      transition: "all 1s",
+                    }}
+                    onClick={() => setTabType("Web")}
+                  >
+                    <span>
+                      <IoMdMenu
+                        size={"1.2vw"}
+                        color={`${tabType == "Web" ? "white" : "#1F4B7F"}`}
+                      />
+                    </span>
+                    <span
+                      className={`${tabType == "Web" ? "text-white" : "text-[#1F4B7F]"
+                        }  text-[1.1vw]`}
+                    >
+                      Web
+                    </span>
+                  </button>
+                  <button
+                    className={`${tabType == "Mobile" ? "bg-[#1F4B7F]" : "bg-white"
+                      } flex px-[1vw] justify-center gap-[0.5vw] items-center rounded-r-[0.3vw]`}
+                    style={{
+                      transition: "all 1s",
+                    }}
+                    onClick={() => setTabType("Mobile")}
+                  >
+                    <span>
+                      <IoGrid
+                        size={"1.2vw"}
+                        color={`${tabType == "Mobile" ? "white" : "#1F4B7F"}`}
+                      />
+                    </span>
+                    <span
+                      className={`${tabType == "Mobile" ? "text-white" : "text-[#1F4B7F]"
+                        }  text-[1.1vw]`}
+                    >
+                      Mobile
+                    </span>
+                  </button>
+                </div>
+
+
                 <button
                   className="bg-[#1F4B7F] flex px-[1vw] h-[5vh] justify-center gap-[0.5vw] items-center rounded-[0.5vw]"
                   onClick={() => setIsModalOpen(true)}
@@ -625,24 +706,49 @@ export default function Advertisement() {
               dataSource={AdsList}
               columns={columns}
               pagination={false}
-              className="custom-table "
+              className="custom-table"
             />
           </div>
           <div className="w-full h-[8vh] flex justify-between items-center">
             <div className="text-[#1f4b7f] flex text-[1.1vw] gap-[0.5vw]">
               <span>Showing</span>
               <span className="font-bold">
-                1 -{" "}
+                {/* 1 -{" "} */}
+                {/* {tabType == "Web"
+                  ?
+                  // getadlist?.length > 0 && getadlist?.length
+                  `${indexOfFirstItem + 1} - ${indexOfFirstItem + currentItems?.length}`
+                  :
+                  // getMobileadlist?.length > 0 && getMobileadlist?.length
+                  ` ${indexOfFirst + 1} - ${indexOfFirst + mobileAds?.length}`
+                } */}
+                {
+                  tabType === "Web"
+                    ? (currentItems && currentItems?.length > 0
+                      ? `${indexOfFirstItem + 1} - ${indexOfFirstItem + currentItems?.length}`
+                      : "0")
+                    : (mobileAds && mobileAds?.length > 0
+                      ? `${indexOfFirst + 1} - ${indexOfFirst + mobileAds?.length}`
+                      : "0")
+                }
+
+                {console.log(currentItems, 'undefined_undefineed')}
+                {console.log(mobileAds, 'mobile_undefined')}
+              </span>
+              <span>from</span>
+              {/* <span className="font-bold">
                 {tabType == "Web"
                   ? getadlist?.length > 0 && getadlist?.length
                   : getMobileadlist?.length > 0 && getMobileadlist?.length}
-              </span>
-              <span>from</span>
+                {console.log(getadlist.length, 'blablablaablaaaa')}
+              </span> */}
               <span className="font-bold">
-                {tabType == "Web"
-                  ? getadlist?.length > 0 && getadlist?.length
-                  : getMobileadlist?.length > 0 && getMobileadlist?.length > 0}
+                {tabType === "Web"
+                  ? (getadlist?.length > 0 ? getadlist?.length : 0)
+                  : (getMobileadlist?.length > 0 ? getMobileadlist?.length : 0)}
+                {console.log(getadlist?.length, 'blablablaablaaaa')}
               </span>
+
               <span>data</span>
             </div>
             <div>
@@ -708,15 +814,15 @@ export default function Advertisement() {
       <ModalPopup
         className="border border-[#1f487c] border-b-8 border-r-8 border-b-[#1f487c] border-r-[#1f487c] rounded-md"
         show={isModalOpen}
-        onClose={tabType == "Web" ? closeModal : closeMbleModal}
+        onClose={closeModal}
         height="auto"
         width="40vw"
         footer={null}
       >
         <Ad_Advertisement
           setIsModalOpen={setIsModalOpen}
-          updatedata={tabType === "Web" ? updatedata : mbleUpdatedata}
-          SetUpdateData={tabType === "Web" ? SetUpdateData : SetMbleUpdateData}
+          updatedata={updatedata}
+          SetUpdateData={SetUpdateData}
           adsdata={adsdata}
           setAdsData={setAdsData}
           tabType={tabType}

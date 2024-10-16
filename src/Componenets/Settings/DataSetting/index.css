@@ -81,8 +81,7 @@
 }
 
 /* Custom styles for the selected option */
-.custom-dropdown
-  .ant-select-item-option-selected:not(.ant-select-item-option-active) {
+.custom-dropdown .ant-select-item-option-selected:not(.ant-select-item-option-active) {
   color: white !important;
   /* Selected option text color */
 }
@@ -102,6 +101,7 @@
 .custom-option .icon {
   margin-left: 0.5vw;
 }
+
 .ant-btn-default:not(:disabled):not(.ant-btn-disabled):hover {
   color: #1f4b7f;
   border-color: #1f4b7f;
@@ -126,7 +126,7 @@
 
 /* Overriding inline styles for selected item */
 .custom-select .ant-select-selection-item {
-  color: #f8f8f8 !important;
+  color: #000000 !important;
 }
 
 /* Ensure the input text (if any) is also the same color */
@@ -153,6 +153,27 @@
   width: 1vw;
   height: 1vw;
   margin-right: 0.5vw;
+}
+
+.custom-select .ant-select-selector {
+  border: none !important;
+  /* Remove border */
+  box-shadow: none !important;
+  /* Remove any box shadow */
+}
+
+.custom-select .ant-select {
+  border: none !important;
+  /* Ensure the outer container has no border */
+  box-shadow: none !important;
+  /* Remove any box shadow */
+}
+
+.custom-select .ant-select-focused .ant-select-selector {
+  border: none !important;
+  /* Remove border when focused */
+  box-shadow: none !important;
+  /* Remove box shadow when focused */
 }
 
 .drag .ant-upload-wrapper .ant-upload-drag {
@@ -185,8 +206,7 @@
 }
 
 /* Custom styles for the selected option */
-.custom-dropdown
-  .ant-select-item-option-selected:not(.ant-select-item-option-active) {
+.custom-dropdown .ant-select-item-option-selected:not(.ant-select-item-option-active) {
   color: white !important;
   /* Selected option text color */
 }

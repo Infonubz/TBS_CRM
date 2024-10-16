@@ -4,11 +4,16 @@ import React, { useEffect, useState } from "react";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
+import { useDispatch, useSelector } from "react-redux";
 import {
   GetEmpAddressById,
   submitEmployeeAddressData,
 } from "../../../Api/UserManagement/Employee";
-import { GetPatAddressById, submitPartnerAddressData } from "../../../Api/UserManagement/Partner";
+import {
+  GetPatAddressById,
+  submitPartnerAddressData,
+  GetPartnerData
+} from "../../../Api/UserManagement/Partner";
 
 const validationSchema = Yup.object().shape({
   temp_address: Yup.string().required("Temporary Address is required"),
@@ -22,34 +27,48 @@ const validationSchema = Yup.object().shape({
 });
 export default function AddRegisterAddress({
   setCurrentpage,
-  EmployeeID,
-  setEmployeeID,
+  PartnerID,
+  setPartnerID,
+  addressback,
+  setproffesionaback,
+  proffesionaback,
+  setAddressBack,
+  setModalIsOpen
 }) {
+
+  const dispatch = useDispatch();
+  const [enable, setEnable] = useState(false);
+
   const handleSubmit = async (values) => {
     // setCurrentpage(3);
-
-    console.log("hihii54455");
-    if (EmployeeID) {
+    if (PartnerID && enable == false) {
       setCurrentpage(3);
-    } else {
+    }else {
       try {
-        const data = await submitPartnerAddressData(values);
+        const data = await submitPartnerAddressData(
+          values,
+          PartnerID,
+          dispatch
+        );
         // setModalIsOpen(false);
+        console.log(data,"hihii54455");
         toast.success(data?.message);
         setCurrentpage(3);
-        // GetOffersData(dispatch);
+        GetPartnerData(dispatch);
         console.log(data);
       } catch (error) {
         console.error("Error uploading data", error);
       }
     }
   };
+
   const [empaddressdata, setEmpAddressData] = useState("");
+
   const fetchGetUser = async () => {
     try {
       const data = await GetPatAddressById(
-        EmployeeID,
-        setEmployeeID,
+        PartnerID,
+        setPartnerID,
         setEmpAddressData
       );
       setEmpAddressData(data);
@@ -59,20 +78,34 @@ export default function AddRegisterAddress({
   };
 
   useEffect(() => {
-    if (EmployeeID != null) {
+    if (PartnerID != null || proffesionaback) {
       fetchGetUser();
     }
-  }, [EmployeeID, setEmployeeID, setEmpAddressData]);
+  }, [PartnerID, setPartnerID, setEmpAddressData, proffesionaback]);
+
+
   return (
+
     <div>
       <div className="border-l-[0.1vw] h-[28vw] overflow-y-scroll px-[2vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f]">
         <div className="h-[4vw] w-full flex items-center justify-between ">
           <label className="text-[1.5vw] font-semibold text-[#1f4b7f] ">
             Registered Address
           </label>
-          <button className="rounded-full font-semibold w-[6vw] h-[2vw] flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] border-[#34AE2A] text-[1.1vw] text-[#34AE2A] ">
-            Save
-          </button>
+         {PartnerID || proffesionaback ? (
+            <button
+              className={`${
+                enable
+                  ? "bg-[#1f4b7f] text-white"
+                  : "text-[#1f4b7f] bg-white border-[#1f4b7f]"
+              } rounded-full font-semibold w-[10vw] h-[2vw] flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] text-[1.1vw] `}
+              onClick={() => setEnable(!enable)}
+            >
+              Enable to Edit
+            </button>
+          ) : (
+            ""
+          )}
         </div>
         <div className="pb-[1vw] ">
           <div className="border-b-[0.1vw] w-full border-[#1f4b7f] "></div>
@@ -80,20 +113,20 @@ export default function AddRegisterAddress({
         <div>
           <Formik
             initialValues={{
-              temp_address: empaddressdata || "",
-              temp_country: empaddressdata || "",
-              temp_state: empaddressdata || "",
-              temp_city: empaddressdata || "",
-              per_address: empaddressdata || "",
-              per_country: empaddressdata || "",
-              per_state: empaddressdata || "",
-              per_city: empaddressdata || "",
-              per_postal: empaddressdata || "",
-              temp_postal: empaddressdata || "",
+              temp_address: empaddressdata?.temp_add || "",
+              temp_country: empaddressdata?.temp_country || "",
+              temp_state: empaddressdata?.temp_state || "",
+              temp_city: empaddressdata?.temp_city || "",
+              per_address: empaddressdata?.perm_add || "",
+              per_country: empaddressdata?.perm_country || "",
+              per_state: empaddressdata?.perm_state || "",
+              per_city: empaddressdata?.perm_city || "",
+              per_postal: empaddressdata?.perm_zip_code || "",
+              temp_postal: empaddressdata?.temp_zip_code || "",
             }}
             validationSchema={validationSchema}
             onSubmit={(values) => {
-              console.log("hellooocsxpspxspxps");
+              console.log(values, "hellooocsxpspxspxps");
               handleSubmit(values);
             }}
             enableReinitialize
@@ -154,9 +187,22 @@ export default function AddRegisterAddress({
                         <Field
                           type="text"
                           name="temp_address"
-                          placeholder="Enter First Name"
-                          // value={values.firstname}
-                          className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                          placeholder="Enter Temperory Address"
+                          value={values.temp_address}
+                          disabled={
+                            PartnerID || proffesionaback
+                              ? enable
+                                ? false
+                                : true
+                              : false
+                          }
+                          className={`${
+                            PartnerID || proffesionaback
+                              ? enable == false
+                                ? " cursor-not-allowed"
+                                : ""
+                              : ""
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                         />
                         <ErrorMessage
                           name="temp_address"
@@ -174,9 +220,22 @@ export default function AddRegisterAddress({
                         <Field
                           type="text"
                           name="per_address"
-                          placeholder="Enter Last Name"
-                          // value={values.firstname}
-                          className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                          placeholder="Enter Permenant Address"
+                          value={values.per_address}
+                          disabled={
+                            PartnerID || proffesionaback
+                              ? enable
+                                ? false
+                                : true
+                              : false
+                          }
+                          className={`${
+                            PartnerID || proffesionaback
+                              ? enable == false
+                                ? " cursor-not-allowed"
+                                : ""
+                              : ""
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                         />
                         <ErrorMessage
                           name="per_address"
@@ -201,7 +260,20 @@ export default function AddRegisterAddress({
                             handleChange(e);
                             localStorage.setItem("status", e.target.value);
                           }}
-                          className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                          disabled={
+                            PartnerID || proffesionaback
+                              ? enable
+                                ? false
+                                : true
+                              : false
+                          }
+                          className={`${
+                            PartnerID || proffesionaback
+                              ? enable == false
+                                ? " cursor-not-allowed"
+                                : ""
+                              : ""
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                         >
                           <option
                             label="Select Country"
@@ -241,7 +313,20 @@ export default function AddRegisterAddress({
                             handleChange(e);
                             localStorage.setItem("status", e.target.value);
                           }}
-                          className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                          disabled={
+                            PartnerID || proffesionaback
+                              ? enable
+                                ? false
+                                : true
+                              : false
+                          }
+                          className={`${
+                            PartnerID || proffesionaback
+                              ? enable == false
+                                ? " cursor-not-allowed"
+                                : ""
+                              : ""
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                         >
                           <option
                             label="Select Country"
@@ -283,7 +368,20 @@ export default function AddRegisterAddress({
                             handleChange(e);
                             localStorage.setItem("status", e.target.value);
                           }}
-                          className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                          disabled={
+                            PartnerID || proffesionaback
+                              ? enable
+                                ? false
+                                : true
+                              : false
+                          }
+                          className={`${
+                            PartnerID || proffesionaback
+                              ? enable == false
+                                ? " cursor-not-allowed"
+                                : ""
+                              : ""
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                         >
                           <option label="Select State" value="" className="" />
                           <option
@@ -315,7 +413,20 @@ export default function AddRegisterAddress({
                             handleChange(e);
                             localStorage.setItem("status", e.target.value);
                           }}
-                          className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                          disabled={
+                            PartnerID || proffesionaback
+                              ? enable
+                                ? false
+                                : true
+                              : false
+                          }
+                          className={`${
+                            PartnerID || proffesionaback
+                              ? enable == false
+                                ? " cursor-not-allowed"
+                                : ""
+                              : ""
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                         >
                           <option label="Select State" value="" className="" />
                           <option
@@ -349,7 +460,20 @@ export default function AddRegisterAddress({
                             handleChange(e);
                             localStorage.setItem("status", e.target.value);
                           }}
-                          className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                          disabled={
+                            PartnerID || proffesionaback
+                              ? enable
+                                ? false
+                                : true
+                              : false
+                          }
+                          className={`${
+                            PartnerID || proffesionaback
+                              ? enable == false
+                                ? " cursor-not-allowed"
+                                : ""
+                              : ""
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                         >
                           <option label="Select City" value="" className="" />
                           <option
@@ -389,7 +513,20 @@ export default function AddRegisterAddress({
                             handleChange(e);
                             localStorage.setItem("status", e.target.value);
                           }}
-                          className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                          disabled={
+                            PartnerID || proffesionaback
+                              ? enable
+                                ? false
+                                : true
+                              : false
+                          }
+                          className={`${
+                            PartnerID || proffesionaback
+                              ? enable == false
+                                ? " cursor-not-allowed"
+                                : ""
+                              : ""
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                         >
                           <option label="Select City" value="" className="" />
                           <option
@@ -427,8 +564,21 @@ export default function AddRegisterAddress({
                           type="text"
                           name="temp_postal"
                           placeholder="Enter Postal Code"
-                          // value={values.firstname}
-                          className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                          value={values.temp_postal}
+                          disabled={
+                            PartnerID || proffesionaback
+                              ? enable
+                                ? false
+                                : true
+                              : false
+                          }
+                          className={`${
+                            PartnerID || proffesionaback
+                              ? enable == false
+                                ? " cursor-not-allowed"
+                                : ""
+                              : ""
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                         />
                         <ErrorMessage
                           name="temp_postal"
@@ -448,7 +598,20 @@ export default function AddRegisterAddress({
                           name="per_postal"
                           placeholder="Enter Postal Code"
                           value={values.per_postal}
-                          className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                          disabled={
+                            PartnerID || proffesionaback
+                              ? enable
+                                ? false
+                                : true
+                              : false
+                          }
+                          className={`${
+                            PartnerID || proffesionaback
+                              ? enable == false
+                                ? " cursor-not-allowed"
+                                : ""
+                              : ""
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                         />
                         <ErrorMessage
                           name="per_postal"
@@ -461,23 +624,30 @@ export default function AddRegisterAddress({
 
                   <div className="flex items-center justify-between  py-[1vw]">
                     <div>
-                      <h1 className="text-[#1F4B7F] text-[0.8vw] font-semibold">
+                      <h1 className="text-[#1F4B7F] text-[0.7vw] font-semibold">
                         *You must fill in all fields to be able to continue
                       </h1>
                     </div>
-                    <div className="flex items-center gap-x-[1vw]">
+                    <div className="flex items-center gap-x-[0.7vw]">
                       <button
                         className="border-[#1F487C] w-[5vw] font-semibold text-[1vw] h-[2vw] rounded-full border-r-[0.2vw]  border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw]"
-                        onClick={() => setCurrentpage(1)}
+                        onClick={() => {
+                          setCurrentpage(1);
+                          setAddressBack(true);
+                        }}
                       >
                         Back
                       </button>
                       <button
-                        className="bg-[#1F487C] font-semibold rounded-full w-[7vw] h-[2vw] text-[1vw] text-white"
+                        className="bg-[#1F487C] font-semibold rounded-full w-[11vw] h-[2vw] text-[1vw] text-white"
                         type="submit"
                         // onClick={() => setCurrentpage(3)}
                       >
-                        Continue
+                        {PartnerID || proffesionaback
+                          ? enable
+                            ? "Update & Continue"
+                            : "Continue"
+                          : "Continue"}{" "}
                       </button>
                     </div>
                   </div>

@@ -12,7 +12,7 @@ import { ClientStatusUpdateApi } from "../../../Api/UserManagement/Client";
 export default function ClientStatusUpdate({ clientid, setViewModal }) {
   const dispatch = useDispatch();
   const handlechange = async (valueid, valuedata) => {
-    console.log(clientid,"clientidgggg");
+    console.log(clientid, "clientidgggg");
     try {
       const data = await ClientStatusUpdateApi(
         valueid,
@@ -52,7 +52,7 @@ export default function ClientStatusUpdate({ clientid, setViewModal }) {
           className="items-center text-[0.9vw] text-white  space-x-[0.7vw] px-[0.8vw] w-[8vw] h-[2vw] bg-[#FF1100] rounded-[0.5vw]"
           onClick={() => handlechange(2, "InActive")}
         >
-          InActive
+          Inactive
         </button>
       </div>
     </div>

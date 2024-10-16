@@ -29,6 +29,8 @@ const ClientTableView = ({
   currentData,
   setClientID,
   clientID,
+  setDeleteModalIsOpen,
+  deletemodalIsOpen,
 }) => {
   const [sortedInfo, setSortedInfo] = useState({});
   const handleChange = (pagination, filters, sorter) => {
@@ -39,6 +41,7 @@ const ClientTableView = ({
   const get_operator_list = useSelector((state) => state.crm.operator_list);
   const [viewmodal, setViewModal] = useState(false);
   const [statusclientid, setStatusClientId] = useState(null);
+
   const columns = [
     {
       title: (
@@ -49,16 +52,15 @@ const ClientTableView = ({
       align: "center",
       render: (row) => {
         console.log(row, "rowrowrow");
-        const image = `http://192.168.90.47:4000${row?.profile_img}`;
+        const image = `http://192.168.90.47:4000${row?.company_logo}`;
         console.log(image, "imageimage");
         return (
           <div className="flex justify-center items-center">
             <img
-              src={`${
-                row?.profile_img == null || "null"
-                  ? UserProfile
-                  : `http://192.168.90.47:4000${row?.profile_img}`
-              } `}
+              src={`${row?.company_logo
+                ? `http://192.168.90.47:4000${row?.company_logo}`
+                : UserProfile
+                } `}
               alt="Photo"
               className="w-[2.15vw] h-[2.15vw] object-cover rounded-[0.2vw]"
             />
@@ -68,11 +70,11 @@ const ClientTableView = ({
       width: "6vw",
     },
     {
-      title: <div className="flex  font-bold text-[1.2vw]">Client Name</div>, // dataIndex: "name",
+      title: <div className="flex items-center justify-center  font-bold text-[1.2vw]">Client Name</div>, // dataIndex: "name",
       key: "name",
       sorter: (a, b) => {
-        const nameA = `${a.firstname} ${a.lastname}`.toUpperCase();
-        const nameB = `${b.firstname} ${b.lastname}`.toUpperCase();
+        const nameA = a.owner_name.toUpperCase();
+        const nameB = b.owner_name.toUpperCase();
         return nameA.localeCompare(nameB);
       },
       width: "12vw",
@@ -85,15 +87,19 @@ const ClientTableView = ({
     },
 
     {
-      title: <div className="flex font-bold text-[1.2vw]">Mobile</div>,
+      title: <div className="flex items-center justify-center font-bold text-[1.2vw]">Mobile</div>,
       key: "mobile",
-      sorter: (a, b) => a.mobilenumber.length - b.mobilenumber.length,
+      sorter: (a, b) => {
+        const phoneA = a.phone ? a.phone.replace(/\D/g, '') : '';
+        const phoneB = b.phone ? b.phone.replace(/\D/g, '') : '';
+        return phoneA.localeCompare(phoneB);
+      },
       sortOrder: sortedInfo.columnKey === "mobile" ? sortedInfo.order : null,
       ellipsis: true,
       width: "10vw",
       render: (text, row) => {
         return (
-          <div className="flex items-center">
+          <div className="flex items-center justify-center">
             <p className="text-[1.1vw]">{row.phone}</p>
           </div>
         );
@@ -103,29 +109,29 @@ const ClientTableView = ({
       title: <div className="flex  font-bold text-[1.2vw]">Email</div>,
       // dataIndex: "email",
       key: "email",
-      sorter: (a, b) => a.emailid.length - b.emailid.length,
+      sorter: (a, b) => a.emailid?.length - b.emailid?.length,
       sortOrder: sortedInfo.columnKey === "email" ? sortedInfo.order : null,
       ellipsis: true,
       width: "15vw",
       render: (row) => {
         return (
-          <div className="flex items-center">
+          <div className="flex items-center justify-center">
             <p className="text-[1.1vw]">{row.emailid}</p>
           </div>
         );
       },
     },
     {
-      title: <div className="flex  font-bold text-[1.2vw]">Created</div>,
+      title: <div className="flex items-center justify-center  font-bold text-[1.2vw]">Created</div>,
       // dataIndex: "created",
-      // key: "created",
-      sorter: (a, b) => a.created.length - b.created.length,
-      sortOrder: sortedInfo.columnKey === "created" ? sortedInfo.order : null,
+      key: "created_date",
+      sorter: (a, b) => new Date(a.created_date) - new Date(b.created_date),
+      sortOrder: sortedInfo.columnKey === "created_date" && sortedInfo.order,
       ellipsis: true,
       width: "10vw",
       render: (row) => {
         return (
-          <div className="flex  items-center">
+          <div className="flex items-center justify-center">
             <p className="text-[1.1vw]">
               {dayjs(row.created_date).format("DD MMM, YY")}
             </p>
@@ -135,7 +141,7 @@ const ClientTableView = ({
     },
     {
       title: (
-        <div className="flex justify-center font-bold text-[1.2vw]">Status</div>
+        <div className="flex items-center justify-center font-bold text-[1.2vw]">Status</div>
       ),
       // dataIndex: "status",
       // key: "status",
@@ -145,17 +151,15 @@ const ClientTableView = ({
           <div className="flex items-center justify-center">
             {row.status_id != null ? (
               <button
-                className={`${
-                  row.status_id == 0
-                    ? "bg-[#FF6B00]"
-                    : row.status_id == 1
+                className={`${row.status_id == 0
+                  ? "bg-[#FF6B00]"
+                  : row.status_id == 1
                     ? "bg-[#38ac2c]"
                     : row.status_id == 2
-                    ? "bg-[#FD3434]"
-                    : "bg-[#2A99FF]"
-                } ${
-                  row.status_id == 0 ? "cursor-not-allowed" : "cursor-pointer"
-                } h-[1.8vw] text-[1.1vw] text-white w-[8vw] rounded-[0.5vw]`}
+                      ? "bg-[#FD3434]"
+                      : "bg-[#2A99FF]"
+                  } ${row.status_id == 0 ? "cursor-not-allowed" : "cursor-pointer"
+                  } h-[1.8vw] text-[1.1vw] text-white w-[8vw] rounded-[0.5vw]`}
                 onClick={() => {
                   setViewModal(true);
                   setStatusClientId(row.tbs_client_id);
@@ -173,7 +177,7 @@ const ClientTableView = ({
     },
     {
       title: (
-        <div className="flex justify-center font-bold text-[1.2vw]">Action</div>
+        <div className="flex items-center justify-center font-bold text-[1.2vw]">Action</div>
       ),
       // dataIndex: "action",
       // key: "action",
@@ -238,15 +242,19 @@ const ClientTableView = ({
     console.log(`Delete record with key: ${""}`);
     // Add your delete logic here
   };
-  const [deletemodalIsOpen, setDeleteModalIsOpen] = useState(false);
+
   const closeDeleteModal = () => {
     setDeleteModalIsOpen(false);
   };
+
   const apiUrl = process.env.REACT_APP_API_URL;
+
   const closeModal = () => {
     setViewModal(false);
   };
+
   console.log(clientID, "clientIDclientID");
+
   return (
     <>
       <Table

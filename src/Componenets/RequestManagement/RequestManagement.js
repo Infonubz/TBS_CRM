@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Backdrop from "../../asserts/CRMbg.png";
 import { IoGrid, IoSearch } from "react-icons/io5";
 import { IoMdMenu } from "react-icons/io";
@@ -12,10 +12,16 @@ import dayjs from "dayjs";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  GetAllReqManOffers,
+  GetReqAdsByDate,
   GetReqOperatorByDate,
   GetReqPromotionByDate,
   GetReqPromotionData,
+  GetRequestAdsData,
   GetRequestManagementData,
+  ReqManOffersDateFilter,
+  ReqManOffersSearch,
+  SearchReqAdvertisement,
   SearchReqOperator,
   SearchRequestPromotion,
 } from "../../Api/RequestManagement/RequestManagement";
@@ -30,8 +36,26 @@ import {
 import { Select } from "antd";
 import ReqPromotion from "./ReqPromotion";
 import moment from "moment/moment";
+import ReqAdvertisement from "./Advertisement";
+import ReqOffers from "./Offers";
+import { IoMdArrowDropdown } from "react-icons/io";
+// import { GetAllReqManOffers, ReqManOffersDateFilter, ReqManOffersSearch } from "../../Api/RequestManagement/RequestManagementOffers";
 const { RangePicker } = DatePicker;
 export default function RequestManagement() {
+  const getadslist = useSelector((state) => state.crm.get_req_ads);
+  const [adfilter, SetAdFilter] = useState("all");
+  const [adsactivePage, setAdsActivePage] = useState(1);
+  const adsitemsPerPage = 10; // Number of items to display per page
+
+  const adsindexOfLastItem = adsactivePage * adsitemsPerPage;
+  const adsindexOfFirstItem = adsindexOfLastItem - adsitemsPerPage;
+  const adscurrentItems =
+    getadslist?.length > 0 &&
+    getadslist?.slice(adsindexOfFirstItem, adsindexOfLastItem);
+
+  const handleOfferPageChange = (pageNumber) => {
+    setAdsActivePage(pageNumber);
+  };
   const [view, setView] = useState("operator");
   const [filter, SetFilter] = useState("all");
   const [search, SetSearch] = useState("");
@@ -44,13 +68,24 @@ export default function RequestManagement() {
   const [operatorId, setOperatorId] = useState(null);
   const [verifyData, setVerifyData] = useState("");
   const [getData, setGetData] = useState("");
+  const [dateClear, setDateClear] = useState()
   const get_rq_man_data = useSelector((state) => state.crm.request_management);
   const getpromotionlist = useSelector((state) => state.crm.req_promotion);
 
+  //offers vikram
+  //************************************************ */
+  const get_req_man_offers = useSelector((state) => state.crm.req_man_offers);
+  //************************************************** */
+
   const [showtable, setShowTable] = useState(1);
+  console.log(showtable, 'show_table')
+  const dispatch = useDispatch();
+
+
 
   useEffect(() => {
     if (showtable == 1) {
+      // setDateClear("")
       GetRequestManagementData(dispatch, filter);
     }
   }, [showtable, filter]);
@@ -180,20 +215,21 @@ export default function RequestManagement() {
       ),
       render: (row) => {
         // console.log("statuus", row.req_status);
+        //##############################################VIKRAM ##########################
         return (
           <div className="flex justify-center">
             <button
-              className={`${
-                row?.req_status == "verified"
-                  ? "bg-[#34AE2A]"
-                  : row?.req_status == "pending"
+              className={`${row?.req_status == "verified" || "Verified"
+                ? "bg-[#34AE2A]"
+                : row?.req_status == "pending" || "Pending"
                   ? "bg-[#FFD600]"
-                  : row?.req_status == "rejected"
-                  ? "bg-[#FF1100]"
-                  : row?.req_status == "under review"
-                  ? "bg-[#FF6B00]"
-                  : "bg-[#ffffff]"
-              } rounded-[0.5vw] font-semibold text-white w-[7vw] py-[0.2vw]`}
+                  : row?.req_status == "rejected" || "Rejected"
+                    ? "bg-[#FF1100]"
+                    : row?.req_status == "under review" || "Under Review"
+                      ? "bg-[#2A99FF]"
+                      : "bg-[#ffffff]"
+                } rounded-[0.5vw] font-semibold text-white w-[7vw] py-[0.2vw]`}
+            // #########################################################################################
             >
               {row?.req_status}
             </button>
@@ -233,7 +269,7 @@ export default function RequestManagement() {
     currentPage * pageSize
   );
 
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   const [activePage, setActivePage] = useState(1);
   const itemsPerPage = 10; // Number of items to display per page
 
@@ -246,13 +282,24 @@ export default function RequestManagement() {
   );
 
   // Handle page change
+
+  //*vikram*  offers********************************** */
   const handlePageChange = (pageNumber) => {
-    setActivePage(pageNumber);
+    if (showtable == 1) {
+      setActivePage(pageNumber);
+    } else if (showtable == 3) {
+      setPromoActivePage(pageNumber);
+    } else {
+      setOfferActivePage(pageNumber);
+    }
   };
+
+  //*************************************** */
 
   const onChange = (value) => {
     setShowTable(value);
     console.log(`selected ${value}`);
+    setDateClear("")
   };
   const [promoactivePage, setPromoActivePage] = useState(1);
   const promoitemsPerPage = 10; // Number of items to display per page
@@ -266,6 +313,7 @@ export default function RequestManagement() {
   const handlePrmoPageChange = (pageNumber) => {
     setPromoActivePage(pageNumber);
   };
+
   const [promofilter, SetPromoFilter] = useState("All");
 
   useEffect(() => {
@@ -273,6 +321,34 @@ export default function RequestManagement() {
       GetReqPromotionData(dispatch, promofilter);
     }
   }, [showtable, promofilter]);
+
+  //****************************************************** */
+  //offers vikram
+
+  const [offerActivePage, setOfferActivePage] = useState(1);
+  const offerItemsPerPage = 10;
+
+  const offerIndexOfLastItem = offerActivePage * offerItemsPerPage;
+  const offerIndexOfFirstItem = offerIndexOfLastItem - offerItemsPerPage;
+  const offerCurrentItems =
+    get_req_man_offers.length > 0 &&
+    get_req_man_offers?.slice(offerIndexOfFirstItem, offerIndexOfLastItem);
+  console.log(offerCurrentItems, "cur items", offerIndexOfFirstItem, "first", offerIndexOfLastItem, "last", "request management offers");
+
+  const [offerfilter, SetOfferFilter] = useState("All");
+  useEffect(() => {
+    if (showtable == 5) {
+      GetAllReqManOffers(dispatch, offerfilter);
+    }
+  }, [showtable, offerfilter]);
+
+  useEffect(() => {
+    setActivePage(1);
+    setPromoActivePage(1);
+    setOfferActivePage(1);
+  }, [offerfilter, promofilter, filter]);
+
+  ////********************************************************************* */
 
   console.log(showtable, "showtableshowtable");
 
@@ -292,9 +368,12 @@ export default function RequestManagement() {
 
   // }
 
+  // #########################################VIKRAM#############################
+
   const datefilter = async (values) => {
     if (showtable == 1) {
       try {
+        setDateClear(values)
         // console.log(values[0].$d.toISOString().split('T')[0],"datevaluesss1")
         // console.log(values[1].$d.toISOString().split('T')[0],"datevaluesss2")
 
@@ -315,8 +394,9 @@ export default function RequestManagement() {
         console.log(err, "iam the error");
         GetRequestManagementData(dispatch);
       }
-    } else {
+    } else if (showtable == 3) {
       try {
+        setDateClear(values)
         await GetReqPromotionByDate(
           dispatch,
           moment(values[0].$d).format("YYYY-MM-DD"),
@@ -326,6 +406,36 @@ export default function RequestManagement() {
       } catch (err) {
         console.log(err);
         GetReqPromotionData(dispatch);
+      }
+    } else if (showtable == 4) {
+      try {
+        setDateClear(values)
+        await GetReqAdsByDate(
+          dispatch,
+          moment(values[0].$d).format("YYYY-MM-DD"),
+          moment(values[1].$d).format("YYYY-MM-DD")
+        );
+        // functioncall()
+      } catch (err) {
+        console.log(err, "iam the error");
+        GetRequestAdsData(dispatch);
+      }
+    } else {
+      try {
+        setDateClear(values)
+        await ReqManOffersDateFilter(
+          dispatch,
+          moment(values[0].$d).format("YYYY-MM-DD"),
+          moment(values[1].$d).format("YYYY-MM-DD")
+        );
+        console.log(
+          moment(values[0].$d).format("YYYY-MM-DD"),
+          moment(values[1].$d).format("YYYY-MM-DD"),
+          "this is promotion request 11"
+        );
+      } catch (err) {
+        console.log(err);
+        GetAllReqManOffers(dispatch);
       }
     }
 
@@ -340,11 +450,28 @@ export default function RequestManagement() {
     if (showtable == 1) {
       console.log(e.target.value, "e values");
       SearchReqOperator(e.target.value, dispatch);
-    } else {
+    } else if (showtable == 3) {
       console.log(e.target.value, "search e value");
       SearchRequestPromotion(e.target.value, dispatch);
+    } else if (showtable == 4) {
+      console.log(e.target.value, "search e value");
+      SearchReqAdvertisement(e.target.value, dispatch);
+    } else {
+      ReqManOffersSearch(e.target.value, dispatch);
+      console.log(e.target.value, "evalues");
     }
   };
+  // ######################################################################
+  useEffect(() => {
+    if (showtable == 4) {
+      GetRequestAdsData(dispatch, adfilter);
+    }
+    console.log(adfilter, "adfilter");
+  }, [showtable, adfilter]);
+  //offer
+  console.log(getadslist, "adscurrentItemsadscurrentItems");
+
+
 
   return (
     <>
@@ -362,13 +489,14 @@ export default function RequestManagement() {
               <h1 className="text-[#1F4B7F]  text-[1.5vw] font-bold">
                 {`REQUEST MANAGEMENT`}
               </h1>
-              <span className="text-[1vw]  text-[#1F4B7F] font-semibold">{`  -  (${
-                showtable == 1
-                  ? "Operator"
-                  : showtable == 2
-                  ? "Partner"
-                  : "Promotion"
-              })`}</span>
+              <span className="text-[1vw]  text-[#1F4B7F] font-semibold">{`  -  (${showtable == 1
+                ? "Operator"
+                : showtable == 3
+                  ? "Promotion"
+                  : showtable == 4 ?
+                    "Advertisment"
+                    : "Offers"
+                })`}</span>
             </div>
             <div className="pb-[0.5vw] flex justify-between h-full items-center ">
               {/* <div className="relative flex items-center ">
@@ -388,7 +516,7 @@ export default function RequestManagement() {
                 <input
                   type="text"
                   className="bg-white outline-none pl-[2vw] w-[20vw] h-[2.5vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw] border-r-[0.2vw] border-b-[0.2vw]"
-                  placeholder="Search Operators"
+                  placeholder="Search ....."
                   onChange={(e) => {
                     SearchRequest(e);
                   }}
@@ -402,11 +530,10 @@ export default function RequestManagement() {
               {showtable == 1 ? (
                 <div className="flex gap-x-[2.5vw] text-[1.3vw]">
                   <div
-                    className={` cursor-pointer ${
-                      filter == "all"
-                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                        : ""
-                    } `}
+                    className={` cursor-pointer ${filter == "all"
+                      ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                      : ""
+                      } `}
                     onClick={() => {
                       SetFilter("all");
                     }}
@@ -416,11 +543,10 @@ export default function RequestManagement() {
                     </p>
                   </div>
                   <div
-                    className={` cursor-pointer ${
-                      filter == "pending"
-                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                        : ""
-                    } `}
+                    className={` cursor-pointer ${filter == "pending"
+                      ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                      : ""
+                      } `}
                     onClick={() => {
                       SetFilter("pending");
                     }}
@@ -430,11 +556,10 @@ export default function RequestManagement() {
                     </p>
                   </div>
                   <div
-                    className={` cursor-pointer ${
-                      filter == "verified"
-                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                        : ""
-                    } `}
+                    className={` cursor-pointer ${filter == "verified"
+                      ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                      : ""
+                      } `}
                     onClick={() => {
                       SetFilter("verified");
                     }}
@@ -444,11 +569,10 @@ export default function RequestManagement() {
                     </p>
                   </div>
                   <div
-                    className={` cursor-pointer ${
-                      filter == "under_review"
-                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                        : ""
-                    } `}
+                    className={` cursor-pointer ${filter == "under_review"
+                      ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                      : ""
+                      } `}
                     onClick={() => {
                       SetFilter("under_review");
                     }}
@@ -458,11 +582,10 @@ export default function RequestManagement() {
                     </p>
                   </div>
                   <div
-                    className={` cursor-pointer ${
-                      filter == "rejected"
-                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                        : ""
-                    } `}
+                    className={` cursor-pointer ${filter == "rejected"
+                      ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                      : ""
+                      } `}
                     onClick={() => {
                       SetFilter("rejected");
                     }}
@@ -472,80 +595,212 @@ export default function RequestManagement() {
                     </p>
                   </div>
                 </div>
-              ) : (
-                <div className="flex gap-x-[2.5vw] text-[1.3vw]">
-                  <div
-                    className={` cursor-pointer ${
-                      promofilter == "All"
+              ) : // ###############################################VIKRAM#######################
+                showtable == 3 ? (
+                  <div className="flex gap-x-[2.5vw] text-[1.3vw]">
+                    <div
+                      className={` cursor-pointer ${promofilter == "All"
                         ? "border-b-[0.25vw] font-bold border-[#1f487c]"
                         : ""
-                    } `}
-                    onClick={() => {
-                      SetPromoFilter("All");
-                    }}
-                  >
-                    <p className="text-[1.3vw] text-[#1f487c] text-center">
-                      All
-                    </p>
-                  </div>
-                  <div
-                    className={` cursor-pointer ${
-                      promofilter == "Pending"
+                        } `}
+                      onClick={() => {
+                        SetPromoFilter("All");
+                      }}
+                    >
+                      <p className="text-[1.3vw] text-[#1f487c] text-center">
+                        All
+                      </p>
+                    </div>
+                    <div
+                      className={` cursor-pointer ${promofilter == "Pending"
                         ? "border-b-[0.25vw] font-bold border-[#1f487c]"
                         : ""
-                    } `}
-                    onClick={() => {
-                      SetPromoFilter("Pending");
-                    }}
-                  >
-                    <p className="text-[1.3vw] text-[#1f487c] text-center">
-                      Pending
-                    </p>
-                  </div>
-                  <div
-                    className={` cursor-pointer ${
-                      promofilter == "Approved"
+                        } `}
+                      onClick={() => {
+                        SetPromoFilter("Pending");
+                      }}
+                    >
+                      <p className="text-[1.3vw] text-[#1f487c] text-center">
+                        Pending
+                      </p>
+                    </div>
+                    <div
+                      className={` cursor-pointer ${promofilter == "Approved"
                         ? "border-b-[0.25vw] font-bold border-[#1f487c]"
                         : ""
-                    } `}
-                    onClick={() => {
-                      SetPromoFilter("Approved");
-                    }}
-                  >
-                    <p className="text-[1.3vw] text-[#1f487c] text-center">
-                      Approved
-                    </p>
-                  </div>
-                  <div
-                    className={` cursor-pointer ${
-                      promofilter == "Rejected"
+                        } `}
+                      onClick={() => {
+                        SetPromoFilter("Approved");
+                      }}
+                    >
+                      <p className="text-[1.3vw] text-[#1f487c] text-center">
+                        Approved
+                      </p>
+                    </div>
+                    <div
+                      className={` cursor-pointer ${promofilter == "Rejected"
                         ? "border-b-[0.25vw] font-bold border-[#1f487c]"
                         : ""
-                    } `}
-                    onClick={() => {
-                      SetPromoFilter("Rejected");
-                    }}
-                  >
-                    <p className="text-[1.3vw] text-[#1f487c] text-center">
-                      Rejected
-                    </p>
-                  </div>
-                  <div
-                    className={` cursor-pointer ${
-                      promofilter == "Under Review"
+                        } `}
+                      onClick={() => {
+                        SetPromoFilter("Rejected");
+                      }}
+                    >
+                      <p className="text-[1.3vw] text-[#1f487c] text-center">
+                        Rejected
+                      </p>
+                    </div>
+                    <div
+                      className={` cursor-pointer ${offerfilter == "Under Review"
                         ? "border-b-[0.25vw] font-bold border-[#1f487c]"
                         : ""
-                    } `}
-                    onClick={() => {
-                      SetPromoFilter("Under Review");
-                    }}
-                  >
-                    <p className="text-[1.3vw] text-[#1f487c] text-center">
-                      Under Review
-                    </p>
+                        } `}
+                      onClick={() => {
+                        SetPromoFilter("Under Review");
+                      }}
+                    >
+                      <p className="text-[1.3vw] text-[#1f487c] text-center">
+                        Under Review
+                      </p>
+                    </div>
                   </div>
-                </div>
-              )}
+                ) : showtable == 4 ? (
+                  <div className="flex gap-x-[2.5vw] text-[1.3vw]">
+                    <div
+                      className={` cursor-pointer ${adfilter == "all"
+                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                        : ""
+                        } `}
+                      onClick={() => {
+                        SetAdFilter("all");
+                      }}
+                    >
+                      <p className="text-[1.3vw] text-[#1f487c] text-center">
+                        All
+                      </p>
+                    </div>
+                    <div
+                      className={` cursor-pointer ${adfilter == "pending"
+                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                        : ""
+                        } `}
+                      onClick={() => {
+                        SetAdFilter("pending");
+                      }}
+                    >
+                      <p className="text-[1.3vw] text-[#1f487c] text-center">
+                        Pending
+                      </p>
+                    </div>
+                    <div
+                      className={` cursor-pointer ${adfilter == "verified"
+                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                        : ""
+                        } `}
+                      onClick={() => {
+                        SetAdFilter("verified");
+                      }}
+                    >
+                      <p className="text-[1.3vw] text-[#1f487c] text-center">
+                        Verified
+                      </p>
+                    </div>
+                    <div
+                      className={` cursor-pointer ${adfilter == "under_review"
+                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                        : ""
+                        } `}
+                      onClick={() => {
+                        SetAdFilter("under_review");
+                      }}
+                    >
+                      <p className="text-[1.3vw] text-[#1f487c] text-center">
+                        Under Review
+                      </p>
+                    </div>
+                    <div
+                      className={` cursor-pointer ${adfilter == "rejected"
+                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                        : ""
+                        } `}
+                      onClick={() => {
+                        SetAdFilter("rejected");
+                      }}
+                    >
+                      <p className="text-[1.3vw] text-[#1f487c] text-center">
+                        Rejected
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex gap-x-[2.5vw] text-[1.3vw]">
+                    <div
+                      className={` cursor-pointer ${offerfilter == "All"
+                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                        : ""
+                        } `}
+                      onClick={() => {
+                        SetOfferFilter("All");
+                      }}
+                    >
+                      <p className="text-[1.3vw] text-[#1f487c] text-center">
+                        All
+                      </p>
+                    </div>
+                    <div
+                      className={` cursor-pointer ${offerfilter == "Pending"
+                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                        : ""
+                        } `}
+                      onClick={() => {
+                        SetOfferFilter("Pending");
+                      }}
+                    >
+                      <p className="text-[1.3vw] text-[#1f487c] text-center">
+                        Pending
+                      </p>
+                    </div>
+                    <div
+                      className={` cursor-pointer ${offerfilter == "Approved"
+                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                        : ""
+                        } `}
+                      onClick={() => {
+                        SetOfferFilter("Approved");
+                      }}
+                    >
+                      <p className="text-[1.3vw] text-[#1f487c] text-center">
+                        Approved
+                      </p>
+                    </div>
+                    <div
+                      className={` cursor-pointer ${offerfilter == "Rejected"
+                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                        : ""
+                        } `}
+                      onClick={() => {
+                        SetOfferFilter("Rejected");
+                      }}
+                    >
+                      <p className="text-[1.3vw] text-[#1f487c] text-center">
+                        Rejected
+                      </p>
+                    </div>
+                    <div
+                      className={` cursor-pointer ${offerfilter == "Under Review"
+                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                        : ""
+                        } `}
+                      onClick={() => {
+                        SetOfferFilter("Under Review");
+                      }}
+                    >
+                      <p className="text-[1.3vw] text-[#1f487c] text-center">
+                        Under Review
+                      </p>
+                    </div>
+                  </div>
+                )}
               <div className="flex gap-x-[1vw]">
                 {/* <div className="flex border-[#1F4B7F] h-[2.5vw] border-l-[0.1vw] border-t-[0.1vw] rounded-l-[0.5vw] rounded-r-[0.5vw] border-r-[0.2vw] border-b-[0.2vw]">
                 <button
@@ -599,38 +854,42 @@ export default function RequestManagement() {
                   <Select
                     showSearch
                     placeholder="Select one"
-                    filterOption={(input, option) =>
-                      (option?.label ?? "")
-                        .toLowerCase()
-                        .includes(input.toLowerCase())
-                    }
+                    suffixIcon={<span style={{ fontSize: '1vw', color: '#1f487c' }}><IoMdArrowDropdown size="2vw" /></span>}
+                    filterOption={(input, option) => {
+                      const labelText = option?.label?.props.children || "";
+                      return labelText.toLowerCase().includes(input.toLowerCase());
+                    }}
                     onChange={onChange}
+                    style={{
+                      width: 170,
+                    }}
                     defaultValue={{
                       value: 1,
-                      label: "Operator",
+                      label: <div className="text-[1vw] font-semibold pl-[0.7vw] pb-[0.1vw]">Operator</div>,
                     }}
                     className="text-blue-500 h-[2.5vw] w-[10vw] outline-none text border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.7vw] border-r-[0.2vw] border-b-[0.2vw]"
                     options={[
                       {
                         value: 1,
-                        label: "Operator",
+                        label: <div className="text-[1vw] font-semibold pl-[0.7vw] pb-[0.1vw]">Operator</div>
                       },
-                      // {
-                      //   value: 2,
-                      //   label: "Partner",
-                      // },
                       {
                         value: 3,
-                        label: "Promotion",
+                        label: <div className="text-[1vw] font-semibold pl-[0.7vw] pb-[0.1vw]">Promotion</div>
+                      },
+                      {
+                        value: 4,
+                        label: <div className="text-[1vw] font-semibold pl-[0.7vw] pb-[0.1vw]">Advertisement</div>
+                      },
+                      {
+                        value: 5,
+                        label: <div className="text-[1vw] font-semibold pl-[0.7vw] pb-[0.1vw]">Offers</div>,
                       },
                     ]}
                   />
 
-                  <FaCaretDown
-                    className="absolute left-[7.5vw] bottom-[.3vw] text-[#1f487f]"
-                    size={"2vw"}
-                  />
                 </div>
+
                 <div className="relative flex items-center">
                   {/* <DatePicker
                   autoFocus={false}
@@ -645,7 +904,8 @@ export default function RequestManagement() {
                       allowClear={true}
                       autoFocus={false}
                       onChange={datefilter}
-                      className="text-blue-500 filterdate h-[2.5vw] w-[17.7vw] outline-none text border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] hover:border-[#1F4B7F] rounded-[0.5vw] border-r-[0.2vw] border-b-[0.2vw]"
+                      value={dateClear}
+                      className="text-blue-500 filterdate h-[2.5vw] w-[15vw] outline-none text border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] hover:border-[#1F4B7F] rounded-[0.5vw] border-r-[0.2vw] border-b-[0.2vw]"
                     />
 
                     {/* </Space> */}
@@ -673,24 +933,52 @@ export default function RequestManagement() {
               <Operator data={currentItems} />
             ) : showtable == 2 ? (
               <Partner data={currentItems} columns={columns} />
-            ) : (
+            ) : showtable == 3 ? (
               <ReqPromotion currentData={promocurrentItems} columns={columns} />
+            ) : showtable == 4 ? (
+              <ReqAdvertisement
+                currentData={adscurrentItems}
+                columns={columns}
+                showtable={showtable}
+              />
+            ) : (
+              <ReqOffers currentData={offerCurrentItems} columns={columns} />
             )}
           </div>
           <div className="w-full h-[8vh] flex justify-between items-center">
             <div className="text-[#1f4b7f] flex text-[1.1vw] gap-[0.5vw]">
               <span>Showing</span>
               <span className="font-bold">
-                1 -{" "}
+                {/* 1 -{" "}
                 {showtable == 1
-                  ? get_rq_man_data?.length
-                  : getpromotionlist?.length}
+                  ? currentItems?.length
+                  : showtable == 3
+                  ? promocurrentItems?.length
+                  : showtable === 4
+                  ? adscurrentItems?.length
+                  : offerCurrentItems.length} */}
+                {/* {offerIndexOfFirstItem+1}
+                   -{" "} */}
+                {showtable == 1
+                  ? `${indexOfFirstItem + 1} - ${indexOfFirstItem + currentItems?.length}`
+                  : showtable == 3
+                    ? `${promoindexOfFirstItem + 1} - ${promoindexOfFirstItem + promocurrentItems?.length}`
+                    : showtable === 4
+                      ? `${adsindexOfFirstItem + 1} - ${adsindexOfFirstItem + adscurrentItems?.length}`
+                      :
+                      `${offerIndexOfFirstItem + 1} - ${offerIndexOfFirstItem + offerCurrentItems?.length}`
+                }
               </span>
               <span>from</span>
               <span className="font-bold">
                 {showtable == 1
-                  ? get_rq_man_data?.length
-                  : getpromotionlist?.length}
+                  ? get_rq_man_data?.length > 0 ? get_rq_man_data?.length : 0
+                  : showtable == 3
+                    ? getpromotionlist?.length > 0 ? getpromotionlist?.length : 0
+                    : showtable === 4
+                      ? getadslist?.length > 0 ? getadslist?.length : 0
+                      : get_req_man_offers?.length > 0 ? get_req_man_offers?.length : 0
+                }
               </span>
               <span>data</span>
             </div>
@@ -704,14 +992,32 @@ export default function RequestManagement() {
                 // showSizeChanger
               /> */}
               <ReactPaginate
-                activePage={showtable == 1 ? activePage : promoactivePage}
+                activePage={
+                  showtable == 1
+                    ? activePage
+                    : showtable == 3
+                      ? promoactivePage
+                      : showtable == 4
+                        ? adsactivePage
+                        : offerActivePage
+                }
                 itemsCountPerPage={
-                  showtable == 1 ? itemsPerPage : promoitemsPerPage
+                  showtable == 1
+                    ? itemsPerPage
+                    : showtable == 3
+                      ? promoitemsPerPage
+                      : showtable == 4
+                        ? adsitemsPerPage
+                        : offerItemsPerPage
                 }
                 totalItemsCount={
                   showtable == 1
                     ? get_rq_man_data?.length
-                    : getpromotionlist?.length
+                    : showtable == 3
+                      ? getpromotionlist?.length
+                      : showtable == 4
+                        ? getadslist?.length
+                        : get_req_man_offers.length
                 }
                 pageRangeDisplayed={3}
                 onChange={handlePageChange}
@@ -731,12 +1037,15 @@ export default function RequestManagement() {
                   <FontAwesomeIcon icon={faAngleDoubleRight} size="1vw" />
                 }
               />
+
               {/* <input
               type="file"
               // onChange={(e) => console.log(e.target.value, "datatatat")}
               onChange={(e) => handleSubmit(e)}
             /> */}
             </div>
+
+            {/* ###################################################################### */}
           </div>
         </div>
       </div>

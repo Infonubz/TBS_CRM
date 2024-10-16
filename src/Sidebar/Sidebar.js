@@ -31,25 +31,33 @@ import { CgProfile } from "react-icons/cg";
 import { useSelector } from "react-redux";
 
 export default function Sidebar() {
- 
-  
-  const unreadnotification = useSelector(
-    (state) => state.crm.unread_notification
+
+
+  const unreadCounts = 0;
+
+  const getnotificationlist = useSelector(
+    (state) => state.crm.notification_count
   );
-  const [unreadCountss, setunreadCountss] = useState(unreadnotification.unreadCount);
+
+  // const {unread_count}=getnotificationlist
+  const [unreadCountss, setunreadCountss] = useState(0);
 
   useEffect(() => {
-    if (unreadnotification && unreadnotification.unreadCount !== undefined) {
-      setunreadCountss(unreadnotification.unreadCount);
+    if (getnotificationlist !== undefined) {
+      setunreadCountss(getnotificationlist);
     }
-  }, [unreadnotification.unreadCount]);
+  }, [getnotificationlist]);
 
   console.log(unreadCountss, "this is sidebar");
 
-  const [selectedIcon, setSelectedIcon] = useState("dashboard");
+  const [selectedIcon, setSelectedIcon] = useState(() => {
+    return sessionStorage.getItem('selectedIcon') || 'dashboard';
+  });
   const navigation = useNavigate();
+
   const handleIconClick = (iconName, page) => {
     setSelectedIcon(iconName);
+    sessionStorage.setItem('selectedIcon', iconName);
     navigation(`/${page}`);
   };
 
@@ -64,7 +72,7 @@ export default function Sidebar() {
     setIsNotificationOpen(true);
     setSelectedIcon("notification");
   };
-  
+
   const openSupport = () => {
     setIsNotificationOpen(false);
     setIsSupportOpen(true);
@@ -85,9 +93,8 @@ export default function Sidebar() {
             <div className="flex items-center gap-[2vw]">
               <Tooltip title="Dashboard" color="#1F4B7F">
                 <div
-                  className={`icon-container ${
-                    selectedIcon === "dashboard" ? "selected" : ""
-                  }`}
+                  className={`icon-container ${selectedIcon === "dashboard" ? "selected" : ""
+                    }`}
                   onClick={() => handleIconClick("dashboard", "dashboard")}
                 >
                   <RiDashboardFill color="white" size={"2.5vw"} />
@@ -146,9 +153,8 @@ export default function Sidebar() {
               </Tooltip>
               <Tooltip title="User Management" color="#1F4B7F">
                 <div
-                  className={`icon-container ${
-                    selectedIcon === "users" ? "selected" : ""
-                  }`}
+                  className={`icon-container ${selectedIcon === "users" ? "selected" : ""
+                    }`}
                   onClick={() => handleIconClick("users", "usermanagement")}
                 >
                   <FaUsers color="white" size={"2.5vw"} />
@@ -156,9 +162,8 @@ export default function Sidebar() {
               </Tooltip>
               <Tooltip title="Request Management" color="#1F4B7F">
                 <div
-                  className={`icon-container ${
-                    selectedIcon === "request" ? "selected" : ""
-                  }`}
+                  className={`icon-container ${selectedIcon === "request" ? "selected" : ""
+                    }`}
                   onClick={() =>
                     handleIconClick("request", "requestmanagement")
                   }
@@ -169,15 +174,14 @@ export default function Sidebar() {
                   /> */}
                   <img
                     src={request_management}
-                    className="h-[2.5vw] w-[2.5vw]"
+                    className="h-[2vw] w-[2vw]"
                   />
                 </div>
               </Tooltip>
               <Tooltip title="Offers & Deals" color="#1F4B7F">
                 <div
-                  className={`icon-container ${
-                    selectedIcon === "discount" ? "selected" : ""
-                  }`}
+                  className={`icon-container ${selectedIcon === "discount" ? "selected" : ""
+                    }`}
                   onClick={() => handleIconClick("discount", "discounts")}
                 >
                   <RiDiscountPercentFill color="white" size={"2.5vw"} />
@@ -185,9 +189,8 @@ export default function Sidebar() {
               </Tooltip>
               <Tooltip title="Advertisement" color="#1F4B7F">
                 <div
-                  className={`icon-container ${
-                    selectedIcon === "advertisement" ? "selected" : ""
-                  }`}
+                  className={`icon-container ${selectedIcon === "advertisement" ? "selected" : ""
+                    }`}
                   onClick={() => handleIconClick("advertisement", "ads")}
                 >
                   <RiAdvertisementFill color="white" size={"2.5vw"} />
@@ -195,9 +198,8 @@ export default function Sidebar() {
               </Tooltip>
               <Tooltip title="Promotion" color="#1F4B7F">
                 <div
-                  className={`icon-container ${
-                    selectedIcon === "Promotion" ? "selected" : ""
-                  }`}
+                  className={`icon-container ${selectedIcon === "Promotion" ? "selected" : ""
+                    }`}
                   onClick={() => handleIconClick("Promotion", "promotion")}
                 >
                   {/* <MdOutlineSpeakerNotes color="white" size={"2.5vw"} /> */}
@@ -206,9 +208,8 @@ export default function Sidebar() {
               </Tooltip>
               <Tooltip title="Roles & Responsibilities" color="#1F4B7F">
                 <div
-                  className={`icon-container ${
-                    selectedIcon === "userGear" ? "selected" : ""
-                  }`}
+                  className={`icon-container ${selectedIcon === "userGear" ? "selected" : ""
+                    }`}
                   onClick={() => handleIconClick("userGear", "roles")}
                 >
                   <FaUserGear color="white" size={"2.5vw"} />
@@ -226,9 +227,8 @@ export default function Sidebar() {
               </Tooltip> */}
               <Tooltip title="Subscription" color="#1F4B7F">
                 <div
-                  className={`icon-container ${
-                    selectedIcon === "subscription" ? "selected" : ""
-                  }`}
+                  className={`icon-container ${selectedIcon === "subscription" ? "selected" : ""
+                    }`}
                   onClick={() =>
                     handleIconClick("subscription", "subscription")
                   }
@@ -240,9 +240,8 @@ export default function Sidebar() {
             <div className="flex items-center gap-[1vw]">
               <Tooltip title="Settings" color="#1F4B7F">
                 <div
-                  className={`icon-container ${
-                    selectedIcon === "settings" ? "selected" : ""
-                  }`}
+                  className={`icon-container ${selectedIcon === "settings" ? "selected" : ""
+                    }`}
                   onClick={() => handleIconClick("settings", "settings")}
                 >
                   <IoMdSettings color="white" size={"2.5vw"} />
@@ -250,9 +249,8 @@ export default function Sidebar() {
               </Tooltip>
               <Tooltip title="Notification" color="#1F4B7F">
                 <div
-                  className={`icon-container ${
-                    selectedIcon === "notification" ? "selected" : ""
-                  }`}
+                  className={`icon-container ${selectedIcon === "notification" ? "selected" : ""
+                    }`}
                   onClick={
                     openNotification
                     // handleIconClick("notification", "notification")
@@ -260,19 +258,20 @@ export default function Sidebar() {
                 >
                   {/* <div> */}
                   <div className="relative">
-                  <IoIosNotifications  color="white" size={"2.5vw"}/>
+                    <IoIosNotifications color="white" size={"2.5vw"} />
                   </div>
-                  <div className="h-[1.5vw] w-[1.5vw] absolute bottom-[1.5vw] left-[1.3vw] rounded-xl bg-red-600 text-white">
-                    <span className="flex flex-col items-center text-[1vw]">{unreadCountss}</span>
-                  </div>
-                  </div>
+                  {unreadCountss > 0 ?
+                    <div className="h-[1.5vw] w-[1.5vw] absolute bottom-[1.5vw] left-[1.3vw] rounded-xl bg-red-600 text-white">
+                      <span className="flex flex-col items-center text-[1vw]">{unreadCountss}</span>
+                    </div>
+                    : ""}
+                </div>
                 {/* </div> */}
               </Tooltip>
               <Tooltip title="Support" color="#1F4B7F">
                 <div
-                  className={`icon-container ${
-                    selectedIcon === "support" ? "selected" : ""
-                  }`}
+                  className={`icon-container ${selectedIcon === "support" ? "selected" : ""
+                    }`}
                   onClick={
                     openSupport
                     // handleIconClick("support", "support")
@@ -281,7 +280,7 @@ export default function Sidebar() {
                   <IoHelpCircle color="white" size={"2.5vw"} />
                 </div>
               </Tooltip>
-              {/* <Tooltip title="Recycle Bin" color="#1F4B7F">
+              <Tooltip title="Recycle Bin" color="#1F4B7F">
                 <div
                   className={`icon-container ${
                     selectedIcon === "recycle" ? "selected" : ""
@@ -290,7 +289,7 @@ export default function Sidebar() {
                 >
                   <RiDeleteBin5Fill color="white" size={"2.5vw"} />
                 </div>
-              </Tooltip> */}
+              </Tooltip>
               <div className="border-r-[0.2vw] border-white h-[2.5vw]"></div>
               <div className="w-[7vw]">
                 <Popover
@@ -305,8 +304,10 @@ export default function Sidebar() {
                           className="text-[1.2vw] pl-[0.5vw] text-black cursor-pointer font-semibold"
                           onClick={() => {
                             sessionStorage.removeItem("token");
+                            sessionStorage.removeItem("selectedIcon");
+                            localStorage.removeItem("token")
                             navigation("/");
-                            window.location.reload();
+                            // window.location.reload();
                           }}
                         >
                           Logout
@@ -315,12 +316,13 @@ export default function Sidebar() {
                     </div>
                   }
                   trigger="click"
-                  // open={openPopovers[row.ad_id] || false}
-                  // onOpenChange={() => togglePopover(row.ad_id)}
+                // open={openPopovers[row.ad_id] || false}
+                // onOpenChange={() => togglePopover(row.ad_id)}
                 >
                   <div className="flex items-center cursor-pointer">
                     <label className="text-[1.2vw] text-white cursor-pointer  font-semibold">
-                      {sessionStorage.getItem("user_name")}
+                      {localStorage.getItem("user_name")}
+                      {/* {sessionStorage.getItem("user_name")} */}
                     </label>
                     <span className="pl-[0.5vw]">
                       <CgProfile
@@ -338,8 +340,8 @@ export default function Sidebar() {
               show={isNotificationOpen}
               closeicon={false}
               onClose={closeNotification}
-              // height="90%"
-              // width="30vw"
+            // height="90%"
+            // width="30vw"
             >
               {/* <div className="overflow-auto mt-6 max-h-[70vh]">
         {content.map((item, index) => (
@@ -357,8 +359,8 @@ export default function Sidebar() {
             show={isSupportOpen}
             closeicon={false}
             onClose={colseSupport}
-            // height="90%"
-            // width="30vw"
+          // height="90%"
+          // width="30vw"
           >
             {/* <div>
         <div className="flex justify-center text-[#1f487c] font-bold"><h1>GEt In Touch</h1></div>

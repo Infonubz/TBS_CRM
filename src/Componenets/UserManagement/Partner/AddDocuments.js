@@ -81,6 +81,7 @@ export default function AddDocuments({
   EmployeeID,
   setEmployeeID,
   operatorID,
+  setDocumentBack
 }) {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
@@ -152,9 +153,9 @@ export default function AddDocuments({
           <label className="text-[1.5vw] font-semibold text-[#1f4b7f]">
             Documents
           </label>
-          <button className="rounded-full font-semibold w-[6vw] h-[2vw] flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] border-[#34AE2A] text-[1.1vw] text-[#34AE2A]">
+          {/* <button className="rounded-full font-semibold w-[6vw] h-[2vw] flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] border-[#34AE2A] text-[1.1vw] text-[#34AE2A]">
             Save
-          </button>
+          </button> */}
         </div>
         <div className="pb-[1vw]">
           <div className="border-b-[0.1vw] w-full border-[#1f4b7f]"></div>
@@ -243,10 +244,12 @@ export default function AddDocuments({
                         }}
                       />
                       <button
+                        type="button"
                         className="border-r-[0.3vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none"
-                        onClick={() =>
-                          document.getElementById("aadhar_doc").click()
-                        }
+                        onClick={(event) => {
+                          event.preventDefault();
+                          document.getElementById("aadhar_doc").click();
+                        }}
                       >
                         <span className="opacity-50">
                           Upload Aadhar Document
@@ -299,10 +302,12 @@ export default function AddDocuments({
                         }}
                       />
                       <button
+                        type="button"
                         className="border-r-[0.3vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none"
-                        onClick={() =>
-                          document.getElementById("pan_doc").click()
-                        }
+                        onClick={(event) => {
+                          event.preventDefault();
+                          document.getElementById("pan_doc").click();
+                        }}
                       >
                         <span className="opacity-50">Upload Pan Document</span>
                         <FaCloudUploadAlt
@@ -354,10 +359,12 @@ export default function AddDocuments({
                         }}
                       />
                       <button
+                        type="button"
                         className="border-r-[0.3vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none"
-                        onClick={() =>
-                          document.getElementById("work_exp_doc").click()
-                        }
+                        onClick={(event) => {
+                          event.preventDefault();
+                          document.getElementById("work_exp_doc").click();
+                        }}
                       >
                         <span className="opacity-50">
                           Upload Work Experience
@@ -411,10 +418,12 @@ export default function AddDocuments({
                         }}
                       />
                       <button
+                        type="button"
                         className="border-r-[0.3vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none"
-                        onClick={() =>
-                          document.getElementById("other_doc").click()
-                        }
+                        onClick={(event) => {
+                          event.preventDefault();
+                          document.getElementById("other_doc").click();
+                        }}
                       >
                         <span className="opacity-50">
                           Upload Other Document
@@ -468,10 +477,12 @@ export default function AddDocuments({
                         }}
                       />
                       <button
+                        type="button"
                         className="border-r-[0.3vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none"
-                        onClick={() =>
-                          document.getElementById("edu_cer_doc").click()
-                        }
+                        onClick={(event) => {
+                          event.preventDefault();
+                          document.getElementById("edu_cer_doc").click();
+                        }}
                       >
                         <span className="opacity-50">
                           Upload Education Certificate
@@ -511,7 +522,11 @@ export default function AddDocuments({
                 <div className="flex items-center gap-x-[1vw]">
                   <button
                     className="border-[#1F487C] w-[5vw] font-semibold text-[1vw] h-[2vw] rounded-full border-r-[0.2vw]  border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw]"
-                    onClick={() => setCurrentpage(3)}
+                    onClick={() => {
+                      setCurrentpage(3);
+                      setDocumentBack(true);
+                    }
+                    }
                   >
                     Back
                   </button>
@@ -537,6 +552,6 @@ export default function AddDocuments({
       >
         <img alt="example" style={{ width: "100%" }} src={previewImage} />
       </Modal>
-    </div>
+    </div >
   );
 }

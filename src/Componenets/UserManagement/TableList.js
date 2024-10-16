@@ -18,6 +18,7 @@ import ModalPopup from "../Common/Modal/Modal";
 import DeleteList from "../Offers/DeleteList";
 import { useSelector } from "react-redux";
 import { capitalizeFirstLetter } from "../Common/Captilization";
+import TableListStatusChange from "./TableListStatusChange";
 
 // import { width } from "@fortawesome/free-solid-svg-icons/fa0";
 
@@ -28,8 +29,13 @@ const TableList = ({
   currentData,
   setOperatorID,
   operatorID,
+  setDeleteOpModalIsOpen,
+  deleteOpmodalIsOpen,
 }) => {
   const [sortedInfo, setSortedInfo] = useState({});
+  const [statusModal, setStatusModal] = useState(false);
+  const [statusId, setStatusId] = useState()
+  const [userId, setUserId] = useState()
   const handleChange = (pagination, filters, sorter) => {
     console.log("Various parameters", pagination, filters, sorter);
 
@@ -37,26 +43,33 @@ const TableList = ({
   };
   const get_operator_list = useSelector((state) => state.crm.operator_list);
 
+  const UpdateStatus = (statusid, userid) => {
+    setStatusModal(true)
+    setStatusId(statusid)
+    setUserId(userid)
+  }
+  const CloseStatusModal = () => {
+    setStatusModal(false)
+  }
+  console.log(operatorID, '5102024')
   const columns = [
     {
       title: (
-        <div className="flex justify-center font-bold text-[1.2vw]">Photo</div>
+        <div className="flex justify-center items-center font-bold text-[1.2vw]">Photo</div>
       ),
       // dataIndex: "photo",
       // key: "photo",
       align: "center",
       render: (row) => {
-        console.log(row, "rowrowrow");
         const image = `http://192.168.90.47:4000${row?.profileimg}`;
-        console.log(image, "imageimage");
+        console.log(row?.profileimg, "imageimage");
         return (
           <div className="flex justify-center items-center">
             <img
-              src={`${
-                row?.profileimg
-                  ? `http://192.168.90.47:4000${row?.profileimg}`
-                  : UserProfile
-              } `}
+              src={`${row?.profileimg
+                ? `http://192.168.90.47:4000${row?.profileimg}`
+                : UserProfile
+                } `}
               alt="Photo"
               className="w-[2.15vw] h-[2.15vw] object-cover rounded-[0.2vw]"
             />
@@ -66,27 +79,35 @@ const TableList = ({
       width: "6vw",
     },
     {
-      title: <div className="flex  font-bold text-[1.2vw]">Operator Name</div>, // dataIndex: "name",
+      title: <div className="flex items-center justify-center  font-bold text-[1.2vw]">Company Name</div>, // dataIndex: "name",
       key: "name",
       sorter: (a, b) => {
-        const nameA = `${a.firstname} ${a.lastname}`.toUpperCase();
-        const nameB = `${b.firstname} ${b.lastname}`.toUpperCase();
+        const nameA = a.owner_name.toUpperCase();
+        const nameB = b.owner_name.toUpperCase();
         return nameA.localeCompare(nameB);
       },
       width: "12vw",
       sortOrder: sortedInfo.columnKey === "name" && sortedInfo.order,
       render: (row) => (
         <div className="flex items-center">
-          <p className="text-[1.1vw]">{`${row?.owner_name}`}</p>
+          {console.log(row.tbs_operator_id, "ooooooooooooopppppppppppppppppiiiiiidddd")}
+          {/* <p className="text-[1.1vw]">{`${row?.owner_name}`}</p> */}
+          <p className="text-[1.1vw]">{`${row?.company_name}`}</p>
         </div>
       ),
     },
 
     {
-      title: <div className="flex font-bold text-[1.2vw]">Mobile</div>,
+      title: <div className="flex items-center justify-center font-bold text-[1.2vw]">Mobile</div>,
       key: "mobile",
-      sorter: (a, b) => a.mobilenumber.length - b.mobilenumber.length,
-      sortOrder: sortedInfo.columnKey === "mobile" ? sortedInfo.order : null,
+      //sorter: (a, b) => a.mobilenumber?.length - b.mobilenumber?.length,
+      sorter: (a, b) => {
+        const phoneA = a.phone ? a.phone.replace(/\D/g, '') : '';
+        const phoneB = b.phone ? b.phone.replace(/\D/g, '') : '';
+        return phoneA.localeCompare(phoneB);
+      },
+
+      sortOrder: sortedInfo.columnKey === "mobile" && sortedInfo.order,
       ellipsis: true,
       width: "10vw",
       render: (text, row) => {
@@ -98,11 +119,11 @@ const TableList = ({
       },
     },
     {
-      title: <div className="flex  font-bold text-[1.2vw]">Email</div>,
-      // dataIndex: "email",
+      title: <div className="flex items-center justify-center  font-bold text-[1.2vw]">Email</div>,
       key: "email",
-      sorter: (a, b) => a.emailid.length - b.emailid.length,
-      sortOrder: sortedInfo.columnKey === "email" ? sortedInfo.order : null,
+      sorter: (a, b) =>
+        (a.emailid ? a.emailid.length : 0) - (b.emailid ? b.emailid.length : 0),
+      sortOrder: sortedInfo.columnKey === "email" && sortedInfo.order,
       ellipsis: true,
       width: "15vw",
       render: (row) => {
@@ -114,11 +135,10 @@ const TableList = ({
       },
     },
     {
-      title: <div className="flex  font-bold text-[1.2vw]">Created</div>,
-      // dataIndex: "created",
-      // key: "created",
-      sorter: (a, b) => a.created.length - b.created.length,
-      sortOrder: sortedInfo.columnKey === "created" ? sortedInfo.order : null,
+      title: <div className="flex items-center justify-center  font-bold text-[1.2vw]">Created</div>,
+      key: "created_date",
+      sorter: (a, b) => new Date(a.created_date) - new Date(b.created_date),
+      sortOrder: sortedInfo.columnKey === "created_date" && sortedInfo.order,
       ellipsis: true,
       width: "10vw",
       render: (row) => {
@@ -133,7 +153,7 @@ const TableList = ({
     },
     {
       title: (
-        <div className="flex justify-center font-bold text-[1.2vw]">Status</div>
+        <div className="flex items-center justify-center font-bold text-[1.2vw]">Status</div>
       ),
       // dataIndex: "status",
       // key: "status",
@@ -142,13 +162,18 @@ const TableList = ({
         return (
           <div className="flex items-center justify-center">
             <button
-              className={`${
-                row.user_status_id == 0
-                  ? "bg-[#FF6B00]"
-                  : row.user_status_id == 1
+              className={`${row.user_status_id == 0
+                ? "bg-[#FF6B00] cursor-not-allowed"
+                : row.user_status_id == 1
                   ? "bg-[#38ac2c]"
-                  : "bg-[#FD3434]"
-              } h-[1.8vw] text-[1.1vw] text-white w-[7vw] rounded-[0.5vw]`}
+                  : "bg-[#FD3434] cursor-not-allowed"
+                } h-[1.8vw] text-[1.1vw] text-white w-[7vw] rounded-[0.5vw]`}
+              // onClick={()=>UpdateStatus(row.user_status_id,row.tbs_operator_id)}
+              onClick={() => {
+                if (row.user_status_id === 1) {
+                  UpdateStatus(row.user_status_id, row.tbs_operator_id);
+                }
+              }}
             >
               {capitalizeFirstLetter(row.user_status)}
             </button>
@@ -158,13 +183,12 @@ const TableList = ({
     },
     {
       title: (
-        <div className="flex justify-center font-bold text-[1.2vw]">Action</div>
+        <div className="flex items-center justify-center font-bold text-[1.2vw]">Action</div>
       ),
       // dataIndex: "action",
       // key: "action",
       width: "10vw",
       render: (row) => {
-        console.log(row, "rowrowrow");
         return (
           <div className="flex items-center justify-center">
             <Space>
@@ -173,6 +197,7 @@ const TableList = ({
                   setModalIsOpen(true);
                   SetUpdateData(row.tbs_operator_id);
                   setOperatorID(row?.tbs_operator_id);
+                  // setOperatorID(sessionStorage.getItem("SPA_ID"));
                 }}
                 size="1.4vw"
                 style={{
@@ -192,7 +217,7 @@ const TableList = ({
                 color="#1f487c"
                 className=" cursor-pointer"
                 onClick={() => {
-                  setDeleteModalIsOpen(true);
+                  setDeleteOpModalIsOpen(true);
                   setOperatorID(row?.tbs_operator_id);
                 }}
               />
@@ -223,9 +248,9 @@ const TableList = ({
     console.log(`Delete record with key: ${""}`);
     // Add your delete logic here
   };
-  const [deletemodalIsOpen, setDeleteModalIsOpen] = useState(false);
+
   const closeDeleteModal = () => {
-    setDeleteModalIsOpen(false);
+    setDeleteOpModalIsOpen(false);
   };
   const apiUrl = process.env.REACT_APP_API_URL;
 
@@ -239,15 +264,27 @@ const TableList = ({
         pagination={false}
         className="custom-table"
       />
+
+
       <ModalPopup
-        show={deletemodalIsOpen}
+        show={statusModal}
+        onClose={CloseStatusModal}
+        height="17vw"
+        width="30vw"
+        closeicon={false}>
+        <TableListStatusChange statusId={statusId} userId={userId} setStatusModal={setStatusModal} />
+
+
+      </ModalPopup>
+      <ModalPopup
+        show={deleteOpmodalIsOpen}
         onClose={closeDeleteModal}
         height="20vw"
         width="30vw"
         closeicon={false}
       >
         <DeleteList
-          setDeleteModalIsOpen={setDeleteModalIsOpen}
+          setDeleteModalIsOpen={setDeleteOpModalIsOpen}
           title={"Want to delete this Operator"}
           api={`${apiUrl}/operators/${operatorID}`}
           module={"operator"}

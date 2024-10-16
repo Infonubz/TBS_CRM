@@ -616,13 +616,13 @@ export default function AddRegisterAddress({
                       Temporary Address same as Permanent Address
                     </Checkbox>
                   </div>
-                  <div className="flex items-center justify-between  py-[1vw]">
+                  <div className="flex items-center justify-between py-[1vw]">
                     <div>
-                      <h1 className="text-[#1F4B7F] text-[0.8vw] font-semibold">
+                      <h1 className="text-[#1F4B7F] text-[0.7vw] font-semibold">
                         *You must fill in all fields to be able to continue
                       </h1>
                     </div>
-                    <div className="flex items-center gap-x-[1vw]">
+                    <div className="flex items-center gap-x-[0.7vw]">
                       <button
                         className="border-[#1F487C] w-[5vw] font-semibold text-[1vw] h-[2vw] rounded-full border-r-[0.2vw]  border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw]"
                         onClick={() => {
@@ -633,7 +633,7 @@ export default function AddRegisterAddress({
                         Back
                       </button>
                       <button
-                        className="bg-[#1F487C] font-semibold rounded-full w-[7vw] h-[2vw] text-[1vw] text-white"
+                        className="bg-[#1F487C] font-semibold rounded-full w-[11vw] h-[2vw] text-[1vw] text-white"
                         type="submit"
                         // onClick={() => setCurrentpage(3)}
                       >

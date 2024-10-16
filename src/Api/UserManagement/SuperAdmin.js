@@ -1,5 +1,5 @@
 import axios from "axios";
-import { OPERATOR_LIST, SUPER_ADMIN_LIST } from "../../Store/Type";
+import { OPERATOR_BYID, OPERATOR_LIST, SUPER_ADMIN_LIST } from "../../Store/Type";
 import { toast } from "react-toastify";
 const apiUrl = process.env.REACT_APP_API_URL;
 
@@ -10,6 +10,8 @@ const api = axios.create({
     "Content-Type": "application/json",
   },
 });
+
+
 export const GetOperatorData = async (dispatch) => {
   try {
     const response = await axios.get(`${apiUrl}/Operators-withAll-data`);
@@ -20,6 +22,50 @@ export const GetOperatorData = async (dispatch) => {
     // return null;
   }
 };
+
+
+export const handleOperatorSearch = async (e, dispatch) => {
+  try {
+    if (e.target.value) {
+      const response = await api.get(`${apiUrl}/operators-search/${e.target.value}`);
+      dispatch({ type: OPERATOR_LIST, payload: response.data })
+      return response.data;
+    }
+    else {
+      GetOperatorData(dispatch);
+    }
+  } catch (error) {
+    console.log(error);
+    handleError(error);
+  }
+}
+
+export const SubmitOperatorExcel = async (file) => {
+  const formData = new FormData();
+  formData.append("xlsxFile", file);
+
+  const excelEndpoint = `${apiUrl}/excelupload`;
+  const method = "post";
+
+  try {
+    const response = await api({
+      url: excelEndpoint,
+      method: method,
+      data: formData,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    toast.success(response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    toast.error("Failed to upload file");
+    return null;
+  }
+};
+
+
 export const GetSuperAdminData = async (dispatch) => {
   try {
     const response = await api.get(`${apiUrl}/Operators-withAll-data`);
@@ -30,46 +76,48 @@ export const GetSuperAdminData = async (dispatch) => {
     return null; // Return null or some default value to prevent throwing the error
   }
 };
+
+
 export const SubmitCompanyData = async (
   companyvalue,
   operatorID,
   enable,
   dispatch
 ) => {
-  // console.log(companyvalue.file, "companyvalue.file");F
-  // const formData = new FormData();
-  // formData.append("company_name", companyvalue.companyname);
-  // formData.append("owner_name", companyvalue.ownername);
-  // formData.append("phone", companyvalue.phone);
-  // formData.append("alternate_phone", companyvalue.phone);
-  // formData.append("emailid", companyvalue.emailid);
-  // formData.append("alternate_emailid", companyvalue.emailid);
-  // formData.append("aadharcard_number", companyvalue.aadhar);
-  // // formData.append("aadardoc", companyvalue.aadardoc);
-  // formData.append("pancard_number", companyvalue.pan);
-  // formData.append("profileimg", companyvalue.pancarddoc);
-  // formData.append("user_status", "draft");
-  // formData.append("req_status", "pending");
-  // formData.append("user_status_id", 0);
-  // formData.append("req_status_id", 0);
-  const payload = {
-    company_name: companyvalue.companyname,
-    owner_name: companyvalue.ownername,
-    phone: companyvalue.phone,
-    alternate_phone: companyvalue.phone,
-    emailid: companyvalue.emailid,
-    alternate_emailid: companyvalue.emailid,
-    aadharcard_number: companyvalue.aadhar,
-    pancard_number: companyvalue.pan,
-    user_status: "draft",
-    req_status: "pending",
-    user_status_id: 0,
-    req_status_id: 0,
-  };
+
+  const formData = new FormData();
+
+  formData.append('company_name', companyvalue.companyname);
+  formData.append('owner_name', companyvalue.ownername);
+  formData.append('phone', companyvalue.phone);
+  formData.append('alternate_phone', companyvalue.phone);
+  formData.append('emailid', companyvalue.emailid);
+  formData.append('alternate_emailid', companyvalue.emailid);
+  formData.append('aadharcard_number', companyvalue.aadhar);
+  formData.append('pancard_number', companyvalue.pan);
+  formData.append('user_status', 'draft');
+  formData.append('req_status', 'pending');
+  formData.append('user_status_id', 0);
+  formData.append('req_status_id', 0);
+  formData.append('profileimg', companyvalue.profileimg)
+
+
+  // const payload = {
+  //   company_name: companyvalue.companyname,
+  //   owner_name: companyvalue.ownername,
+  //   phone: companyvalue.phone,
+  //   alternate_phone: companyvalue.phone,
+  //   emailid: companyvalue.emailid,
+  //   alternate_emailid: companyvalue.emailid,
+  //   aadharcard_number: companyvalue.aadhar,
+  //   pancard_number: companyvalue.pan,
+  //   user_status: "draft",
+  //   req_status: "pending",
+  //   user_status_id: 0,
+  //   req_status_id: 0,
+  // };
   console.log(operatorID, "operatorIDoperatorIDoperatorID");
-  const updateurl = `${apiUrl}/operator/${
-    operatorID ? operatorID : sessionStorage.getItem("SPA_ID")
-  }`;
+  const updateurl = `${apiUrl}/operator/${operatorID ? operatorID : sessionStorage.getItem("SPA_ID")}`;
   const submiturl = `${apiUrl}/operators`;
   // const method = operatorID ? "put" : "post";
   const method = enable ? "put" : "post";
@@ -78,15 +126,18 @@ export const SubmitCompanyData = async (
     const response = await api({
       method,
       url,
-      data: payload,
+      // data: payload,
+      data: formData,
       headers: {
-        "Content-Type": "application/json",
-        // "Content-Type": "multipart/form-data",
+        // "Content-Type": "application/json",
+        "Content-Type": "multipart/form-data",
       },
     });
     sessionStorage.setItem("SPA_ID", response?.data?.id);
     GetOperatorData(dispatch);
-    console.log(response, "responseresponse");
+    GetOperatorProfile(sessionStorage.getItem("SPA_ID") === null || sessionStorage.getItem("SPA_ID") === 'null' || sessionStorage.getItem("SPA_ID") === undefined || sessionStorage.getItem("SPA_ID") === 'undefined' ? operatorID : sessionStorage.getItem("SPA_ID"), dispatch)
+    console.log(response?.data?.id, "respnse_submit_company_details");
+
     return response.data;
   } catch (error) {
     handleError(error);
@@ -117,9 +168,8 @@ export const SubmitAddressData = async (
   //   : "${apiUrl}/operator_details";
 
   const method = enable ? "put" : "post";
-  const url = `${apiUrl}/operator_details/${
-    operatorID ? operatorID : sessionStorage.getItem("SPA_ID")
-  }`;
+  const url = `${apiUrl}/operator_details/${operatorID ? operatorID : sessionStorage.getItem("SPA_ID")
+    }`;
   // const method ="post";
   try {
     const response = await api({
@@ -138,6 +188,8 @@ export const SubmitAddressData = async (
     return null;
   }
 };
+
+
 export const SubmitBusinessData = async (
   businessvalues,
   operatorID,
@@ -158,9 +210,8 @@ export const SubmitBusinessData = async (
   //   : "${apiUrl}/operator_details";
 
   // const method = updatedata ? "put" : "post";
-  const url = `${apiUrl}/operator_details/${
-    operatorID ? operatorID : sessionStorage.getItem("SPA_ID")
-  }`;
+  const url = `${apiUrl}/operator_details/${operatorID ? operatorID : sessionStorage.getItem("SPA_ID")
+    }`;
   // const method = "post";
   const method = enable ? "put" : "post";
   try {
@@ -180,6 +231,8 @@ export const SubmitBusinessData = async (
     return null;
   }
 };
+
+
 export const SubmitDocumentsData = async (
   documentsdata,
   operatorID,
@@ -193,9 +246,8 @@ export const SubmitDocumentsData = async (
   formData.append("pancard_back_doc", documentsdata.pan_back);
   formData.append("msme_doc", documentsdata.msme_doc);
 
-  const url = `${apiUrl}/operator_details/${
-    operatorID ? operatorID : sessionStorage.getItem("SPA_ID")
-  }`;
+  const url = `${apiUrl}/operator_details/${operatorID ? operatorID : sessionStorage.getItem("SPA_ID")
+    }`;
   const method = enable ? "put" : "post";
 
   try {
@@ -215,6 +267,7 @@ export const SubmitDocumentsData = async (
     return null;
   }
 };
+
 export const SubmitProfileData = async (
   filedata,
   operatorID,
@@ -224,9 +277,8 @@ export const SubmitProfileData = async (
   const formData = new FormData();
   formData.append("profileimg", filedata);
 
-  const url = `${apiUrl}/operator-profileImg/${
-    operatorID ? operatorID : sessionStorage.getItem("SPA_ID")
-  }`;
+  const url = `${apiUrl}/operator-profileImg/${operatorID ? operatorID : sessionStorage.getItem("SPA_ID")
+    }`;
   const method = "put";
 
   try {
@@ -246,7 +298,30 @@ export const SubmitProfileData = async (
     return null;
   }
 };
-export const SubmitGSTData = async (documentsdata, dispatch) => {
+
+export const GetSuperAdminGSTById = async (
+  operatorID,
+  setOperatorID,
+  setSuperAdminGSTData
+) => {
+  console.log(operatorID, "ahsgxdahsjksaxbj");
+  const getid = sessionStorage.getItem("SPA_ID");
+  try {
+    const response = await api.get(
+      `${apiUrl}/get-GST/${operatorID}`
+    );
+    console.log(response, "responseresponse");
+    // SetUpdateData(null);
+    setSuperAdminGSTData("");
+    return response?.data[0];
+  } catch (error) {
+    handleError(error);
+    return null;
+  }
+};
+
+
+export const SubmitGSTData = async (documentsdata, operatorID, setSuperAdminGSTData, dispatch) => {
   console.log(documentsdata, "documentsdata");
   const formData = new FormData();
   formData.append(
@@ -260,12 +335,12 @@ export const SubmitGSTData = async (documentsdata, dispatch) => {
   formData.append("upload_gst", documentsdata.gst_file);
   formData.append("has_gstin", "true");
 
-  // const url = updatedata
-  //   ? `${apiUrl}/offers-deals/${updatedata}`
-  //   : "${apiUrl}/operators";
-  // const method = updatedata ? "put" : "post";
-  const url = `${apiUrl}/operator_details/${sessionStorage.getItem("SPA_ID")}`;
-  const method = "post";
+  const url = operatorID
+    ? `${apiUrl}/operator_details/${operatorID}`
+    : `${apiUrl}/operator_details/${sessionStorage.getItem('SPA_ID')}`;
+  const method = operatorID ? "put" : "post";
+  // const url = `${apiUrl}/operator_details/${operatorID}`;
+  // const method = "post";
   try {
     const response = await api({
       method,
@@ -276,8 +351,9 @@ export const SubmitGSTData = async (documentsdata, dispatch) => {
       },
     });
     // GetSuperAdminData(dispatch);
-    GetSuperAdminGSTById();
-    // GetOperatorData(dispatch)
+    GetSuperAdminGSTById(operatorID, null, setSuperAdminGSTData);
+    setSuperAdminGSTData("");
+    GetOperatorData(dispatch)
     console.log(response, "responseresponse");
     return response.data;
   } catch (error) {
@@ -285,6 +361,8 @@ export const SubmitGSTData = async (documentsdata, dispatch) => {
     return null;
   }
 };
+
+
 export const GetSuperAdminById = async (
   updatedata,
   SetUpdateData,
@@ -292,16 +370,19 @@ export const GetSuperAdminById = async (
 ) => {
   console.log(updatedata, "ahsgxdahsjksaxbj");
   try {
-    const response = await api.get(`${apiUrl}/operators/${updatedata}`);
+    const response = await api.get(`${apiUrl}/all-operators/${updatedata}`);
     console.log(response, "responseresponse");
     // SetUpdateData(null);
     // setOfferData("");
+    console.log(response.data, "get_super_admin_by_id")
+    sessionStorage.setItem('OPERATE_ID', response.data[0]?.tbs_operator_id)
     return response?.data[0];
   } catch (error) {
     handleError(error);
     return null;
   }
 };
+
 
 export const GetSuperAdminAddressById = async (
   OperatorID,
@@ -310,8 +391,7 @@ export const GetSuperAdminAddressById = async (
 ) => {
   try {
     const response = await api.get(
-      `${apiUrl}/getall-address/${
-        OperatorID ? OperatorID : sessionStorage.getItem("SPA_ID")
+      `${apiUrl}/getall-address/${OperatorID ? OperatorID : sessionStorage.getItem("SPA_ID")
       }`
     );
     console.log(response, "responseresponse");
@@ -323,6 +403,8 @@ export const GetSuperAdminAddressById = async (
     return null;
   }
 };
+
+
 export const GetSuperAdminBusinessById = async (
   OperatorID,
   SetUpdateData,
@@ -330,8 +412,7 @@ export const GetSuperAdminBusinessById = async (
 ) => {
   try {
     const response = await api.get(
-      `${apiUrl}/get-business/${
-        OperatorID ? OperatorID : sessionStorage.getItem("SPA_ID")
+      `${apiUrl}/get-business/${OperatorID ? OperatorID : sessionStorage.getItem("SPA_ID")
       }`
     );
     console.log(response, "responseresponse");
@@ -343,6 +424,8 @@ export const GetSuperAdminBusinessById = async (
     return null;
   }
 };
+
+
 export const GetSuperAdminDocumentById = async (
   updatedata,
   SetUpdateData,
@@ -364,70 +447,74 @@ export const GetSuperAdminDocumentById = async (
   }
 };
 
-export const GetSuperAdminGSTById = async (
-  updatedata,
-  SetUpdateData,
-  setOfferData
-) => {
-  console.log(updatedata, "ahsgxdahsjksaxbj");
-  const getid = sessionStorage.getItem("SPA_ID");
-  try {
-    const response = await api.get(
-      `${apiUrl}/get-GST/${updatedata ? updatedata : getid}`
-    );
-    console.log(response, "responseresponse");
-    // SetUpdateData(null);
-    setOfferData("");
-    return response?.data[0];
-  } catch (error) {
-    handleError(error);
-    return null;
-  }
-};
 
 export const GetOperatorById = async (
   OperatorID,
   setOperatorID,
-  setSuperAdminData
+  setSuperAdminData,
+  dispatch
 ) => {
   try {
     const response = await api.get(
-      `${apiUrl}/operators/${
-        OperatorID ? OperatorID : sessionStorage.getItem("SPA_ID")
+      `${apiUrl}/all-operators/${OperatorID ? OperatorID : sessionStorage.getItem("SPA_ID")
       }`
     );
-    console.log(response, "responseresponse");
+    // dispatch({ type: OPERATOR_BYID, payload: response.data })
     // SetUpdateData(null);
     setSuperAdminData("");
+    console.log(response?.data, "whichOperatorGetWOrks")
     return response?.data;
   } catch (error) {
     handleError(error);
     return null;
   }
 };
-export const GetOperatorProfile = async (operatorID) => {
+
+
+// export const GetOperatorProfile = async (operatorID) => {
+//   console.log(operatorID, "operatorID852");
+//   try {
+//     const response = await axios.get(
+//       `${apiUrl}/operators-profileImg/${operatorID}
+//       }`
+//     );
+//     // dispatch({ type: OPERATOR_LIST, payload: response.data });
+//     console.log(response.data, 'GetOperatorProfile')
+//     sessionStorage.setItem('OperatorProfileImg', response.data[0].profileimg)
+//     return response.data;
+//   } catch (error) {
+//     handleError(error);
+//     // return null;
+//   }
+// };
+
+
+export const GetOperatorProfile = async (operatorID, dispatch) => {
   console.log(operatorID, "operatorID852");
+
+  if (!operatorID) {
+    return null;
+  }
+
   try {
-    const response = await axios.get(
-      `${apiUrl}/operators-profileImg/${
-        operatorID ? operatorID : sessionStorage.getItem("SPA_ID")
-      }`
-    );
-    // dispatch({ type: OPERATOR_LIST, payload: response.data });
+    const response = await axios.get(`${apiUrl}/operators-profileImg/${operatorID !== undefined ? operatorID : sessionStorage.getItem('OPERATE_ID')}`);
+    console.log(response.data, 'GetOperatorProfile');
+    dispatch({ type: OPERATOR_BYID, payload: response.data });
+    sessionStorage.setItem('OperatorProfileImg', response.data[0]?.profileimg);
+    console.log(response.data, 'get_operator_profile')
     return response.data;
   } catch (error) {
     handleError(error);
-    // return null;
+    return null;
   }
 };
-export const OperatorProfile = async (image) => {
+
+export const OperatorProfile = async (image, operatorID) => {
   console.log(image, "image987465222");
   const payload = new FormData();
   payload.append("profileimg", image);
 
-  const updateurl = `${apiUrl}/operator-profileImg/${sessionStorage.getItem(
-    "SPA_ID"
-  )}`;
+  const updateurl = `${apiUrl}/operator-profileImg/${operatorID}`;
 
   const method = "put";
   try {
@@ -440,6 +527,7 @@ export const OperatorProfile = async (image) => {
       },
     });
     GetOperatorProfile();
+    //GetOperatorData();
     console.log(response, "responseresponse");
     return response.data;
   } catch (error) {
@@ -447,6 +535,7 @@ export const OperatorProfile = async (image) => {
     return null;
   }
 };
+
 
 const handleError = (error) => {
   console.error("Error details:", error);

@@ -104,7 +104,7 @@ export default function Client() {
                   <div className="col-span-1">
                     <label className="text-[#886400] text-[1.1vw] ">
                       Email ID
-                      <span className="text-[1vw] text-red-600 pl-[0.2vw]">
+                      <span className="text-[1.1vw] text-red-600 pl-[0.2vw]">
                         *
                       </span>
                     </label>

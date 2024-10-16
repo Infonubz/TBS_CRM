@@ -17,6 +17,8 @@ export default function ListView({
   promotionId,
   setPromotionId,
   setDeleteModalIsOpen,
+  activePage,
+  itemsPerPage
 }) {
   const [eyeModalIsOpen, setEyeModalIsOpen] = useState(false);
   const [promoImage, setPromoImage] = useState("");
@@ -29,27 +31,28 @@ export default function ListView({
     setDeleteModalIsOpen(true);
   };
 
-  const modalOpen = () => {};
+  const modalOpen = () => { };
 
   // const [promotionId, setPromotionId] = useState(null);
   const columns = [
     {
-      title: <h1 className="text-[1.2vw] font-semibold">S.No</h1>,
+      title: <h1 className="text-[1.2vw] font-semibold  flex items-center justify-center">S.No</h1>,
       width: "5vw",
       render: (row, rowdta, index) => {
+        const serialNumber = (activePage - 1) * itemsPerPage + (index + 1);
         return (
-          <div className="">
-            <h1 className="pl-[1vw]">{index + 1}</h1>
+          <div className="flex items-center justify-center">
+            <h1 className="pl-[1vw]">{serialNumber}</h1>
           </div>
         );
       },
     },
     {
-      title: <h1 className="text-[1.2vw] font-semibold">Name</h1>,
+      title: <h1 className="text-[1.2vw] font-semibold  flex items-center justify-center">Name</h1>,
       sorter: (a, b) => a.promo_name.localeCompare(b.promo_name),
       render: (row, rowdta, index) => {
         return (
-          <div className="flex items-center text-[1.2vw]">
+          <div className="flex items-center justify-center text-[1.2vw]">
             {row?.promo_name?.length > 15 ? (
               <Tooltip
                 placement="bottom"
@@ -68,14 +71,14 @@ export default function ListView({
       width: "14vw",
     },
     {
-      title: <h1 className="text-[1.2vw] font-semibold">Description</h1>,
+      title: <h1 className="text-[1.2vw] font-semibold  flex items-center justify-center">Description</h1>,
       sorter: (a, b) => a.promo_description.localeCompare(b.promo_description),
       render: (row, rowdta, index) => {
         return (
           // <div className="flex items-center">
           //   <h1 className="text-[1.1vw]">{row.promo_description}</h1>
           // </div>
-          <div className="flex items-center">
+          <div className="flex items-center justify-center">
             <h1 className="text-[1.1vw]">
               {/* {row.promo_description} */}
               {row?.promo_description?.length > 15 ? (
@@ -97,25 +100,25 @@ export default function ListView({
       width: "14vw",
     },
     {
-      title: <h1 className="text-[1.2vw] font-semibold">Operator Details</h1>,
+      title: <h1 className="text-[1.2vw] font-semibold  flex items-center justify-center">Company Name</h1>,
       sorter: (a, b) => a.operator_details.localeCompare(b.operator_details),
       width: "17vw",
       render: (row, rowdta, index) => {
         return (
-          <div>
+          <div className="flex items-center justify-center">
             <p className="text-[1.1vw]">{row.operator_details}</p>
           </div>
         );
       },
     },
     {
-      title: <h1 className="text-[1.2vw] font-semibold">Duration</h1>,
+      title: <h1 className="text-[1.2vw] font-semibold  flex items-center justify-center">Duration</h1>,
       sorter: (a, b) =>
         dayjs(a.start_date).valueOf() - dayjs(b.start_date).valueOf(),
       width: "15vw",
       render: (row) => {
         return (
-          <div>
+          <div className="flex items-center justify-center">
             <p className="text-[1.1vw]">{`${dayjs(row?.start_date).format(
               "MMM DD"
             )} - ${dayjs(row?.expiry_date).format("MMM DD")}`}</p>
@@ -124,12 +127,12 @@ export default function ListView({
       },
     },
     {
-      title: <h1 className="text-[1.2vw] font-semibold">Usage</h1>,
+      title: <h1 className="text-[1.2vw] font-semibold  flex items-center justify-center">Usage</h1>,
       sorter: (a, b) => a.usage - b.usage,
       width: "7vw",
       render: (row) => {
         return (
-          <div>
+          <div className="flex items-center justify-center">
             <p className="text-[1.1vw]">{row.usage}</p>
           </div>
         );
@@ -137,27 +140,26 @@ export default function ListView({
     },
 
     {
-      title: <h1 className="text-[1.2vw] font-semibold">Status</h1>,
+      title: <h1 className="text-[1.2vw] font-semibold  flex items-center justify-center">Status</h1>,
       width: "10vw",
       render: (row) => {
         console.log(row.promo_status_id == 0, "schjbsdc");
         return (
-          <div>
+          <div className="flex items-center justify-center">
             {row?.promo_status_id != null ? (
               <button
-                className={`${
-                  row.promo_status_id == 0
-                    ? "bg-[#777575]"
-                    : row.promo_status_id == 1
+                className={`${row.promo_status_id == 0
+                  ? "bg-[#777575]"
+                  : row.promo_status_id == 1
                     ? "bg-[#FF9900]"
                     : row.promo_status_id == 2
-                    ? "bg-[#34AE2A]"
-                    : row.promo_status_id == 3
-                    ? "bg-[#FD3434]"
-                    : row.promo_status_id == 4
-                    ? "bg-[#2A99FF]"
-                    : "bg-[#646262]"
-                } rounded-[0.5vw] text-[1.1vw]  font-bold text-white w-[7vw] py-[0.2vw]`}
+                      ? "bg-[#34AE2A]"
+                      : row.promo_status_id == 3
+                        ? "bg-[#FD3434]"
+                        : row.promo_status_id == 4
+                          ? "bg-[#2A99FF]"
+                          : "bg-[#646262]"
+                  } rounded-[0.5vw] text-[1.1vw]  font-bold text-white w-[7vw] py-[0.2vw]`}
               >
                 {capitalizeFirstLetter(row.promo_status)}
               </button>
@@ -169,7 +171,7 @@ export default function ListView({
       },
     },
     {
-      title: <h1 className="text-[1.2vw] font-semibold">Actions</h1>,
+      title: <h1 className="text-[1.2vw] font-semibold  flex items-center justify-center">Actions</h1>,
       width: "10vw",
       render: (row) => {
         console.log(row, "rowrowrowrow");
@@ -191,6 +193,7 @@ export default function ListView({
                 className=" cursor-pointer"
                 onClick={() => {
                   setPromotionId(row.promo_id);
+                  SetUpdateData(row.promo_id)
                   setModalIsOpen(true);
                 }}
               />

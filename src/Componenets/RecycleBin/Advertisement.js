@@ -8,7 +8,7 @@ import { TbRestore } from "react-icons/tb";
 import ModalPopup from "../Common/Modal/Modal";
 import Video_modal from "./Video_Modal";
 
-export default function Advertisement() {
+export default function Advertisement({currentItems}) {
   const [adsData, setAdsData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(3);
@@ -102,12 +102,14 @@ export default function Advertisement() {
 
   return (
     <>
+     <div className="h-[72vh] w-full">
       <Table
-        dataSource={paginatedAdsData}
+        dataSource={currentItems}
         columns={columns}
         pagination={false}
         className="custom-table"
       />
+      </div>
       <ModalPopup
         className="border border-[#1f487c] border-b-8 border-r-8 rounded-md"
         show={viewModal}
@@ -118,7 +120,7 @@ export default function Advertisement() {
       >
         <Video_modal
           viewData={viewData}
-          setViewModalIsOpen={setViewModalIsOpen}
+          setViewModalIsOpen={setViewModalIsOpen} 
         />
       </ModalPopup>
     </>

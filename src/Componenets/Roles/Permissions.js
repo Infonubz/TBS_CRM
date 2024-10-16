@@ -45,10 +45,10 @@ export default function Permission({
   const paginatedData =
     getpermissionlist?.length > 0 &&
     getpermissionlist?.filter(
-        (item) =>
-          (item.crud_permissions && item.crud_permissions.length > 0) ||
-          (item.module_permissions && item.module_permissions.length > 0)
-      )
+      (item) =>
+        (item.crud_permissions && item.crud_permissions.length > 0) ||
+        (item.module_permissions && item.module_permissions.length > 0)
+    )
       .slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   // const handlePageChange = (page, pageSize) => {
@@ -254,10 +254,11 @@ export default function Permission({
         <div className="w-full h-[8vh] px-[1vw] flex justify-between items-center">
           <div className="text-[#1f4b7f]  flex text-[1.1vw] gap-[0.5vw]">
             <span>Showing</span>
-            <span className="font-bold">1 - {pageSize}</span>
+            <span className="font-bold">{currentItems && currentItems?.length > 0
+              ? <div>{indexOfFirstItem + 1} - {indexOfFirstItem + currentItems?.length}</div> : '0'}</span>
             <span>from</span>
             <span className="font-bold">
-              {getpermissionlist?.length > 0 && getpermissionlist?.length}
+              {getpermissionlist?.length > 0 ? getpermissionlist?.length : 0}
             </span>
             <span>data</span>
           </div>

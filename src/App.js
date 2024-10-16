@@ -29,14 +29,21 @@ import OperatorLoginPage from "./Componenets/LoginPage/Operator";
 import OwnerEmployeeLoginPage from "./Componenets/LoginPage/OwnerEmployee";
 
 function App() {
-  const [authtoken, setAuthtoken] = useState(sessionStorage.getItem("token"));
+  // const [authtoken, setAuthtoken] = useState(sessionStorage.getItem("token"));
+  const [authtoken, setAuthtoken] = useState(localStorage.getItem("token"));
+
 
   useEffect(() => {
-    const token = sessionStorage.getItem("token");
+    // const token = sessionStorage.getItem("token");
+    const token = localStorage.getItem("token")
     if (token) {
       setAuthtoken(token);
     }
   }, []);
+
+  // window.onbeforeunload = function () {
+  //   localStorage.clear();
+  // }
 
   return (
     <Router>

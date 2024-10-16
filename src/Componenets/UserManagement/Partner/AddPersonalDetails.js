@@ -1,15 +1,20 @@
-import { Progress } from "antd";
+import { Progress, Upload } from "antd";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
+import { useDispatch, useSelector } from "react-redux";
+import dayjs from "dayjs";
 import {
   GetEmpPersonalById,
+  GetPartnerData,
+  GetPartnerProfile,
   GetPatPersonalById,
   submitPartnerPersonalData,
   submitPersonalData,
 } from "../../../Api/UserManagement/Partner";
+import { FaUpload } from "react-icons/fa";
 
 const validationSchema = Yup.object().shape({
   phone: Yup.string()
@@ -30,60 +35,148 @@ const validationSchema = Yup.object().shape({
     .required("Alternative Phone Number is required"),
   firstname: Yup.string().required("Company Name is required"),
   lastname: Yup.string().required("Owner Name is required"),
-  blood: Yup.string().required("Company Name is required"),
+  // blood: Yup.string().required("Company Name is required"),
   gender: Yup.string().required("Please select an Gender"), // Validation schema for select field
   dob: Yup.date().required("Date of Birth is required").nullable(),
+  profile_img: Yup.mixed()
+    .required("File is empty")
+    .test("required", "A file is required", function (value) {
+      const { isEdit } = this.options.context;
+      if (!isEdit && !value) {
+        return false;
+      }
+      return true;
+    })
+    .test("file_size", "File size is too large", function (value) {
+      if (value && value.size > 2000000) {
+        // 2MB
+        return false;
+      }
+      return true;
+    })
+    .test("file_type", "Unsupported File Format", function (value) {
+      if (typeof value === "string") {
+        // If value is a string (file path), skip file type validation
+        return true;
+      }
+      if (
+        value &&
+        ["image/jpeg", "image/png", "image/jpg"].includes(value.type)
+      ) {
+        return true;
+      }
+      return false;
+    }),
 });
+
+
+
 export default function AddPersonalDetails({
   setCurrentpage,
   PartnerID,
   setPartnerID,
+  addressback
 }) {
+
+  const dispatch = useDispatch();
+
   const handleSubmit = async (values) => {
-    if (PartnerID) {
+    console.log(values, 'values_values');
+
+    if (PartnerID && enable == false) {
       setCurrentpage(2);
     } else {
       try {
-        const data = await submitPartnerPersonalData(values);
+        const data = await submitPartnerPersonalData(
+          values,
+          PartnerID,
+          enable,
+          dispatch
+        );
         // setModalIsOpen(false);
+        console.log(data, "111111");
         toast.success(data?.message);
         setCurrentpage(2);
-        // GetOffersData(dispatch);
+        GetPartnerProfile(PartnerID, dispatch)
+        GetPartnerData(dispatch);
         console.log(data);
       } catch (error) {
         console.error("Error uploading data", error);
       }
     }
+    setPatPersonalData({
+      partner_first_name: values.firstname,
+      partner_last_name: values.lastname,
+      phone: values.phone,
+      alt_phone: values.alt_phone,
+      emailid: values.emailid,
+      gender: values.gender,
+      date_of_birth: values.dob,
+      profile_img: values.profile_img
+    })
   };
-  const [empproffesionaldata, setEmpPersonalData] = useState("");
+
+
+  const [patpersonalData, setPatPersonalData] = useState({
+    partner_first_name: "",
+    partner_last_name: "",
+    phone: "",
+    alt_phone: "",
+    emailid: "",
+    gender: "",
+    date_of_birth: "",
+    profile_img: "",
+  });
+  const [enable, setEnable] = useState(false);
+
+  console.log(patpersonalData, 'emp_proffesional_data')
   const fetchGetUser = async () => {
     try {
       const data = await GetPatPersonalById(
         PartnerID,
         setPartnerID,
-        setEmpPersonalData
+        setPatPersonalData,
+        dispatch
       );
-      setEmpPersonalData(data);
+      setPatPersonalData(data);
     } catch (error) {
       console.error("Error fetching additional user data", error);
     }
   };
 
   useEffect(() => {
-    if (PartnerID != null) {
+    if (PartnerID != null || enable || addressback) {
       fetchGetUser();
     }
-  }, [PartnerID, setPartnerID, setEmpPersonalData]);
+  }, [PartnerID, setPartnerID, setPatPersonalData, enable, addressback]);
+
+
+  const { Dragger } = Upload;
+  const [profileImage, setProfileImage] = useState("");
+  const [draggerImage, setDraggerImage] = useState(false)
+  const [previewUrl, setPreviewUrl] = useState("");
+
   return (
+
     <div>
       <div className="border-l-[0.1vw] h-[28vw] overflow-y-scroll px-[2vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f]">
         <div className="h-[4vw] w-full flex items-center justify-between ">
           <label className="text-[1.5vw] font-semibold text-[#1f4b7f] ">
             Personal Details
           </label>
-          <button className="rounded-full font-semibold w-[6vw] h-[2vw] flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] border-[#34AE2A] text-[1.1vw] text-[#34AE2A] ">
-            Save
-          </button>
+          {PartnerID || addressback ? (
+            <button
+              className={`${enable
+                ? "bg-[#1f4b7f] text-white"
+                : "text-[#1f4b7f] bg-white border-[#1f4b7f]"
+                } rounded-full font-semibold w-[10vw] h-[2vw] flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] text-[1.1vw] `}
+              onClick={() => setEnable(!enable)}
+            >
+              Enable to Edit
+            </button>
+          ) : (
+            ""
+          )}
         </div>
         <div className="pb-[1vw] ">
           <div className="border-b-[0.1vw] w-full border-[#1f4b7f] "></div>
@@ -91,17 +184,21 @@ export default function AddPersonalDetails({
         <div>
           <Formik
             initialValues={{
-              firstname: empproffesionaldata || "",
-              lastname: empproffesionaldata || "",
-              phone: empproffesionaldata || "",
-              emailid: empproffesionaldata || "",
-              alt_phone: empproffesionaldata || "",
-              dob: empproffesionaldata || "",
-              gender: empproffesionaldata || "",
-              blood: empproffesionaldata || "",
+              firstname: patpersonalData?.partner_first_name || "",
+              lastname: patpersonalData?.partner_last_name || "",
+              phone: patpersonalData?.phone || "",
+              emailid: patpersonalData?.emailid || "",
+              alt_phone: patpersonalData?.alternate_phone || "",
+              dob: patpersonalData?.date_of_birth ? dayjs(patpersonalData.date_of_birth).format("YYYY-MM-DD")
+                : "",
+              gender: patpersonalData?.gender || "",
+              // blood: patpersonalData || "",
+              profile_img: patpersonalData?.profile_img || "",
             }}
             validationSchema={validationSchema}
             onSubmit={(values) => {
+              console.log("harionambio", values)
+
               handleSubmit(values);
             }}
             enableReinitialize
@@ -113,6 +210,9 @@ export default function AddPersonalDetails({
               handleSubmit,
               values,
               handleChange,
+              resetForm,
+              errors,
+              touched
             }) => (
               <Form onSubmit={handleSubmit}>
                 <div className="gap-y-[1.5vw] flex-col flex">
@@ -128,8 +228,20 @@ export default function AddPersonalDetails({
                         type="text"
                         name="firstname"
                         placeholder="Enter First Name"
-                        // value={values.firstname}
-                        className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                        value={values.firstname}
+                        disabled={
+                          PartnerID || addressback
+                            ? enable
+                              ? false
+                              : true
+                            : false
+                        }
+                        className={`${PartnerID || addressback
+                          ? enable == false
+                            ? " cursor-not-allowed"
+                            : ""
+                          : ""
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                       />
                       <ErrorMessage
                         name="firstname"
@@ -148,8 +260,20 @@ export default function AddPersonalDetails({
                         type="text"
                         name="lastname"
                         placeholder="Enter Last Name"
-                        // value={values.firstname}
-                        className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                        value={values.lastname}
+                        disabled={
+                          PartnerID || addressback
+                            ? enable
+                              ? false
+                              : true
+                            : false
+                        }
+                        className={`${PartnerID || addressback
+                          ? enable == false
+                            ? " cursor-not-allowed"
+                            : ""
+                          : ""
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                       />
                       <ErrorMessage
                         name="lastname"
@@ -171,8 +295,20 @@ export default function AddPersonalDetails({
                           type="text"
                           name="phone"
                           placeholder="Enter Number"
-                          // value={values.firstname}
-                          className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                          value={values.phone}
+                          disabled={
+                            PartnerID || addressback
+                              ? enable
+                                ? false
+                                : true
+                              : false
+                          }
+                          className={`${PartnerID || addressback
+                            ? enable == false
+                              ? " cursor-not-allowed"
+                              : ""
+                            : ""
+                            } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                         />
                         {/* <button className="absolute right-[0.5vw] text-[1vw] text-white w-[5vw] bg-[#1F4B7F] rounded-full h-[1.7vw]">
                           Verify
@@ -195,8 +331,20 @@ export default function AddPersonalDetails({
                         type="text"
                         name="emailid"
                         placeholder="Enter Email Address"
-                        // value={values.firstname}
-                        className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                        value={values.emailid}
+                        disabled={
+                          PartnerID || addressback
+                            ? enable
+                              ? false
+                              : true
+                            : false
+                        }
+                        className={`${PartnerID || addressback
+                          ? enable == false
+                            ? " cursor-not-allowed"
+                            : ""
+                          : ""
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                       />
                       <ErrorMessage
                         name="emailid"
@@ -217,8 +365,20 @@ export default function AddPersonalDetails({
                         type="text"
                         name="alt_phone"
                         placeholder="Enter Alternate Number"
-                        // value={values.firstname}
-                        className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                        value={values.alt_phone}
+                        disabled={
+                          PartnerID || addressback
+                            ? enable
+                              ? false
+                              : true
+                            : false
+                        }
+                        className={`${PartnerID || addressback
+                          ? enable == false
+                            ? " cursor-not-allowed"
+                            : ""
+                          : ""
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                       />
                       <ErrorMessage
                         name="alt_phone"
@@ -237,12 +397,24 @@ export default function AddPersonalDetails({
                         type="date"
                         name="dob"
                         placeholder="Select Date of Birth"
-                        value={values.expiry_date}
+                        value={values.dob}
                         onChange={(e) => {
                           handleChange(e);
                           localStorage.setItem("dob", e.target.value);
                         }}
-                        className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                        disabled={
+                          PartnerID || addressback
+                            ? enable
+                              ? false
+                              : true
+                            : false
+                        }
+                        className={`${PartnerID || addressback
+                          ? enable == false
+                            ? " cursor-not-allowed"
+                            : ""
+                          : ""
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                       />
                       <ErrorMessage
                         name="dob"
@@ -262,12 +434,24 @@ export default function AddPersonalDetails({
                       <Field
                         as="select"
                         name="gender"
-                        value={values.status}
+                        value={values.gender}
                         onChange={(e) => {
                           handleChange(e);
                           localStorage.setItem("status", e.target.value);
                         }}
-                        className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                        disabled={
+                          PartnerID || addressback
+                            ? enable
+                              ? false
+                              : true
+                            : false
+                        }
+                        className={`${PartnerID || addressback
+                          ? enable == false
+                            ? " cursor-not-allowed"
+                            : ""
+                          : ""
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                       >
                         <option label="Select Gender" value="" className="" />
                         <option label="Male" value="Male" className="" />
@@ -280,7 +464,7 @@ export default function AddPersonalDetails({
                         className="text-red-500 text-[0.8vw]"
                       />
                     </div>
-                    <div className="col-span-1">
+                    {/* <div className="col-span-1">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         Blood Group
                         <span className="text-[1vw] text-red-600 pl-[0.2vw]">
@@ -299,24 +483,113 @@ export default function AddPersonalDetails({
                         component="div"
                         className="text-red-500 text-[0.8vw]"
                       />
+                    </div> */}
+
+                    <div className="col-span-1 relative">
+                      <label className="text-[#1F4B7F] text-[1.1vw] ">
+                        Profile Image
+                      </label>
+                      <Field name="profile_img">
+                        {({ field, form }) => (
+                          <>
+                            <Dragger
+                              onChange={() => setDraggerImage(true)}
+                              height={"7.2vw"}
+                              beforeUpload={(file) => {
+                                console.log(file, "filefilefilefile");
+                                setFieldValue("profile_img", file);
+                                setProfileImage(file.name);
+                                setPatPersonalData({
+                                  ...patpersonalData,
+                                  offer_name: file,
+                                });
+                                setFieldValue("fileType", file.type);
+                                setFieldValue("fileSize", file.size);
+                                const reader = new FileReader();
+
+                                reader.onloadend = () => {
+                                  setPreviewUrl(reader.result); // Set the preview URL
+                                };
+
+                                reader.readAsDataURL(file);
+                                return false; // Prevent automatic upload
+                              }}
+                              showUploadList={false} // Disable the default upload list
+                              className=" mt-[0.5vw] relative"
+                              style={{
+                                backgroundSize: "cover",
+                                backgroundPosition: "center",
+                                position: "relative",
+                              }}
+                              disabled={
+                                PartnerID || addressback
+                                  ? enable
+                                    ? false
+                                    : true
+                                  : false
+                              }
+                            >
+                              <label className="flex items-center justify-center z-10 absolute top-[0.5vw]">
+                                <p className="text-[#1F4B7F] font-bold text-[1.1vw] pr-[1vw]"> {/* Added leading */}
+                                  Drag and Drop
+                                </p>
+                                <FaUpload color="#1F4B7F" size={"1.2vw"} />
+                              </label>
+                              <div
+                                className="absolute top-0 left-0 w-full h-full"
+                                style={{
+                                  backgroundImage: `url(${(patpersonalData.profile_img
+                                    && draggerImage == false
+                                  )
+                                    ? `http://192.168.90.47:4000${patpersonalData.profile_img}`
+                                    : ""
+                                    // `http://192.168.90.47:4000${superadmincompanydata.profileimg}`
+                                    })`,
+                                  backgroundSize: "cover",
+                                  backgroundPosition: "center",
+                                  opacity: "30%",
+                                  zIndex: 0,
+                                }}
+                              ></div>
+                            </Dragger>
+                          </>
+                        )}
+                      </Field>
+                      {profileImage && (
+                        <p className="text-[#1F4B7F] text-[0.8vw] mt-2">
+                          {profileImage}
+                        </p>
+                      )}
+                      {errors.file && touched.file && (
+                        <div className="text-red-500 text-[0.8vw]">
+                          {errors.file}
+                        </div>
+                      )}
                     </div>
                   </div>
+
                   <div className="flex items-center justify-between py-[1vw]">
                     <div>
-                      <h1 className="text-[#1F4B7F] text-[0.8vw] font-semibold">
+                      <h1 className="text-[#1F4B7F] text-[0.7vw] font-semibold">
                         *You must fill in all fields to be able to continue
                       </h1>
                     </div>
                     <div className="flex items-center gap-x-[1vw]">
-                      <button className="border-[#1F487C] w-[5vw] font-semibold text-[1vw] h-[2vw] rounded-full border-r-[0.2vw]  border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw]">
+                      <button
+                        type="button"
+                        className="border-[#1F487C] w-[5vw] font-semibold text-[1vw] h-[2vw] rounded-full border-r-[0.2vw]  border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw]"
+                        onClick={resetForm}>
                         Reset
                       </button>
                       <button
-                        className="bg-[#1F487C] font-semibold rounded-full w-[7vw] h-[2vw] text-[1vw] text-white"
+                        className="bg-[#1F487C] font-semibold rounded-full w-[11vw] h-[2vw] text-[1vw] text-white"
                         type="submit"
-                        // onClick={() => setCurrentpage(2)}
+                      // onClick={() => setCurrentpage(2)}
                       >
-                        Continue
+                        {PartnerID || addressback ? enable
+                          ? "Update & Continue"
+                          : "Continue"
+                          : "Continue"}
                       </button>
                     </div>
                   </div>
@@ -326,6 +599,6 @@ export default function AddPersonalDetails({
           </Formik>
         </div>
       </div>
-    </div>
+    </div >
   );
 }

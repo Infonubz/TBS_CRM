@@ -34,6 +34,15 @@ import {
   GET_OP_EMP_COUNT,
   GET_PRO_EMP_COUNT,
   GET_MOBILE_ADS,
+  GET_OPERATOR_EMAILID,
+  GET_ALL_EMAIL_INFO,
+  GET_RECENT_OFFERS,
+  GET_RECENT_ADS,
+  GET_RECENT_PROMOFILE,
+  REQ_MAN_OFFERS,
+  GET_REQ_ADS,
+  OPERATOR_BYID,
+  PARTNER_BYID,
 } from "./Type";
 
 const initialState = {
@@ -67,13 +76,20 @@ const initialState = {
   op_emp_count: [],
   pro_emp_count: [],
   mobile_adsList: [],
+  get_all_email_info: [],
+  get_all_operator_email: [],
+  notification_count: "",
+  req_man_offers: [],
+  get_req_ads: [],
+  operator_byid: {}
 };
 
 export const crmreducer = (state = initialState, action) => {
-  const { type, payload } = action;
+  const { type, payload, payload_count } = action;
 
   switch (type) {
     case PROMOTION_DATA:
+      console.log(payload, 'PROMOTION_DATA')
       return {
         ...state,
         promotion_data: payload,
@@ -89,16 +105,19 @@ export const crmreducer = (state = initialState, action) => {
         user_management_user_list: payload,
       };
     case OFFERS_LIST:
+      console.log(payload, 'OFFERS_LIST')
       return {
         ...state,
         offers_list: payload,
       };
     case SUPER_ADMIN_LIST:
+      console.log(payload, 'super_admin_list')
       return {
         ...state,
         super_admin_list: payload,
       };
     case OPERATOR_LIST:
+      console.log(payload, 'operator_list_payload')
       return {
         ...state,
         operator_list: payload,
@@ -201,11 +220,11 @@ export const crmreducer = (state = initialState, action) => {
         ...state,
         unread_notification: payload,
       };
-    case NOTIFICATION_DATA:
-      return {
-        ...state,
-        notification_data: payload,
-      };
+    // case NOTIFICATION_DATA:
+    //   return {
+    //     ...state,
+    //     notification_data: payload,
+    //   };
     case GET_ADS_CLIENT:
       return {
         ...state,
@@ -253,6 +272,74 @@ export const crmreducer = (state = initialState, action) => {
         ...state,
         operator_name: payload,
       };
+
+    case GET_OPERATOR_EMAILID: {
+      // console.log(payload, "payloadpayload");
+      return {
+        ...state,
+        get_all_operator_email: payload,
+      };
+    }
+
+    case GET_ALL_EMAIL_INFO: {
+      return {
+        ...state,
+        get_all_email_info: payload,
+      };
+    }
+    case GET_RECENT_PROMOFILE: {
+      return {
+        ...state,
+        get_recent_promofile: payload,
+      };
+    }
+
+    case GET_RECENT_ADS: {
+      return {
+        ...state,
+        get_recent_ads: payload,
+      };
+    }
+
+    case GET_RECENT_OFFERS: {
+      return {
+        ...state,
+        get_recent_offers: payload,
+      };
+    }
+
+    case NOTIFICATION_DATA:
+      console.log(payload, "reducer notifiaction");
+      console.log(payload_count, "payload_count");
+      return {
+        ...state,
+        notification_data: payload,
+        notification_count: payload_count,
+      };
+    case REQ_MAN_OFFERS:
+      return {
+        ...state,
+        req_man_offers: payload,
+      };
+    case GET_REQ_ADS: {
+      return {
+        ...state,
+        get_req_ads: payload,
+      };
+    }
+    case OPERATOR_BYID:
+      console.log(payload, "operator_byid");
+      return {
+        ...state,
+        operator_byid: payload,
+      };
+    case PARTNER_BYID:
+      console.log(payload, "partner_byid");
+      return {
+        ...state,
+        partner_byid: payload,
+      };
+
     default:
       return state;
   }

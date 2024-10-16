@@ -1,53 +1,67 @@
 import axios from "axios";
 import { GET_EMPLOYEE_LIST } from "../../Store/Type";
 import { toast } from "react-toastify";
+
 const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
 });
+
 const apiUrl = process.env.REACT_APP_API_URL;
 
+const user = sessionStorage.getItem("USER_ID");
+
 export const GetEmployeeData = async (dispatch) => {
+  const endpoint = user?.startsWith("tbs-pro")
+    ? `${apiUrl}/pro-All-emp-details`
+    : `${apiUrl}/All-emp-details`;
+
   try {
-    const response = await api.get(`${apiUrl}/pro-All-emp-details`);
+    const response = await api.get(endpoint);
     dispatch({ type: GET_EMPLOYEE_LIST, payload: response.data });
+    console.log(response, "---employee data");
     return response.data;
   } catch (error) {
     handleError(error);
-    return null; // Return null or some default value to prevent throwing the error
+    return null;
   }
 };
-export const submitPersonalData = async (
-  personalvalues,
-  enable,
-  EmployeeID,
+
+export const handleEmployeeSearch = async (e, dispatch) => {
+  try {
+    if (e.target.value) {
+      const response = await api.get(
+        `${apiUrl}/proemp-search/${e.target.value}`
+      );
+      dispatch({ type: GET_EMPLOYEE_LIST, payload: response.data });
+      return response.data[0];
+    } else {
+      GetEmployeeData(dispatch);
+    }
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+export const EmployeeStatusUpdateApi = async (
+  valueid,
+  value,
+  employeeid,
   dispatch
 ) => {
   const payload = {
-    emp_first_name: personalvalues.firstname,
-    emp_last_name: personalvalues.lastname,
-    phone: personalvalues.phone,
-    email_id: personalvalues.emailid,
-    alternate_phone: personalvalues.alt_phone,
-    date_of_birth: personalvalues.dob,
-    gender: personalvalues.gender,
-    blood_group: personalvalues.blood,
-    role_type: personalvalues.role,
-    role_type_id: personalvalues.role_id,
+    emp_status_id: valueid,
+    emp_status: value,
   };
 
-  // const url = updatedata
-  //   ? `${apiUrl}/operator_details/${updatedata}`
-  //   : "${apiUrl}/operator_details";
+  const url = user.startsWith("tbs-pro")
+    ? `${apiUrl}/pro-emp-status/${employeeid}`
+    : `${apiUrl}/emp-status/${employeeid}`;
 
-  // const method = updatedata ? "put" : "post";
-  const submiturl = `${apiUrl}/pro-emp-personal-details`;
-  const updateurl = `${apiUrl}/pro-emp-personal-details/${
-    EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
-  }`;
-  const method = enable ? "put" : "post";
-  const url = enable ? updateurl : submiturl;
+  // const url = `${apiUrl}/pro-emp-status/${employeeid}`;
+  const method = "put";
+
   try {
     const response = await api({
       method,
@@ -55,6 +69,79 @@ export const submitPersonalData = async (
       data: payload,
       headers: {
         "Content-Type": "application/json",
+      },
+    });
+    GetEmployeeData(dispatch);
+    console.log(response, "responseresponse");
+    return response.data;
+  } catch (error) {
+    handleError(error);
+    return null;
+  }
+};
+
+export const submitPersonalData = async (
+  personalvalues,
+  enable,
+  EmployeeID,
+  dispatch
+) => {
+  const dynamicId = user.startsWith("tbs-pro") ? "owner_id" : "tbs_operator_id";
+  // const payload = {
+  //   emp_first_name: personalvalues.firstname,
+  //   emp_last_name: personalvalues.lastname,
+  //   phone: personalvalues.phone,
+  //   email_id: personalvalues.emailid,
+  //   alternate_phone: personalvalues.alt_phone,
+  //   date_of_birth: personalvalues.dob,
+  //   gender: personalvalues.gender,
+  //   blood_group: personalvalues.blood,
+  //   role_type: personalvalues.role,
+  //   role_type_id: personalvalues.role_id,
+  //   [dynamicId]: sessionStorage.getItem("USER_ID")
+  // };
+
+  const formData = new FormData();
+
+  formData.append("emp_first_name", personalvalues.firstname);
+  formData.append("emp_last_name", personalvalues.lastname);
+  formData.append("phone", personalvalues.phone);
+  formData.append("email_id", personalvalues.emailid);
+  formData.append("alternate_phone", personalvalues.alt_phone);
+  formData.append("date_of_birth", personalvalues.dob);
+  formData.append("gender", personalvalues.gender);
+  formData.append("blood_group", personalvalues.blood);
+  formData.append("role_type", personalvalues.role);
+  formData.append("role_type_id", personalvalues.role_id);
+  formData.append("profile_img", personalvalues.profile_img);
+  formData.append(dynamicId, sessionStorage.getItem("USER_ID"));
+
+  // Now `formData` is ready to be used
+
+  // const url = updatedata
+  //   ? `${apiUrl}/operator_details/${updatedata}`
+  //   : "${apiUrl}/operator_details";
+
+  // const method = updatedata ? "put" : "post";
+  const submiturl = user.startsWith("tbs-pro")
+    ? `${apiUrl}/pro-emp-personal-details`
+    : `${apiUrl}/emp-personal-details`;
+  const updateurl = user.startsWith("tbs-pro")
+    ? `${apiUrl}/pro-emp-personal-details/${EmployeeID}`
+    : `${apiUrl}/emp-personal-detail/${EmployeeID}`;
+
+  const method = enable ? "put" : "post";
+  const url = enable ? updateurl : submiturl;
+  try {
+    const response = await api({
+      method,
+      url,
+      // data: payload,
+      data: formData,
+      headers: {
+        // "Content-Type": "application/json",
+        "Content-Type": "multipart/form-data",
+
       },
     });
     GetEmployeeData(dispatch);
@@ -66,6 +153,7 @@ export const submitPersonalData = async (
     return null;
   }
 };
+
 export const submitEmployeeAddressData = async (
   addressvalues,
   EmployeeID,
@@ -89,9 +177,17 @@ export const submitEmployeeAddressData = async (
   //   : "${apiUrl}/operator_details";
 
   // const method = updatedata ? "put" : "post";
-  const url = `${apiUrl}/pro-emp-registered-address/${
-    EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
-  }`;
+
+  const url = user.startsWith("tbs-pro")
+    ? `${apiUrl}/pro-emp-registered-address/${EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
+    }`
+    : `${apiUrl}/emp-registered-address/${EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
+    }`;
+
+  // const url = `${apiUrl}/pro-emp-registered-address/${
+  //   EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
+  // }`;
+
   const method = "put";
 
   try {
@@ -127,9 +223,16 @@ export const submitEmployeeProffesionalData = async (
     reporting_manager: values.report_manager,
   };
 
-  const url = `${apiUrl}/pro-emp-professional-details/${
-    EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
-  }`;
+  // const url = `${apiUrl}/pro-emp-professional-details/${
+  //   EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
+  // }`;
+
+  const url = user.startsWith("tbs-pro")
+    ? `${apiUrl}/pro-emp-professional-details/${EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
+    }`
+    : `${apiUrl}/emp-professional-details/${EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
+    }`;
+
   const method = "post";
 
   try {
@@ -164,9 +267,16 @@ export const SubmitEmpDocumentsData = async (
   formData.append("aadhar_card_number", documentsdata.aadhar_number);
   formData.append("pan_card_number", documentsdata.pan_number);
 
-  const url = `${apiUrl}/pro-emp-professional-documents/${
-    EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
-  }`;
+  const url = user.startsWith("tbs-pro")
+    ? `${apiUrl}/pro-emp-professional-documents/${EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
+    }`
+    : `${apiUrl}/emp-professional-documents/${EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
+    }`;
+
+  // const url = `${apiUrl}/pro-emp-professional-documents/${
+  //   EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
+  // }`;
+
   const method = "post";
 
   try {
@@ -192,12 +302,14 @@ export const GetEmpAddressById = async (
   setEmployeeID,
   setEmpAddressData
 ) => {
+  const endpoint = user.startsWith("tbs-pro")
+    ? `${apiUrl}/pro-emp-registered-address/${EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
+    }`
+    : `${apiUrl}/emp-registered-address/${EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
+    }`;
+
   try {
-    const response = await api.get(
-      `${apiUrl}/pro-emp-registered-address/${
-        EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
-      }`
-    );
+    const response = await api.get(endpoint);
     console.log(response, "responseresponse");
     // SetUpdateData(null);
     setEmpAddressData("");
@@ -207,15 +319,18 @@ export const GetEmpAddressById = async (
     return null;
   }
 };
+
 export const GetEmpProffesionalById = async (
   EmployeeID,
   setEmployeeID,
   setEmpProffesionalData
 ) => {
+  const endpoint = user.startsWith("tbs-pro")
+    ? `${apiUrl}/pro-emp-professional-details/${EmployeeID}`
+    : `${apiUrl}/emp-professional-details/${EmployeeID}`;
+
   try {
-    const response = await api.get(
-      `${apiUrl}/pro-emp-professional-details/${EmployeeID}`
-    );
+    const response = await api.get(endpoint);
     console.log(response, "responseresponse");
     // SetUpdateData(null);
     setEmpProffesionalData("");
@@ -225,61 +340,55 @@ export const GetEmpProffesionalById = async (
     return null;
   }
 };
+
 export const GetEmpPersonalById = async (
   EmployeeID,
   setEmployeeID,
   setEmpPersonalData
 ) => {
+  const endpoint = user.startsWith("tbs-pro")
+    ? `${apiUrl}/pro-emp-personal-details/${EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
+    }`
+    : `${apiUrl}/emp-personal-details/${EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
+    }`;
+
   try {
-    const response = await api.get(
-      `${apiUrl}/pro-emp-personal-details/${
-        EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
-      }`
-    );
+    const response = await api.get(endpoint);
     console.log(response, "responseresponse");
     // SetUpdateData(null);
     setEmpPersonalData("");
+    sessionStorage.setItem('EmployeeProfileImg', response.data[0].profile_img)
     return response?.data;
   } catch (error) {
     handleError(error);
     return null;
   }
 };
+
 export const GetEmpDocumentById = async (
   EmployeeID,
   setEmployeeID,
   setEmpDocumentlData
 ) => {
+  const endpoint = user.startsWith("tbs-pro")
+    ? `${apiUrl}/pro-emp-professional-documents/${EmployeeID}`
+    : `${apiUrl}/emp-documents-only/${EmployeeID}`;
+
   try {
-    const response = await api.get(
-      `${apiUrl}/pro-emp-documents-only/${EmployeeID}`
-    );
+    const response = await api.get(endpoint);
     console.log(response, "responseresponse");
     // SetUpdateData(null);
     setEmpDocumentlData("");
-    return response?.data[0];
+    return response?.data;
   } catch (error) {
     handleError(error);
     return null;
   }
 };
 
-export const GetProductOwnerEmployee = async (values) => {
-  const payload = {
-    user_id: values,
-  };
-  const url = `${apiUrl}/permissions/userRoles`;
-  const method = "post";
-
+export const GetProductOwnerEmployee = async () => {
   try {
-    const response = await api({
-      method,
-      url,
-      data: payload,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await api.get(`${apiUrl}/role`);
     // GetEmployeeData(dispatch);
     console.log(response, "responseresponse");
     return response.data;
@@ -288,29 +397,59 @@ export const GetProductOwnerEmployee = async (values) => {
     return null;
   }
 };
-export const GetOwnerEmployeeProfile = async (operatorID) => {
-  console.log(operatorID, "operatorID852");
+
+export const GetOwnerEmployeeProfile = async (EmployeeID) => {
+  console.log(EmployeeID, "operatorID852");
+
+  const endpoint = user.startsWith("tbs-pro")
+    ? `${apiUrl}/pro-emp-ProfileImg/${EmployeeID}`
+    : `${apiUrl}/emp-profileImg/${EmployeeID}`;
+
   try {
-    const response = await axios.get(
-      `${apiUrl}/pro-emp-ProfileImg/${
-        operatorID ? operatorID : sessionStorage.getItem("SPA_ID")
-      }`
-    );
+    const response = await axios.get(endpoint);
     // dispatch({ type: OPERATOR_LIST, payload: response.data });
+    console.log(response, "response");
     return response.data;
   } catch (error) {
     handleError(error);
     // return null;
   }
 };
-export const OwnerEmployeeProfile = async (image) => {
-  console.log(image, "image987465222");
-  const payload = new FormData();
-  payload.append("profileimg", image);
 
-  const updateurl = `${apiUrl}/pro-emp-profileImg/${sessionStorage.getItem(
-    "EMP_ID"
-  )}`;
+export const SubmitEmployeeExcel = async (file) => {
+  const formData = new FormData();
+  formData.append("xlsxFile", file);
+  const excelEndpoint = `${apiUrl}/pro-employee-importExcel`;
+  const method = "post";
+
+  try {
+    const response = await api({
+      url: excelEndpoint,
+      method: method,
+      data: formData,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    toast.success(response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    toast.error("Failed to upload file");
+    return null;
+  }
+};
+
+export const OwnerEmployeeProfile = async (image, EmployeeID) => {
+  console.log(image, "image987465222");
+
+  const payload = new FormData();
+  payload.append("profile_img", image);
+
+  const updateurl = user.startsWith("tbs-pro")
+    ? `${apiUrl}/pro-emp-profileImg/${EmployeeID}`
+    : `${apiUrl}/emp-profileImg/${EmployeeID}`;
+
 
   const method = "put";
   try {
@@ -329,7 +468,8 @@ export const OwnerEmployeeProfile = async (image) => {
     handleError(error);
     return null;
   }
-}
+};
+
 const handleError = (error) => {
   console.error("Error details:", error);
   let errorMessage = "An error occurred";

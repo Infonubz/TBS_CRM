@@ -132,7 +132,7 @@ export default function OwnerEmployee({ setAuthtoken }) {
                         type="text"
                         name="emailid_phone"
                         placeholder="Enter Email Address"
-                        className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                        className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                       />
                       <ErrorMessage
                         name="emailid_phone"
@@ -152,7 +152,7 @@ export default function OwnerEmployee({ setAuthtoken }) {
                           type={showPassword ? "text" : "password"}
                           name="password"
                           placeholder="Enter Password"
-                          className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                          className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                         />
                         <div
                           className="absolute right-[1vw] cursor-pointer"

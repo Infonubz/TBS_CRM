@@ -28,14 +28,13 @@ export default function GridView({
 
   return (
     <div className="pt-[0.5vw]">
-      <div className="grid grid-cols-5 w-full gap-x-[3vw] gap-b-[1.5vw]">
+      <div className="grid grid-cols-5 w-full gap-x-[4vw] gap-[1vw] pb-[5vw]">
         {currentData.map((item) => (
           <div
-            className={`${
-              hoverid == item.tbs_offer_id
-                ? "bg-[#1f4b7f] text-white"
-                : "bg-white"
-            }  h-[18vw] border-[#1f4b7f] border-l-[0.1vw] cursor-pointer border-r-[0.3vw] border-b-[0.3vw] border-t-[0.1vw] rounded-[0.5vw]`}
+            className={`${hoverid == item.tbs_offer_id
+              ? "bg-[#1f4b7f] text-white"
+              : "bg-white"
+              }  h-[16.5vw] border-[#1f4b7f] border-l-[0.1vw] cursor-pointer border-r-[0.3vw] border-b-[0.3vw] border-t-[0.1vw] rounded-[0.5vw]`}
             onMouseEnter={() => setHoverId(item.tbs_offer_id)}
             onMouseLeave={() => setHoverId("")}
             style={{
@@ -44,7 +43,7 @@ export default function GridView({
           >
             <div className="flex justify-end pt-[1vw] pr-[.5vw]">
               <Popover
-               placement="bottomRight"
+                placement="bottomRight"
                 content={
                   <div className="flex flex-col">
                     <div>
@@ -52,7 +51,7 @@ export default function GridView({
                         onClick={() => {
                           setModalIsOpen(true);
                           SetUpdateData(item.tbs_offer_id)
-                          }}
+                        }}
                         className="flex items-center cursor-pointer text-[1vw] text-[#1F4B7F] hover:text-[#1f487c]"
                       >
                         <FontAwesomeIcon
@@ -82,8 +81,8 @@ export default function GridView({
                   </div>
                 }
                 trigger="click"
-                // open={openPopovers[row.tbs_ad_id] || false}
-                // onOpenChange={() => togglePopover(row.tbs_ad_id)}
+              // open={openPopovers[row.tbs_ad_id] || false}
+              // onOpenChange={() => togglePopover(row.tbs_ad_id)}
               >
                 <FontAwesomeIcon
                   icon={faEllipsisVertical}
@@ -92,18 +91,17 @@ export default function GridView({
                     height: "1.5vw",
                     width: "1.5vw",
                   }}
-                  className={`${
-                    hoverid == item.tbs_offer_id
-                      ? "text-white"
-                      : ""
-                  }`}
+                  className={`${hoverid == item.tbs_offer_id
+                    ? "text-white"
+                    : ""
+                    }`}
                 />
               </Popover>
             </div>
             <div className="flex-col flex items-center  h-full w-full gap-y-[0.3vw]">
               <img
                 src={
-                  item.offer_img != null
+                  item?.offer_img != null
                     ? `http://192.168.90.47:4000${item.offer_img}`
                     : userimg
                 }
@@ -120,17 +118,18 @@ export default function GridView({
                   item?.expiry_date
                 ).format("MMM DD")}`}
               </h1>
-              <button
-                className={`${
-                  item.status == "Active"
+              <div className="px-[0.5vw] w-full">
+                <button
+                  className={`${item.status == "Active"
                     ? "bg-[#34AE2A]"
                     : item.status == "Draft"
-                    ? "bg-[#FD3434]"
-                    : "bg-[#FF9900]"
-                } border-dashed  border-white border-[0.2vw] text-[1.1vw] rounded-full text-white px-[4.5vw] py-[0.2vw]`}
-              >
-                {item.status}
-              </button>
+                      ? "bg-[#FD3434]"
+                      : "bg-[#FF9900]"
+                    } border-dashed  border-white border-[0.2vw] text-[1.1vw] rounded-full text-white px-[0.5vw] py-[0.2vw] w-full `}
+                >
+                  {item.code}
+                </button>
+              </div>
             </div>
           </div>
         ))}

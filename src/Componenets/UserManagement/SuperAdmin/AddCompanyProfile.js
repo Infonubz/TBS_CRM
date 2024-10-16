@@ -1,4 +1,4 @@
-import { Progress } from "antd";
+import { Progress, Upload } from "antd";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { FaCloudUploadAlt } from "react-icons/fa";
@@ -6,11 +6,13 @@ import { toast } from "react-toastify";
 import * as Yup from "yup";
 import {
   GetOperatorById,
+  GetOperatorProfile,
   SubmitAddressData,
   SubmitCompanyData,
 } from "../../../Api/UserManagement/SuperAdmin";
 import axios from "axios";
 import { useDispatch } from "react-redux";
+import { FaUpload } from "react-icons/fa";
 
 const validationSchema = Yup.object().shape({
   phone: Yup.string()
@@ -42,8 +44,12 @@ const validationSchema = Yup.object().shape({
     // )
     .min(3, "Company name must be at least 3 characters long")
     .max(30, "Company name must be at most 30 characters long")
+    .matches(/^[^!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+$/, 'Special characters are not allowed')
     .required("Company Name is required"),
-  ownername: Yup.string().required("Owner Name is required"),
+  ownername: Yup.string()
+    .required("Owner Name is required")
+    .matches(/^[^!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+$/, 'Special characters are not allowed'),
+  password: Yup.string(),
   aadhar: Yup.string()
     .matches(/^[0-9]{12}$/, "Aadhar number must be exactly 12 digits")
     .required("Aadhar Number is required"),
@@ -53,6 +59,35 @@ const validationSchema = Yup.object().shape({
       "PAN number must be in the format: ABCDE1234F"
     )
     .required("Pan Number is required"),
+  profileimg: Yup.mixed()
+    .required("File is empty")
+    .test("required", "A file is required", function (value) {
+      const { isEdit } = this.options.context;
+      if (!isEdit && !value) {
+        return false;
+      }
+      return true;
+    })
+    .test("file_size", "File size is too large", function (value) {
+      if (value && value.size > 2000000) {
+        // 2MB
+        return false;
+      }
+      return true;
+    })
+    .test("file_type", "Unsupported File Format", function (value) {
+      if (typeof value === "string") {
+        // If value is a string (file path), skip file type validation
+        return true;
+      }
+      if (
+        value &&
+        ["image/jpeg", "image/png", "image/jpg"].includes(value.type)
+      ) {
+        return true;
+      }
+      return false;
+    }),
 });
 export default function AddSuperAdmin({
   setCurrentpage,
@@ -62,10 +97,13 @@ export default function AddSuperAdmin({
   operatorID,
   setOperatorID,
   addressback,
+  operator_id,
+  setOperator_Id,
 }) {
   const dispatch = useDispatch();
+
   const handleSubmit = async (values) => {
-    console.log(enable,"hiiiiiiiiii");
+    console.log(enable, "hiiiiiiiiii");
     if (operatorID && enable == false) {
       setCurrentpage(2);
     } else {
@@ -78,12 +116,26 @@ export default function AddSuperAdmin({
         );
         toast.success(data?.message);
         setCurrentpage(2);
+        setOperator_Id(data?.id);
+        GetOperatorProfile(operatorID, dispatch)
         console.log("Current page set to 2");
       } catch (error) {
         console.error("Error uploading data", error);
       }
     }
+    setsuperadmincompanydata({
+      company_name: values.companyname,
+      owner_name: values.ownername,
+      phone: values.phone,
+      alternate_phone: values.phone,
+      emailid: values.emailid,
+      alternate_emailid: values.emailid,
+      aadharcard_number: values.aadhar,
+      pancard_number: values.pan,
+      profileimg: values.profileimg
+    });
   };
+
   const handleBlur = async (e, setFieldError) => {
     const { value } = e.target;
 
@@ -102,14 +154,35 @@ export default function AddSuperAdmin({
       setFieldError("phone", "Error checking mobile number");
     }
   };
-  const [superadmincompanydata, setsuperadmincompanydata] = useState("");
+  const [superadmincompanydata, setsuperadmincompanydata] = useState({
+    company_name: "",
+    owner_name: "",
+    phone: "",
+    alternate_phone: "",
+    emailid: "",
+    alternate_emailid: "",
+    aadharcard_number: "",
+    pancard_number: "",
+    profileimg: ""
+  });
+  console.log(superadmincompanydata, 'super_admin_company_data')
+
+
+  const { Dragger } = Upload;
+  const [profileImage, setProfileImage] = useState("");
+  const [previewUrl, setPreviewUrl] = useState("");
+  const [draggerImage, setDraggerImage] = useState(false)
+
+
+  // console.log(superadmincompanydata?.profileimg, 'super_admin_company_data')
   const [enable, setEnable] = useState(false);
   const fetchGetUser = async () => {
     try {
       const data = await GetOperatorById(
         operatorID,
         setOperatorID,
-        setsuperadmincompanydata
+        setsuperadmincompanydata,
+        dispatch
       );
       setsuperadmincompanydata(data[0]);
     } catch (error) {
@@ -140,11 +213,10 @@ export default function AddSuperAdmin({
           </button> */}
           {operatorID || addressback ? (
             <button
-              className={`${
-                enable
-                  ? "bg-[#1f4b7f] text-white"
-                  : "text-[#1f4b7f] bg-white border-[#1f4b7f]"
-              } rounded-full font-semibold w-[10vw] h-[2vw] flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] text-[1.1vw] `}
+              className={`${enable
+                ? "bg-[#1f4b7f] text-white"
+                : "text-[#1f4b7f] bg-white border-[#1f4b7f]"
+                } rounded-full font-semibold w-[10vw] h-[2vw] flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] text-[1.1vw] `}
               onClick={() => setEnable(!enable)}
             >
               Enable to Edit
@@ -159,22 +231,24 @@ export default function AddSuperAdmin({
         <div>
           <Formik
             initialValues={{
-              companyname: superadmincompanydata.company_name || "",
-              ownername: superadmincompanydata.owner_name || "",
-              phone: superadmincompanydata.phone || "",
-              emailid: superadmincompanydata.emailid || "",
+              companyname: superadmincompanydata?.company_name || "",
+              ownername: superadmincompanydata?.owner_name || "",
+              phone: superadmincompanydata?.phone || "",
+              emailid: superadmincompanydata?.emailid || "",
               // alt_phone: "",
               // alt_emailid: "",
-              aadhar: superadmincompanydata.aadharcard_number || "",
-              pan: superadmincompanydata.pancard_number || "",
+              aadhar: superadmincompanydata?.aadharcard_number || "",
+              pan: superadmincompanydata?.pancard_number || "",
               // pancarddoc: "",
               // aadardoc: "",
-              user_status: superadmincompanydata.user_status || "",
-              req_status: superadmincompanydata.req_status || "",
+              user_status: superadmincompanydata?.user_status || "",
+              req_status: superadmincompanydata?.req_status || "",
+              profileimg: superadmincompanydata?.profileimg || "",
             }}
             validationSchema={validationSchema}
             onSubmit={(values) => {
               handleSubmit(values);
+
             }}
             enableReinitialize
           >
@@ -186,6 +260,9 @@ export default function AddSuperAdmin({
               values,
               handleChange,
               setFieldError,
+              errors,
+              touched,
+              resetForm
             }) => (
               <Form onSubmit={handleSubmit}>
                 <div className="gap-y-[1.5vw] flex-col flex">
@@ -209,13 +286,12 @@ export default function AddSuperAdmin({
                               : true
                             : false
                         }
-                        className={`${
-                          operatorID || addressback
-                            ? enable == false
-                              ? " cursor-not-allowed"
-                              : ""
+                        className={`${operatorID || addressback
+                          ? enable == false
+                            ? " cursor-not-allowed"
                             : ""
-                        } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          : ""
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                       />
                       <ErrorMessage
                         name="companyname"
@@ -242,13 +318,12 @@ export default function AddSuperAdmin({
                               : true
                             : false
                         }
-                        className={`${
-                          operatorID || addressback
-                            ? enable == false
-                              ? " cursor-not-allowed"
-                              : ""
+                        className={`${operatorID || addressback
+                          ? enable == false
+                            ? " cursor-not-allowed"
                             : ""
-                        } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          : ""
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                       />
                       <ErrorMessage
                         name="ownername"
@@ -280,13 +355,12 @@ export default function AddSuperAdmin({
                                 : true
                               : false
                           }
-                          className={`${
-                            operatorID || addressback
-                              ? enable == false
-                                ? " cursor-not-allowed"
-                                : ""
+                          className={`${operatorID || addressback
+                            ? enable == false
+                              ? " cursor-not-allowed"
                               : ""
-                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                            : ""
+                            } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                         />
                         {/* <button className="absolute right-[0.5vw] text-[1vw] text-white w-[5vw] bg-[#1F4B7F] rounded-full h-[1.7vw]">
                           Verify
@@ -317,13 +391,12 @@ export default function AddSuperAdmin({
                               : true
                             : false
                         }
-                        className={`${
-                          operatorID || addressback
-                            ? enable == false
-                              ? " cursor-not-allowed"
-                              : ""
+                        className={`${operatorID || addressback
+                          ? enable == false
+                            ? " cursor-not-allowed"
                             : ""
-                        } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          : ""
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                       />
                       <ErrorMessage
                         name="emailid"
@@ -395,13 +468,12 @@ export default function AddSuperAdmin({
                                 : true
                               : false
                           }
-                          className={`${
-                            operatorID || addressback
-                              ? enable == false
-                                ? " cursor-not-allowed"
-                                : ""
+                          className={`${operatorID || addressback
+                            ? enable == false
+                              ? " cursor-not-allowed"
                               : ""
-                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                            : ""
+                            } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                         />
 
                         {/* <div className=" absolute right-[1vw]">
@@ -434,13 +506,12 @@ export default function AddSuperAdmin({
                                 : true
                               : false
                           }
-                          className={`${
-                            operatorID || addressback
-                              ? enable == false
-                                ? " cursor-not-allowed"
-                                : ""
+                          className={`${operatorID || addressback
+                            ? enable == false
+                              ? " cursor-not-allowed"
                               : ""
-                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                            : ""
+                            } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                         />
 
                         {/* <div className=" absolute right-[1vw]">
@@ -454,10 +525,96 @@ export default function AddSuperAdmin({
                         className="text-red-500 text-[0.8vw]"
                       />
                     </div>
+
+
+
+                  </div>
+
+                  <div className="col-span-1 flex flex-col">
+                    <label className="text-[#1F4B7F] text-[1.1vw] font-semibold">
+                      Company Logo
+                    </label>
+                    <Field name="profileimg">
+                      {({ field, form }) => (
+                        <>
+                          <Dragger
+                            onChange={() => setDraggerImage(true)}
+                            height={"7.2vw"}
+                            beforeUpload={(file) => {
+                              console.log(file, "filefilefilefile");
+                              setFieldValue("profileimg", file);
+                              setProfileImage(file.name);
+                              setsuperadmincompanydata({
+                                ...superadmincompanydata,
+                                offer_name: file,
+                              });
+                              setFieldValue("fileType", file.type);
+                              setFieldValue("fileSize", file.size);
+                              const reader = new FileReader();
+
+                              reader.onloadend = () => {
+                                setPreviewUrl(reader.result); // Set the preview URL
+                              };
+
+                              reader.readAsDataURL(file);
+                              return false; // Prevent automatic upload
+                            }}
+                            showUploadList={false} // Disable the default upload list
+                            className="custom-dragger mt-[0.5vw] relative"
+                            style={{
+                              backgroundSize: "cover",
+                              backgroundPosition: "center",
+                              position: "relative",
+                            }}
+                            disabled={
+                              operatorID || addressback
+                                ? enable
+                                  ? false
+                                  : true
+                                : false
+                            }
+                          >
+                            <label className="flex items-center justify-center z-10 absolute top-[0.5vw]">
+                              <p className="text-[#1F4B7F] font-bold text-[1.1vw] pr-[1vw]"> {/* Added leading */}
+                                Drag and Drop
+                              </p>
+                              <FaUpload color="#1F4B7F" size={"1.2vw"} />
+                            </label>
+                            <div
+                              className="absolute top-0 left-0 w-full h-full"
+                              style={{
+                                backgroundImage: `url(${(superadmincompanydata?.profileimg
+                                  && draggerImage == false
+                                )
+                                  ? `http://192.168.90.47:4000${superadmincompanydata?.profileimg}`
+                                  : ""
+                                  // `http://192.168.90.47:4000${superadmincompanydata.profileimg}`
+                                  })`,
+                                backgroundSize: "cover",
+                                backgroundPosition: "center",
+                                opacity: "30%",
+                                zIndex: 0,
+                              }}
+                            ></div>
+                          </Dragger>
+                        </>
+                      )}
+                    </Field>
+                    {profileImage && (
+                      <p className="text-[#1F4B7F] text-[0.8vw] mt-2">
+                        {profileImage}
+                      </p>
+                    )}
+                    {errors.file && touched.file && (
+                      <div className="text-red-500 text-[0.8vw]">
+                        {errors.file}
+                      </div>
+                    )}
+
                   </div>
                   <div className="flex items-center justify-between py-[1vw]">
                     <div>
-                      <h1 className="text-[#1F4B7F] text-[0.8vw] font-semibold">
+                      <h1 className="text-[#1F4B7F] text-[0.7vw] font-semibold">
                         *You must fill in all fields to be able to continue
                       </h1>
                     </div>
@@ -466,9 +623,9 @@ export default function AddSuperAdmin({
                         Reset
                       </button> */}
                       <button
-                        className="bg-[#1F487C] font-semibold rounded-full w-[10vw] h-[2vw] text-[1vw] text-white"
+                        className="bg-[#1F487C] font-semibold rounded-full w-[11vw] h-[2vw] text-[1vw] text-white"
                         type="submit"
-                        // onClick={() => setCurrentpage(2)}
+                      // onClick={() => setCurrentpage(2)}
                       >
                         {operatorID || addressback
                           ? enable

@@ -19,7 +19,20 @@ export const GetSubscriptionList = async (dispatch) => {
     handleError(error);
   }
 };
-
+export const handleAdsearch = async (e, dispatch) => {
+  try {
+    if (e.target.value) {
+      const response = await api.get(`${apiUrl}/subscription/search/${e.target.value}`);
+      dispatch({ type: GET_SUBSCRIPTION, payload: response.data });
+      return response.data[0];
+    } else {
+      GetSubscriptionList(dispatch);
+    }
+  } catch (error) {
+    handleError(error);
+    return null;
+  }
+};
 const handleError = (error) => {
   console.error("Error details:", error);
   let errorMessage = "An error occurred";

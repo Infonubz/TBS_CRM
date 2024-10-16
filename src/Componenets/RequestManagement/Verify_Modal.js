@@ -18,14 +18,19 @@ import { REQUEST_MANAGEMENT_DATA } from "../../Store/Type";
 import {
   GetRequestDataById
 } from "../../Api/RequestManagement/RequestManagement";
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
 
 
-export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyData, setRequestData, requestData,statusFromEdit }) {
+export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyData, setRequestData, requestData, statusFromEdit }) {
   const [value, setValue] = useState(1);
   const [isUpdateStatus, setIsUpdateStatus] = useState(false);
   const [isDwldModal, setIsDwldModal] = useState(false);
   const [modalContent, setModalContent] = useState("download");
   const [dataValue, setDataValue] = useState();
+
+
+  console.log(requestData, "This is my status id");
 
   const onChange = (e) => {
     console.log("radio checked", e.target.value);
@@ -36,6 +41,16 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
     setIsUpdateStatus(false);
     setIsDwldModal(false);
   };
+
+  useEffect(() => {
+    if (isDwldModal) {
+      const timer = setTimeout(() => {
+        closeModal();
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [isDwldModal]);
+
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
 
@@ -43,7 +58,7 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
     try {
       const data = await GetRequestDataById(verifyData, setVerifyData, setRequestData);
       //console.log(verifyData,"data data data");
-     // console.log(data,"----- data ---");
+      // console.log(data,"----- data ---");
       setRequestData(data);
     } catch (error) {
       console.error("Error fetching additional user data", error);
@@ -73,7 +88,7 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
   //     GetData();
   //   }, 5000); // 5000 milliseconds = 5 seconds
   // };
- 
+
   // console.log(dataValue, "updatedata");
   // const { getCode, getName } = require("country-list");
   // const countryList = require("country-list");
@@ -93,9 +108,38 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
       .catch((error) => console.log("error", error));
   }, []);
 
- // console.log(dataValue, "dataValuedataValue");
+  // console.log(dataValue, "dataValuedataValue");
   const [currentfile, setCurrentFile] = useState(null);
-  console.log(verifyData,"verifyDataverifyData")
+  console.log(verifyData, "verifyDataverifyData")
+
+
+
+  const downloadImages = async () => {
+    const imageUrls = await fetchImages(); // Fetch your dynamic images
+
+    const zip = new JSZip();
+
+    for (const url of imageUrls) {
+      const imageBlob = await fetch(url).then(res => res.blob());
+      const fileName = url.split('/').pop(); 
+      zip.file(fileName, imageBlob);
+    }
+
+    zip.generateAsync({ type: 'blob' }).then(content => {
+      saveAs(content, `${requestData?.tbs_operator_id}.zip`); 
+    });
+  };
+
+  const fetchImages = async () => {
+    return [
+      `http://192.168.90.47:4000${requestData?.aadar_front_doc}`,
+      `http://192.168.90.47:4000${requestData?.aadar_back_doc}`,
+      `http://192.168.90.47:4000${requestData?.pancard_front_doc}`,
+      `http://192.168.90.47:4000${requestData?.pancard_back_doc}`,
+      `http://192.168.90.47:4000${requestData?.msme_doc}`,
+    ];
+  };
+
   return (
     <>
       {/* <Spin spinning={loading}> */}
@@ -194,11 +238,10 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
                             : no_image_available
                         }
                         alt="Aadhar Front Img"
-                        className={`w-full ${
-                          currentfile == 1
-                            ? "h-[20vw] object-fill"
-                            : "h-[10vw] object-cover"
-                        } object-cover cursor-zoom-in border-[#1F487C] border-[0.2vw] border-dashed rounded-[1vw]`}
+                        className={`w-full ${currentfile == 1
+                          ? "h-[20vw] object-fill"
+                          : "h-[10vw] object-cover"
+                          } object-cover cursor-zoom-in border-[#1F487C] border-[0.2vw] border-dashed rounded-[1vw]`}
                         style={{
                           transition: "ease-in 0.5s",
                         }}
@@ -213,17 +256,16 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
                             : no_image_available
                         }
                         alt="Aadhar Back Img"
-                        className={`w-full ${
-                          currentfile == 2
-                            ? "h-[20vw] object-fill"
-                            : "h-[10vw] object-cover"
-                        } object-cover cursor-zoom-in border-[#1F487C] border-[0.2vw] border-dashed rounded-[1vw]`}
+                        className={`w-full ${currentfile == 2
+                          ? "h-[20vw] object-fill"
+                          : "h-[10vw] object-cover"
+                          } object-cover cursor-zoom-in border-[#1F487C] border-[0.2vw] border-dashed rounded-[1vw]`}
                         style={{
                           transition: "ease-in 0.5s",
                         }}
                         onMouseEnter={() => setCurrentFile(2)}
                         onMouseLeave={() => setCurrentFile(null)}
-                        // onClick={() => setCurrentFile(2)}
+                      // onClick={() => setCurrentFile(2)}
                       />
                       <img
                         src={
@@ -232,11 +274,10 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
                             : no_image_available
                         }
                         alt="PAN Front Img"
-                        className={`w-full ${
-                          currentfile == 3
-                            ? "h-[20vw] object-fill"
-                            : "h-[10vw] object-cover"
-                        } object-cover cursor-zoom-in border-[#1F487C] border-[0.2vw] border-dashed rounded-[1vw]`}
+                        className={`w-full ${currentfile == 3
+                          ? "h-[20vw] object-fill"
+                          : "h-[10vw] object-cover"
+                          } object-cover cursor-zoom-in border-[#1F487C] border-[0.2vw] border-dashed rounded-[1vw]`}
                         style={{
                           transition: "ease-in 0.5s",
                         }}
@@ -250,11 +291,10 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
                             : no_image_available
                         }
                         alt="PAN Back Img"
-                        className={`w-full ${
-                          currentfile == 4
-                            ? "h-[20vw] object-fill"
-                            : "h-[10vw] object-cover"
-                        } object-cover cursor-zoom-in border-[#1F487C] border-[0.2vw] border-dashed rounded-[1vw]`}
+                        className={`w-full ${currentfile == 4
+                          ? "h-[20vw] object-fill"
+                          : "h-[10vw] object-cover"
+                          } object-cover cursor-zoom-in border-[#1F487C] border-[0.2vw] border-dashed rounded-[1vw]`}
                         style={{
                           transition: "ease-in 0.5s",
                         }}
@@ -268,11 +308,10 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
                             : no_image_available
                         }
                         alt="MSME"
-                        className={`w-full ${
-                          currentfile == 5
-                            ? "h-[30vw] object-fill"
-                            : "h-[10vw] object-cover"
-                        }  cursor-zoom-in border-[#1F487C] border-[0.2vw] border-dashed rounded-[1vw]`}
+                        className={`w-full ${currentfile == 5
+                          ? "h-[30vw] object-fill"
+                          : "h-[10vw] object-cover"
+                          }  cursor-zoom-in border-[#1F487C] border-[0.2vw] border-dashed rounded-[1vw]`}
                         style={{
                           transition: "ease-in 0.5s",
                         }}
@@ -500,6 +539,7 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
                         onClick={() => {
                           setModalContent("download");
                           setIsDwldModal(true);
+                          downloadImages()
                         }}
                       >
                         <span>
@@ -507,14 +547,16 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
                         </span>
                         <span>Download</span>
                       </button>
+                      {/* {requestData.req_status_id==2?<span>hell</span>:<span> NO hell</span>} */}
                       <button
-                        className="bg-[#34AE2A] rounded-[0.5vw] text-[1vw] text-white w-[8vw] h-[2.5vw]"
+                        className={`bg-[#34AE2A] ${requestData.req_status_id == 2 ? "opacity-50 cursor-not-allowed" : ""} rounded-[0.5vw] text-[1vw] text-white w-[8vw] h-[2.5vw]`}
                         onClick={() => {
                           setIsUpdateStatus(true);
                         }
                         }
+                        disabled={requestData.req_status_id == 2}
                       >
-                        {statusFromEdit==true?<span>Update Status</span>:<span> Verify Status</span>}
+                        {statusFromEdit == true ? <span>Update Status</span> : <span> Verify Status</span>}
                         {/* Verify Status */}
                       </button>
                     </div>
@@ -536,10 +578,10 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
         <Status_Update_Modal
           setIsSaveModal={setIsUpdateStatus}
           currentid={verifyData}
-          verifyData = {verifyData}
-          setVerifyData = {setVerifyData}
-          setRequestData = {setRequestData}
-          requestData = {requestData}
+          verifyData={verifyData}
+          setVerifyData={setVerifyData}
+          setRequestData={setRequestData}
+          requestData={requestData}
           setIsVerifyModal={setIsVerifyModal}
         />
       </ModalPopup>
@@ -549,8 +591,7 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
         show={isDwldModal}
         closeicon={false}
         onClose={closeModal}
-        height="260px"
-        width="450px"
+        width="23vw"
       >
         <Success_Modal
           actionType={modalContent}

@@ -16,9 +16,10 @@ import {
   SubmitProfileData,
 } from "../../../Api/UserManagement/SuperAdmin";
 import { useLocation } from "react-router";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
-
+import USERPROFILE from '../../../asserts/Image.png'
+import { RiUser3Fill } from "react-icons/ri";
 const getBase64 = (file) =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -38,6 +39,7 @@ export default function SuperAdminIndex({
   const [previewImage, setPreviewImage] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
   const [fileList, setFileList] = useState([]);
+  const [operator_id, setOperator_Id] = useState(null);
 
   const handlePreview = async (file) => {
     if (!file.url && !file.preview) {
@@ -49,7 +51,13 @@ export default function SuperAdminIndex({
       file.name || file.url.substring(file.url.lastIndexOf("/") + 1)
     );
   };
+
+  const operatorProfileImage = sessionStorage.getItem('OperatorProfileImg')
+  // const operatorProfileImage = useSelector((state) => state.crm.operator_byid[0]?.profileimg)
+  console.log(operatorProfileImage, 'check_operator_profile_image')
+
   const dispatch = useDispatch();
+
   const handleChange = async ({ fileList: newFileList }) => {
     console.log(newFileList, "newFileList");
     setFileList(newFileList);
@@ -71,25 +79,29 @@ export default function SuperAdminIndex({
       <div style={{ marginTop: 8 }}>Upload</div>
     </div>
   );
+
   console.log(currentpage == 1, "shcjsbd");
   const [SPA_ID, SetSPAID] = useState(null);
   const [superadmindata, setSuperAdminData] = useState("");
+
   const fetchGetUser = async () => {
     try {
       const data = await GetSuperAdminById(
         operatorID,
         setOperatorID,
-        setSuperAdminData
+        setSuperAdminData,
+        dispatch
       );
       setSuperAdminData(data);
     } catch (error) {
       console.error("Error fetching additional user data", error);
     }
   };
+
   const handleupload = async (image) => {
     console.log(image, "85885555");
     try {
-      const data = await OperatorProfile(image);
+      const data = await OperatorProfile(image, operatorID);
       // setSuperAdminData(data);
       toast.success(data.message);
       getprofile();
@@ -97,42 +109,60 @@ export default function SuperAdminIndex({
       console.error("Error fetching additional user data", error);
     }
   };
+
   useEffect(() => {
     if (operatorID != null) {
       fetchGetUser();
     }
   }, [operatorID, setOperatorID, setSuperAdminData]);
 
-  console.log(operatorID, "operatorIDoperatorID");
+  console.log(operatorID, "operatorID operatorID");
+
   const [addressback, setAddressBack] = useState(false);
   const [businessback, setBusinessBack] = useState(false);
   const [documentback, setDocumentBack] = useState(false);
   const [gstback, setGstback] = useState(false);
   const location = useLocation();
   const [selectedFile, setSelectedFile] = useState(null);
+  console.log(selectedFile, 'selected_file')
+  
   const getprofile = async () => {
     try {
-      const data = await GetOperatorProfile(operatorID);
+      const data = await GetOperatorProfile(operatorID, dispatch);
       setSelectedFile(data[0]?.profileimg);
     } catch (error) {
       console.error("Error fetching additional user data", error);
     }
   };
-  const handleFileChange = (event) => {
-    setSelectedFile(event.target.files[0]);
-  };
+
+  // const handleFileChange = (event) => {
+  //   setSelectedFile(event.target.files[0]);
+  // };
+
   useEffect(() => {
     getprofile();
   }, [operatorID]);
+
   const apiurl = process.env.REACT_APP_API_URL;
+
   const profileurl = process.env.REACT_SERVER_IMAGE_URL;
-  console.log(`${profileurl}${selectedFile}`, "locationlocationlocation");
+
+  console.log(
+    `http://192.168.90.47:4000${selectedFile}`,
+    "locationlocationlocation"
+  );
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    setSelectedFile(file); 
+  };
+
+
   return (
     <div>
       <div
-        className={`w-full h-full ${
-          location.pathname != "/settings" ? "py-0" : "py-[1vw] px-[1vw]"
-        }`}
+        className={`w-full h-full ${location.pathname != "/settings" ? "py-0" : "py-[1vw] px-[1vw]"
+          }`}
       >
         {location.pathname != "/settings" ? (
           <div className="w-full h-[3vw] flex">
@@ -141,12 +171,12 @@ export default function SuperAdminIndex({
                 currentpage == 1
                   ? 20
                   : currentpage == 2
-                  ? 40
-                  : currentpage == 3
-                  ? 60
-                  : currentpage == 4
-                  ? 80
-                  : 100
+                    ? 40
+                    : currentpage == 3
+                      ? 60
+                      : currentpage == 4
+                        ? 80
+                        : 100
               }
               size="1.2vw"
               strokeColor="#1F4B7F"
@@ -188,24 +218,32 @@ export default function SuperAdminIndex({
                 >
                   {fileList.length >= 1 ? null : uploadButton}
                 </Upload> */}
-                <input
-                  id="fileInput"
-                  type="file"
-                  style={{ display: "none" }}
-                  onChange={(e) => handleupload(e?.target?.files[0])}
-                />
-                <label
-                  htmlFor="fileInput"
-                  className="h-[7vw] w-[7vw] cursor-pointer flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.3vw] border-[#1f4b7f] rounded-[0.5vw]"
-                >
-                  {selectedFile ? (
-                    <img src={`http://192.168.90.47:4000${selectedFile}`} />
-                  ) : (
-                    <span className="text-[1.1vw] text-[#1f4b7f] font-bold">
-                      Profile
-                    </span>
-                  )}
-                </label>
+
+                {/* <img
+                  src={`${operatorProfileImage
+                    ? `http://192.168.90.47:4000${operatorProfileImage}`
+                    : `${USERPROFILE}`
+                    } `}
+                  alt="Photo"
+                  className="w-[5vw] h-[5vw] object-cover rounded-[0.2vw]"
+                /> */}
+
+
+                {operatorProfileImage === 'null' || operatorProfileImage === null ? (
+                  <div>
+                    <RiUser3Fill size='1vw'
+                      color="#1F487C"
+                      className="h-[7vw] w-[7vw] cursor-pointer flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.3vw] border-[#1f4b7f] rounded-[0.5vw]" />
+                  </div>
+                ) : (
+
+                  <img
+                    onChange={handleFileChange}
+                    src={`http://192.168.90.47:4000${operatorProfileImage}`}
+                    alt="Photo"
+                    className="h-[7vw] w-[7vw] cursor-pointer flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.3vw] border-[#1f4b7f] rounded-[0.5vw]" />
+                )}
+
                 <Modal
                   visible={previewOpen}
                   title={previewTitle}
@@ -224,17 +262,16 @@ export default function SuperAdminIndex({
                 <div className="">
                   <div className="bg-[#D9D9D9] rounded-t-full rounded-b-full w-[0.7vw] h-[14vw] relative">
                     <div
-                      className={`absolute rounded-t-full rounded-b-full w-[0.7vw] h-[2vw] bg-[#1f4b7f] ${
-                        currentpage == 1
-                          ? "top-0"
-                          : currentpage == 2
+                      className={`absolute rounded-t-full rounded-b-full w-[0.7vw] h-[2vw] bg-[#1f4b7f] ${currentpage == 1
+                        ? "top-0"
+                        : currentpage == 2
                           ? "top-[3vw]"
                           : currentpage == 3
-                          ? "top-[6vw]"
-                          : currentpage == 4
-                          ? "top-[9vw]"
-                          : "bottom-0"
-                      }`}
+                            ? "top-[6vw]"
+                            : currentpage == 4
+                              ? "top-[9vw]"
+                              : "bottom-0"
+                        }`}
                     ></div>
                   </div>
                 </div>
@@ -270,6 +307,8 @@ export default function SuperAdminIndex({
                   operatorID={operatorID}
                   setAddressBack={setAddressBack}
                   addressback={addressback}
+                  operator_id={operator_id}
+                  setOperator_Id={setOperator_Id}
                 />
               ) : currentpage == 2 ? (
                 <AddRegisterAddress
@@ -318,8 +357,10 @@ export default function SuperAdminIndex({
                     SPA_ID={SPA_ID}
                     superadmindata={superadmindata}
                     operatorID={operatorID}
+                    setOperatorID={setOperatorID}
                     setModalIsOpen={setModalIsOpen}
                     gstback={gstback}
+                    operator_id={operator_id}
                     setGstback={setGstback}
                   />
                 )
@@ -328,6 +369,6 @@ export default function SuperAdminIndex({
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 }

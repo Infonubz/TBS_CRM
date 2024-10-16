@@ -30,24 +30,25 @@ export default function ReqPromotion({
   const [viewmodal, setViewPromoModal] = useState(false);
   const [viewid, setViewID] = useState(null);
   const [promoId, setPromoId] = useState("");
+  console.log(promoId,"prooooooooooid");
   const columns = [
     {
-      title: <h1 className="text-[1.2vw] font-semibold">S.No</h1>,
+      title: <h1 className="text-[1.2vw] font-semibold flex items-center justify-center">S.No</h1>,
       width: "5vw",
       render: (row, rowdta, index) => {
         return (
-          <div className="">
+          <div className="flex items-center justify-center">
             <h1 className="pl-[1vw]">{index + 1}</h1>
           </div>
         );
       },
     },
     {
-      title: <h1 className="text-[1.2vw] font-semibold">Name</h1>,
+      title: <h1 className="text-[1.2vw] font-semibold flex items-center justify-center">Name</h1>,
       sorter: (a, b) => a.promo_name.localeCompare(b.promo_name),
       render: (row, rowdta, index) => {
         return (
-          <div className="flex items-center">
+          <div className="flex items-center justify-center">
             {/* <h1 className="text-[1.1vw]">{row.promo_name}</h1> */}
             {row?.promo_name?.length > 15 ? (
               <Tooltip
@@ -68,14 +69,14 @@ export default function ReqPromotion({
     },
 
     {
-      title: <h1 className="text-[1.2vw] font-semibold">Description</h1>,
+      title: <h1 className="flex items-center justify-center text-[1.2vw] font-semibold">Description</h1>,
       sorter: (a, b) => a.promo_description.localeCompare(b.promo_description),
       render: (row, rowdta, index) => {
         return (
           // <div className="flex items-center">
           //   <h1 className="text-[1.1vw]">{row.promo_description}</h1>
           // </div>
-          <div className="flex items-center">
+          <div className="flex items-center justify-center">
             <h1 className="text-[1.1vw]">
               {/* {row.promo_description} */}
               {row?.promo_description?.length > 15 ? (
@@ -97,7 +98,7 @@ export default function ReqPromotion({
       width: "14vw",
     },
     {
-      title: <h1 className="text-[1.2vw] font-semibold">Operator</h1>,
+      title: <h1 className="flex items-center justify-center text-[1.2vw] font-semibold">Operator</h1>,
       width: "17vw",
       render: (row) => {
         return (
@@ -123,14 +124,14 @@ export default function ReqPromotion({
       },
     },
     {
-      title: <h1 className="text-[1.2vw] font-semibold">Duration</h1>,
+      title: <h1 className=" flex items-center justify-center text-[1.2vw] font-semibold">Duration</h1>,
       sorter: (a, b) =>
         dayjs(a.start_date).valueOf() - dayjs(b.start_date).valueOf(),
       width: "15vw",
       render: (row) => {
         return (
           <div>
-            <p className="text-[1.1vw]">{`${dayjs(row?.start_date).format(
+            <p className="flex items-center justify-center text-[1.1vw]">{`${dayjs(row?.start_date).format(
               "MMM DD"
             )} - ${dayjs(row?.expiry_date).format("MMM DD")}`}</p>
           </div>
@@ -138,36 +139,43 @@ export default function ReqPromotion({
       },
     },
     {
-      title: <h1 className="text-[1.2vw] font-semibold">Usage</h1>,
+      title: <h1 className=" flex items-center justify-center text-[1.2vw] font-semibold">Usage</h1>,
       sorter: (a, b) => a.usage - b.usage,
       width: "7vw",
       render: (row) => {
         return (
           <div>
-            <p className="text-[1.1vw]">{row.usage}</p>
+            <p className="flex items-center justify-center text-[1.1vw]">{row.usage}</p>
           </div>
         );
       },
     },
     {
       title: (
-        <div className="flex justify-center font-bold text-[1.2vw]">
+        <div className="flex justify-center items-center font-bold text-[1.2vw]">
           Card
         </div>
       ),
       width: "10vw",
       render: (row) => {
-        setPromoId(row.promo_id);
+        // setPromoId(row.promo_id);
         console.log(row, "rowrowrowrow");
         return (
-          <div className="flex  justify-center">
+          <div className="flex  justify-center items-center">
             <button
-              type="button"
+              
               className="text-white bg-[#727070] flex items-center justify-center rounded-[0.5vw]  text-[1vw] w-[5vw] py-[0.2vw]  
                "
-              onClick={() => {
-                setViewPromoModal(true);
-                setViewID(row.tbs_operator_id);
+              // onClick={() => {
+              //   setViewID(row.tbs_operator_id);
+              //   setViewPromoModal(true);
+              // }}
+              onClick={()=>{
+                // setViewID(row.promo_id)
+                setPromoId(row.promo_id)
+                console.log(row.promo_id,"idvaratum");
+                setViewPromoModal(true)
+
               }}
             >
               <span>
@@ -180,11 +188,11 @@ export default function ReqPromotion({
       },
     },
     {
-      title: <h1 className="text-[1.2vw] font-semibold">Status</h1>,
+      title: <h1 className="text-[1.2vw] font-semibold flex items-center justify-center">Status</h1>,
       width: "10vw",
       render: (row) => {
         return (
-          <div>
+          <div className="flex items-center justify-center">
             {row?.user_id != null ? (
               <button
                 className={`${
@@ -198,7 +206,10 @@ export default function ReqPromotion({
                     ? "bg-[#2A99FF]"
                     : "bg-[#646262]"
                 } rounded-[0.5vw] text-[1.1vw]  font-bold text-white w-[8vw] py-[0.2vw]`}
-                onClick={() => setViewStatus(true)}
+                onClick={() =>{
+                  setViewStatus(true)
+                  setPromoId(row.promo_id)
+                }}
               >
                 {capitalizeFirstLetter(row.user_status)}
               </button>
@@ -210,12 +221,12 @@ export default function ReqPromotion({
       },
     },
     {
-      title: <h1 className="text-[1.2vw] font-semibold">Actions</h1>,
+      title: <h1 className="text-[1.2vw] font-semibold flex items-center justify-center">Actions</h1>,
       width: "10vw",
       render: (row) => {
         console.log(row, "rowrowrowrow");
         return (
-          <div className="flex gap-[0.7vw]  items-center">
+          <div className="flex gap-[0.7vw] justify-center  items-center">
             {/* <div><IoMdEye size={"1.6vw"} color="#1F4B7F" onClick={() => { setEyeModalIsOpen(true) }} /></div> */}
             {/* <MdEdit
               size={"1.3vw"}

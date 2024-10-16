@@ -16,6 +16,8 @@ import dayjs from "dayjs";
 import UserProfile from "../../asserts/userprofile.png";
 import ModalPopup from "../Common/Modal/Modal";
 import DeleteList from "../Offers/DeleteList";
+import { capitalizeFirstLetter } from "../Common/Captilization";
+import PartnerStatusUpdate from "./Partner/PartnerStatusUpdate";
 import { useSelector } from "react-redux";
 
 // import { width } from "@fortawesome/free-solid-svg-icons/fa0";
@@ -25,20 +27,30 @@ const PartnerTableList = ({
   setModalIsOpen,
   SetUpdateData,
   currentData,
+  PartnerID,
+  setPartnerID,
+  get_partner_list,
 }) => {
   const [sortedInfo, setSortedInfo] = useState({});
+  const [viewmodal, setViewModal] = useState(false);
+
   const handleChange = (pagination, filters, sorter) => {
     console.log("Various parameters", pagination, filters, sorter);
 
     setSortedInfo(sorter);
   };
-  const get_operator_list = useSelector((state) => state.crm.operator_list);
+  // const get_partner_list = useSelector((state) => state.crm.partner_list);
 
   const [employee_id, setemployee_id] = useState(null);
+
+  const closeModal = () => {
+    setViewModal(false);
+  };
+
   const columns = [
     {
       title: (
-        <div className="flex justify-center font-bold text-[1.2vw]">Photo</div>
+        <div className="flex items-center justify-center font-bold text-[1.2vw]">Photo</div>
       ),
       // dataIndex: "photo",
       // key: "photo",
@@ -50,11 +62,10 @@ const PartnerTableList = ({
         return (
           <div className="flex justify-center items-center">
             <img
-              src={`${
-                row?.profile_img == null || "null"
-                  ? UserProfile
-                  : `http://192.168.90.47:4000${row?.profile_img}`
-              } `}
+              src={`${row?.profile_img
+                ? `http://192.168.90.47:4000${row?.profile_img}`
+                : UserProfile
+                } `}
               alt="Photo"
               className="w-[2.15vw] h-[2.15vw] object-cover rounded-[0.2vw]"
             />
@@ -64,7 +75,7 @@ const PartnerTableList = ({
       width: "6vw",
     },
     {
-      title: <div className="flex  font-bold text-[1.2vw]">Partner Name</div>, // dataIndex: "name",
+      title: <div className="flex items-center justify-center  font-bold text-[1.2vw]">Partner Name</div>, // dataIndex: "name",
       key: "name",
       sorter: (a, b) => {
         const nameA =
@@ -76,29 +87,29 @@ const PartnerTableList = ({
       width: "12vw",
       sortOrder: sortedInfo.columnKey === "name" && sortedInfo.order,
       render: (row) => (
-        <div className="flex items-center">
+        <div className="flex items-center justify-center">
           <p className="text-[1.1vw]">{`${row?.partner_first_name} ${row.partner_last_name}`}</p>
         </div>
       ),
     },
 
     {
-      title: <div className="flex font-bold text-[1.2vw]">Mobile</div>,
+      title: <div className="flex items-center justify-center font-bold text-[1.2vw]">Mobile</div>,
       key: "mobile",
-      sorter: (a, b) => a.mobilenumber.length - b.mobilenumber.length,
+      sorter: (a, b) => a.mobilenumber?.length - b.mobilenumber?.length,
       sortOrder: sortedInfo.columnKey === "mobile" ? sortedInfo.order : null,
       ellipsis: true,
       width: "10vw",
       render: (text, row) => {
         return (
-          <div className="flex items-center">
+          <div className="flex items-center justify-center">
             <p className="text-[1.1vw]">{row.phone}</p>
           </div>
         );
       },
     },
     {
-      title: <div className="flex  font-bold text-[1.2vw]">Email</div>,
+      title: <div className="flex items-center justify-center  font-bold text-[1.2vw]">Email</div>,
       // dataIndex: "email",
       key: "email",
       sorter: (a, b) => a.emailid.length - b.emailid.length,
@@ -107,14 +118,14 @@ const PartnerTableList = ({
       width: "15vw",
       render: (row) => {
         return (
-          <div className="flex items-center">
+          <div className="flex items-center justify-center">
             <p className="text-[1.1vw]">{row.emailid}</p>
           </div>
         );
       },
     },
     {
-      title: <div className="flex  font-bold text-[1.2vw]">Created</div>,
+      title: <div className="flex items-center justify-center  font-bold text-[1.2vw]">Created</div>,
       // dataIndex: "created",
       // key: "created",
       sorter: (a, b) => a.created.length - b.created.length,
@@ -123,7 +134,7 @@ const PartnerTableList = ({
       width: "10vw",
       render: (row) => {
         return (
-          <div className="flex  items-center">
+          <div className="flex items-center justify-center">
             <p className="text-[1.1vw]">
               {dayjs(row.created_date).format("MMM DD hh:mm a")}
             </p>
@@ -133,7 +144,7 @@ const PartnerTableList = ({
     },
     {
       title: (
-        <div className="flex justify-center font-bold text-[1.2vw]">Status</div>
+        <div className="flex items-center justify-center font-bold text-[1.2vw]">Status</div>
       ),
       // dataIndex: "status",
       // key: "status",
@@ -142,11 +153,25 @@ const PartnerTableList = ({
         return (
           <div className="flex items-center justify-center">
             <button
-              className={`${
-                row.status_id == 1 ? "bg-[#38ac2c]" : "bg-[#FD3434]"
-              } h-[1.8vw] text-[1.1vw] text-white w-[7vw] rounded-[0.5vw]`}
+              className={`${row.partner_status_id == 0
+                ? "bg-[#FF6B00]"
+                : row.partner_status_id == 1
+                  ? "bg-[#38ac2c]"
+                  : row.partner_status_id == 2
+                    ? "bg-[#FD3434]"
+                    : "bg-[#2A99FF]"
+                } ${row.partner_status_id == 0
+                  ? "cursor-not-allowed"
+                  : "cursor-pointer"
+                } h-[1.8vw] text-[1.1vw] text-white w-[8vw] rounded-[0.5vw]`}
+              onClick={() => {
+                if (row.partner_status_id === 1) {
+                  setViewModal(true);
+                  setPartnerID(row?.tbs_partner_id);
+                }
+              }}
             >
-              {row.gender}
+              {capitalizeFirstLetter(row.partner_status)}
             </button>
           </div>
         );
@@ -154,21 +179,21 @@ const PartnerTableList = ({
     },
     {
       title: (
-        <div className="flex justify-center font-bold text-[1.2vw]">Action</div>
+        <div className="flex items-center justify-center font-bold text-[1.2vw]">Action</div>
       ),
       // dataIndex: "action",
       // key: "action",
       width: "10vw",
       render: (row) => {
-        console.log(row?.employee_id, "rowrowrow");
+        console.log(row?.tbs_partner_id, "rowrowrow");
         return (
           <div className="flex items-center justify-center">
             <Space>
               <MdModeEditOutline
                 onClick={() => {
                   setModalIsOpen(true);
-                  SetUpdateData(row.employee_id);
-                  setemployee_id(row?.employee_id);
+                  SetUpdateData(row.tbs_partner_id);
+                  setPartnerID(row?.tbs_partner_id);
                 }}
                 size="1.4vw"
                 style={{
@@ -189,11 +214,11 @@ const PartnerTableList = ({
                 className=" cursor-pointer"
                 onClick={() => {
                   setDeleteModalIsOpen(true);
-                  setemployee_id(row?.employee_id);
+                  setPartnerID(row?.tbs_partner_id);
                 }}
               />
 
-              <FaEllipsisV
+              {/* <FaEllipsisV
                 onClick={() => handleMenu()}
                 size="1.2vw"
                 style={{
@@ -202,7 +227,7 @@ const PartnerTableList = ({
                   display: "flex",
                 }}
                 color="#1f487c"
-              />
+              /> */}
             </Space>
           </div>
         );
@@ -245,8 +270,21 @@ const PartnerTableList = ({
         <DeleteList
           setDeleteModalIsOpen={setDeleteModalIsOpen}
           title={"Want to delete this User"}
-          api={`${apiUrl}/emp-personal-details/${employee_id}`}
+          api={`${apiUrl}/partner_details/${PartnerID}`}
           module={"partner"}
+        />
+      </ModalPopup>
+      <ModalPopup
+        className="border border-[#1f487c] border-b-8 border-r-8 border-b-[#1f487c] border-r-[#1f487c] rounded-md"
+        show={viewmodal}
+        closeicon={false}
+        onClose={closeModal}
+        height="16vw"
+        width="30vw"
+      >
+        <PartnerStatusUpdate
+          PartnerID={PartnerID}
+          setViewModal={setViewModal}
         />
       </ModalPopup>
     </>

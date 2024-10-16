@@ -82,7 +82,8 @@ const ForgotPassword = () => {
     console.log(id, "session id");
     EditUserSettings(id, dispatch);
   }, []);
-  const pass = sessionStorage.getItem("password");
+  // const pass = sessionStorage.getItem("password");
+  const pass = localStorage.getItem("password");
   console.log(pass, "password");
 
   const handleSubmit = async (values) => {

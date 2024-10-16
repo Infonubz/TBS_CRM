@@ -45,7 +45,7 @@ const validationSchema = Yup.object().shape({
         : value && SUPPORTED_FORMATS.includes(value.type)
     ),
   work_exp_doc: Yup.mixed()
-    .required("Pan Front Page is required")
+    .required("Work Expirence Front Page is required")
     .test("fileSize", "File too large", (value) =>
       typeof value === "string" ? true : value && value.size <= FILE_SIZE
     )
@@ -85,7 +85,7 @@ export default function AddDocuments({
   setEmployeeID,
   operatorID,
   setDocumentBack,
-  setModalIsOpen
+  setModalIsOpen,
 }) {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
@@ -115,6 +115,7 @@ export default function AddDocuments({
   // };
   const [enable, setEnable] = useState(false);
   const dispatch = useDispatch();
+
   const handleSubmit = async (values, actions) => {
     try {
       if (operatorID) {
@@ -124,7 +125,7 @@ export default function AddDocuments({
         console.log(data, "dataascbkjasbckja"); // Replace with actual API call function
         toast.success(data);
         setCurrentpage(5); // Assuming setCurrentPage is a function in your component
-        setModalIsOpen(false)
+        setModalIsOpen(false);
       }
     } catch (error) {
       console.error("Error uploading data", error);
@@ -133,9 +134,13 @@ export default function AddDocuments({
       actions.setSubmitting(false);
     }
   };
+
   console.log(currentpage, "currentpagecurrentpage");
+
   const handleCancel = () => setPreviewOpen(false);
-  const [empproffesionaldata, setEmpDocumentData] = useState("");
+
+  const [empDocumentdata, setEmpDocumentData] = useState("");
+
   const fetchGetUser = async () => {
     try {
       const data = await GetEmpDocumentById(
@@ -154,6 +159,9 @@ export default function AddDocuments({
       fetchGetUser();
     }
   }, [EmployeeID, setEmployeeID, setEmpDocumentData]);
+
+  console.log(empDocumentdata, "empDocumentdataempDocumentdata");
+
   return (
     <div>
       <div className="border-l-[0.1vw] h-[28vw] overflow-y-scroll relative  px-[2vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f]">
@@ -170,19 +178,19 @@ export default function AddDocuments({
         </div>
         <Formik
           initialValues={{
-            aadhar_doc: empproffesionaldata?.aadar_front_doc || null,
-            aadhar_number: empproffesionaldata?.aadar_back_doc || "",
-            pan_doc: empproffesionaldata?.pancard_front_doc || null,
-            pan_number: empproffesionaldata?.pancard_back_doc || "",
-            work_exp_doc: empproffesionaldata?.msme_doc || null,
-            other_doc: empproffesionaldata?.msme_doc || null,
-            edu_cer_doc: empproffesionaldata?.msme_doc || null,
+            aadhar_doc: empDocumentdata?.aadhar_card_doc || null,
+            aadhar_number: empDocumentdata?.aadhar_card_number || "",
+            pan_doc: empDocumentdata?.pan_card_doc || null,
+            pan_number: empDocumentdata?.pan_card_number || "",
+            work_exp_doc: empDocumentdata?.work_experience_certificate || null,
+            other_doc: empDocumentdata?.other_documents || null,
+            edu_cer_doc: empDocumentdata?.educational_certificate || null,
           }}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
           enableReinitialize
         >
-          {({ isSubmitting, isValid, setFieldValue, values, handleChange }) => (
+          {({ isSubmitting, isValid, setFieldValue, values, handleChange, errors, touched }) => (
             <Form>
               <div className="gap-y-[1.5vw] flex-col flex">
                 <div className="grid grid-cols-2 w-full gap-x-[2vw]">
@@ -252,10 +260,12 @@ export default function AddDocuments({
                         }}
                       />
                       <button
+                        type="button"
                         className="border-r-[0.3vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none"
-                        onClick={() =>
-                          document.getElementById("aadhar_doc").click()
-                        }
+                        onClick={(event) => {
+                          event.preventDefault();
+                          document.getElementById("aadhar_doc").click();
+                        }}
                       >
                         <span className="opacity-50">
                           Upload Aadhar Document
@@ -268,7 +278,10 @@ export default function AddDocuments({
                       </button>
                       {values.aadhar_doc && (
                         <div
-                          onClick={() => setPreviewOpen(true)}
+                          onClick={() => {
+                            setPreviewImage(empDocumentdata?.aadhar_card_doc);
+                            setPreviewOpen(true);
+                          }}
                           className="cursor-pointer underline-offset-1 underline text-[#1F4B7F] text-[0.8vw]"
                         >
                           {values.aadhar_doc.name
@@ -308,10 +321,12 @@ export default function AddDocuments({
                         }}
                       />
                       <button
+                        type="button"
                         className="border-r-[0.3vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none"
-                        onClick={() =>
-                          document.getElementById("pan_doc").click()
-                        }
+                        onClick={(event) => {
+                          event.preventDefault();
+                          document.getElementById("pan_doc").click();
+                        }}
                       >
                         <span className="opacity-50">Upload Pan Document</span>
                         <FaCloudUploadAlt
@@ -322,7 +337,10 @@ export default function AddDocuments({
                       </button>
                       {values.pan_doc && (
                         <div
-                          onClick={() => setPreviewOpen(true)}
+                          onClick={() => {
+                            setPreviewImage(empDocumentdata?.pan_card_doc);
+                            setPreviewOpen(true);
+                          }}
                           className="cursor-pointer underline-offset-1 underline text-[#1F4B7F] text-[0.8vw]"
                         >
                           {values.pan_doc.name
@@ -363,10 +381,12 @@ export default function AddDocuments({
                         }}
                       />
                       <button
+                        type="button"
                         className="border-r-[0.3vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none"
-                        onClick={() =>
-                          document.getElementById("work_exp_doc").click()
-                        }
+                        onClick={(event) => {
+                          event.preventDefault();
+                          document.getElementById("work_exp_doc").click();
+                        }}
                       >
                         <span className="opacity-50">
                           Upload Work Experience
@@ -379,7 +399,12 @@ export default function AddDocuments({
                       </button>
                       {values.work_exp_doc && (
                         <div
-                          onClick={() => setPreviewOpen(true)}
+                          onClick={() => {
+                            setPreviewImage(
+                              empDocumentdata?.work_experience_certificate
+                            );
+                            setPreviewOpen(true);
+                          }}
                           className="cursor-pointer underline-offset-1 underline text-[#1F4B7F] text-[0.8vw]"
                         >
                           {values.work_exp_doc.name
@@ -388,7 +413,7 @@ export default function AddDocuments({
                         </div>
                       )}
                       <ErrorMessage
-                        name="pan_front"
+                        name="work_exp_doc"
                         component="div"
                         style={{ color: "red" }}
                         className="text-[0.8vw]"
@@ -420,10 +445,12 @@ export default function AddDocuments({
                         }}
                       />
                       <button
+                        type="button"
                         className="border-r-[0.3vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none"
-                        onClick={() =>
-                          document.getElementById("other_doc").click()
-                        }
+                        onClick={(event) => {
+                          event.preventDefault();
+                          document.getElementById("other_doc").click();
+                        }}
                       >
                         <span className="opacity-50">
                           Upload Other Document
@@ -434,9 +461,12 @@ export default function AddDocuments({
                           className="absolute right-[1vw]"
                         />
                       </button>
-                      {values.pan_back && (
+                      {values.other_doc && (
                         <div
-                          onClick={() => setPreviewOpen(true)}
+                          onClick={() => {
+                            setPreviewImage(empDocumentdata?.other_documents);
+                            setPreviewOpen(true);
+                          }}
                           className="cursor-pointer underline-offset-1 underline text-[#1F4B7F] text-[0.8vw]"
                         >
                           {values.other_doc.name
@@ -477,10 +507,12 @@ export default function AddDocuments({
                         }}
                       />
                       <button
+                        type="button"
                         className="border-r-[0.3vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none"
-                        onClick={() =>
-                          document.getElementById("edu_cer_doc").click()
-                        }
+                        onClick={(event) => {
+                          event.preventDefault();
+                          document.getElementById("edu_cer_doc").click();
+                        }}
                       >
                         <span className="opacity-50">
                           Upload Education Certificate
@@ -493,7 +525,12 @@ export default function AddDocuments({
                       </button>
                       {values.edu_cer_doc && (
                         <div
-                          onClick={() => setPreviewOpen(true)}
+                          onClick={() => {
+                            setPreviewImage(
+                              empDocumentdata?.educational_certificate
+                            );
+                            setPreviewOpen(true);
+                          }}
                           className="cursor-pointer underline-offset-1 underline text-[#1F4B7F] text-[0.8vw]"
                         >
                           {values.edu_cer_doc.name
@@ -513,7 +550,7 @@ export default function AddDocuments({
               </div>
               <div className="flex items-center  w-full justify-between py-[1vw]">
                 <div>
-                  <h1 className="text-[#1F4B7F] text-[0.8vw] font-semibold">
+                  <h1 className="text-[#1F4B7F] text-[0.7vw] font-semibold">
                     *You must fill in all fields to be able to continue
                   </h1>
                 </div>
@@ -530,7 +567,7 @@ export default function AddDocuments({
                   <button
                     className="bg-[#1F487C] font-semibold rounded-full w-[7vw] h-[2vw] text-[1vw] text-white"
                     type="submit"
-                    // onClick={() => setCurrentpage(4)}
+                  // onClick={() => setCurrentpage(4)}
                   >
                     Submit
                   </button>
@@ -547,7 +584,11 @@ export default function AddDocuments({
         footer={null}
         onCancel={handleCancel}
       >
-        <img alt="example" style={{ width: "100%" }} src={previewImage} />
+        <img
+          alt="example"
+          style={{ width: "100%" }}
+          src={`http://192.168.90.47:4000${previewImage}`}
+        />
       </Modal>
     </div>
   );

@@ -18,6 +18,7 @@ import ModalPopup from "../Common/Modal/Modal";
 import DeleteList from "../Offers/DeleteList";
 import { useSelector } from "react-redux";
 import { capitalizeFirstLetter } from "../Common/Captilization";
+import EmployeeStatusUpdate from "./Employee/EmployeeStatusUpdate";
 
 // import { width } from "@fortawesome/free-solid-svg-icons/fa0";
 
@@ -27,20 +28,32 @@ const EmployeeTableList = ({
   SetUpdateData,
   currentData,
   setEmployeeID,
+  setDeleteEmpModalIsOpen,
+  deleteEmpmodalIsOpen,
 }) => {
   const [sortedInfo, setSortedInfo] = useState({});
+  const [viewmodal, setViewModal] = useState(false);
+
   const handleChange = (pagination, filters, sorter) => {
     console.log("Various parameters", pagination, filters, sorter);
 
     setSortedInfo(sorter);
   };
+
   const get_operator_list = useSelector((state) => state.crm.operator_list);
 
+  const user = sessionStorage.getItem("USER_ID");
+
   const [employee_id, setemployee_id] = useState(null);
+
+  const closeModal = () => {
+    setViewModal(false);
+  };
+
   const columns = [
     {
       title: (
-        <div className="flex justify-center font-bold text-[1.2vw]">Photo</div>
+        <div className="flex items-center justify-center font-bold text-[1.2vw]">Photo</div>
       ),
       // dataIndex: "photo",
       // key: "photo",
@@ -53,9 +66,9 @@ const EmployeeTableList = ({
           <div className="flex justify-center items-center">
             <img
               src={`${
-                row?.profile_img == null || "null"
-                  ? UserProfile
-                  : `http://192.168.90.47:4000${row?.profile_img}`
+                row?.profile_img
+                  ? `http://192.168.90.47:4000${row?.profile_img}`
+                  : UserProfile
               } `}
               alt="Photo"
               className="w-[2.15vw] h-[2.15vw] object-cover rounded-[0.2vw]"
@@ -66,11 +79,11 @@ const EmployeeTableList = ({
       width: "6vw",
     },
     {
-      title: <div className="flex  font-bold text-[1.2vw]">Employee Name</div>, // dataIndex: "name",
+      title: <div className="flex items-center justify-center  font-bold text-[1.2vw]">Employee Name</div>, // dataIndex: "name",
       key: "name",
       sorter: (a, b) => {
-        const nameA = `${a.firstname} ${a.lastname}`.toUpperCase();
-        const nameB = `${b.firstname} ${b.lastname}`.toUpperCase();
+        const nameA = `${a.emp_first_name} ${a.emp_last_name}`.toUpperCase();
+        const nameB = `${b.emp_first_name} ${b.emp_last_name}`.toUpperCase();
         return nameA.localeCompare(nameB);
       },
       width: "12vw",
@@ -83,47 +96,47 @@ const EmployeeTableList = ({
     },
 
     {
-      title: <div className="flex font-bold text-[1.2vw]">Mobile</div>,
+      title: <div className="flex items-center justify-center font-bold text-[1.2vw]">Mobile</div>,
       key: "mobile",
-      sorter: (a, b) => a.mobilenumber.length - b.mobilenumber.length,
+      sorter: (a, b) => a.phone?.length - b.phone?.length,
       sortOrder: sortedInfo.columnKey === "mobile" ? sortedInfo.order : null,
       ellipsis: true,
       width: "10vw",
       render: (text, row) => {
         return (
-          <div className="flex items-center">
+          <div className="flex items-center justify-center">
             <p className="text-[1.1vw]">{row.phone}</p>
           </div>
         );
       },
     },
     {
-      title: <div className="flex  font-bold text-[1.2vw]">Email</div>,
+      title: <div className="flex items-center justify-center  font-bold text-[1.2vw]">Email</div>,
       // dataIndex: "email",
       key: "email",
-      sorter: (a, b) => a.emailid.length - b.emailid.length,
+      sorter: (a, b) => a.email_id?.length - b.email_id?.length,
       sortOrder: sortedInfo.columnKey === "email" ? sortedInfo.order : null,
       ellipsis: true,
       width: "15vw",
       render: (row) => {
         return (
-          <div className="flex items-center">
+          <div className="flex items-center justify-center">
             <p className="text-[1.1vw]">{row.email_id}</p>
           </div>
         );
       },
     },
     {
-      title: <div className="flex  font-bold text-[1.2vw]">Created</div>,
+      title: <div className="flex items-center justify-center  font-bold text-[1.2vw]">Created</div>,
       // dataIndex: "created",
-      // key: "created",
-      sorter: (a, b) => a.created.length - b.created.length,
-      sortOrder: sortedInfo.columnKey === "created" ? sortedInfo.order : null,
+      key: "created_date",
+      sorter: (a, b) => new Date(a.created_date) - new Date(b.created_date),
+      sortOrder: sortedInfo.columnKey === "created_date" && sortedInfo.order,
       ellipsis: true,
       width: "10vw",
       render: (row) => {
         return (
-          <div className="flex  items-center">
+          <div className="flex items-center justify-center">
             <p className="text-[1.1vw]">
               {dayjs(row.created_date).format("MMM DD hh:mm a")}
             </p>
@@ -133,7 +146,7 @@ const EmployeeTableList = ({
     },
     {
       title: (
-        <div className="flex justify-center font-bold text-[1.2vw]">Status</div>
+        <div className="flex items-center justify-center font-bold text-[1.2vw]">Status</div>
       ),
       // dataIndex: "status",
       // key: "status",
@@ -144,11 +157,23 @@ const EmployeeTableList = ({
             <button
               className={`${
                 row.emp_status_id == 0
-                ? "bg-[#FF6B00]"
-                : row.emp_status_id == 1
-                ? "bg-[#38ac2c]"
-                : "bg-[#FD3434]"
-              } h-[1.8vw] text-[1.1vw] text-white w-[7vw] rounded-[0.5vw]`}
+                  ? "bg-[#FF6B00]"
+                  : row.emp_status_id == 1
+                  ? "bg-[#38ac2c]"
+                  : row.emp_status_id == 2
+                  ? "bg-[#FD3434]"
+                  : "bg-[#2A99FF]"
+              } ${
+                row.emp_status_id == 0 ? "cursor-not-allowed" : "cursor-pointer"
+              } h-[1.8vw] text-[1.1vw] text-white w-[8vw] rounded-[0.5vw]`}
+              onClick={() => {
+                setViewModal(true);
+                setemployee_id(
+                  user.startsWith("tbs-pro")
+                    ? row.tbs_pro_emp_id
+                    : row.tbs_op_emp_id
+                );
+              }}
             >
               {capitalizeFirstLetter(row.emp_status)}
             </button>
@@ -158,22 +183,34 @@ const EmployeeTableList = ({
     },
     {
       title: (
-        <div className="flex justify-center font-bold text-[1.2vw]">Action</div>
+        <div className="flex items-center justify-center font-bold text-[1.2vw]">Action</div>
       ),
       // dataIndex: "action",
       // key: "action",
       width: "10vw",
       render: (row) => {
-        console.log(row?.tbs_pro_emp_id, "rowrowrow");
+        console.log(
+          user?.startsWith("tbs-pro") ? row.tbs_pro_emp_id : row.tbs_op_emp_id,
+          "rowrowrow"
+        );
         return (
           <div className="flex items-center justify-center">
             <Space>
               <MdModeEditOutline
                 onClick={() => {
                   setModalIsOpen(true);
-                  SetUpdateData(row.tbs_pro_emp_id);
-                  setemployee_id(row?.tbs_pro_emp_id);
-                  setEmployeeID(row?.tbs_pro_emp_id);
+
+                  if (user.startsWith("tbs-pro")) {
+                    SetUpdateData(row.tbs_pro_emp_id);
+                    setemployee_id(row.tbs_pro_emp_id);
+                    setEmployeeID(row.tbs_pro_emp_id);
+                    console.log(row.tbs_pro_emp_id, "----owner id");
+                  } else {
+                    SetUpdateData(row.tbs_op_emp_id);
+                    setemployee_id(row.tbs_op_emp_id);
+                    setEmployeeID(row.tbs_op_emp_id);
+                    console.log(row.tbs_op_emp_id, "----op id");
+                  }
                 }}
                 size="1.4vw"
                 style={{
@@ -193,8 +230,14 @@ const EmployeeTableList = ({
                 color="#1f487c"
                 className=" cursor-pointer"
                 onClick={() => {
-                  setDeleteModalIsOpen(true);
-                  setemployee_id(row?.tbs_pro_emp_id);
+                  setDeleteEmpModalIsOpen(true);
+                  if (user?.startsWith("tbs-pro")) {
+                    setemployee_id(row.tbs_pro_emp_id);
+                    console.log(row.tbs_pro_emp_id, "----owner id");
+                  } else {
+                    setemployee_id(row.tbs_op_emp_id);
+                    console.log(row.tbs_op_emp_id, "----op id");
+                  }
                 }}
               />
 
@@ -224,9 +267,8 @@ const EmployeeTableList = ({
     console.log(`Delete record with key: ${""}`);
     // Add your delete logic here
   };
-  const [deletemodalIsOpen, setDeleteModalIsOpen] = useState(false);
   const closeDeleteModal = () => {
-    setDeleteModalIsOpen(false);
+    setDeleteEmpModalIsOpen(false);
   };
   console.log(currentData, "wefwefewfcewskjfbjksdvkjdfv");
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -241,17 +283,34 @@ const EmployeeTableList = ({
         className="custom-table"
       />
       <ModalPopup
-        show={deletemodalIsOpen}
+        show={deleteEmpmodalIsOpen}
         onClose={closeDeleteModal}
         height="20vw"
         width="30vw"
         closeicon={false}
       >
         <DeleteList
-          setDeleteModalIsOpen={setDeleteModalIsOpen}
+          setDeleteModalIsOpen={setDeleteEmpModalIsOpen}
           title={"Want to delete this User"}
-          api={`${apiUrl}/pro-emp-personal-details/${employee_id}`}
+          api={
+            user?.startsWith("tbs-pro")
+              ? `${apiUrl}/pro-emp-personal-details/${employee_id}`
+              : `${apiUrl}/emp-personal-details/${employee_id}`
+          }
           module={"employee"}
+        />
+      </ModalPopup>
+      <ModalPopup
+        className="border border-[#1f487c] border-b-8 border-r-8 border-b-[#1f487c] border-r-[#1f487c] rounded-md"
+        show={viewmodal}
+        closeicon={false}
+        onClose={closeModal}
+        height="16vw"
+        width="30vw"
+      >
+        <EmployeeStatusUpdate
+          employeeid={employee_id}
+          setViewModal={setViewModal}
         />
       </ModalPopup>
     </>

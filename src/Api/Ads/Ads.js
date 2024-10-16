@@ -1,5 +1,5 @@
 import axios from "axios";
-import { GET_ADS, GET_ADS_CLIENT, GET_MOBILE_ADS } from "../../Store/Type";
+import { GET_ADS, GET_ADS_CLIENT, GET_MOBILE_ADS, GET_RECENT_ADS } from "../../Store/Type";
 import { toast } from "react-toastify";
 
 const api = axios.create({
@@ -43,7 +43,16 @@ export const Deleteall = async (api, dispatch) => {
     return null;
   }
 };
-export const SubmitAdsData = async (advalues, updatedata, dispatch) => {
+
+
+export const SubmitAdsData = async (
+  advalues,
+  ad_id,
+  duration,
+  hours,
+  adsdata,
+  dispatch
+) => {
   console.log(advalues, "promotionvalues.file");
 
   const webFormData = new FormData();
@@ -55,31 +64,54 @@ export const SubmitAdsData = async (advalues, updatedata, dispatch) => {
   webFormData.append("usage_per_day", advalues.usage_per_day);
   webFormData.append("status", advalues.status);
   webFormData.append("ad_video", advalues.file);
-  webFormData.append("ad_file_size", advalues.file.size);
-  webFormData.append("ad_file_type", advalues.file.type);
+  webFormData.append("ad_file_size", advalues.file.size || adsdata.ad_file_size);
+  webFormData.append("ad_file_type", advalues.file.type || adsdata.ad_file_type);
   webFormData.append("page_name", advalues.page_name);
   webFormData.append("tbs_client_id", advalues.tbs_client_id);
+  // webFormData.append("tbs_user_id", sessionStorage.getItem("USER_ID"));
+  webFormData.append("tbs_user_id", localStorage.getItem("USER_ID"));
+  webFormData.append("duration", duration);
+  webFormData.append("hours", hours);
+  if (ad_id) {
+    webFormData.append("ad_video_details", adsdata.ad_video_details);
+  }
   webFormData.append(
     "page_id",
     advalues.page_name == "Home"
       ? 1
       : advalues.page_name == "Dashboard"
-      ? 2
-      : advalues.page_name == "Filter"
-      ? 3
-      : 4
+        ? 2
+        : advalues.page_name == "Filter"
+          ? 3
+          : 4
   );
+  // webFormData.append(
+  //   "status_id",
+  //   advalues.status == "Draft" ? 1 : advalues.status == "Paused" ? 2 : 3
+  // );
   webFormData.append(
     "status_id",
-    advalues.status == "Draft" ? 1 : advalues.status == "Paused" ? 2 : 3
+    advalues.status == "Draft" ? 1 : advalues.status == "Requested" ? 2 : 3
+  );
+  webFormData.append(
+    "req_status",
+    advalues.status == "Draft"
+      ? "Draft"
+      : advalues.status == "Requested"
+        ? "Pending"
+        : "Approved"
+  );
+  webFormData.append(
+    "req_status_id",
+    advalues.status == "Draft" ? 0 : advalues.status == "Requested" ? 1 : 3
   );
 
   console.log(
-    updatedata,
-    "updatedataupdatedataupdatedataupdatedataupdatedataupdatedataupdatedata"
+    ad_id,
+    "updatedataupdatedata"
   );
-  const url = updatedata ? `${apiUrl}/ads/${updatedata}` : `${apiUrl}/ads`;
-  const method = updatedata ? "put" : "post";
+  const url = ad_id ? `${apiUrl}/ads/${ad_id}` : `${apiUrl}/ads`;
+  const method = ad_id ? "put" : "post";
 
   try {
     const response = await api({
@@ -99,6 +131,77 @@ export const SubmitAdsData = async (advalues, updatedata, dispatch) => {
   }
 };
 
+// export const SubmitAdsMobile = async (advalues, updatedata, dispatch) => {
+//   console.log(advalues.file, "promotionvalues.file");
+
+//   const mbleFormData = new FormData();
+//   mbleFormData.append("client_details", advalues.client_details);
+//   mbleFormData.append("mobad_title", advalues.ad_title);
+//   mbleFormData.append("start_date", advalues.start_date);
+//   mbleFormData.append("end_date", advalues.end_date);
+//   mbleFormData.append("mobad_description", advalues.ad_description);
+//   mbleFormData.append("usage_per_day", advalues.usage_per_day);
+//   mbleFormData.append("mobad_vdo", advalues.file);
+//   mbleFormData.append("mobad_file_size", advalues.file.size);
+//   mbleFormData.append("mobad_file_type", advalues.file.type);
+//   mbleFormData.append("page_name", advalues.page_name);
+//   mbleFormData.append("tbs_client_id", advalues.tbs_client_id);
+//   mbleFormData.append(
+//     "page_id",
+//     advalues.page_name == "Home"
+//       ? 1
+//       : advalues.page_name == "Dashboard"
+//       ? 2
+//       : advalues.page_name == "Filter"
+//       ? 3
+//       : 4
+//   );
+//   mbleFormData.append("status", advalues.status);
+//   mbleFormData.append(
+//     "status_id",
+//     advalues.status == "Draft" ? 1 : advalues.status == "Requested" ? 2 : 3
+//   );
+//   mbleFormData.append(
+//     "req_status",
+//     advalues.status == "Draft"
+//       ? "Draft"
+//       : advalues.status == "Requested"
+//       ? "pending"
+//       : "approved"
+//   );
+//   mbleFormData.append(
+//     "req_status_id",
+//     advalues.status == "Draft" ? 0 : advalues.status == "Requested" ? 1 : 3
+//   );
+
+//   console.log(
+//     updatedata,
+//     "updatedataupdatedataupdatedataupdatedataupdatedataupdatedataupdatedata"
+//   );
+//   const url = updatedata
+//     ? `${apiUrl}/mobads/${updatedata}`
+//     : `${apiUrl}/mobads`;
+//   const method = updatedata ? "put" : "post";
+
+//   try {
+//     const response = await api({
+//       method,
+//       url,
+//       data: mbleFormData,
+//       headers: {
+//         "Content-Type": "multipart/form-data",
+//       },
+//     });
+//     GetMobileAds(dispatch);
+//     GetAdsData(dispatch);
+//     console.log(response, "responseresponse");
+//     return response.data;
+//   } catch (error) {
+//     handleError(error);
+//     return null;
+//   }
+// };
+
 export const SubmitAdsMobile = async (advalues, updatedata, dispatch) => {
   console.log(advalues.file, "promotionvalues.file");
 
@@ -115,20 +218,39 @@ export const SubmitAdsMobile = async (advalues, updatedata, dispatch) => {
   mbleFormData.append("mobad_file_type", advalues.file.type);
   mbleFormData.append("page_name", advalues.page_name);
   mbleFormData.append("tbs_client_id", advalues.tbs_client_id);
+  // mbleFormData.append("tbs_user_id", sessionStorage.getItem("USER_ID"));
+  mbleFormData.append("tbs_user_id", localStorage.getItem("USER_ID"));
   mbleFormData.append(
     "page_id",
     advalues.page_name == "Home"
       ? 1
       : advalues.page_name == "Dashboard"
-      ? 2
-      : advalues.page_name == "Filter"
-      ? 3
-      : 4
+        ? 2
+        : advalues.page_name == "Filter"
+          ? 3
+          : 4
   );
+  // mbleFormData.append(
+  //   "status_id",
+  //   advalues.status == "Draft" ? 1 : advalues.status == "Paused" ? 2 : 3
+  // );
   mbleFormData.append(
     "status_id",
-    advalues.status == "Draft" ? 1 : advalues.status == "Paused" ? 2 : 3
+    advalues.status == "Draft" ? 1 : advalues.status == "Requested" ? 2 : 3
   );
+  mbleFormData.append(
+    "req_status",
+    advalues.status == "Draft"
+      ? "Draft"
+      : advalues.status == "Requested"
+        ? "Pending"
+        : "Approved"
+  );
+  mbleFormData.append(
+    "req_status_id",
+    advalues.status == "Draft" ? 0 : advalues.status == "Requested" ? 1 : 3
+  );
+
   console.log(
     updatedata,
     "updatedataupdatedataupdatedataupdatedataupdatedataupdatedataupdatedata"
@@ -163,8 +285,8 @@ export const GetAdsById = async (updatedata, SetUpdateData, setAdData) => {
     const response = await api.get(`${apiUrl}/ads/${updatedata}`);
     console.log(response, "responseresponse");
     // SetUpdateData(null);
-    setAdData("");
-    return response?.data[0];
+    // setAdData("");
+    return response?.data;
   } catch (error) {
     handleError(error);
     return null;
@@ -203,7 +325,9 @@ export const handleAdsearch = async (e, dispatch) => {
 export const handleMbleAdsearch = async (e, dispatch) => {
   try {
     if (e.target.value) {
-      const response = await api.get(`${apiUrl}/mobads/search/${e.target.value}`);
+      const response = await api.get(
+        `${apiUrl}/mobads/search/${e.target.value}`
+      );
       dispatch({ type: GET_MOBILE_ADS, payload: response.data });
       return response.data[0];
     } else {
@@ -222,6 +346,18 @@ export const GetClientList = async (dispatch) => {
     return response.data;
   } catch (error) {
     handleError(error);
+  }
+};
+export const GetRecentAds = async (dispatch) => {
+  try {
+    const response = await axios.get(`${apiUrl}/recentAds`);
+    dispatch({ type: GET_RECENT_ADS, payload: response.data });
+    console.log(response, "response");
+    return response.data;
+  } catch (error) {
+    handleError(error);
+
+    // return null;
   }
 };
 const handleError = (error) => {

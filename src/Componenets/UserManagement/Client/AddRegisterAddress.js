@@ -5,9 +5,9 @@ import { FaCloudUploadAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
 import {
-  GetSuperAdminAddressById,
+  GetClientAddressById,
   SubmitAddressData,
-} from "../../../Api/UserManagement/SuperAdmin";
+} from "../../../Api/UserManagement/Client";
 import { useDispatch } from "react-redux";
 import { SubmitClientAddressData } from "../../../Api/UserManagement/Client";
 
@@ -26,9 +26,9 @@ const validationSchema = Yup.object().shape({
 export default function AddRegisterAddress({
   setCurrentpage,
   SPA_ID,
-  operatorID,
+  clientID,
   superadmindata,
-  setOperatorID,
+  setClientID,
   setbusinessback,
   setBusinessBack,
   businessback,
@@ -36,15 +36,16 @@ export default function AddRegisterAddress({
 }) {
   const [enable, setEnable] = useState(false);
   const dispatch = useDispatch();
+
   const handleSubmit = async (values) => {
     console.log("hiihih");
-    if (operatorID && enable == false) {
+    if (clientID && enable == false) {
       setCurrentpage(3);
     } else {
       try {
         const data = await SubmitClientAddressData(
           values,
-          operatorID,
+          clientID,
           enable,
           dispatch
         );
@@ -58,33 +59,31 @@ export default function AddRegisterAddress({
       }
     }
   };
-  const [superadminaddressdata, setSuperAdminAddressData] = useState("");
+
+  const [clientAddress, setClientAddress] = useState("");
+
   const fetchGetUser = async () => {
     try {
-      const data = await GetSuperAdminAddressById(
-        operatorID,
-        setOperatorID,
-        setSuperAdminAddressData
+      const data = await GetClientAddressById(
+        clientID,
+        setClientID,
+        setClientAddress
       );
-      setSuperAdminAddressData(data);
+      setClientAddress(data);
     } catch (error) {
       console.error("Error fetching additional user data", error);
     }
   };
 
   useEffect(() => {
-    if (operatorID != null || enable || businessback) {
+    if (clientID != null || enable || businessback) {
       fetchGetUser();
     }
-  }, [
-    operatorID,
-    setOperatorID,
-    setSuperAdminAddressData,
-    enable,
-    businessback,
-  ]);
-  console.log(operatorID, "operatorID55555");
-  console.log(superadminaddressdata, "superadminaddressdata");
+  }, [clientID, setClientID, setClientAddress, enable, businessback]);
+
+  console.log(clientID, "setClientID");
+  console.log(clientAddress, "superadminaddressdata");
+
   return (
     <div>
       <div className="border-l-[0.1vw] px-[2vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f]">
@@ -92,7 +91,7 @@ export default function AddRegisterAddress({
           <label className="text-[1.5vw] font-semibold text-[#1f4b7f] ">
             Registered Address
           </label>
-          {operatorID || businessback ? (
+          {clientID || businessback ? (
             <button
               className={`${
                 enable
@@ -113,12 +112,12 @@ export default function AddRegisterAddress({
         <div>
           <Formik
             initialValues={{
-              country: superadminaddressdata?.country || "",
-              city: superadminaddressdata?.city || "",
-              state: superadminaddressdata?.state || "",
-              postal: superadminaddressdata?.zip_code || "",
-              address: superadminaddressdata?.address || "",
-              region: superadminaddressdata?.region || "",
+              country: clientAddress?.country || "",
+              city: clientAddress?.city || "",
+              state: clientAddress?.state || "",
+              postal: clientAddress?.zip_code || "",
+              address: clientAddress?.address || "",
+              region: clientAddress?.region || "",
             }}
             validationSchema={validationSchema}
             onSubmit={(values) => {
@@ -150,14 +149,14 @@ export default function AddRegisterAddress({
                         placeholder="Enter Address"
                         // value={values.firstname}
                         disabled={
-                          operatorID || businessback
+                          clientID || businessback
                             ? enable
                               ? false
                               : true
                             : false
                         }
                         className={`${
-                          operatorID || businessback
+                          clientID || businessback
                             ? enable == false
                               ? " cursor-not-allowed"
                               : ""
@@ -183,14 +182,14 @@ export default function AddRegisterAddress({
                         id="state"
                         value={values.state}
                         disabled={
-                          operatorID || businessback
+                          clientID || businessback
                             ? enable
                               ? false
                               : true
                             : false
                         }
                         className={`${
-                          operatorID || businessback
+                          clientID || businessback
                             ? enable == false
                               ? " cursor-not-allowed"
                               : ""
@@ -232,14 +231,14 @@ export default function AddRegisterAddress({
                         id="region"
                         value={values.region}
                         disabled={
-                          operatorID || businessback
+                          clientID || businessback
                             ? enable
                               ? false
                               : true
                             : false
                         }
                         className={`${
-                          operatorID || businessback
+                          clientID || businessback
                             ? enable == false
                               ? " cursor-not-allowed"
                               : ""
@@ -292,14 +291,14 @@ export default function AddRegisterAddress({
                         id="city"
                         value={values.city}
                         disabled={
-                          operatorID || businessback
+                          clientID || businessback
                             ? enable
                               ? false
                               : true
                             : false
                         }
                         className={`${
-                          operatorID || businessback
+                          clientID || businessback
                             ? enable == false
                               ? " cursor-not-allowed"
                               : ""
@@ -341,14 +340,14 @@ export default function AddRegisterAddress({
                         id="country"
                         value={values.country}
                         disabled={
-                          operatorID || businessback
+                          clientID || businessback
                             ? enable
                               ? false
                               : true
                             : false
                         }
                         className={`${
-                          operatorID || businessback
+                          clientID || businessback
                             ? enable == false
                               ? " cursor-not-allowed"
                               : ""
@@ -388,14 +387,14 @@ export default function AddRegisterAddress({
                         placeholder="Enter Postal Code"
                         // value={values.firstname}
                         disabled={
-                          operatorID || businessback
+                          clientID || businessback
                             ? enable
                               ? false
                               : true
                             : false
                         }
                         className={`${
-                          operatorID || businessback
+                          clientID || businessback
                             ? enable == false
                               ? " cursor-not-allowed"
                               : ""
@@ -427,11 +426,11 @@ export default function AddRegisterAddress({
                         Back
                       </button>
                       <button
-                        className="bg-[#1F487C] font-semibold rounded-full w-[7vw] h-[2vw] text-[1vw] text-white"
+                        className="bg-[#1F487C] font-semibold rounded-full w-[10vw] h-[2vw] text-[1vw] text-white"
                         type="submit"
                         // onClick={() => setCurrentpage(3)}
                       >
-                        {operatorID || businessback
+                        {clientID || businessback
                           ? enable
                             ? "Update & Continue"
                             : "Continue"

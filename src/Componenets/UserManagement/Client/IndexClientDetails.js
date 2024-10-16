@@ -7,7 +7,6 @@ import { BiPlus } from "react-icons/bi";
 import AddRegisterAddress from "./AddRegisterAddress";
 import AddGSTDetails from "./AddGSTDetails";
 import {
-  GetSuperAdminById,
   SubmitProfileData,
 } from "../../../Api/UserManagement/SuperAdmin";
 import { useLocation } from "react-router";
@@ -16,8 +15,11 @@ import AddCompanyDetails from "./AddCompanyDetails";
 import {
   ClientProfile,
   GetClientProfile,
+  GetCompanyDetailsById,
+  GetClientData,
 } from "../../../Api/UserManagement/Client";
 import { toast } from "react-toastify";
+import { RiUser3Fill } from "react-icons/ri";
 
 const getBase64 = (file) =>
   new Promise((resolve, reject) => {
@@ -38,6 +40,7 @@ export default function ClientIndex({
   const [previewImage, setPreviewImage] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
   const [fileList, setFileList] = useState([]);
+  const [client_id, setClient_Id] = useState(null);
 
   const handlePreview = async (file) => {
     if (!file.url && !file.preview) {
@@ -49,7 +52,9 @@ export default function ClientIndex({
       file.name || file.url.substring(file.url.lastIndexOf("/") + 1)
     );
   };
+
   const dispatch = useDispatch();
+
   const handleChange = ({ fileList: newFileList }) => {
     console.log(newFileList, "newFileList");
     setFileList(newFileList);
@@ -64,17 +69,20 @@ export default function ClientIndex({
       <div style={{ marginTop: 8 }}>Upload</div>
     </div>
   );
+
   console.log(currentpage == 1, "shcjsbd");
   const [SPA_ID, SetSPAID] = useState(null);
-  const [superadmindata, setSuperAdminData] = useState("");
-  const fetchGetUser = async () => {
+  //const [superadmindata, setSuperAdminData] = useState("");
+  const [clientdata, setClientData] = useState("");
+
+  const fetchGetClient = async () => {
     try {
-      const data = await GetSuperAdminById(
+      const data = await GetCompanyDetailsById(
         clientID,
         setClientID,
-        setSuperAdminData
+        setClientData
       );
-      setSuperAdminData(data);
+      setClientData(data);
     } catch (error) {
       console.error("Error fetching additional user data", error);
     }
@@ -82,43 +90,62 @@ export default function ClientIndex({
 
   useEffect(() => {
     if (clientID != null) {
-      fetchGetUser();
+      fetchGetClient();
     }
-  }, [clientID, setClientID, setSuperAdminData]);
+  }, [clientID, setClientID, setClientData]);
 
-  console.log(superadmindata, "superadmindata");
+  console.log(clientdata, "clientdata");
   const [addressback, setAddressBack] = useState(false);
   const [businessback, setBusinessBack] = useState(false);
   const [documentback, setDocumentBack] = useState(false);
   const [gstback, setGstback] = useState(false);
   const location = useLocation();
   const [selectedFile, setSelectedFile] = useState(null);
+
   const getprofile = async () => {
     try {
       const data = await GetClientProfile(clientID);
-      setSelectedFile(data[0]?.profileimg);
+      setSelectedFile(data?.company_logo);
     } catch (error) {
       console.error("Error fetching additional user data", error);
     }
   };
-  const handleupload = async (image) => {
-    console.log(image, "85885555");
-    try {
-      const data = await ClientProfile(image, clientID);
-      // setSuperAdminData(data);
-      toast.success(data.message);
+
+  // const handleupload = async (image) => {
+  //   console.log(image, "85885555");
+  //   try {
+  //     const data = await ClientProfile(image, clientID, dispatch);
+  //     // setClientData(data);
+  //     toast.success(data.message);
+  //     GetClientProfile(clientID);
+  //     GetClientData(dispatch);
+  //   } catch (error) {
+  //     console.error("Error fetching additional user data", error);
+  //   }
+  // };
+
+  useEffect(() => {
+    if (clientID != null) {
       getprofile();
-    } catch (error) {
-      console.error("Error fetching additional user data", error);
     }
-  };
+    console.log(clientID, "clientID");
+
+  }, []);
+
   console.log(location.pathname == "/settings", "locationlocationlocation");
+
+  const ClientCompanyLogo = sessionStorage.getItem('ClientCompanyLogo')
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    setSelectedFile(file);
+  };
+
   return (
     <div>
       <div
-        className={`w-full h-full ${
-          location.pathname != "/settings" ? "py-0" : "py-[1vw] px-[1vw]"
-        }`}
+        className={`w-full h-full ${location.pathname != "/settings" ? "py-0" : "py-[1vw] px-[1vw]"
+          }`}
       >
         {location.pathname != "/settings" ? (
           <div className="w-full h-[3vw] flex">
@@ -127,10 +154,10 @@ export default function ClientIndex({
                 currentpage == 1
                   ? 35
                   : currentpage == 2
-                  ? 70
-                  : currentpage == 3
-                  ? 100
-                  : 100
+                    ? 70
+                    : currentpage == 3
+                      ? 100
+                      : 100
               }
               size="1.2vw"
               strokeColor="#1F4B7F"
@@ -172,7 +199,21 @@ export default function ClientIndex({
                 >
                   {fileList.length >= 1 ? null : uploadButton}
                 </Upload> */}
-                <input
+                {ClientCompanyLogo === 'null' || ClientCompanyLogo === null ? (
+                  <div>
+                    <RiUser3Fill size='1vw'
+                      color="#1F487C"
+                      className="h-[7vw] w-[7vw] cursor-pointer flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.3vw] border-[#1f4b7f] rounded-[0.5vw]" />
+                  </div>
+                ) : (
+
+                  <img
+                    onChange={handleFileChange}
+                    src={`http://192.168.90.47:4000${ClientCompanyLogo}`}
+                    alt="Photo"
+                    className="h-[7vw] w-[7vw] cursor-pointer flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.3vw] border-[#1f4b7f] rounded-[0.5vw]" />
+                )}
+                {/* <input
                   id="fileInput"
                   type="file"
                   style={{ display: "none" }}
@@ -189,7 +230,7 @@ export default function ClientIndex({
                       Profile
                     </span>
                   )}
-                </label>
+                </label> */}
                 <Modal
                   visible={previewOpen}
                   title={previewTitle}
@@ -208,15 +249,14 @@ export default function ClientIndex({
                 <div className="">
                   <div className="bg-[#D9D9D9] rounded-t-full rounded-b-full w-[0.7vw] h-[11vw] relative">
                     <div
-                      className={`absolute rounded-t-full rounded-b-full w-[0.7vw] h-[2vw] bg-[#1f4b7f] ${
-                        currentpage == 1
-                          ? "top-0"
-                          : currentpage == 2
+                      className={`absolute rounded-t-full rounded-b-full w-[0.7vw] h-[2vw] bg-[#1f4b7f] ${currentpage == 1
+                        ? "top-0"
+                        : currentpage == 2
                           ? "top-[4.5vw]"
                           : currentpage == 3
-                          ? "bottom-0"
-                          : "bottom-0"
-                      }`}
+                            ? "bottom-0"
+                            : "bottom-0"
+                        }`}
                     ></div>
                   </div>
                 </div>
@@ -242,10 +282,12 @@ export default function ClientIndex({
                   setCurrentpage={setCurrentpage}
                   SetSPAID={SetSPAID}
                   SPA_ID={SPA_ID}
-                  superadmindata={superadmindata}
+                  clientdata={clientdata}
                   clientID={clientID}
                   setAddressBack={setAddressBack}
                   addressback={addressback}
+                  client_id={client_id}
+                  setClient_Id={setClient_Id}
                 />
               ) : currentpage == 2 ? (
                 <AddRegisterAddress
@@ -253,8 +295,9 @@ export default function ClientIndex({
                   currentpage={currentpage}
                   SetSPAID={SetSPAID}
                   SPA_ID={SPA_ID}
-                  superadmindata={superadmindata}
+                  clientdata={clientdata}
                   clientID={clientID}
+                  setClientID={setClientID}
                   setAddressBack={setAddressBack}
                   addressback={addressback}
                   setBusinessBack={setBusinessBack}
@@ -266,10 +309,12 @@ export default function ClientIndex({
                     setCurrentpage={setCurrentpage}
                     SetSPAID={SetSPAID}
                     SPA_ID={SPA_ID}
-                    superadmindata={superadmindata}
+                    clientdata={clientdata}
                     clientID={clientID}
+                    setClientID={setClientID}
                     setModalIsOpen={setModalIsOpen}
                     gstback={gstback}
+                    client_id={client_id}
                     setGstback={setGstback}
                   />
                 )

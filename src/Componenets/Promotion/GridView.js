@@ -10,7 +10,7 @@ import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
 export default function GridView({
   currentData,
   setModalIsOpen,
-  setUpdateData,
+  SetUpdateData,
   promotionId,
   setPromotionId,
   setDeleteModalIsOpen,
@@ -22,6 +22,7 @@ export default function GridView({
     setModalIsOpen(true);
     setPromotionId(promo_id);
     togglePopover(promo_id);
+    SetUpdateData(promo_id)
   };
 
   const handleDelete = (promo_id) => {
@@ -43,9 +44,8 @@ export default function GridView({
         {dataArr?.map((item) => (
           <div
             key={item.promo_id}
-            className={`${
-              hoverid === item.promo_id ? "bg-[#1f4b7f] text-white" : "bg-white"
-            } h-[34vh] border-[#1f4b7f] border-l-[0.1vw] cursor-pointer border-r-[0.3vw] border-b-[0.3vw] border-t-[0.1vw] rounded-[0.5vw]`}
+            className={`${hoverid === item.promo_id ? "bg-[#1f4b7f] text-white" : "bg-white"
+              } h-[17vw] border-[#1f4b7f] border-l-[0.1vw] cursor-pointer border-r-[0.3vw] border-b-[0.3vw] border-t-[0.1vw] rounded-[0.5vw]`}
             onMouseEnter={() => setHoverId(item.promo_id)}
             onMouseLeave={() => setHoverId("")}
             style={{
@@ -68,15 +68,18 @@ export default function GridView({
                     <div className="flex flex-col">
                       {(item?.promo_status_id === 1 ||
                         item?.promo_status_id === 0) && (
-                        <div>
-                          <a
-                            onClick={() => handleEdit(item.promo_id)}
-                            className="flex items-center cursor-pointer text-[1vw] text-[#1F4B7F] hover:text-[#1f487c]"
-                          >
-                            Edit
-                          </a>
-                        </div>
-                      )}
+                          <div>
+                            <a
+                              onClick={() =>
+                                handleEdit(item.promo_id)
+
+                              }
+                              className="flex items-center cursor-pointer text-[1vw] text-[#1F4B7F] hover:text-[#1f487c]"
+                            >
+                              Edit
+                            </a>
+                          </div>
+                        )}
                       <div>
                         <a
                           onClick={() => handleDelete(item.promo_id)}
@@ -88,17 +91,16 @@ export default function GridView({
                     </div>
                   }
                   trigger="click"
-                  //open={openPopovers[item.promo_id] || false}
-                  //onOpenChange={() => togglePopover(item.promo_id)}
+                //open={openPopovers[item.promo_id] || false}
+                //onOpenChange={() => togglePopover(item.promo_id)}
                 >
                   <FontAwesomeIcon
                     icon={faEllipsisVertical}
                     color="#1f487c"
-                    className={`${
-                      hoverid === item.promo_id
-                        ? "text-white"
-                        : "text-[#1f4b7f]"
-                    } cursor-pointer rounded-[0.5vw]`}
+                    className={`${hoverid === item.promo_id
+                      ? "text-white"
+                      : "text-[#1f4b7f]"
+                      } cursor-pointer rounded-[0.5vw]`}
                     onMouseEnter={() => setHoverId(item.promo_id)}
                     onMouseLeave={() => setHoverId("")}
                     style={{
@@ -123,23 +125,24 @@ export default function GridView({
                   item.expiry_date
                 ).format("MMM DD")}`}
               </h1>
-              <button
-                className={`${
-                  item?.promo_status_id == 0
-                    ? "bg-[#777575]"
-                    : item?.promo_status_id == 1
-                    ? "bg-[#FF9900]"
-                    : item?.promo_status_id == 2
-                    ? "bg-[#34AE2A]"
-                    : item?.promo_status_id == 3
-                    ? "bg-[#FD3434]"
-                    : item?.promo_status_id == 4
-                    ? "bg-[#2A99FF]"
-                    : "bg-[#646262]"
-                } border-dashed border-white border-[0.2vw] text-[1.1vw] rounded-full text-white px-[4.5vw] py-[0.2vw]`}
-              >
-                {item.promo_status}
-              </button>
+              <div className="px-[0.5vw] w-full">
+                <button
+                  className={`${item?.promo_status_id == 0
+                      ? "bg-[#777575]"
+                      : item?.promo_status_id == 1
+                        ? "bg-[#FF9900]"
+                        : item?.promo_status_id == 2
+                          ? "bg-[#34AE2A]"
+                          : item?.promo_status_id == 3
+                            ? "bg-[#FD3434]"
+                            : item?.promo_status_id == 4
+                              ? "bg-[#2A99FF]"
+                              : "bg-[#646262]"
+                    } border-dashed border-white border-[0.2vw] text-[1.1vw] rounded-full text-white px-[0.5vw] py-[0.2vw] w-full`}
+                >
+                  {item.promo_status}
+                </button>
+              </div>
             </div>
           </div>
         ))}

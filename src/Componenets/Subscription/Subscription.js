@@ -7,12 +7,21 @@ import { Dropdown, Space, Typography } from "antd";
 import { IoEyeOffOutline } from "react-icons/io5";
 import Backdrop from "../../asserts/CRMbg.png";
 import "../../App.css";
-import { GetSubscriptionList } from "../../Api/Subscription/Subscription";
+import { GetSubscriptionList, handleAdsearch } from "../../Api/Subscription/Subscription";
 import { useDispatch, useSelector } from "react-redux";
 import dayjs from "dayjs";
 import { GetOperatorDataById } from "../../Api/UserManagement/UserManagement";
+// import { faAngleDoubleLeft, faAngleDoubleRight, faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import {
+  faChevronLeft,
+  faChevronRight,
+  faAngleDoubleLeft,
+  faAngleDoubleRight,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import ReactPaginate from "react-js-pagination";
 
-export default function Subscription({}) {
+export default function Subscription({ }) {
   const [expandedRowKey, setExpandedRowKey] = useState(null);
   const [showHalfMap, setShowHalfMap] = useState({}); // State to track which user's product key to show/hide
   const [eyeIcon, setEyeIcon] = useState(false);
@@ -31,9 +40,26 @@ export default function Subscription({}) {
       currentPage * pageSize
     );
 
-  const handlePageChange = (page, pageSize) => {
-    setCurrentPage(page);
-    setPageSize(pageSize);
+  const [activePage, setActivePage] = useState(1);
+  const itemsPerPage = 10; // Number of items to display per page
+
+  // Calculate pagination slice based on activePage
+  const indexOfLastItem = activePage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems =
+    getSubscriptionlist?.length > 0 &&
+    getSubscriptionlist?.slice(indexOfFirstItem, indexOfLastItem);
+
+  const Search = (e) => {
+    handleAdsearch(e, dispatch);
+  };
+
+  // const handlePageChange = (page, pageSize) => {
+  //   setCurrentPage(page);
+  //   setPageSize(pageSize);
+  // };
+  const handlePageChange = (pageNumber) => {
+    setActivePage(pageNumber);
   };
 
   const toggleShowHalf = (user_id) => {
@@ -81,7 +107,7 @@ export default function Subscription({}) {
     {
       title: (
         <div
-          className="w-[3vw] text-[1.2vw]"
+          className="w-[3vw] text-[1.2vw] flex items-center justify-center"
           style={{ color: "whitex", width: "5vw" }}
         >
           USER ID
@@ -92,7 +118,7 @@ export default function Subscription({}) {
     },
     {
       title: (
-        <div className="text-[1.2vw]" style={{ color: "whitex" }}>
+        <div className="text-[1.2vw]  flex items-center justify-center" style={{ color: "whitex" }}>
           PRODUCT KEY
         </div>
       ),
@@ -119,7 +145,7 @@ export default function Subscription({}) {
     },
     {
       title: (
-        <div className="text-[1.2vw]" style={{ color: "whitex" }}>
+        <div className="text-[1.2vw]  flex items-center justify-center" style={{ color: "whitex" }}>
           ACTIVATED DATE
         </div>
       ),
@@ -127,7 +153,7 @@ export default function Subscription({}) {
     },
     {
       title: (
-        <div className="text-[1.2vw]" style={{ color: "whitex" }}>
+        <div className="text-[1.2vw]  flex items-center justify-center" style={{ color: "whitex" }}>
           PLAN NAME
         </div>
       ),
@@ -135,7 +161,7 @@ export default function Subscription({}) {
     },
     {
       title: (
-        <div className="text-[1.2vw]" style={{ color: "whitex" }}>
+        <div className="text-[1.2vw]  flex items-center justify-center" style={{ color: "whitex" }}>
           ENDED DATE
         </div>
       ),
@@ -143,7 +169,7 @@ export default function Subscription({}) {
     },
     {
       title: (
-        <div className="text-[1.2vw]" style={{ color: "whitex" }}>
+        <div className="text-[1.2vw]  flex items-center justify-center" style={{ color: "whitex" }}>
           PLAN TYPE
         </div>
       ),
@@ -284,7 +310,10 @@ export default function Subscription({}) {
             <input
               type="text"
               className="bg-white outline-none pl-[2vw] w-[25vw] h-[2.5vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw] border-r-[0.2vw] border-b-[0.2vw]"
-              placeholder="Search By Plan Id"
+              placeholder="Search By Plan"
+              onChange={(e) => {
+                Search(e);
+              }}
             />
           </div>
           <div className="order-last">
@@ -323,21 +352,50 @@ export default function Subscription({}) {
         />
       </div>
 
-      <div className="px-[2.5vw] absolute bottom-[4.5vw] w-[95%] justify-between flex right-[2vw] items-center ">
+      <div className="px-[2.5vw] absolute bottom-[7vw] w-[95%] justify-between flex right-[2vw] items-center ">
         <div className="text-[#1f4b7f] flex text-[1.1vw] gap-[0.5vw] ">
           <span>Showing</span>
-          <span className="font-bold">1 - {getSubscriptionlist?.length}</span>
+          <span className="font-bold">{currentItems && currentItems?.length > 0
+            ? <div>{indexOfFirstItem + 1} - {indexOfFirstItem + currentItems?.length}</div> : "0"}</span>
           <span>from</span>
-          <span className="font-bold"> {getSubscriptionlist?.length}</span>
+          <span className="font-bold"> {getSubscriptionlist?.length > 0 ? getSubscriptionlist?.length : 0}</span>
           <span>data</span>
         </div>
         <div>
-          <Pagination
+          {/* <Pagination
             current={currentPage}
             pageSize={pageSize}
             total={getSubscriptionlist?.length}
             onChange={handlePageChange}
             onShowSizeChange={handlePageChange}
+          /> */}
+          <ReactPaginate
+            activePage={activePage}
+            itemsCountPerPage={itemsPerPage}
+            totalItemsCount={getSubscriptionlist?.length}
+            pageRangeDisplayed={5}
+            onChange={handlePageChange}
+            itemClass="page-item"
+            linkClass="page-link"
+            activeClass="active"
+            prevPageText={
+              <FontAwesomeIcon icon={faChevronLeft} size="1vw" />
+            }
+            nextPageText={
+              <FontAwesomeIcon icon={faChevronRight} size="1vw" />
+            }
+            firstPageText={
+              <FontAwesomeIcon
+                icon={faAngleDoubleLeft}
+                size="1vw"
+              />
+            }
+            lastPageText={
+              <FontAwesomeIcon
+                icon={faAngleDoubleRight}
+                size="1vw"
+              />
+            }
           />
         </div>
       </div>

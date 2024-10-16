@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { PlusOutlined } from "@ant-design/icons";
 import { Upload, Image, Progress, Modal } from "antd";
 // import AddSuperAdmin from "./AddCompanyProfile";
@@ -6,12 +6,19 @@ import { Upload, Image, Progress, Modal } from "antd";
 // import AddEmployee from "../Employee/IndexAddEmployee";
 import { BiPlus } from "react-icons/bi";
 import AddPersonalDetails from "./AddPersonalDetails";
+import { useDispatch } from "react-redux";
 import AddProfessionalDetails from "./AddProfessionalDetails";
 import AddDocuments from "./AddDocuments";
 import AddRegisterAddress from "./AddRegisterAddress";
 import { useLocation } from "react-router";
-import { GetOwnerEmployeeProfile, OwnerEmployeeProfile } from "../../../Api/UserManagement/Employee";
+import {
+  GetOwnerEmployeeProfile,
+  OwnerEmployeeProfile,
+  GetEmployeeData
+} from "../../../Api/UserManagement/Employee";
 import { toast } from "react-toastify";
+import { RiUser3Fill } from "react-icons/ri";
+
 // import AddRegisterAddress from "./AddRegisterAddress";
 // import AddBusinessDetails from "./AddBusinessDetails";
 // import AddGSTDetails from "./AddGSTDetails";
@@ -35,6 +42,7 @@ export default function AddEmployee({
   const [previewImage, setPreviewImage] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
   const [fileList, setFileList] = useState([]);
+  const dispatch = useDispatch();
 
   const handlePreview = async (file) => {
     if (!file.url && !file.preview) {
@@ -67,25 +75,33 @@ export default function AddEmployee({
   const [documentback, setDocumentBack] = useState(false);
 
   const [selectedFile, setSelectedFile] = useState(null);
+
   const getprofile = async () => {
     try {
       const data = await GetOwnerEmployeeProfile(EmployeeID);
-      setSelectedFile(data[0]?.profileimg);
+      setSelectedFile(data?.profile_img);
     } catch (error) {
       console.error("Error fetching additional user data", error);
     }
   };
+
   const handleupload = async (image) => {
     console.log(image, "85885555");
     try {
-      const data = await OwnerEmployeeProfile(image);
+      const data = await OwnerEmployeeProfile(image, EmployeeID, dispatch);
       // setSuperAdminData(data);
       toast.success(data.message);
-      getprofile();
+      GetEmployeeData(dispatch);
     } catch (error) {
       console.error("Error fetching additional user data", error);
     }
   };
+
+  useEffect(() => {
+    getprofile();
+  }, []);
+  const EmployeeProfileImg = sessionStorage.getItem('EmployeeProfileImg')
+
   return (
     <div>
       <div className="w-full h-full">
@@ -95,10 +111,10 @@ export default function AddEmployee({
               currentpage == 1
                 ? 25
                 : currentpage == 2
-                ? 50
-                : currentpage == 3
-                ? 75
-                : 100
+                  ? 50
+                  : currentpage == 3
+                    ? 75
+                    : 100
             }
             size="1.2vw"
             strokeColor="#1F4B7F"
@@ -111,7 +127,7 @@ export default function AddEmployee({
             <div className="col-span-3 flex relative flex-col">
               <div className="flex flex-col px-[5vw]">
                 <label className="text-[1.5vw] font-bold text-[#1f4b7f]">
-                  Create Employee
+                  {EmployeeID ? "Update Employee" : "Create Employee"}
                 </label>
                 <label className="text-[1vw] text-[#1f4b7f]">
                   Company Setup
@@ -137,7 +153,7 @@ export default function AddEmployee({
                 >
                   {fileList.length >= 1 ? null : uploadButton}
                 </Upload> */}
-                <input
+                {/* <input
                   id="fileInput"
                   type="file"
                   style={{ display: "none" }}
@@ -146,15 +162,28 @@ export default function AddEmployee({
                 <label
                   htmlFor="fileInput"
                   className="h-[7vw] w-[7vw] cursor-pointer flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.3vw] border-[#1f4b7f] rounded-[0.5vw]"
-                >
-                  {selectedFile ? (
+                > */}
+                {/* {selectedFile ? (
                     <img src={`http://192.168.90.47:4000${selectedFile}`} />
                   ) : (
                     <span className="text-[1.1vw] text-[#1f4b7f] font-bold">
                       Profile
                     </span>
-                  )}
-                </label>
+                  )} */}
+                {/* </label> */}
+
+                {EmployeeProfileImg === null ? (
+                  <div>
+                    <RiUser3Fill size='1vw'
+                      color="#1F487C"
+                      className="h-[7vw] w-[7vw] cursor-pointer flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.3vw] border-[#1f4b7f] rounded-[0.5vw]" />
+                  </div>
+                ) : (
+
+                  <img src={`http://192.168.90.47:4000${EmployeeProfileImg}`}
+                    alt="Photo"
+                    className="h-[7vw] w-[7vw] cursor-pointer flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.3vw] border-[#1f4b7f] rounded-[0.5vw]" />
+                )}
                 <Modal
                   visible={previewOpen}
                   title={previewTitle}
@@ -173,15 +202,14 @@ export default function AddEmployee({
                 <div className="">
                   <div className="bg-[#D9D9D9] rounded-t-full rounded-b-full w-[0.7vw] h-[14vw] relative">
                     <div
-                      className={`absolute rounded-t-full rounded-b-full w-[0.7vw] h-[2.5vw] bg-[#1f4b7f] ${
-                        currentpage == 1
-                          ? "top-0"
-                          : currentpage == 2
+                      className={`absolute rounded-t-full rounded-b-full w-[0.7vw] h-[2.5vw] bg-[#1f4b7f] ${currentpage == 1
+                        ? "top-0"
+                        : currentpage == 2
                           ? "top-[4vw]"
                           : currentpage == 3
-                          ? "top-[8vw]"
-                          : "bottom-0"
-                      }`}
+                            ? "top-[8vw]"
+                            : "bottom-0"
+                        }`}
                     ></div>
                   </div>
                 </div>

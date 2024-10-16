@@ -175,9 +175,8 @@ export default function Promotion() {
 
                   <div className="flex border-[#1F4B7F] h-[2.5vw] border-l-[0.1vw] border-t-[0.1vw] rounded-l-[0.5vw] rounded-r-[0.5vw] border-r-[0.2vw] border-b-[0.2vw]">
                     <button
-                      className={`${
-                        view == "list" ? "bg-[#1F4B7F]" : "bg-white"
-                      } flex px-[1vw] justify-center gap-[0.5vw] items-center rounded-tl-[0.4vw]   rounded-bl-[0.3vw] `}
+                      className={`${view == "list" ? "bg-[#1F4B7F]" : "bg-white"
+                        } flex px-[1vw] justify-center gap-[0.5vw] items-center rounded-tl-[0.4vw]   rounded-bl-[0.3vw] `}
                       style={{
                         transition: "all 1s",
                       }}
@@ -190,17 +189,15 @@ export default function Promotion() {
                         />
                       </span>
                       <span
-                        className={`${
-                          view == "list" ? "text-white" : "text-[#1F4B7F]"
-                        }  text-[1.1vw]`}
+                        className={`${view == "list" ? "text-white" : "text-[#1F4B7F]"
+                          }  text-[1.1vw]`}
                       >
                         List View
                       </span>
                     </button>
                     <button
-                      className={`${
-                        view == "grid" ? "bg-[#1F4B7F]" : "bg-white"
-                      } flex px-[1vw] justify-center gap-[0.5vw] items-center rounded-r-[0.3vw]`}
+                      className={`${view == "grid" ? "bg-[#1F4B7F]" : "bg-white"
+                        } flex px-[1vw] justify-center gap-[0.5vw] items-center rounded-r-[0.3vw]`}
                       style={{
                         transition: "all 1s",
                       }}
@@ -213,9 +210,8 @@ export default function Promotion() {
                         />
                       </span>
                       <span
-                        className={`${
-                          view == "grid" ? "text-white" : "text-[#1F4B7F]"
-                        }  text-[1.1vw]`}
+                        className={`${view == "grid" ? "text-white" : "text-[#1F4B7F]"
+                          }  text-[1.1vw]`}
                       >
                         Grid View
                       </span>
@@ -224,9 +220,10 @@ export default function Promotion() {
                   <button
                     className="bg-[#1F4B7F] flex px-[1vw] h-[2.5vw] justify-center gap-[0.5vw] items-center rounded-[0.5vw]"
                     onClick={() => {
+                      setPromoData("")
                       setModalIsOpen(true);
                       SetUpdateData(null);
-                      setPromoData("");
+
                     }}
                   >
                     <span>
@@ -248,6 +245,8 @@ export default function Promotion() {
                   promotionId={promotionId}
                   setDeleteModalIsOpen={setDeleteModalIsOpen}
                   setPromotionId={setPromotionId}
+                  activePage={activePage}
+                  itemsPerPage={itemsPerPage}
                 />
               ) : (
                 <GridView
@@ -263,9 +262,9 @@ export default function Promotion() {
             <div className="w-full h-[8vh] flex justify-between items-center">
               <div className="text-[#1f4b7f] flex text-[1.1vw] gap-[0.5vw]">
                 <span>Showing</span>
-                <span className="font-bold">1 - {pageSize}</span>
+                <span className="font-bold">{currentItems && currentItems?.length > 0 ? <div>{indexOfFirstItem + 1} - {indexOfFirstItem + currentItems?.length}</div> : "0"}</span>
                 <span>from</span>
-                <span className="font-bold">{getpromotionlist?.length}</span>
+                <span className="font-bold">{getpromotionlist?.length > 0 ? getpromotionlist?.length : 0}</span>
                 <span>data</span>
               </div>
               <div>

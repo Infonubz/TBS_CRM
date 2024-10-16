@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import { PRODUCT_OWNER_DATA } from "../../Store/Type";
 const apiUrl = process.env.REACT_APP_API_URL;
+// const apiUrl = 'http://192.168.90.47:4000/api'
 const api = axios.create({
   headers: {
     "Content-Type": "application/json",
@@ -18,14 +19,15 @@ export const ProductOwnerLogin = async (personalvalues, validationResult) => {
     phone: personalvalues.emailid_phone,
     password: personalvalues.password,
   };
-  const url = `${apiUrl}/product_owner_login`;
+  // const url = `http://192.168.90.47:4000/api/product_owner_login`;
+  const url = `${apiUrl}/product_owner_login`
   const method = "post";
   const payload =
     validationResult === 1
       ? emailpayload
       : validationResult === 2
-      ? phonepayload
-      : "";
+        ? phonepayload
+        : "";
 
   try {
     const response = await axios({
@@ -39,12 +41,20 @@ export const ProductOwnerLogin = async (personalvalues, validationResult) => {
 
     if (response.data) {
       // sessionStorage.setItem("PRO_ID", response.data.id);
-      sessionStorage.setItem("USER_ID", response.data.id);
-      sessionStorage.setItem("token", response.data.token);
-      sessionStorage.setItem("user_name", response.data.user_name);
-      sessionStorage.setItem("type_id", response.data.type_id);
-      sessionStorage.setItem("type_name", response.data.type_name);
-      sessionStorage.setItem("password",response.data.password)
+      // sessionStorage.setItem("USER_ID", response.data.id);
+      // sessionStorage.setItem("token", response.data.token);
+      // sessionStorage.setItem("user_name", response.data.user_name);
+      // sessionStorage.setItem("type_id", response.data.type_id);
+      // sessionStorage.setItem("type_name", response.data.type_name);
+      // sessionStorage.setItem("password", response.data.password)
+      localStorage.setItem("PRO_ID", response.data.id);
+      localStorage.setItem("USER_ID", response.data.id);
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("user_name", response.data.user_name);
+      localStorage.setItem("type_id", response.data.type_id);
+      localStorage.setItem("type_name", response.data.type_name);
+      localStorage.setItem("password", response.data.password)
+      // sessionStorage.getItem("PRO_ID")
       return response.data;
     } else {
       throw new Error("Invalid response from server");
@@ -70,8 +80,8 @@ export const ProEmpLogin = async (personalvalues, validationResult) => {
     validationResult === 1
       ? emailpayload
       : validationResult === 2
-      ? phonepayload
-      : "";
+        ? phonepayload
+        : "";
   console.log(payload, "payloadpayloadpayload");
   try {
     const responce = await axios({

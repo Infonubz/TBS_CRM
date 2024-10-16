@@ -1,4 +1,4 @@
-import { Progress } from "antd";
+import { Progress, Upload } from "antd";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { FaCloudUploadAlt } from "react-icons/fa";
@@ -13,6 +13,7 @@ import dayjs from "dayjs";
 import { useDispatch, useSelector } from "react-redux";
 import { GetRolesData } from "../../../Api/Role&Responsibilites/ActiveRoles";
 import { capitalizeFirstLetter } from "../../Common/Captilization";
+import { FaUpload } from "react-icons/fa";
 
 const validationSchema = Yup.object().shape({
   phone: Yup.string()
@@ -36,6 +37,15 @@ const validationSchema = Yup.object().shape({
   blood: Yup.string().required("Company Name is required"),
   gender: Yup.string().required("Please select an Gender"), // Validation schema for select field
   dob: Yup.date().required("Date of Birth is required").nullable(),
+  profile_img: Yup.mixed()
+    .test('fileSize', 'File size is too large', value => {
+      // return value && value.size <= 2000000;
+      return value && value.size <= 15728640; // 15 MB in bytes
+
+    })
+    .test('fileType', 'Unsupported file format', value => {
+      return value && ['image/jpeg', 'image/png'].includes(value.type);
+    }),
 });
 export default function AddPersonalDetails({
   setCurrentpage,
@@ -45,6 +55,7 @@ export default function AddPersonalDetails({
 }) {
   const [enable, setEnable] = useState(false);
   const dispatch = useDispatch();
+
   const handleSubmit = async (values) => {
     if (EmployeeID && enable == false) {
       setCurrentpage(2);
@@ -66,7 +77,9 @@ export default function AddPersonalDetails({
       }
     }
   };
+
   const [emppersonaldata, setEmpPersonalData] = useState("");
+
   const fetchGetUser = async () => {
     try {
       const data = await GetEmpPersonalById(
@@ -85,22 +98,32 @@ export default function AddPersonalDetails({
       fetchGetUser();
     }
   }, [EmployeeID, setEmployeeID, setEmpPersonalData, enable, addressback]);
+
   const [roledata, setRoleData] = useState("");
+
   const GetRoles = async () => {
     try {
-      const data = await GetProductOwnerEmployee("EMP101");
+      const data = await GetProductOwnerEmployee(EmployeeID);
       setRoleData(data);
     } catch (error) {
       console.error("Error fetching additional user data", error);
     }
   };
+
   useEffect(() => {
     GetRolesData(dispatch);
     GetRoles();
   }, []);
 
   const getrolelist = useSelector((state) => state.crm.role_list);
+
   console.log(roledata, "roledata");
+
+  const { Dragger } = Upload;
+  const [profileImage, setProfileImage] = useState("");
+  const [draggerImage, setDraggerImage] = useState(false)
+  const [previewUrl, setPreviewUrl] = useState("");
+
   return (
     <div>
       <div className="border-l-[0.1vw] h-[28vw] overflow-y-scroll px-[2vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f]">
@@ -110,11 +133,10 @@ export default function AddPersonalDetails({
           </label>
           {EmployeeID || addressback ? (
             <button
-              className={`${
-                enable
-                  ? "bg-[#1f4b7f] text-white"
-                  : "text-[#1f4b7f] bg-white border-[#1f4b7f]"
-              } rounded-full font-semibold w-[10vw] h-[2vw] flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] text-[1.1vw] `}
+              className={`${enable
+                ? "bg-[#1f4b7f] text-white"
+                : "text-[#1f4b7f] bg-white border-[#1f4b7f]"
+                } rounded-full font-semibold w-[10vw] h-[2vw] flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] text-[1.1vw] `}
               onClick={() => setEnable(!enable)}
             >
               Enable to Edit
@@ -155,6 +177,8 @@ export default function AddPersonalDetails({
               handleSubmit,
               values,
               handleChange,
+              errors,
+              touched
             }) => (
               <Form onSubmit={handleSubmit}>
                 <div className="gap-y-[1.5vw] flex-col flex">
@@ -178,13 +202,12 @@ export default function AddPersonalDetails({
                               : true
                             : false
                         }
-                        className={`${
-                          EmployeeID || addressback
-                            ? enable == false
-                              ? " cursor-not-allowed"
-                              : ""
+                        className={`${EmployeeID || addressback
+                          ? enable == false
+                            ? " cursor-not-allowed"
                             : ""
-                        } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          : ""
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                       />
                       <ErrorMessage
                         name="firstname"
@@ -211,13 +234,12 @@ export default function AddPersonalDetails({
                               : true
                             : false
                         }
-                        className={`${
-                          EmployeeID || addressback
-                            ? enable == false
-                              ? " cursor-not-allowed"
-                              : ""
+                        className={`${EmployeeID || addressback
+                          ? enable == false
+                            ? " cursor-not-allowed"
                             : ""
-                        } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          : ""
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                       />
                       <ErrorMessage
                         name="lastname"
@@ -247,13 +269,12 @@ export default function AddPersonalDetails({
                                 : true
                               : false
                           }
-                          className={`${
-                            EmployeeID || addressback
-                              ? enable == false
-                                ? " cursor-not-allowed"
-                                : ""
+                          className={`${EmployeeID || addressback
+                            ? enable == false
+                              ? " cursor-not-allowed"
                               : ""
-                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                            : ""
+                            } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                         />
                         {/* <button className="absolute right-[0.5vw] text-[1vw] text-white w-[5vw] bg-[#1F4B7F] rounded-full h-[1.7vw]">
                           Verify
@@ -284,13 +305,12 @@ export default function AddPersonalDetails({
                               : true
                             : false
                         }
-                        className={`${
-                          EmployeeID || addressback
-                            ? enable == false
-                              ? " cursor-not-allowed"
-                              : ""
+                        className={`${EmployeeID || addressback
+                          ? enable == false
+                            ? " cursor-not-allowed"
                             : ""
-                        } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          : ""
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                       />
                       <ErrorMessage
                         name="emailid"
@@ -319,13 +339,12 @@ export default function AddPersonalDetails({
                               : true
                             : false
                         }
-                        className={`${
-                          EmployeeID || addressback
-                            ? enable == false
-                              ? " cursor-not-allowed"
-                              : ""
+                        className={`${EmployeeID || addressback
+                          ? enable == false
+                            ? " cursor-not-allowed"
                             : ""
-                        } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          : ""
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                       />
                       <ErrorMessage
                         name="alt_phone"
@@ -355,13 +374,12 @@ export default function AddPersonalDetails({
                               : true
                             : false
                         }
-                        className={`${
-                          EmployeeID || addressback
-                            ? enable == false
-                              ? " cursor-not-allowed"
-                              : ""
+                        className={`${EmployeeID || addressback
+                          ? enable == false
+                            ? " cursor-not-allowed"
                             : ""
-                        } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          : ""
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                       />
                       <ErrorMessage
                         name="dob"
@@ -393,13 +411,12 @@ export default function AddPersonalDetails({
                               : true
                             : false
                         }
-                        className={`${
-                          EmployeeID || addressback
-                            ? enable == false
-                              ? " cursor-not-allowed"
-                              : ""
+                        className={`${EmployeeID || addressback
+                          ? enable == false
+                            ? " cursor-not-allowed"
                             : ""
-                        } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          : ""
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                       >
                         <option label="Select Gender" value="" className="" />
                         <option label="Male" value="Male" className="" />
@@ -431,13 +448,12 @@ export default function AddPersonalDetails({
                               : true
                             : false
                         }
-                        className={`${
-                          EmployeeID || addressback
-                            ? enable == false
-                              ? " cursor-not-allowed"
-                              : ""
+                        className={`${EmployeeID || addressback
+                          ? enable == false
+                            ? " cursor-not-allowed"
                             : ""
-                        } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          : ""
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                       />
                       <ErrorMessage
                         name="blood"
@@ -475,13 +491,12 @@ export default function AddPersonalDetails({
                               : true
                             : false
                         }
-                        className={`${
-                          EmployeeID || addressback
-                            ? enable == false
-                              ? " cursor-not-allowed"
-                              : ""
+                        className={`${EmployeeID || addressback
+                          ? enable == false
+                            ? " cursor-not-allowed"
                             : ""
-                        } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          : ""
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                       >
                         <option label="Select Role" value="" className="" />
                         {/* <option label="Male" value="Male" className="" />
@@ -507,7 +522,57 @@ export default function AddPersonalDetails({
                         className="text-red-500 text-[0.8vw]"
                       />
                     </div>
-                    <div className="col-span-1"></div>
+                    <div className="col-span-1 relative">
+                      <label className="text-[#1F4B7F] text-[1.1vw] ">
+                        Profile Image
+                      </label>
+                      <Field name="profile_img">
+                        {({ field, form }) => (
+                          <Dragger
+                            height={"7.2vw"}
+                            onChange={() => setDraggerImage(true)}
+                            beforeUpload={(file) => {
+                              console.log(file, "filefilefilefile");
+                              setProfileImage(file.name);
+                              setFieldValue("profile_img", file);
+                              setFieldValue("fileType", file.type);
+                              setFieldValue("fileSize", file.size);
+                              const reader = new FileReader();
+                              reader.onloadend = () => {
+                                setPreviewUrl(reader.result); // Set the preview URL
+                              };
+
+                              reader.readAsDataURL(file);
+                              return false; // Prevent automatic upload
+                            }}
+                            showUploadList={false} // Disable the default upload list
+                            className="mt-[0.5vw] relative"
+                            style={{
+                              backgroundSize: "cover",
+                              backgroundPosition: "center",
+                              position: "relative",
+                            }}
+                          >
+                            <label className="flex items-center justify-center relative z-10">
+                              <p className="text-[#1F4B7F] font-bold text-[1.1vw] pr-[1vw]">
+                                Drag and Drop
+                              </p>
+                              <FaUpload color="#1F4B7F" size={"1.2vw"} />
+                            </label>
+                          </Dragger>
+                        )}
+                      </Field>
+                      {profileImage && (
+                        <p className="text-[#1F4B7F] text-[0.8vw] mt-2">
+                          {profileImage}
+                        </p>
+                      )}
+                      {errors.file && touched.file && (
+                        <div className="text-red-500 text-[0.8vw]">
+                          {errors.file}
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <div className="flex items-center justify-between py-[1vw]">
                     <div>
@@ -520,9 +585,9 @@ export default function AddPersonalDetails({
                         Reset
                       </button>
                       <button
-                        className="bg-[#1F487C] font-semibold rounded-full w-[10vw] h-[2vw] text-[1vw] text-white"
+                        className="bg-[#1F487C] font-semibold rounded-full w-[11vw] h-[2vw] text-[1vw] text-white"
                         type="submit"
-                        // onClick={() => setCurrentpage(2)}
+                      // onClick={() => setCurrentpage(2)}
                       >
                         {EmployeeID || addressback
                           ? enable

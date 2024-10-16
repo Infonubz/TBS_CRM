@@ -19,6 +19,7 @@ import "../../App.css";
 // import ListUserView from "../../Componenets/UserManagement/User/ListUserView";
 // import AddUser from "./User/AddUser";
 import ExportButton from "../Common/Download/Excel";
+import { toast } from "react-toastify";
 // import AddAdmin from "./Admin/AddAdmin";
 import {
   Getuserdata,
@@ -34,16 +35,26 @@ import TableList from "./TableList";
 import {
   GetOperatorData,
   GetSuperAdminData,
+  handleOperatorSearch,
+  SubmitOperatorExcel,
 } from "../../Api/UserManagement/SuperAdmin";
 import AddEmployee from "./Employee/IndexAddEmployee";
 import EmployeeTableList from "./EmployeeTableList";
 import EmployeeGridView from "./EmployeeGridView";
-import { GetEmployeeData } from "../../Api/UserManagement/Employee";
+import {
+  GetEmployeeData,
+  handleEmployeeSearch,
+  SubmitEmployeeExcel,
+} from "../../Api/UserManagement/Employee";
 import PartnerTableList from "./PartnerTableList";
 import PartnerGridView from "./PartnerGridView";
 import AddParner from "./Partner/IndexAddPartner";
 import GridList from "./GridList";
-import { GetPartnerData } from "../../Api/UserManagement/Partner";
+import {
+  GetPartnerData,
+  handlePartnerSearch,
+  SubmitPartnerExcel,
+} from "../../Api/UserManagement/Partner";
 import ReactPaginate from "react-js-pagination";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -55,7 +66,12 @@ import {
 import ClientGridView from "./ClientGridView";
 import ClientTableView from "./ClientTableView";
 import ClientIndex from "./Client/IndexClientDetails";
-import { GetClientData } from "../../Api/UserManagement/Client";
+import {
+  GetClientData,
+  handleClientSearch,
+  SubmitClientExcel,
+} from "../../Api/UserManagement/Client";
+import { Flex, Spin } from "antd";
 
 export default function Discounts() {
   const [view, setView] = useState("list");
@@ -74,7 +90,15 @@ export default function Discounts() {
   const get_operator_list = useSelector((state) => state.crm.operator_list);
   const get_employee_list = useSelector((state) => state.crm.employee_list);
   const get_partner_list = useSelector((state) => state.crm.partner_list);
-  console.log(get_employee_list, "get_partner_list");
+  const [deletemodalIsOpen, setDeleteModalIsOpen] = useState(false);
+  const [deleteEmpmodalIsOpen, setDeleteEmpModalIsOpen] = useState(false);
+  const [deleteOpmodalIsOpen, setDeleteOpModalIsOpen] = useState(false);
+
+  // const user = sessionStorage.getItem("USER_ID");
+  const user = localStorage.getItem("USER_ID")
+
+  console.log(get_partner_list, user, "get_partner_list");
+
   const currentData =
     get_operator_list.length > 0 &&
     get_operator_list?.slice(
@@ -82,12 +106,14 @@ export default function Discounts() {
       currentPage * pageSize
     );
   console.log(currentData, "currentData");
+
   const employeecurrentdata =
     get_employee_list.length > 0 &&
     get_employee_list?.slice(
       (employeecurrentPage - 1) * employeepagesize,
       employeecurrentPage * employeepagesize
     );
+
   const patcurrentdata =
     get_partner_list.length > 0 &&
     get_partner_list?.slice(
@@ -162,6 +188,27 @@ export default function Discounts() {
     setOperatorID(null);
     GetSuperAdminData(dispatch);
     // Getuserdata();
+  };
+
+  useEffect(() => {
+    if (user?.startsWith("tbs-pro")) {
+      setAdminUser("super_admin");
+    } else {
+      setAdminUser("employee");
+    }
+  }, [user]);
+
+  const search = (e) => {
+    if (adminUser == "super_admin") {
+      console.log(e.target.value, "superadminsearch")
+      handleOperatorSearch(e, dispatch);
+    } else if (adminUser == "client") {
+      handleClientSearch(e, dispatch);
+    } else if (adminUser == "employee") {
+      handleEmployeeSearch(e, dispatch);
+    } else {
+      handlePartnerSearch(e, dispatch);
+    }
   };
 
   // const Getuserdata = async () => {
@@ -282,7 +329,8 @@ export default function Discounts() {
       (currentPage + 1) * perPage
     );
   const [SPA_ID, SetSPAID] = useState(null);
-  const [operatorID, setOperatorID] = useState(null);
+  const [operatorID, setOperatorID] = useState('');
+  console.log(operatorID, 'operator_id')
   const [EmployeeID, setEmployeeID] = useState(null);
   const [PartnerID, setPartnerID] = useState(null);
   const [clientID, setClientID] = useState(null);
@@ -317,8 +365,8 @@ export default function Discounts() {
   const indexOfLastPartnerItem = PartnerActivePage * partnerItemsPerPage;
   const indexOfFirstPartnerItem = indexOfLastOperatorItem - partnerItemsPerPage;
   const currentPartnerItems =
-    get_partner_list.length > 0 &&
-    get_partner_list?.slice(indexOfLastPartnerItem, indexOfFirstPartnerItem);
+    get_partner_list?.length > 0 &&
+    get_partner_list?.slice(indexOfFirstPartnerItem, indexOfLastPartnerItem);
   const handlePartnerPageChange = (pageNumber) => {
     setPartnerActivePage(pageNumber);
   };
@@ -334,8 +382,94 @@ export default function Discounts() {
     setClientActivePage(pageNumber);
   };
   console.log(get_all_client, "get_all_client");
+
+  const [excelData, setExcelData] = useState(null);
+
+  const [loading, setLoading] = useState(false);
+
+  const handleOnClick = async (file) => {
+    console.log(file, "adfdsfadsfa");
+
+    if (adminUser == "super_admin") {
+      setLoading(true);
+      try {
+        const response = await SubmitOperatorExcel(file, dispatch);
+        toast.success(response);
+        GetOperatorData(dispatch);
+        setLoading(false);
+        //   setTimeout(()=>{
+        //     setLoading(false);
+        // },[5000])
+      } catch (error) {
+        console.error("Error uploading file:", error);
+        // toast.error("Failed to upload file");
+      }
+    } else if (adminUser == "client") {
+      setLoading(true);
+      try {
+        const response = await SubmitClientExcel(file, dispatch);
+        toast.success(response);
+        GetClientData(dispatch);
+        setLoading(false);
+        //   setTimeout(()=>{
+        //     setLoading(false);
+        // },[5000])
+      } catch (error) {
+        console.error("Error uploading file:", error);
+        // toast.error("Failed to upload file");
+      }
+    } else if (adminUser == "employee") {
+      setLoading(true);
+      try {
+        const response = await SubmitEmployeeExcel(file, dispatch);
+        toast.success(response);
+        GetEmployeeData(dispatch);
+        setLoading(false);
+        //   setTimeout(()=>{
+        //     setLoading(false);
+        // },[5000])
+      } catch (error) {
+        console.error("Error uploading file:", error);
+        // toast.error("Failed to upload file");
+      }
+    } else if (adminUser == "partner") {
+      setLoading(true);
+      try {
+        const response = await SubmitPartnerExcel(file, dispatch);
+        console.log(response, "----partner");
+        toast.success(response);
+        GetPartnerData(dispatch);
+        setLoading(false);
+        //   setTimeout(()=>{
+        //     setLoading(false);
+        // },[5000])
+      } catch (error) {
+        console.error("Error uploading file:", error);
+        // toast.error("Failed to upload file");
+      }
+    }
+  };
+  console.log(adminUser, "ididididididididididididddddd");
+
+
+  const handleAddButton = () => {
+    sessionStorage.removeItem('OperatorProfileImg');
+    sessionStorage.removeItem('ClientCompanyLogo');
+    sessionStorage.removeItem('PartnerProfileImg');
+    sessionStorage.removeItem("PARTNER_ID")
+    sessionStorage.removeItem('CLIENT_ID')
+    // sessionStorage.removeItem('EmployeeProfileImg');
+    sessionStorage.removeItem("OPERATE_ID")
+    setModalIsOpen(true);
+    setOperatorID(null);
+    setEmployeeID(null);
+    setPartnerID(null);
+    setClientID(null);
+  };
+
   return (
     <>
+      <Spin size="large" spinning={loading} fullscreen />
       <div className="mb-[5vw]">
         <div
           className="h-screen w-screen blur-0"
@@ -356,8 +490,8 @@ export default function Discounts() {
                     <input
                       type="text"
                       className="bg-white outline-none pl-[2vw] w-[17vw] h-[5vh] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw] border-r-[0.2vw] border-b-[0.2vw]"
-                      placeholder="Search Operators"
-                      // onChange={(e) => handleSearch(e.target.value)}
+                      placeholder="Search Operator"
+                      onChange={(e) => search(e)}
                     />
                     <IoSearch
                       className="absolute left-[0.5vw]"
@@ -365,51 +499,51 @@ export default function Discounts() {
                       color="#1F4B7F"
                     />
                   </div>
-                  <div className="flex items-center gap-x-[2vw] ">
+                  <div className="flex items-center gap-x-[1.8vw] ">
+                    {user?.startsWith("tbs-pro") && (
+                      <div
+                        className={` cursor-pointer ${adminUser == "super_admin"
+                          ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                          : ""
+                          } `}
+                        onClick={() => {
+                          setAdminUser("super_admin");
+                        }}
+                      >
+                        <p className="text-[1.3vw] text-[#1f487c] text-center">
+                          Bus Operator
+                        </p>
+                      </div>
+                    )}
                     <div
-                      className={` cursor-pointer ${
-                        adminUser == "super_admin"
-                          ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                          : ""
-                      } `}
-                      onClick={() => {
-                        setAdminUser("super_admin");
-                      }}
-                    >
-                      <p className="text-[1.3vw] text-[#1f487c] text-center">
-                        Bus Operator
-                      </p>
-                    </div>
-                    {/* <div
-                      className={` cursor-pointer ${
-                        adminUser == "partner"
-                          ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                          : ""
-                      } `}
+                      className={` cursor-pointer ${adminUser == "partner"
+                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                        : ""
+                        } `}
                       onClick={() => setAdminUser("partner")}
                     >
                       <div className="text-[1.3vw] text-[#1f487c] text-center">
                         Partner
                       </div>
-                    </div> */}
-                    <div
-                      className={` cursor-pointer ${
-                        adminUser == "client"
-                          ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                          : ""
-                      } `}
-                      onClick={() => setAdminUser("client")}
-                    >
-                      <div className="text-[1.3vw] text-[#1f487c] text-center">
-                        Client
-                      </div>
                     </div>
-                    <div
-                      className={` cursor-pointer ${
-                        adminUser == "employee"
+                    {user?.startsWith("tbs-pro") && (
+                      <div
+                        className={` cursor-pointer ${adminUser == "client"
                           ? "border-b-[0.25vw] font-bold border-[#1f487c]"
                           : ""
-                      } `}
+                          } `}
+                        onClick={() => setAdminUser("client")}
+                      >
+                        <div className="text-[1.3vw] text-[#1f487c] text-center">
+                          Client
+                        </div>
+                      </div>
+                    )}
+                    <div
+                      className={` cursor-pointer ${adminUser == "employee"
+                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                        : ""
+                        } `}
                       onClick={() => setAdminUser("employee")}
                     >
                       <div className="text-[1.3vw] text-[#1f487c] text-center">
@@ -418,21 +552,47 @@ export default function Discounts() {
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-x-[1vw] h-full ">
+                <div className="flex items-center gap-x-[0.5vw] h-full ">
                   <ExportButton
-                    dataArray={adminUser ? employeecurrentdata : currentData}
+                    dataArray={
+                      adminUser == "employee"
+                        ? currentEmployeeItems
+                        : adminUser == "client"
+                          ? currentClientItems
+                          : adminUser == "super_admin"
+                            ? currentOperatorItems
+                            : currentPartnerItems
+                    }
                   />
-                  <button className="bg-[#1F4B7F] flex px-[1vw]  justify-center h-[5vh] gap-[0.5vw] items-center rounded-[0.5vw]">
-                    <span>
-                      <CiImport size={"1.2vw"} color="white" />
-                    </span>
-                    <span className="text-white  text-[1.1vw]">Import</span>
-                  </button>
+                  <div>
+                    <input
+                      id="xlsxFile"
+                      name="xlsxFile"
+                      type="file"
+                      style={{ display: "none" }}
+                      onChange={(event) => {
+                        const file = event.target.files[0];
+                        console.log(file, "filesfiles");
+                        setExcelData(file);
+                        handleOnClick(file);
+                      }}
+                    />
+                    <button
+                      className="bg-[#1F4B7F] flex px-[1vw]  justify-center h-[5vh] gap-[0.5vw] items-center rounded-[0.5vw]"
+                      onClick={() =>
+                        document.getElementById("xlsxFile").click()
+                      }
+                    >
+                      <span>
+                        <CiImport size={"1.05vw"} color="white" />
+                      </span>
+                      <span className="text-white text-[1.1vw]">Import</span>
+                    </button>
+                  </div>
                   <div className="flex border-[#1F4B7F] h-[5vh] border-l-[0.1vw] border-t-[0.1vw] rounded-l-[0.5vw] rounded-r-[0.5vw] border-r-[0.2vw] border-b-[0.2vw]">
                     <button
-                      className={`${
-                        view == "list" ? "bg-[#1F4B7F]" : "bg-white"
-                      } flex px-[1vw] justify-center gap-[0.5vw] items-center rounded-tl-[0.4vw]   rounded-bl-[0.3vw] `}
+                      className={`${view == "list" ? "bg-[#1F4B7F]" : "bg-white"
+                        } flex px-[1vw] justify-center gap-[0.5vw] items-center rounded-tl-[0.4vw]   rounded-bl-[0.3vw] `}
                       style={{
                         transition: "all 1s",
                       }}
@@ -445,17 +605,15 @@ export default function Discounts() {
                         />
                       </span>
                       <span
-                        className={`${
-                          view == "list" ? "text-white" : "text-[#1F4B7F]"
-                        }  text-[1.1vw]`}
+                        className={`${view == "list" ? "text-white" : "text-[#1F4B7F]"
+                          }  text-[1.1vw]`}
                       >
                         List View
                       </span>
                     </button>
                     <button
-                      className={`${
-                        view == "grid" ? "bg-[#1F4B7F]" : "bg-white"
-                      } flex px-[1vw] justify-center gap-[0.5vw] items-center rounded-r-[0.3vw]`}
+                      className={`${view == "grid" ? "bg-[#1F4B7F]" : "bg-white"
+                        } flex px-[0.7vw] justify-center gap-[0.5vw] items-center rounded-r-[0.3vw]`}
                       style={{
                         transition: "all 1s",
                       }}
@@ -463,43 +621,42 @@ export default function Discounts() {
                     >
                       <span>
                         <IoGrid
-                          size={"1.2vw"}
+                          size={"1.1vw"}
                           color={`${view == "grid" ? "white" : "#1F4B7F"}`}
                         />
                       </span>
                       <span
-                        className={`${
-                          view == "grid" ? "text-white" : "text-[#1F4B7F]"
-                        }  text-[1.1vw]`}
+                        className={`${view == "grid" ? "text-white" : "text-[#1F4B7F]"
+                          }  text-[1.1vw]`}
                       >
                         Grid View
                       </span>
                     </button>
                   </div>
                   <button
-                    className="bg-[#1F4B7F] flex w-[12vw] h-[5vh] justify-center gap-[0.5vw] items-center rounded-[0.5vw]"
+                    className="bg-[#1F4B7F] flex w-[10vw] h-[5vh] justify-center gap-[0.5vw] items-center rounded-[0.5vw]"
                     // onClick={() => handleAdd()}
                     onClick={() => {
-                      setModalIsOpen(true);
-                      setOperatorID(null);
-                      setEmployeeID(null);
-                      setPartnerID(null);
-                      setClientID(null);
+                      // setModalIsOpen(true);
+                      // setOperatorID(null);
+                      // setEmployeeID(null);
+                      // setPartnerID(null);
+                      // setClientID(null);
+                      handleAddButton()
                     }}
                   >
                     <span>
                       <FaPlus size={"1.2vw"} color="white" />
                     </span>
-                    <span className="text-white  text-[1.1vw]">
-                      {`Add ${
-                        adminUser == "super_admin"
-                          ? "Operator"
-                          : adminUser == "partner"
+                    <span className="text-white text-[1.1vw]">
+                      {`Add ${adminUser == "super_admin"
+                        ? "Operator"
+                        : adminUser == "partner"
                           ? "Partner"
                           : adminUser == "client"
-                          ? "Client"
-                          : "Employee"
-                      }`}
+                            ? "Client"
+                            : "Employee"
+                        }`}
                     </span>
                   </button>
                 </div>
@@ -559,6 +716,9 @@ export default function Discounts() {
                     SPA_ID={SPA_ID}
                     setModalIsOpen={setModalIsOpen}
                     SetUpdateData={SetUpdateData}
+                    updatedata={updatedata}
+                    setDeleteOpModalIsOpen={setDeleteOpModalIsOpen}
+                    deleteOpmodalIsOpen={deleteOpmodalIsOpen}
                     setOperatorID={setOperatorID}
                     operatorID={operatorID}
                   />
@@ -567,16 +727,21 @@ export default function Discounts() {
                     currentData={currentOperatorItems}
                     SetSPAID={SetSPAID}
                     SPA_ID={SPA_ID}
+                    setDeleteOpModalIsOpen={setDeleteOpModalIsOpen}
+                    deleteOpmodalIsOpen={deleteOpmodalIsOpen}
                     setModalIsOpen={setModalIsOpen}
                     SetUpdateData={SetUpdateData}
+                    PartnerID={PartnerID}
                     setOperatorID={setOperatorID}
                     operatorID={operatorID}
+                    setPartnerID={setPartnerID}
                   />
                 )
               ) : adminUser == "partner" ? (
                 view == "grid" ? (
                   <PartnerGridView
                     currentData={currentPartnerItems}
+                    get_partner_list={get_partner_list}
                     setModalIsOpen={setModalIsOpen}
                     SetUpdateData={SetUpdateData}
                     PartnerID={PartnerID}
@@ -586,6 +751,7 @@ export default function Discounts() {
                   <PartnerTableList
                     currentData={currentPartnerItems}
                     setModalIsOpen={setModalIsOpen}
+                    get_partner_list={get_partner_list}
                     SetUpdateData={SetUpdateData}
                     PartnerID={PartnerID}
                     setPartnerID={setPartnerID}
@@ -598,6 +764,8 @@ export default function Discounts() {
                     setModalIsOpen={setModalIsOpen}
                     SetUpdateData={SetUpdateData}
                     clientID={clientID}
+                    setDeleteModalIsOpen={setDeleteModalIsOpen}
+                    deletemodalIsOpen={deletemodalIsOpen}
                     setClientID={setClientID}
                   />
                 ) : (
@@ -606,6 +774,8 @@ export default function Discounts() {
                     setModalIsOpen={setModalIsOpen}
                     SetUpdateData={SetUpdateData}
                     clientID={clientID}
+                    setDeleteModalIsOpen={setDeleteModalIsOpen}
+                    deletemodalIsOpen={deletemodalIsOpen}
                     setClientID={setClientID}
                   />
                 )
@@ -616,6 +786,8 @@ export default function Discounts() {
                   SetUpdateData={SetUpdateData}
                   EmployeeID={EmployeeID}
                   setEmployeeID={setEmployeeID}
+                  setDeleteEmpModalIsOpen={setDeleteEmpModalIsOpen}
+                  deleteEmpmodalIsOpen={deleteEmpmodalIsOpen}
                 />
               ) : (
                 <EmployeeTableList
@@ -624,6 +796,8 @@ export default function Discounts() {
                   SetUpdateData={SetUpdateData}
                   EmployeeID={EmployeeID}
                   setEmployeeID={setEmployeeID}
+                  setDeleteEmpModalIsOpen={setDeleteEmpModalIsOpen}
+                  deleteEmpmodalIsOpen={deleteEmpmodalIsOpen}
                 />
               )}
 
@@ -637,25 +811,52 @@ export default function Discounts() {
               <div className="text-[#1f4b7f] flex text-[1.1vw] gap-[0.5vw] ">
                 <span>Showing</span>
                 <span className="font-bold">
-                  1 -{" "}
+                  {/* 1 -{" "} */}
                   {adminUser == "super_admin"
-                    ? get_operator_list?.length
+                    ?
+                    //  get_operator_list?.length
+                    // `${indexOfFirstOperatorItem + 1} - ${indexOfFirstOperatorItem + currentOperatorItems.length}`
+                    (currentOperatorItems && currentOperatorItems?.length > 0
+                      ? `${indexOfFirstOperatorItem + 1} - ${indexOfFirstOperatorItem + currentOperatorItems?.length}`
+                      : "0"
+                    )
                     : adminUser == "partner"
-                    ? get_partner_list.length
-                    : adminUser == "client"
-                    ? get_all_client?.length
-                    : get_employee_list?.length}
+                      ?
+                      //  get_partner_list?.length 
+                      // `${indexOfFirstPartnerItem + 1} - ${indexOfFirstPartnerItem + currentPartnerItems.length}`
+                      (currentPartnerItems && currentOperatorItems?.length > 0
+                        ? `${indexOfFirstPartnerItem + 1} - ${indexOfFirstPartnerItem + currentPartnerItems?.length}`
+                        : "0"
+                      )
+                      : adminUser == "client"
+                        ?
+                        //  get_all_client?.length
+                        // `${indexOfFirstClientItem + 1} - ${indexOfFirstClientItem + currentClientItems.length}`
+                        (currentClientItems && currentClientItems?.length > 0
+                          ? `${indexOfFirstClientItem + 1} - ${indexOfFirstClientItem + currentClientItems?.length}`
+                          : "0"
+                        )
+                        :
+                        // get_employee_list?.length
+                        // `${indexOfFirstEmployeeItem + 1} - ${indexOfFirstEmployeeItem + currentEmployeeItems.length}`
+                        (currentEmployeeItems && currentEmployeeItems?.length > 0
+                          ? `${indexOfFirstEmployeeItem + 1} - ${indexOfFirstEmployeeItem + currentEmployeeItems?.length}`
+                          : "0"
+                        )
+                  }
+
                 </span>
                 <span>from</span>
                 <span className="font-bold">
                   {" "}
                   {adminUser == "super_admin"
-                    ? get_operator_list?.length
+                    ? get_operator_list?.length > 0 ? get_operator_list?.length : 0
                     : adminUser == "partner"
-                    ? get_partner_list.length
-                    : adminUser == "client"
-                    ? get_all_client?.length
-                    : get_employee_list?.length}
+                      ? get_partner_list?.length > 0 ? get_partner_list?.length : 0
+                      : adminUser == "client"
+                        ? get_all_client?.length > 0 ? get_all_client?.length : 0
+                        : get_employee_list?.length > 0 ? get_employee_list?.length : 0
+                  }
                 </span>
                 <span>data</span>
               </div>
@@ -703,43 +904,45 @@ export default function Discounts() {
                   // onShowSizeChange={handlePageChange}
                   // showSizeChanger
                 /> */}
+
+
                 <ReactPaginate
-                  OperatorActivePage={
+                  activePage={
                     adminUser === "super_admin"
                       ? OperatorActivePage
                       : adminUser === "partner"
-                      ? PartnerActivePage
-                      : adminUser === "client"
-                      ? ClientActivePage
-                      : EmployeeActivePage
+                        ? PartnerActivePage
+                        : adminUser === "client"
+                          ? ClientActivePage
+                          : EmployeeActivePage
                   }
                   itemsCountPerPage={
                     adminUser === "super_admin"
                       ? operatorItemsPerPage
                       : adminUser === "partner"
-                      ? partnerItemsPerPage
-                      : adminUser === "client"
-                      ? clientItemsPerPage
-                      : employeeItemsPerPage
+                        ? partnerItemsPerPage
+                        : adminUser === "client"
+                          ? clientItemsPerPage
+                          : employeeItemsPerPage
                   }
                   totalItemsCount={
                     adminUser === "super_admin"
                       ? get_operator_list?.length
                       : adminUser === "partner"
-                      ? get_partner_list?.length
-                      : adminUser === "client"
-                      ? get_all_client?.length
-                      : get_employee_list?.length
+                        ? get_partner_list?.length
+                        : adminUser === "client"
+                          ? get_all_client?.length
+                          : get_employee_list?.length
                   }
                   pageRangeDisplayed={3}
                   onChange={
-                    adminUser === "super_admin"
+                    adminUser == "super_admin"
                       ? handleOperatorPageChange
-                      : adminUser === "partner"
-                      ? handlePartnerPageChange
-                      : adminUser === "client"
-                      ? handleClientPageChange
-                      : handleEmployeePageChange
+                      : adminUser == "partner"
+                        ? handlePartnerPageChange
+                        : adminUser == "client"
+                          ? handleClientPageChange
+                          : handleEmployeePageChange
                   }
                   itemClass="page-item"
                   linkClass="page-link"

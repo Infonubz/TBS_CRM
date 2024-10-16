@@ -20,7 +20,7 @@ export default function Status_Update_Modal({ currentid, setIsSaveModal, setIsVe
   const handlechange = async (valueid, valuedata) => {
     try {
       const data = await statuschange(valueid, valuedata, currentid, dispatch);
-      console.log(valueid, valuedata, currentid, "currentidcurrentid");
+      console.log(valueid, valuedata, currentid, "currentidcurrentid ithu value");
       toast.success(data?.message);
       GetRequestManagementData(dispatch);
       console.log(data);
@@ -29,7 +29,7 @@ export default function Status_Update_Modal({ currentid, setIsSaveModal, setIsVe
     }
   };
 
-  console.log( currentid, "currentidcurrentid");
+  console.log(currentid, "currentidcurrentid");
   return (
     <>
       <div className="flex flex-col items-center justify-center">
@@ -37,7 +37,7 @@ export default function Status_Update_Modal({ currentid, setIsSaveModal, setIsVe
         <img src={image} className="h-[6vw] w-[6vw] mt-[1vw]"></img>
         <div className="flex gap-2 mt-[1vw]">
           <button
-            className="items-center text-[0.9vw] text-white  space-x-[0.7vw] px-[0.8vw] w-[8vw] h-[2vw] bg-[#FF7A00] rounded-[0.5vw]"
+            className="items-center text-[0.9vw] text-white  space-x-[0.7vw] px-[0.8vw] w-[8vw] h-[2vw] bg-[#2A99FF] rounded-[0.5vw]"
             onClick={() => {
               handlechange(1, "Under review");
               setIsSaveModal(false);
@@ -59,12 +59,11 @@ export default function Status_Update_Modal({ currentid, setIsSaveModal, setIsVe
           </button>
           <button
             className="items-center text-[0.9vw] text-white  space-x-[0.7vw] px-[0.8vw] w-[8vw] h-[2vw] bg-[#FF1100] rounded-[0.5vw]"
-            onClick={() =>
-            {
+            onClick={() => {
               handlechange(3, "Rejected")
               setIsSaveModal(false);
             }
-              }
+            }
           >
             Rejected
           </button>
@@ -79,15 +78,15 @@ export default function Status_Update_Modal({ currentid, setIsSaveModal, setIsVe
         height="300px"
         width="600px"
       >
-        <Activate_Modal 
-        isActivate={setIsActivate} 
-        currentid={currentid} 
-        setIsSaveModal={setIsSaveModal}
-        verifyData = {verifyData}
-        setVerifyData = {setVerifyData}
-        setRequestData = {setRequestData}
-        requestData = {requestData}
-         />
+        <Activate_Modal
+          isActivate={setIsActivate}
+          currentid={currentid}
+          setIsSaveModal={setIsSaveModal}
+          verifyData={verifyData}
+          setVerifyData={setVerifyData}
+          setRequestData={setRequestData}
+          requestData={requestData}
+        />
       </ModalPopup>
     </>
   );

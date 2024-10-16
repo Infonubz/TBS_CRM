@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import domtoimage from "dom-to-image";
+import { useRef } from "react";
+import rasterizeHTML from "rasterizehtml";
 import logo from "../../asserts/bus.jpg";
+import { toPng, toJpeg } from "html-to-image";
 // business
 import business1 from "../../asserts/Offers/Business/Business01.png";
 import business2 from "../../asserts/Offers/Business/Business02.png";
@@ -97,7 +101,10 @@ const BackgroundView = ({
   allvalues,
   setBgImage,
   updatedata,
+  offerdata,
+  draggerImage,
 }) => {
+  console.log(offerdata, "uuupppddddaatteeee");
   const [showDialog, setShowDialog] = useState(false);
   // const [modalIsOpen, setModalIsOpen] = useState(false);
   const [startIndex, setStartIndex] = useState(0);
@@ -212,30 +219,199 @@ const BackgroundView = ({
       setCurrentOffer("");
     }
   }, [offerlist.occupation]);
+  const [downloadReq, setDownloadReq] = useState(false);
+  const offerContainerRef = useRef(null);
+  const offerRef = useRef(null);
+
   const downloadImage = () => {
+    const element = document.querySelector(".offer-container");
+    setDownloadReq(true);
+
+    //*********dom to image quality 60 % */
+
+    // if (element) {
+    //   domtoimage.toPng(element, { bgcolor: '#ffffff' ,quality: 1.0 }) // Use bgcolor to avoid transparency issues
+    //     .then((dataUrl) => {
+    //       const link = document.createElement('a');
+    //       link.href = dataUrl;
+    //       link.download = 'capture.png';
+    //       link.click();
+    //     })
+    //     .catch((error) => console.error('Error capturing image:', error));
+    // }
+
+    //***********html2canva************** */
+
+    // if (element) {
+    //   html2canvas(element, { scale: 2 }) // Increase scale for better resolution
+    //     .then((canvas) => {
+    //       const link = document.createElement('a');
+    //       link.href = canvas.toDataURL('image/png');
+    //       link.download = 'capture.png';
+    //       link.click();
+    //     });
+    // }
+
+    //********************to png************************ */
+
+    if (element) {
+      toPng(element, { quality: 1.0 }) // Adjust quality if needed
+        .then((dataUrl) => {
+          const link = document.createElement("a");
+          link.href = dataUrl;
+          link.download = "OfferImage.png";
+          link.click();
+        })
+        .catch((error) => console.error("Error capturing image:", error));
+    }
+
+    // if (element) {
+    //   toJpeg(element, { quality: 1.0 }) // Adjust quality (0.0 to 1.0, where 1.0 is highest)
+    //     .then((dataUrl) => {
+    //       const link = document.createElement('a');
+    //       link.href = dataUrl;
+    //       link.download = 'capture.jpeg'; // Change the file extension to .jpeg
+    //       link.click();
+    //     })
+    //     .catch((error) => console.error('Error capturing image:', error));
+    // }
+
+    // if (element) {
+    //   // Create a new canvas with higher resolution
+    //   const scale = 2; // Scale factor for higher resolution
+    //   const originalWidth = element.offsetWidth;
+    //   const originalHeight = element.offsetHeight;
+
+    //   // Set a higher resolution for the canvas
+    //   const canvas = document.createElement('canvas');
+    //   canvas.width = originalWidth * scale;
+    //   canvas.height = originalHeight * scale;
+    //   const context = canvas.getContext('2d');
+    //   context.scale(scale, scale);
+
+    //   // Capture the image using the higher-resolution canvas
+    //   toJpeg(element, {
+    //     canvas: canvas,
+    //     quality: 0.9 // Set quality (0.0 to 1.0, where 1.0 is highest)
+    //   })
+    //   .then((dataUrl) => {
+    //     const link = document.createElement('a');
+    //     link.href = dataUrl;
+    //     link.download = 'capture.jpeg'; // Change extension to .jpeg
+    //     link.click();
+    //   })
+    //   .catch((error) => console.error('Error capturing image:', error));
+    // }
+
     // html2canvas(document.querySelector(".offer-container")).then((canvas) => {
     //   const link = document.createElement("a");
     //   link.href = canvas.toDataURL("image/png");
     //   link.download = "offer-image.png";
     //   link.click();
     // });
-    html2canvas(document.querySelector(".offer-container"), {
-      scale: 2, // Increase the resolution of the canvas
-      useCORS: true, // Enable cross-origin resource sharing if needed
-      onclone: (clonedDoc) => {
-        // Ensure fonts are loaded
-        const offerContainer = clonedDoc.querySelector(".offer-container");
-        offerContainer.style.fontFamily = getComputedStyle(
-          document.querySelector(".offer-container")
-        ).fontFamily;
-      },
-    }).then((canvas) => {
-      const link = document.createElement("a");
-      link.href = canvas.toDataURL("image/png");
-      link.download = "offer-image.png";
-      link.click();
-    });
+
+    // html2canvas(document.querySelector(".offer-container"), {
+    //   scale: 2, // Increase the resolution of the canvas
+    //   useCORS: true, // Enable cross-origin resource sharing if needed
+    //   onclone: (clonedDoc) => {
+    //     // Ensure fonts are loaded
+    //     const offerContainer = clonedDoc.querySelector(".offer-container");
+    //     offerContainer.style.fontFamily = getComputedStyle(
+    //       document.querySelector(".offer-container")
+    //     ).fontFamily;
+    //   },
+    // }).then((canvas) => {
+    //   const link = document.createElement("a");
+    //   link.href = canvas.toDataURL("image/png");
+    //   link.download = "offer-image.png";
+    //   link.click();
+    // });
+
+    // html2canvas(document.querySelector(".offer-container"), {
+    //   scale: 2, // Increase the resolution of the canvas
+    //   useCORS: true, // Enable cross-origin resource sharing if needed
+    //   onclone: (clonedDoc) => {
+    //     const offerContainer = clonedDoc.querySelector(".offer-container");
+    //     const originalStyles = getComputedStyle(document.querySelector(".offer-container"));
+
+    //     // Apply the same styles to the cloned document
+    //     offerContainer.style.fontFamily = originalStyles.fontFamily;
+    //     offerContainer.style.fontSize = originalStyles.fontSize;
+    //     offerContainer.style.lineHeight = originalStyles.lineHeight;
+    //     offerContainer.style.textAlign = originalStyles.textAlign;
+    //     offerContainer.style.margin = originalStyles.margin; // Add margin
+    //     offerContainer.style.padding = originalStyles.padding; // Add padding
+    //     offerContainer.style.boxSizing = originalStyles.boxSizing; // Add box-sizing
+    //     offerContainer.style.position = originalStyles.position; // Ensure position is included
+    //     offerContainer.style.top = originalStyles.top; // Ensure top is included
+    //     offerContainer.style.left = originalStyles.left; // Ensure left is included
+    //     offerContainer.style.transform = originalStyles.transform; // Add transform if applicable
+    //     offerContainer.style.marginTop = (parseFloat(originalStyles.marginTop) + 0.5) + 'vw';
+    //   },
+    // }).then((canvas) => {
+    //   const link = document.createElement("a");
+    //   link.href = canvas.toDataURL("image/png");
+    //   link.download = "offer-image.png";
+    //   link.click();
+    // });
+
+    //********************Dom to Image Package ************************* */
+
+    //   if (offerContainerRef.current) {
+    //     domtoimage.toPng(offerContainerRef.current, {
+    //       bgcolor: 'white', // Background color (adjust as needed)
+    //       quality: 1, // Image quality
+    //       style: {
+    //         fontFamily: getComputedStyle(offerContainerRef.current).fontFamily, // Ensure correct font
+    //       },
+    //       scale: 10
+    //     })
+    //     .then((dataUrl) => {
+    //       const link = document.createElement('a');
+    //       link.href = dataUrl;
+    //       link.download = 'offer-image.png';
+    //       link.click();
+    //     })
+    //     .catch((error) => {
+    //       console.error('Error generating image:', error);
+    //     });
+    //   }
+    // };
+
+    //********************Dom to Image Package ************************* */
+
+    // if (offerRef.current) {
+    //   // Define scale factor to improve image quality
+    //   const scaleFactor = 2; // Increase this for higher resolution
+
+    //   // Calculate width and height based on scale factor
+    //   const width = offerRef.current.offsetWidth * scaleFactor;
+    //   const height = offerRef.current.offsetHeight * scaleFactor;
+
+    //   rasterizeHTML.drawHTML(offerRef.current.outerHTML, {
+    //     windowWidth: width,
+    //     windowHeight: height,
+    //     // Additional options if necessary
+    //   }).then(function (renderResult) {
+    //     // Create a new canvas to apply higher DPI
+    //     const highDpiCanvas = document.createElement('canvas');
+    //     const context = highDpiCanvas.getContext('2d');
+    //     highDpiCanvas.width = width;
+    //     highDpiCanvas.height = height;
+    //     context.scale(scaleFactor, scaleFactor);
+    //     context.drawImage(renderResult.image, 0, 0);
+
+    //     // Create download link and trigger download
+    //     const link = document.createElement("a");
+    //     link.href = highDpiCanvas.toDataURL("image/png");
+    //     link.download = "offer-image.png";
+    //     link.click();
+    //   }).catch(function (error) {
+    //     console.error("Error rasterizing HTML:", error);
+    //   });
+    // }
   };
+
   // const downloadImage = async() => {
   //   const element = document.getElementById('.offer-container'),
   //   canvas = await html2canvas(element),
@@ -277,12 +453,15 @@ const BackgroundView = ({
       } catch (error) {
         console.error("Error uploading data", error);
       }
-    }
-    else{
-      toast.error("Please upload Offer Image")
+    } else {
+      toast.error("Please upload Offer Image");
     }
   };
   console.log(currentoffers, "offerlistofferlist");
+
+  useEffect(() => {
+    setOfferlist({ ...offerlist, occupation: offerdata.occupation_id });
+  }, []);
   return uploadimage == false ? (
     <>
       <div className="h-full w-full">
@@ -291,6 +470,7 @@ const BackgroundView = ({
             Occupation
           </label>
           <select
+            value={offerdata.occupation_id || ""}
             onChange={(e) => {
               setOfferlist({ ...offerlist, occupation: e.target.value });
             }}
@@ -308,15 +488,21 @@ const BackgroundView = ({
         </div>
         {currentoffers.length > 0 ? (
           <div className="flex items-center justify-between mt-[2.5vw]">
-            <button
-              onClick={prevSlide}
-              disabled={startIndex === 0}
-              className="text-[#1F4B7F] font-semibold"
-            >
-              <IoIosArrowDropleft size={"3vw"} />
-            </button>
+            {startIndex === 0 ?
+              <div className="w-[3vw] h-[3vw]"></div>
+              :
+              <button
+                onClick={prevSlide}
+                disabled={startIndex === 0}
+                className="text-[#1F4B7F] font-semibold"
+              >
+                <IoIosArrowDropleft size={"3vw"} />
+              </button>}
 
-            <div className="flex relative justify-center items-center space-x-[1vw] offer-container">
+            <div
+              ref={offerRef}
+              className="flex relative justify-center items-center space-x-[1vw] offer-container"
+            >
               {currentoffers
                 .slice(startIndex, startIndex + 1)
                 .map((image, index) => (
@@ -328,15 +514,34 @@ const BackgroundView = ({
                   />
                 ))}
               <div className=" absolute top-0 left-[-1vw]">
+                {updatedata && draggerImage === false ? (
+                  <img
+                    // src={previewUrl}
+                    // src={currentofferdata.file}
+                    src={`http://192.168.90.47:4000${offerdata.offer_img}`}
+                    className="w-[8.2vw] h-[15vw] bg-white object-cover opacity-50 rounded-tl-[1vw] rounded-bl-[1vw] rounded-tr-[2.2vw] rounded-br-[1.5vw]"
+                  />
+                ) : (
+                  <img
+                    src={previewUrl}
+                    className="w-[8.2vw] h-[15vw] bg-white object-cover opacity-50 rounded-tl-[1vw] rounded-bl-[1vw] rounded-tr-[2.2vw] rounded-br-[1.5vw]"
+                  />
+                )}
+              </div>
+
+              {updatedata && draggerImage === false ? (
+                <img
+                  // src={previewUrl}
+                  src={`http://192.168.90.47:4000${offerdata.offer_img}`}
+                  className="absolute top-[4.5vw] bg-white left-[0.5vw] w-[5.5vw] h-[5.5vw] rounded-[50%]"
+                />
+              ) : (
                 <img
                   src={previewUrl}
-                  className="w-[8.2vw] h-[15vw] bg-white object-cover opacity-50 rounded-tl-[1vw] rounded-bl-[1vw] rounded-tr-[2.2vw] rounded-br-[1.5vw]"
+                  // src={`http://192.168.90.47:4000${offerdata.offer_img}`}
+                  className="absolute top-[4.5vw] bg-white left-[0.5vw] w-[5.5vw] h-[5.5vw] rounded-[50%]"
                 />
-              </div>
-              <img
-                src={previewUrl}
-                className="absolute top-[4.5vw] bg-white left-[0.5vw] w-[5.5vw] h-[5.5vw] rounded-[50%]"
-              />
+              )}
 
               <div className="bg-white bg-opacity-30 rounded-[2vw] px-[1vw]  py-[0.2vw] absolute top-[1.5vw] left-[9vw]">
                 <h1 className="text-white  text-[1.2vw]">
@@ -347,7 +552,7 @@ const BackgroundView = ({
                 {currentofferdata.offer_desc}
               </p>
               <p className="text-white  text-[1vw]  absolute top-[9.5vw] left-[9vw]">{`Valid till ${dayjs(
-                new Date(currentofferdata.start_date)
+                new Date(currentofferdata.expiry_date)
               ).format("DD MMM")}`}</p>
               <div className="bg-white bg-opacity-30 border-dashed border-[0.1vw] border-white px-[1vw]  py-[0.2vw] absolute top-[11.5vw] left-[9vw]">
                 <p className="text-white font-bold text-[1vw]">
@@ -355,21 +560,39 @@ const BackgroundView = ({
                 </p>
               </div>
             </div>
+            {startIndex + 1 >= currentoffers.length ?
+              (
+                <div className="w-[3vw] h-[3vw]"></div>
+              )
+              :
+              (<button
+                onClick={nextSlide}
+                disabled={startIndex + 1 >= currentoffers.length}
+                className="text-[#1F4B7F] font-semibold"
+              >
+                <IoIosArrowDropright size={"3vw"} />
+              </button>)
+            }
 
-            <button
-              onClick={nextSlide}
-              disabled={startIndex + 1 >= currentoffers.length}
-              className="text-[#1F4B7F] font-semibold"
-            >
-              <IoIosArrowDropright size={"3vw"} />
-            </button>
           </div>
         ) : (
           ""
         )}
         {currentoffers.length > 0 && (
-          <div className="flex items-center justify-end">
+          // <div className="flex">
+
+          <div className="flex items-center justify-between">
+            {downloadReq == false ? (
+              <div className="mt-[1.5vw] text-red-400 text-[1.2vw]">
+                {" "}
+                Download and click next
+              </div>
+            ) : (
+              <div></div>
+            )}
+
             <div className="flex gap-[1vw]">
+              {/* <p className="text-red-600">download and click next</p> */}
               <button
                 onClick={downloadImage}
                 className="mt-[1.5vw] bg-[#1F4B7F] text-[1vw] rounded-[0.5vw] text-white py-[0.5vw] px-[1vw] "
@@ -378,15 +601,18 @@ const BackgroundView = ({
               </button>
               <button
                 // onClick={downloadImage}
-                onClick={() => setUploadImage(true)}
+                onClick={() =>
+                  downloadReq == true ? setUploadImage(true) : ""
+                }
                 className="mt-[1.5vw] bg-[#1F4B7F] text-[1vw] rounded-[0.5vw] text-white py-[0.5vw] px-[2vw] "
               >
                 Next
               </button>
             </div>
           </div>
+          // </div>
         )}
-      </div>
+      </div >
     </>
   ) : (
     <>

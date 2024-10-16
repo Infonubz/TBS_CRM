@@ -3,6 +3,7 @@ import { GetReqPromotionById } from "../../Api/RequestManagement/RequestManageme
 
 export default function ViewPromotion({ promoId }) {
   const [promodata, setPromoData] = useState("");
+  console.log(promoId, "idddddddsaasd");
   const fetchGetPromo = async () => {
     try {
       const data = await GetReqPromotionById(promoId);
@@ -26,7 +27,10 @@ export default function ViewPromotion({ promoId }) {
           Tseting
         </span>
       </div> */}
-      <img src={`http://192.168.90.47:4000${promodata.promo_image}`} className="w-full h-full object-contain" />
+      <img
+        src={`http://192.168.90.47:4000${promodata.background_image}`}
+        className="w-full h-full object-contain"
+      />
     </div>
   );
 }

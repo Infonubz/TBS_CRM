@@ -8,7 +8,7 @@ import { message } from "antd";
 import { PiUpload } from "react-icons/pi";
 import "../../App.css";
 import { useDispatch, useSelector } from "react-redux";
-import { PROMOTION_DATA } from "../../Store/Type";
+import { OFFERS_LIST, PROMOTION_DATA } from "../../Store/Type";
 import axios from "axios";
 import { toast } from "react-toastify";
 import {
@@ -48,46 +48,58 @@ import BackgroundView from "./BackgroundImage";
 //     }),
 // });
 const validationSchema = Yup.object().shape({
-  usage: Yup.number()
+  usage: Yup.string()
     .required("usage is required")
     .min(1, "usage must be at least 1")
-    .max(100, "usage cannot exceed 100"),
-  promotion_name: Yup.string().required("Offer Name is required"),
-  promotion_description: Yup.string().required(
-    "Offer Description Name is required"
-  ),
-  code: Yup.string().required("Code is required"),
-  // file: Yup.mixed()
-  //   .required("A file is required")
-  //   .test("fileSize", "File size is too large", (value) => {
-  //     return value && value.size <= 2000000; // 2MB
-  //   })
-  //   .test("fileType", "Unsupported File Format", (value) => {
-  //     return (
-  //       value &&
-  //       ["image/jpeg", "image/png", "application/pdf"].includes(value.type)
-  //     );
-  //   }),
-  file: Yup.mixed().test(
-    "fileValidation",
-    "Unsupported File Format or File size is too large",
-    function (value) {
-      const { offerdata } = this.parent;
-      if (offerdata && offerdata.image_file) {
-        return true; // Skip validation if a file is already available from the backend
+    .max(100, "usage cannot exceed 100")
+    .matches(/^[0-9]+$/, 'Only numbers are allowed'),
+  promotion_name: Yup.string()
+    .required("Offer Name is required")
+    // .min(1, "usage must be at least 1")
+    .max(17, "Max 17 characters only"),
+  promotion_description: Yup.string()
+    .required("Offer Description Name is required")
+    .max(57, "Max 57 characters only"),
+  status: Yup.string()
+    .required('This field is required'),
+  code: Yup.string()
+    .required("Code is required")
+    .max(18, "Max 18 characters only"),
+  start_date: Yup.date()
+    .required('Start Date is required')
+    .min(new Date(), 'Start Date cannot be in the past'),
+  expiry_date: Yup.date()
+    .required('Expiry Date is required')
+    .min(Yup.ref('start_date'), 'Expiry Date must be after Start Date'),
+  file: Yup.mixed()
+    .required("File is empty")
+    .test("required", "A file is required", function (value) {
+      const { isEdit } = this.options.context;
+      if (!isEdit && !value) {
+        return false;
       }
-      if (value) {
-        const validType = [
-          "image/jpeg",
-          "image/png",
-          "application/pdf",
-        ].includes(value.type);
-        const validSize = value.size <= 2000000; // 2MB
-        return validType && validSize;
+      return true;
+    })
+    .test("file_size", "File size is too large", function (value) {
+      if (value && value.size > 2000000) {
+        // 2MB
+        return false;
       }
-      return false; // Return false if no file is uploaded
-    }
-  ),
+      return true;
+    })
+    .test("file_type", "Unsupported File Format", function (value) {
+      if (typeof value === "string") {
+        // If value is a string (file path), skip file type validation
+        return true;
+      }
+      if (
+        value &&
+        ["image/jpeg", "image/png", "image/jpg"].includes(value.type)
+      ) {
+        return true;
+      }
+      return false;
+    }),
 });
 export default function AddOffer({
   setModalIsOpen,
@@ -100,6 +112,18 @@ export default function AddOffer({
   const [fileName, setFileName] = useState("");
   const dispatch = useDispatch();
   const handleSubmit = async (values) => {
+    console.log(values, "vvvvvvvvaaaaaaaaaaalllllllllla");
+
+    setCurrentOfferdata({
+      offer_name: values.promotion_name,
+      offer_code: values.code,
+      start_date: values.start_date,
+      expiry_date: values.expiry_date,
+      offer_desc: values.promotion_description,
+      offer_image: values.file,
+    });
+
+
     // if (offerlist.offer_bgImgae) {
     //   try {
     //     const data = await SubmitOffersData(values, updatedata, dispatch);
@@ -181,10 +205,13 @@ export default function AddOffer({
   };
   const [bgimage, setBgImage] = useState(false);
   const [currentoffers, setCurrentOffer] = useState([]);
+  console.log(currentoffers, 'current_offer_data')
+
   const closemodal = () => {
     setBgImage(false);
     setCurrentOffer("");
   };
+  const [draggerImage, setDraggerImage] = useState(false)
   const [occupationvalue, setOccupationValue] = useState("");
   const [currentofferdata, setCurrentOfferdata] = useState({
     offer_name: "",
@@ -203,6 +230,32 @@ export default function AddOffer({
     offer_bgImgae: "",
   });
   const [allvalues, setAllValues] = useState("");
+  // const typeid = sessionStorage.getItem("type_id");
+  const typeid = localStorage.getItem("type_id");
+
+  const getStatusOptions = () => {
+    if (typeid == "PRO101") {
+      return [
+        { label: "Select Status", value: "" },
+        { label: "Draft", value: "Draft" },
+        { label: "Active", value: "Active" },
+      ];
+    } else if (typeid == "EMP101") {
+      return [
+        { label: "Select Status", value: "" },
+        { label: "Draft", value: "Draft" },
+        { label: "Requested", value: "Requested" },
+      ];
+    } else {
+      return [{ label: "Select Status", value: "" }];
+    }
+  };
+
+  const options = getStatusOptions();
+
+
+  const [minExpiryDate, setMinExpiryDate] = useState(new Date().toISOString().split("T")[0]);
+
   return (
     <>
       <Formik
@@ -268,7 +321,7 @@ export default function AddOffer({
                   <button
                     type="submit"
                     className="flex text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] items-center justify-center"
-                    // onClick={() => setBgImage(true)}
+                  // onClick={() => setBgImage(true)}
                   >
                     Next
                   </button>
@@ -297,7 +350,7 @@ export default function AddOffer({
                           offer_name: e.target.value,
                         });
                       }}
-                      className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                      className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                     />
                     <ErrorMessage
                       name="promotion_name"
@@ -324,7 +377,7 @@ export default function AddOffer({
                           offer_code: e.target.value,
                         });
                       }}
-                      className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                      className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                     />
                     <ErrorMessage
                       name="code"
@@ -337,20 +390,35 @@ export default function AddOffer({
                   <div className="col-span-1 flex-col flex">
                     <label className="text-[#1F4B7F] text-[1.1vw] font-semibold">
                       Start Date
+                      <span className="text-red-500 text-[1vw] pl-[0.2vw]">
+                        *
+                      </span>
                     </label>
                     <Field
                       type="date"
                       name="start_date"
                       placeholder="Start Date"
                       value={values.start_date}
+                      min={new Date().toISOString().split("T")[0]}
                       onChange={(e) => {
+                        const selectedStartDate = e.target.value;
                         handleChange(e);
                         setCurrentOfferdata({
                           ...currentofferdata,
-                          start_date: e.target.value,
+                          start_date: selectedStartDate,
                         });
+
+                        // Update the minimum expiry date
+                        setMinExpiryDate(selectedStartDate);
                       }}
-                      className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                      // onChange={(e) => {
+                      //   handleChange(e);
+                      //   setCurrentOfferdata({
+                      //     ...currentofferdata,
+                      //     start_date: e.target.value,
+                      //   });
+                      // }}
+                      className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                     />
                     <ErrorMessage
                       name="start_date"
@@ -361,12 +429,17 @@ export default function AddOffer({
                   <div className="col-span-1 flex flex-col">
                     <label className="text-[#1F4B7F] text-[1.1vw] font-semibold">
                       Expiry Date
+                      <span className="text-red-500 text-[1vw] pl-[0.2vw]">
+                        *
+                      </span>
                     </label>
                     <Field
                       type="date"
                       name="expiry_date"
                       placeholder="Expiry Date"
                       value={values.expiry_date}
+                      // min={new Date().toISOString().split("T")[0]}
+                      min={minExpiryDate} // Set the minimum date here
                       onChange={(e) => {
                         handleChange(e);
                         setCurrentOfferdata({
@@ -374,7 +447,7 @@ export default function AddOffer({
                           expiry_date: e.target.value,
                         });
                       }}
-                      className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                      className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                     />
                     <ErrorMessage
                       name="expiry_date"
@@ -387,17 +460,20 @@ export default function AddOffer({
                   <div className="col-span-1 flex-col flex">
                     <label className="text-[#1F4B7F] text-[1.1vw] font-semibold">
                       Usage
+                      <span className="text-red-500 text-[1vw] pl-[0.2vw]">
+                        *
+                      </span>
                     </label>
                     <Field
                       type="text"
                       name="usage"
-                      placeholder="Select Usage Count"
+                      placeholder="Usage Count"
                       value={values.usage}
                       onChange={(e) => {
                         handleChange(e);
                         localStorage.setItem("usage", e.target.value);
                       }}
-                      className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                      className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                     />
                     <ErrorMessage
                       name="usage"
@@ -408,6 +484,9 @@ export default function AddOffer({
                   <div className="col-span-1 flex flex-col">
                     <label className="text-[#1F4B7F] text-[1.1vw] font-semibold">
                       Status
+                      <span className="text-red-500 text-[1vw] pl-[0.2vw]">
+                        *
+                      </span>
                     </label>
                     <Field
                       as="select"
@@ -417,12 +496,19 @@ export default function AddOffer({
                         handleChange(e);
                         localStorage.setItem("status", e.target.value);
                       }}
-                      className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                      className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                     >
-                      <option label="Select Status" value="" className="" />
+                      {/* <option label="Select Status" value="" className="" />
                       <option label="Draft" value="Draft" className="" />
                       <option label="Paused" value="Paused" className="" />
-                      <option label="Active" value="Active" className="" />
+                      <option label="Active" value="Active" className="" /> */}
+                      {options.map((option) => (
+                        <option
+                          key={option.value}
+                          label={option.label}
+                          value={option.value}
+                        />
+                      ))}
                     </Field>
                     <ErrorMessage
                       name="status"
@@ -457,7 +543,7 @@ export default function AddOffer({
                       }}
                       rows="4"
                       cols="50"
-                      className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                      className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.1vw] w-[100%] h-full rounded-[0.5vw] outline-none px-[1vw]"
                     />
                     <ErrorMessage
                       name="promotion_description"
@@ -465,7 +551,7 @@ export default function AddOffer({
                       className="text-red-500 text-[0.8vw]"
                     />
                   </div>
-                  <div className="col-span-1 flex flex-col">
+                  <div className=" relative col-span-1 flex flex-col">
                     <label className="text-[#1F4B7F] text-[1.1vw] font-semibold">
                       Image
                       <span className="text-red-500 text-[1vw] pl-[0.2vw]">
@@ -476,15 +562,16 @@ export default function AddOffer({
                       {() => (
                         <>
                           <Dragger
+                            onChange={() => setDraggerImage(true)}
                             height={"7.2vw"}
                             beforeUpload={(file) => {
                               console.log(file, "filefilefilefile");
                               setFieldValue("file", file);
                               setFileName(file.name); // Set the file name
-                              // setCurrentOfferdata({
-                              //   ...currentofferdata,
-                              //   offer_name: file,
-                              // });
+                              setCurrentOfferdata({
+                                ...currentofferdata,
+                                offer_name: file,
+                              });
                               setFieldValue("file_type", file.type);
                               setFieldValue("file_size", file.size);
                               const reader = new FileReader();
@@ -503,15 +590,15 @@ export default function AddOffer({
                               backgroundPosition: "center",
                               position: "relative",
                             }} // Apply custom CSS class
-                            // onChange={(e) => {
-                            //   console.log(e.file, "checking");
-                            //   setFieldValue("file", e.file);
-                            //   setFieldValue("file_type", e.file.type);
-                            //   setFieldValue("file_size", e.file.size);
-                            //   handleChange({
-                            //     target: { name: "file", value: e.file },
-                            //   });
-                            // }}
+                          // onChange={(e) => {
+                          //   console.log(e.file, "checking");
+                          //   setFieldValue("file", e.file);
+                          //   setFieldValue("file_type", e.file.type);
+                          //   setFieldValue("file_size", e.file.size);
+                          //   handleChange({
+                          //     target: { name: "file", value: e.file },
+                          //   });
+                          // }}
                           >
                             <label className="flex items-center justify-center relative z-10">
                               <p className="text-[#1F4B7F] font-bold text-[1.1vw] pr-[1vw]">
@@ -522,11 +609,12 @@ export default function AddOffer({
                             <div
                               className="absolute top-0 left-0 w-full h-full"
                               style={{
-                                backgroundImage: `url(${
-                                  offerdata.offer_img
-                                    ? `http://192.168.90.47:4000${offerdata.offer_img}`
-                                    : `http://192.168.90.47:4000${fileName.offer_img}`
-                                })`,
+                                backgroundImage: `url(${(offerdata.offer_img
+                                  && draggerImage == false
+                                )
+                                  ? `http://192.168.90.47:4000${offerdata.offer_img}`
+                                  : `http://192.168.90.47:4000${offerdata.offer_img}`
+                                  })`,
                                 backgroundSize: "cover",
                                 backgroundPosition: "center",
                                 opacity: "30%",
@@ -534,11 +622,11 @@ export default function AddOffer({
                               }}
                             ></div>
                           </Dragger>
-                          {fileName && (
-                            <p className="text-[#1F4B7F] text-[0.8vw] mt-2">
+                          {/* {fileName && (
+                            <p className="text-[#1F4B7F] text-[0.8vw] mt-2 absolute bottom-[0.3vw]">
                               {fileName}
                             </p>
-                          )}
+                          )} */}
                         </>
                       )}
                     </Field>
@@ -587,11 +675,15 @@ export default function AddOffer({
                         </>
                       )}
                     </Field> */}
-                    <ErrorMessage
+                    {fileName ? (
+                      <p className="text-[#1F4B7F] text-[0.8vw] mt-2 absolute bottom-[-1.3vw]">
+                        {fileName}
+                      </p>
+                    ) : <ErrorMessage
                       name="file"
                       component="div"
-                      className="text-red-500 text-[0.8vw]"
-                    />
+                      className="text-red-500 text-[0.8vw] absolute bottom-[-1.3vw]"
+                    />}
                   </div>
                 </div>
                 {/* <div className="grid grid-cols-2 gap-[1vw] pt-[1vw]">
@@ -679,6 +771,8 @@ export default function AddOffer({
           allvalues={allvalues}
           setBgImage={setBgImage}
           updatedata={updatedata}
+          offerdata={offerdata}
+          draggerImage={draggerImage}
         />
       </ModalPopup>
     </>

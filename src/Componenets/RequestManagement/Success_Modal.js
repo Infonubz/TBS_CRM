@@ -14,8 +14,8 @@ export default function Success_Modal({ actionType, verifyData, setVerifyData, s
   const fetchGetRequest = async () => {
     try {
       const data = await GetRequestDataById(verifyData, setVerifyData, setRequestData);
-      console.log(verifyData,"data data data")
-      console.log(data,"Data........");
+      console.log(verifyData, "data data data")
+      console.log(data, "Data........");
       setRequestData(data);
     } catch (error) {
       console.error("Error fetching additional user data", error);
@@ -31,21 +31,20 @@ export default function Success_Modal({ actionType, verifyData, setVerifyData, s
   return (
     <div>
       {actionType === "download" ? (
-        <div>
+        <div className=" w-auto h-auto">
           <div className="flex justify-center">
             <p className="text-[1.5vw] pl-[1.5vw] font-bold">
-              Downloded successfully
+              Downloded Successfully
             </p>
           </div>
           <div className="flex justify-center mt-[0.5vw]">
             <img src={image} className="h-[5vw] w-[5vw]"></img>
           </div>
-          <p className="pt-[1vw]">
-            The Documents has been successfully downloaded !
-          </p>
+          <p className="pt-[0.5vw] text-[1vw]">
+            The Documents Has Been Successfully Downloaded!          </p>
         </div>
       ) : (
-        <div>
+        <div className=" w-auto h-auto">
           <div className="flex justufy-center">
             <p className="text-[1.5vw] pl-[1.5vw] font-bold">
               Activated successfully
@@ -54,9 +53,9 @@ export default function Success_Modal({ actionType, verifyData, setVerifyData, s
           <div className="flex justify-center mt-[0.5vw]">
             <img src={image} className="h-[5vw] w-[5vw]"></img>
           </div>
-          <p className="pt-[1vw]">
-          {requestData?.owner_name} has been successfully activated !
-          </p>
+          <div className="text-[#1F487C] text-[1.1vw] w-full">
+            {`${requestData?.owner_name} has been successfully activated !`}
+          </div>
         </div>
       )}
     </div>

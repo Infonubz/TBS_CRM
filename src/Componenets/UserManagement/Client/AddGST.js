@@ -9,7 +9,10 @@ import {
   SubmitGSTData,
 } from "../../../Api/UserManagement/SuperAdmin";
 import { useDispatch } from "react-redux";
-import { GetClientGSTById, SubmitClientGSTData } from "../../../Api/UserManagement/Client";
+import {
+  GetClientGSTById,
+  SubmitClientGSTData,
+} from "../../../Api/UserManagement/Client";
 const FILE_SIZE = 1024 * 1024 * 5; // 5MB
 const SUPPORTED_FORMATS = [
   "application/pdf",
@@ -23,24 +26,40 @@ const validationSchema = Yup.object().shape({
   state: Yup.string().required("State is required"),
   head_office: Yup.string().required("Head Offcie is required"),
   gst_file: Yup.mixed()
-    .required("GST Document is required")
-    .test(
-      "fileSize",
-      "File too large",
-      (value) => value && value.size <= FILE_SIZE
-    )
-    .test(
-      "fileFormat",
-      "Unsupported Format",
-      (value) => value && SUPPORTED_FORMATS.includes(value.type)
-    ),
+    .test("required", "A file is required", function (value) {
+      const { isEdit } = this.options.context;
+      if (!isEdit && !value) {
+        return false;
+      }
+      return true;
+    })
+    .test("fileSize", "File size is too large", function (value) {
+      if (value && value.size > FILE_SIZE) {
+        // 2MB
+        return false;
+      }
+      return true;
+    })
+    .test("fileFormat", "Unsupported File Format", function (value) {
+      if (typeof value === "string") {
+        // If value is a string (file path), skip file type validation
+        return true;
+      }
+      if (value && ["image/jpeg", "image/png", "image/jpg"].includes(value.type)
+      ) {
+        return true;
+      }
+      return false;
+    }),
   ctc: Yup.string().required("GST is required"),
 });
 export default function AddGST({
   setCurrentpage,
   SPA_ID,
   setOperatorID,
-  operatorID,
+  clientID,
+  client_id,
+  setClientID,
   setModalIsOpen,
   setmodalIsOpen1,
   modalIsOpen1,
@@ -74,11 +93,16 @@ export default function AddGST({
     };
     reader?.readAsDataURL(file);
   };
+
+  const [superadmingstdata, setSuperAdminGSTData] = useState("");
   const dispatch = useDispatch();
+
+  const updateId = clientID ? clientID : client_id;
+
   const handleSubmit = async (values) => {
-    console.log("Subm65656", values);
+    console.log("Subm65656", updateId);
     try {
-      const data = await SubmitClientGSTData(values, dispatch);
+      const data = await SubmitClientGSTData(values, updateId, setSuperAdminGSTData, dispatch);
       toast.success(data?.message);
       // setOperatorID(null);
       setmodalIsOpen1(false);
@@ -93,29 +117,33 @@ export default function AddGST({
 
   // Additional logging to check state change
   useEffect(() => {
+    console.log(updateId, "clientID111");
+
     console.log("modalIsOpen1 state changed:", modalIsOpen1);
   }, [modalIsOpen1]);
 
-  const [superadmingstdata, setSuperAdminGSTData] = useState("");
+
+
   const fetchGetUser = async () => {
     try {
       const data = await GetClientGSTById(
-        operatorID,
-        setOperatorID,
+        clientID,
+        setClientID,
         setSuperAdminGSTData
       );
       setSuperAdminGSTData(data);
+      console.log(data, "superadmingstdata4444");
     } catch (error) {
       console.error("Error fetching additional user data", error);
     }
   };
 
   useEffect(() => {
-    if (operatorID != null) {
+    if (clientID != null) {
       fetchGetUser();
     }
-  }, [operatorID, setOperatorID, setSuperAdminGSTData]);
-  console.log(superadmingstdata, "superadmingstdata4444");
+  }, [clientID, setClientID]);
+
   return (
     <div>
       <div className="">
@@ -123,9 +151,9 @@ export default function AddGST({
           <label className="text-[1.5vw] font-semibold text-[#1f4b7f] ">
             Add GST
           </label>
-          <button className="rounded-full font-semibold w-[6vw] h-[2vw] flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] border-[#34AE2A] text-[1.1vw] text-[#34AE2A] ">
+          {/* <button className="rounded-full font-semibold w-[6vw] h-[2vw] flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] border-[#34AE2A] text-[1.1vw] text-[#34AE2A] ">
             Save
-          </button>
+          </button> */}
         </div>
         <div className="pb-[1vw] ">
           <div className="border-b-[0.1vw] w-full border-[#1f4b7f] "></div>
@@ -133,12 +161,12 @@ export default function AddGST({
         <div>
           <Formik
             initialValues={{
-              gst: "",
-              state_code: "",
-              state: "",
-              head_office: "",
-              gst_file: null,
-              ctc: "",
+              gst: superadmingstdata?.gstin || "",
+              state_code: superadmingstdata?.state_code_number || "",
+              state: superadmingstdata?.state_name || "",
+              head_office: superadmingstdata?.head_office || "",
+              gst_file: superadmingstdata?.upload_gst || null,
+              ctc: superadmingstdata?.aggregate_turnover_exceeded || "",
             }}
             validationSchema={validationSchema}
             onSubmit={(values) => {
@@ -170,7 +198,7 @@ export default function AddGST({
                         type="text"
                         name="gst"
                         placeholder="Enter GSTIN"
-                        // value={values.firstname}
+                        value={values.gst}
                         className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                       />
                       <ErrorMessage
@@ -190,7 +218,7 @@ export default function AddGST({
                         type="text"
                         name="state_code"
                         placeholder="Enter State Code"
-                        // value={values.firstname}
+                        value={values.state_code}
                         className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                       />
                       <ErrorMessage
@@ -239,7 +267,7 @@ export default function AddGST({
                         type="text"
                         name="head_office"
                         placeholder="Enter Head Office"
-                        // value={values.firstname}
+                        value={values.head_office}
                         className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                       />
                       <ErrorMessage
@@ -342,13 +370,14 @@ export default function AddGST({
                               className="absolute right-[1vw]"
                             />
                           </button>
-
                           {values.gst_file && (
                             <div
                               onClick={() => setPreviewOpen(true)}
-                              className="cursor-pointer underline-offset-1 underline text-[#1F4B7F] text-[0.8vw]"
+                              className="cursor-pointer underline-offset-1 underline text-[#1F4B7F] text-[0.7vw]"
                             >
-                              {values.gst_file.name}
+                              {values.gst_file.name
+                                ? values.gst_file.name
+                                : values.gst_file}
                             </div>
                           )}
                           <ErrorMessage

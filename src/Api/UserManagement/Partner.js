@@ -1,5 +1,5 @@
 import axios from "axios";
-import { GET_PARTNER_LIST } from "../../Store/Type";
+import { GET_PARTNER_LIST, PARTNER_BYID } from "../../Store/Type";
 import { toast } from "react-toastify";
 const api = axios.create({
   headers: {
@@ -10,9 +10,7 @@ const apiUrl = process.env.REACT_APP_API_URL;
 
 export const GetPartnerData = async (dispatch) => {
   try {
-    const response = await api.get(
-      `${apiUrl}/partner_details`
-    );
+    const response = await api.get(`${apiUrl}/all-partner_details`);
     dispatch({ type: GET_PARTNER_LIST, payload: response.data });
     return response.data;
   } catch (error) {
@@ -20,29 +18,81 @@ export const GetPartnerData = async (dispatch) => {
     return null; // Return null or some default value to prevent throwing the error
   }
 };
-export const submitPartnerPersonalData = async (personalvalues, updatedata) => {
+
+export const handlePartnerSearch = async (e, dispatch) => {
+  try {
+    if (e.target.value) {
+      const response = await api.get(
+        `${apiUrl}/partner-search/${e.target.value}`
+      );
+      dispatch({ type: GET_PARTNER_LIST, payload: response.data });
+      return response.data[0];
+    } else {
+      GetPartnerData(dispatch);
+    }
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+export const GetPartnerProfile = async (PartnerID, dispatch) => {
+  console.log(PartnerID, "operatorID852");
+
+  const endpoint = `${apiUrl}/partner_ProfileImg/${PartnerID !== 'null' ? PartnerID : sessionStorage.getItem('PARTNER_ID')}`;
+
+  try {
+    const response = await axios.get(endpoint);
+    // dispatch({ type: PARTNER_BYID, payload: response.data });
+    console.log(response.data, "response_partner_byid");
+    sessionStorage.setItem('PartnerProfileImg', response.data.profile_img)
+    return response.data;
+  } catch (error) {
+    handleError(error);
+    // return null;
+  }
+};
+
+export const SubmitPartnerExcel = async (file, dispatch) => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const excelEndpoint = `${apiUrl}/import-partner-details`;
+  const method = "post";
+
+  try {
+    const response = await api({
+      url: excelEndpoint,
+      method: method,
+      data: formData,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    toast.success(response.data);
+    GetPartnerData(dispatch);
+    return response.data;
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    toast.error("Failed to upload file");
+    return null;
+  }
+};
+
+export const PartnerStatusUpdateApi = async (
+  valueid,
+  value,
+  PartnerID,
+  dispatch
+) => {
   const payload = {
-    emp_first_name: personalvalues.firstname,
-    emp_last_name: personalvalues.lastname,
-    phone: personalvalues.phone,
-    email_id: personalvalues.emailid,
-    alternate_phone: personalvalues.alt_phone,
-    date_of_birth: personalvalues.dob,
-    gender: personalvalues.gender,
-    blood_group: personalvalues.blood,
+    partner_status_id: valueid,
+    partner_status: value,
   };
 
-  console.log(
-    updatedata,
-    "updatedataupdatedataupdatedataupdatedataupdatedataupdatedataupdatedata"
-  );
-  // const url = updatedata
-  //   ? `${apiUrl}/operator_details/${updatedata}`
-  //   : "${apiUrl}/operator_details";
+  const url = `${apiUrl}/partner_status_update/${PartnerID}`;
 
-  // const method = updatedata ? "put" : "post";
-  const url = `${apiUrl}/partner_details`;
-  const method = "post";
+  // const url = `${apiUrl}/pro-emp-status/${employeeid}`;
+  const method = "put";
 
   try {
     const response = await api({
@@ -53,7 +103,7 @@ export const submitPartnerPersonalData = async (personalvalues, updatedata) => {
         "Content-Type": "application/json",
       },
     });
-    sessionStorage.setItem("PAT_ID", response?.data?.id);
+    GetPartnerData(dispatch);
     console.log(response, "responseresponse");
     return response.data;
   } catch (error) {
@@ -61,7 +111,105 @@ export const submitPartnerPersonalData = async (personalvalues, updatedata) => {
     return null;
   }
 };
-export const submitPartnerAddressData = async (addressvalues, updatedata) => {
+
+export const PartnerProfile = async (image, PartnerID, dispatch) => {
+  console.log(image, "image987465222");
+
+  const payload = new FormData();
+  payload.append("profile_img", image);
+
+  const updateurl = `${apiUrl}/partner_profileImg/${PartnerID}`;
+
+  const method = "put";
+  try {
+    const response = await api({
+      method,
+      url: updateurl,
+      data: payload,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    GetPartnerData(dispatch);
+    GetPartnerProfile();
+    console.log(response, "responseresponse");
+    return response.data;
+  } catch (error) {
+    handleError(error);
+    return null;
+  }
+};
+
+export const submitPartnerPersonalData = async (
+  personalvalues,
+  PartnerID,
+  enable,
+  dispatch
+) => {
+  // const payload = {
+  //   partner_first_name: personalvalues.firstname,
+  //   partner_last_name: personalvalues.lastname,
+  //   phone: personalvalues.phone,
+  //   emailid: personalvalues.emailid,
+  //   alternate_phone: personalvalues.alt_phone,
+  //   date_of_birth: personalvalues.dob,
+  //   gender: personalvalues.gender,
+  //   //blood_group: personalvalues.blood,
+  // };
+  const formData = new FormData();
+  formData.append('partner_first_name', personalvalues.firstname);
+  formData.append('partner_last_name', personalvalues.lastname);
+  formData.append('phone', personalvalues.phone);
+  formData.append('emailid', personalvalues.emailid);
+  formData.append('alternate_phone', personalvalues.alt_phone);
+  formData.append('date_of_birth', personalvalues.dob);
+  formData.append('gender', personalvalues.gender);
+  formData.append('profile_img', personalvalues.profile_img)
+  // formData.append('blood_group', personalvalues.blood); // Uncomment if needed
+
+  console.log(
+    PartnerID,
+    "check_submit_partner_id"
+  );
+  // const url = PartnerID
+  //   ? `${apiUrl}/partner_details_update/${PartnerID ? PartnerID : sessionStorage.getItem("PAT_ID")}`
+  //   : `${apiUrl}/partner_details`;
+  // const method = PartnerID ? "put" : "post";
+  // const url = `${apiUrl}/partner_details`;
+  // const method = "post";
+  const updateurl = `${apiUrl}/partner_details_update/${PartnerID ? PartnerID : sessionStorage.getItem("PAT_ID")}`
+  const submiturl = `${apiUrl}/partner_details`;
+  const method = enable ? "put" : "post";
+  const url = enable ? updateurl : submiturl;
+
+  try {
+    const response = await api({
+      method,
+      url,
+      data: formData,
+      // data: payload,
+      headers: {
+        // "Content-Type": "application/json",
+        "Content-Type": "multipart/form-data",
+
+      },
+    });
+    console.log(response, "responseresponse");
+    sessionStorage.setItem("PAT_ID", response?.data?.id);
+    GetPartnerData(dispatch);
+    GetPartnerProfile(sessionStorage.getItem("PAT_ID") === null || sessionStorage.getItem("PAT_ID") === 'null' || sessionStorage.getItem("PAT_ID") === undefined || sessionStorage.getItem("PAT_ID") === 'undefined' ? PartnerID : sessionStorage.getItem("PAT_ID"), dispatch)
+    return response.data;
+  } catch (error) {
+    handleError(error);
+    return null;
+  }
+};
+
+export const submitPartnerAddressData = async (
+  addressvalues,
+  PartnerID,
+  dispatch
+) => {
   const payload = {
     temp_add: addressvalues.temp_address,
     temp_country: addressvalues.temp_country,
@@ -75,7 +223,7 @@ export const submitPartnerAddressData = async (addressvalues, updatedata) => {
     perm_zip_code: addressvalues.per_postal,
   };
   console.log(
-    updatedata,
+    PartnerID,
     "updatedataupdatedataupdatedataupdatedataupdatedataupdatedataupdatedata"
   );
   // const url = updatedata
@@ -150,20 +298,22 @@ export const submitPartnerProffesionalData = async (
   }
 };
 
-export const SubmitPatDocumentsData = async (documentsdata, updatedata) => {
+export const SubmitPatDocumentsData = async (
+  documentsdata,
+  PartnerID,
+  dispatch
+) => {
   const formData = new FormData();
   formData.append("aadhar_card_doc", documentsdata.aadhar_doc);
   formData.append("pan_card_doc", documentsdata.pan_doc);
-  formData.append("work_experience_certificate", documentsdata.work_exp_doc);
+  //formData.append("work_experience_certificate", documentsdata.work_exp_doc);
   formData.append("educational_certificate", documentsdata.edu_cer_doc);
   formData.append("other_documents", documentsdata.other_doc);
   formData.append("aadhar_card_number", documentsdata.aadhar_number);
   formData.append("pan_card_number", documentsdata.pan_number);
 
-  const url = `${apiUrl}/emp-professional-documents/${sessionStorage.getItem(
-    "EMP_ID"
-  )}`;
-  const method = "post";
+  const url = `${apiUrl}/partner-documents/${PartnerID}`;
+  const method = "put";
 
   try {
     const response = await api({
@@ -189,7 +339,7 @@ export const GetPatAddressById = async (
 ) => {
   try {
     const response = await api.get(
-      `${apiUrl}/emp-registered-address/${PartnerID}`
+      `${apiUrl}/partner_address_details/${PartnerID}`
     );
     console.log(response, "responseresponse");
     // SetUpdateData(null);
@@ -200,6 +350,7 @@ export const GetPatAddressById = async (
     return null;
   }
 };
+
 export const GetPatProffesionalById = async (
   PartnerID,
   setPartnerID,
@@ -218,24 +369,25 @@ export const GetPatProffesionalById = async (
     return null;
   }
 };
+
 export const GetPatPersonalById = async (
   PartnerID,
   setPartnerID,
   setEmpPersonalData
 ) => {
   try {
-    const response = await api.get(
-      `${apiUrl}/emp-personal-details/${PartnerID}`
-    );
-    console.log(response, "responseresponse");
+    const response = await api.get(`${apiUrl}/partner_details/${PartnerID ? PartnerID : sessionStorage.getItem("PAT_ID")}`);
+    console.log(response, "responseresponse_client");
     // SetUpdateData(null);
     setEmpPersonalData("");
+    sessionStorage.setItem('PARTNER_ID', response.data?.tbs_partner_id)
     return response?.data;
   } catch (error) {
     handleError(error);
     return null;
   }
 };
+
 export const GetPatDocumentById = async (
   PartnerID,
   setPartnerID,
@@ -243,17 +395,18 @@ export const GetPatDocumentById = async (
 ) => {
   try {
     const response = await api.get(
-      `${apiUrl}/emp-personal-details/${PartnerID}`
+      `${apiUrl}/partner-documents-details/${PartnerID}`
     );
     console.log(response, "responseresponse");
     // SetUpdateData(null);
-    setEmpDocumentlData("");
-    return response?.data[0];
+    //setEmpDocumentlData("");
+    return response?.data;
   } catch (error) {
     handleError(error);
     return null;
   }
 };
+
 const handleError = (error) => {
   console.error("Error details:", error);
   let errorMessage = "An error occurred";

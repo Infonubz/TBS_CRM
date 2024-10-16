@@ -144,7 +144,7 @@ const Documents = () => {
           {selectedTab === "ads" && <Advertisement />}
           {selectedTab === "promo" && <Promo />}
         </div>
-        <div className="flex py-[1vw] space-x-[2.5vw]">
+        {/* <div className="flex py-[1vw] space-x-[2.5vw]">
           <div className="w-[50%]">
             <Table
               columns={columns}
@@ -226,7 +226,7 @@ const Documents = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </>
   );

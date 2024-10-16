@@ -18,22 +18,79 @@ export const GetClientData = async (dispatch) => {
     return null; // Return null or some default value to prevent throwing the error
   }
 };
+
+export const handleClientSearch = async (e, dispatch) => {
+  try {
+    if (e.target.value) {
+      const response = await api.get(`${apiUrl}/client-search/${e.target.value}`);
+      dispatch({ type: CLIENT_DATA, payload: response.data })
+      return response.data[0];
+    }
+    else {
+      GetClientData(dispatch);
+    }
+  } catch (error) {
+    handleError(error);
+  }
+}
+
+export const SubmitClientExcel = async (file) => {
+  const formData = new FormData();
+  formData.append("xlsxFile", file);
+
+  const excelEndpoint = `${apiUrl}/upload`;
+  const method = "post";
+
+  try {
+    const response = await api({
+      url: excelEndpoint,
+      method: method,
+      data: formData,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    toast.success(response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    toast.error("Failed to upload file");
+    return null;
+  }
+};
+
+
 export const submitClientComapanyData = async (
   companyvalues,
   enable,
-  EmployeeID,
+  clientID,
   dispatch
 ) => {
-  const payload = {
-    company_name: companyvalues.company_name,
-    owner_name: companyvalues.owner_name,
-    phone: companyvalues.phone,
-    alternate_phone: companyvalues.phone,
-    emailid: companyvalues.emailid,
-    type_of_constitution: companyvalues.constitution,
-    business_background: companyvalues.business,
-    web_url: companyvalues.web_url,
-  };
+  // const payload = {
+  //   company_name: companyvalues.company_name,
+  //   owner_name: companyvalues.owner_name,
+  //   phone: companyvalues.phone,
+  //   alternate_phone: companyvalues.phone,
+  //   emailid: companyvalues.emailid,
+  //   type_of_constitution: companyvalues.constitution,
+  //   business_background: companyvalues.business,
+  //   web_url: companyvalues.web_url,
+  // };
+
+  const formData = new FormData();
+
+  formData.append("company_name", companyvalues.company_name);
+  formData.append("owner_name", companyvalues.owner_name);
+  formData.append("phone", companyvalues.phone);
+  formData.append("alternate_phone", companyvalues.phone); // Note: same as phone
+  formData.append("emailid", companyvalues.emailid);
+  formData.append("type_of_constitution", companyvalues.constitution);
+  formData.append("business_background", companyvalues.business);
+  formData.append("web_url", companyvalues.web_url);
+  formData.append("company_logo", companyvalues.company_logo);
+
+
+  // Now `formData` is ready to be used
 
   // const url = updatedata
   //   ? `${apiUrl}/operator_details/${updatedata}`
@@ -41,22 +98,24 @@ export const submitClientComapanyData = async (
 
   // const method = updatedata ? "put" : "post";
   const submiturl = `${apiUrl}/client-details`;
-  const updateurl = `${apiUrl}/client-details/${
-    EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
-  }`;
+  const updateurl = `${apiUrl}/client-details/${clientID ? clientID : sessionStorage.getItem("EMP_ID")
+    }`;
   const method = enable ? "put" : "post";
   const url = enable ? updateurl : submiturl;
   try {
     const response = await api({
       method,
       url,
-      data: payload,
+      // data: payload,
+      data: formData,
       headers: {
-        "Content-Type": "application/json",
+        // "Content-Type": "application/json",
+        "Content-Type": "multipart/form-data"
       },
     });
-    GetClientData(dispatch);
     sessionStorage.setItem("CLI_ID", response?.data?.id);
+    GetClientData(dispatch);
+    GetClientProfile(sessionStorage.getItem("CLI_ID") === null || sessionStorage.getItem("CLI_ID") === 'null' || sessionStorage.getItem("CLI_ID") === undefined || sessionStorage.getItem("CLI_ID") === 'undefined' ? clientID : sessionStorage.getItem("CLI_ID"), dispatch)
     console.log(response, "responseresponse");
     return response.data;
   } catch (error) {
@@ -64,9 +123,11 @@ export const submitClientComapanyData = async (
     return null;
   }
 };
+
+
 export const SubmitClientAddressData = async (
   addressvalue,
-  operatorID,
+  clientID,
   enable,
   dispatch
 ) => {
@@ -87,9 +148,8 @@ export const SubmitClientAddressData = async (
   //   : "${apiUrl}/operator_details";
 
   const method = "put";
-  const url = `${apiUrl}/client-address/${
-    operatorID ? operatorID : sessionStorage.getItem("CLI_ID")
-  }`;
+  const url = `${apiUrl}/client-address/${clientID ? clientID : sessionStorage.getItem("CLI_ID")
+    }`;
   // const method ="post";
   try {
     const response = await api({
@@ -100,7 +160,7 @@ export const SubmitClientAddressData = async (
         "Content-Type": "application/json",
       },
     });
-    // GetOperatorData(dispatch);
+    GetClientData(dispatch);
     console.log(response, "responseresponse");
     return response.data;
   } catch (error) {
@@ -108,7 +168,9 @@ export const SubmitClientAddressData = async (
     return null;
   }
 };
-export const SubmitClientGSTData = async (documentsdata, dispatch) => {
+
+
+export const SubmitClientGSTData = async (documentsdata, clientID, setSuperAdminGSTData, dispatch) => {
   console.log(documentsdata, "documentsdata");
   const formData = new FormData();
   formData.append(
@@ -116,18 +178,20 @@ export const SubmitClientGSTData = async (documentsdata, dispatch) => {
     documentsdata.ctc == "1" || 1 ? "true" : "false"
   );
   formData.append("state_name", documentsdata.state);
-  formData.append("state_code_number", 30);
+  formData.append("state_code_number", documentsdata.state_code);
   formData.append("gstin", documentsdata.gst);
   formData.append("head_office", documentsdata.head_office);
   formData.append("upload_gst", documentsdata.gst_file);
   formData.append("has_gstin", "true");
 
-  // const url = updatedata
-  //   ? `${apiUrl}/offers-deals/${updatedata}`
-  //   : "${apiUrl}/operators";
-  // const method = updatedata ? "put" : "post";
-  const url = `${apiUrl}/client-gst/${sessionStorage.getItem("CLI_ID")}`;
+  // const url = clientID
+  //   ? `${apiUrl}/client-gst/${clientID}`
+  //   : `${apiUrl}/client-gst`;
+  // const method = clientID ? "put" : "post";
+
+  const url = `${apiUrl}/client-gst/${clientID}`;
   const method = "put";
+
   try {
     const response = await api({
       method,
@@ -137,7 +201,8 @@ export const SubmitClientGSTData = async (documentsdata, dispatch) => {
         "Content-Type": "multipart/form-data",
       },
     });
-    // GetSuperAdminData(dispatch);
+    //GetClientData(dispatch);
+    setSuperAdminGSTData("");
     //   GetSuperAdminGSTById();
     // GetOperatorData(dispatch)
     console.log(response, "responseresponse");
@@ -149,42 +214,65 @@ export const SubmitClientGSTData = async (documentsdata, dispatch) => {
 };
 
 export const GetClientGSTById = async (
-  updatedata,
-  SetUpdateData,
+  clientID,
+  setClientID,
   setSuperAdminGSTData
 ) => {
-  console.log(updatedata, "ahsgxdahsjksaxbj");
+  console.log(clientID, "ahsgxdahsjksaxbj");
   const getid = sessionStorage.getItem("CLI_ID");
   try {
     const response = await api.get(
-      `${apiUrl}/client-gst/${updatedata ? updatedata : getid}`
+      `${apiUrl}/client-gst/${clientID}`
     );
     console.log(response, "responseresponse");
-    // SetUpdateData(null);
+    // setOperatorID(null);
     setSuperAdminGSTData(response.data);
-    return response?.data[0];
+    return response?.data;
   } catch (error) {
     handleError(error);
     return null;
   }
 };
+
+
 export const GetCompanyDetailsById = async (
-  updatedata,
-  SetUpdateData,
-  setOfferData
+  clientID,
+  setClientID,
+  setClientData
 ) => {
-  console.log(updatedata, "ahsgxdahsjksaxbj");
+  console.log(clientID, "ahsgxdahsjksaxbj");
   try {
-    const response = await api.get(`${apiUrl}/client-details/${updatedata}`);
-    console.log(response, "responseresponse");
-    // SetUpdateData(null);
-    // setOfferData("");
+    const response = await api.get(`${apiUrl}/client-details/${clientID ? clientID : sessionStorage.getItem('CLI_ID')}`);
+    console.log(response, "responseresponse_client");
+    sessionStorage.setItem('CLIENT_ID', response.data[0]?.tbs_client_id)
+    //setClientID(null);
+    setClientData("");
     return response?.data[0];
   } catch (error) {
     handleError(error);
     return null;
   }
 };
+
+export const GetClientAddressById = async (
+  clientID,
+  setClientID,
+  setClientAddress
+) => {
+  console.log(clientID, "ahsgxdahsjksaxbj");
+  try {
+    const response = await api.get(`${apiUrl}/client-address/${clientID}`);
+    console.log(response, "responseresponse");
+    //setClientID(null);
+    setClientAddress("");
+    return response?.data;
+  } catch (error) {
+    handleError(error);
+    return null;
+  }
+};
+
+
 export const submitEmployeeProffesionalData = async (
   values,
   EmployeeID,
@@ -200,9 +288,8 @@ export const submitEmployeeProffesionalData = async (
     reporting_manager: values.report_manager,
   };
 
-  const url = `${apiUrl}/emp-professional-details/${
-    EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
-  }`;
+  const url = `${apiUrl}/emp-professional-details/${EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
+    }`;
   const method = "post";
 
   try {
@@ -237,9 +324,8 @@ export const SubmitEmpDocumentsData = async (
   formData.append("aadhar_card_number", documentsdata.aadhar_number);
   formData.append("pan_card_number", documentsdata.pan_number);
 
-  const url = `${apiUrl}/emp-professional-documents/${
-    EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
-  }`;
+  const url = `${apiUrl}/emp-professional-documents/${EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
+    }`;
   const method = "post";
 
   try {
@@ -267,8 +353,7 @@ export const GetEmpAddressById = async (
 ) => {
   try {
     const response = await api.get(
-      `${apiUrl}/emp-registered-address/${
-        EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
+      `${apiUrl}/emp-registered-address/${EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
       }`
     );
     console.log(response, "responseresponse");
@@ -280,6 +365,8 @@ export const GetEmpAddressById = async (
     return null;
   }
 };
+
+
 export const GetEmpProffesionalById = async (
   EmployeeID,
   setEmployeeID,
@@ -298,6 +385,8 @@ export const GetEmpProffesionalById = async (
     return null;
   }
 };
+
+
 export const GetEmpPersonalById = async (
   EmployeeID,
   setEmployeeID,
@@ -305,11 +394,11 @@ export const GetEmpPersonalById = async (
 ) => {
   try {
     const response = await api.get(
-      `${apiUrl}/emp-personal-details/${
-        EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
+      `${apiUrl}/emp-personal-details/${EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
       }`
     );
-    console.log(response, "responseresponse");
+    console.log(response, "responseresponse ");
+
     // SetUpdateData(null);
     setEmpPersonalData("");
     return response?.data;
@@ -318,6 +407,8 @@ export const GetEmpPersonalById = async (
     return null;
   }
 };
+
+
 export const GetEmpDocumentById = async (
   EmployeeID,
   setEmployeeID,
@@ -336,6 +427,8 @@ export const GetEmpDocumentById = async (
     return null;
   }
 };
+
+
 export const ClientStatusUpdateApi = async (
   valueid,
   value,
@@ -367,14 +460,19 @@ export const ClientStatusUpdateApi = async (
     return null;
   }
 };
+
+
 export const GetClientProfile = async (clientID) => {
   console.log(clientID, "operatorID852");
   try {
+    // const response = await axios.get(
+    //   `${apiUrl}/client-profileImg/${clientID !== undefined || clientID != null || clientID !== 'null' ? clientID : sessionStorage.getItem('CLIENT_ID')}`
+    // );
     const response = await axios.get(
-      `${apiUrl}/client-profileImg/${
-        clientID ? clientID : sessionStorage.getItem("CLI_ID")
-      }`
+      `${apiUrl}/client-profileImg/${clientID ? clientID : sessionStorage.getItem('CLI_ID') ? sessionStorage.getItem('CLI_ID') : sessionStorage.getItem('CLIENT_ID')}`
     );
+    console.log(response, "response_get_profile");
+    sessionStorage.setItem('ClientCompanyLogo', response.data?.company_logo)
     // dispatch({ type: OPERATOR_LIST, payload: response.data });
     return response.data;
   } catch (error) {
@@ -382,14 +480,39 @@ export const GetClientProfile = async (clientID) => {
     // return null;
   }
 };
-export const ClientProfile = async (image, clientID) => {
+
+
+// export const ClientProfile = async (image, clientID) => {
+//   console.log(image, "image987465222");
+//   const payload = new FormData();
+//   payload.append("profile_img", image);
+
+//   const updateurl = `${apiUrl}/client-profileImg/${clientID}`;
+
+//   const method = "put";
+//   try {
+//     const response = await api({
+//       method,
+//       url: updateurl,
+//       data: payload,
+//       headers: {
+//         "Content-Type": "multipart/form-data",
+//       },
+//     });
+//     GetClientProfile();
+//     console.log(response, "responseresponse");
+//     return response.data;
+//   } catch (error) {
+//     handleError(error);
+//     return null;
+//   }
+// };
+export const ClientProfile = async (image, clientID, dispatch) => {
   console.log(image, "image987465222");
   const payload = new FormData();
-  payload.append("profileimg", image);
+  payload.append("profile_img", image);
 
-  const updateurl = `${apiUrl}/client-profileImg/${
-    clientID ? clientID : sessionStorage.getItem("CLI_ID")
-  }`;
+  const updateurl = `${apiUrl}/client-profileImg/${clientID}`;
 
   const method = "put";
   try {
@@ -401,7 +524,7 @@ export const ClientProfile = async (image, clientID) => {
         "Content-Type": "multipart/form-data",
       },
     });
-    GetClientProfile();
+    GetClientProfile(clientID);
     console.log(response, "responseresponse");
     return response.data;
   } catch (error) {
@@ -409,6 +532,7 @@ export const ClientProfile = async (image, clientID) => {
     return null;
   }
 };
+
 const handleError = (error) => {
   console.error("Error details:", error);
   let errorMessage = "An error occurred";

@@ -15,19 +15,19 @@ export default function Operator({ data }) {
   const [isVerifyModal, setIsVerifyModal] = useState(false);
   const [requestData, setRequestData] = useState("");
   const [openStatusModal, setOpenStatusModal] = useState("");
-  const [statusFromEdit,SetStatusFromEdit]= useState(false)
+  const [statusFromEdit, SetStatusFromEdit] = useState(false)
 
   const columns = [
     {
       title: (
-        <div className="flex justify-center font-bold text-[1.2vw]">
+        <div className="flex items-center justify-center font-bold text-[1.2vw]">
           Operator Id
         </div>
       ),
       render: (row) => {
         //console.log("statuus", row.tbs_operator_id);
         return (
-          <div className="flex justify-center">
+          <div className="flex items-center justify-center">
             <h1 className="pl-[1vw] text-[1vw] text-[#1F4B7F]">
               {row?.tbs_operator_id}
             </h1>
@@ -37,26 +37,27 @@ export default function Operator({ data }) {
     },
     {
       title: (
-        <div className="flex justify-center font-bold text-[1.2vw]">
-          Operator Name
+        <div className="flex items-center justify-center font-bold text-[1.2vw]">
+          Company Name
         </div>
       ),
-      sorter: (a, b) => a.owner_name.localeCompare(b.owner_name),
+      sorter: (a, b) => a.company_name.localeCompare(b.company_name),
       render: (row, rowdta, index) => {
         return (
-          <div className="flex justify-center text-[1vw] text-[#1F4B7F]">
+          <div className="flex items-center justify-center text-[1vw] text-[#1F4B7F]">
             {/* <p className="text-[1vw] text-[#1F4B7F]">{row?.owner_name}</p> */}
             {row?.owner_name?.length > 15 ? (
               <Tooltip
                 placement="bottom"
-                title={row?.owner_name}
+                // title={row?.owner_name}
+                title={row.company_name}
                 className="cursor-pointer"
                 color="#1F487C"
               >
-                {`${row?.owner_name?.slice(0, 15)}...`}
+                {`${row?.company_name?.slice(0, 15)}...`}
               </Tooltip>
             ) : (
-              row?.owner_name?.slice(0, 15)
+              row?.company_name?.slice(0, 15)
             )}
           </div>
         );
@@ -65,14 +66,14 @@ export default function Operator({ data }) {
     },
     {
       title: (
-        <div className="flex justify-center font-bold text-[1.2vw]">
+        <div className="flex items-center justify-center font-bold text-[1.2vw]">
           Phone Number
         </div>
       ),
       sorter: (a, b) => a.phone.localeCompare(b.phone),
       render: (row) => {
         return (
-          <div className="flex justify-center">
+          <div className="flex items-center justify-center">
             <p className="text-[1vw] text-[#1F4B7F]">{row?.phone}</p>
           </div>
         );
@@ -81,14 +82,14 @@ export default function Operator({ data }) {
 
     {
       title: (
-        <div className="flex justify-center font-bold text-[1.2vw]">
+        <div className="flex items-center justify-center font-bold text-[1.2vw]">
           Email Id
         </div>
       ),
       sorter: (a, b) => a.emailid.localeCompare(b.emailid),
       render: (row) => {
         return (
-          <div className="flex justify-center">
+          <div className="flex items-center justify-center">
             <p className="text-[1vw] text-[#1F4B7F]">{row?.emailid}</p>
           </div>
         );
@@ -97,13 +98,13 @@ export default function Operator({ data }) {
 
     {
       title: (
-        <div className="flex justify-center font-bold text-[1.2vw]">
+        <div className="flex items-center justify-center font-bold text-[1.2vw]">
           Request Date
         </div>
       ),
       render: (row) => {
         return (
-          <div className="flex justify-center">
+          <div className="flex items-center justify-center">
             <p className="text-[1vw] text-[#1F4B7F]">{`${dayjs(
               row?.created_date
             ).format("DD MMM YY - hh:mm a")}`}</p>
@@ -113,7 +114,7 @@ export default function Operator({ data }) {
     },
     {
       title: (
-        <div className="flex justify-center font-bold text-[1.2vw]">
+        <div className="flex items-center justify-center font-bold text-[1.2vw]">
           Documents
         </div>
       ),
@@ -160,7 +161,7 @@ export default function Operator({ data }) {
       render: (row) => {
         // console.log("statuus", row.req_status);
         return (
-          <div className="flex justify-center">
+          <div className="flex items-center justify-center">
             <button
               className={`${
                 // row?.req_status_id == 2
@@ -175,13 +176,13 @@ export default function Operator({ data }) {
                 row?.req_status_id == 0
                   ? "bg-[#FF6B00]"
                   : row?.req_status_id == 1
-                  ? "bg-[#2A99FF]"
-                  : row?.req_status_id == 2
-                  ? "bg-[#34AE2A]"
-                  : row?.req_status_id == 3
-                  ? "bg-[#e60f00]"
-                  : "bg-[#646262]"
-              } rounded-[0.5vw] text-[1.1vw]  font-bold text-white w-[8vw] py-[0.2vw]`}
+                    ? "bg-[#2A99FF]"
+                    : row?.req_status_id == 2
+                      ? "bg-[#34AE2A]"
+                      : row?.req_status_id == 3
+                        ? "bg-[#e60f00]"
+                        : "bg-[#646262]"
+                } rounded-[0.5vw] text-[1.1vw]  font-bold text-white w-[8vw] py-[0.2vw]`}
             >
               {capitalizeFirstLetter(row?.req_status)}
             </button>
@@ -191,8 +192,8 @@ export default function Operator({ data }) {
     },
     {
       title: (
-        <div className="flex justify-center font-bold text-[1.2vw]">
-          Actions
+        <div className="flex items-center justify-center font-bold text-[1.2vw]">
+          Action
         </div>
       ),
       render: (row) => {
@@ -214,8 +215,8 @@ export default function Operator({ data }) {
               className=" cursor-pointer"
             />):("")} */}
             {row?.req_status_id === 1 ||
-            row?.req_status_id === 2 ||
-            row?.req_status_id === 3 ? (
+              // row?.req_status_id === 2 ||
+              row?.req_status_id === 3 ? (
               <MdEdit
                 size={"1.3vw"}
                 color="#1F4B7F"
@@ -262,9 +263,9 @@ export default function Operator({ data }) {
           pagination={false}
           dataSource={data}
           columns={columns}
-          rowClassName={(record, index) =>
-            index % 2 === 1 ? "bg-white" : "bg-[#1F487C]/[10%]"
-          }
+        // rowClassName={(record, index) =>
+        //   index % 2 === 1 ? "bg-white" : "bg-[#1F487C]/[10%]"
+        // }
         />
       </div>
 

@@ -35,14 +35,16 @@ const validationSchema = Yup.object().shape({
     ),
   ctc: Yup.string().required("GST is required"),
 });
+
 export default function AddGST({
   setCurrentpage,
   SPA_ID,
   setOperatorID,
   operatorID,
+  operator_id,
   setModalIsOpen,
   setmodalIsOpen1,
-  modalIsOpen1
+  modalIsOpen1,
 }) {
   const props = {
     name: "file",
@@ -50,6 +52,7 @@ export default function AddGST({
     headers: {
       authorization: "authorization-text",
     },
+
     onChange(info) {
       if (info.file.status !== "uploading") {
         console.log(info.file, info.fileList);
@@ -61,9 +64,13 @@ export default function AddGST({
       }
     },
   };
+
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
+  const [superadmingstdata, setSuperAdminGSTData] = useState("");
+  const updateId = operatorID ? operatorID : operator_id;
+
 
   const handlePreview = (file) => {
     const reader = new FileReader();
@@ -74,10 +81,11 @@ export default function AddGST({
     reader?.readAsDataURL(file);
   };
   const dispatch = useDispatch();
+
   const handleSubmit = async (values) => {
     console.log("Subm65656", values);
     try {
-      const data = await SubmitGSTData(values, dispatch);
+      const data = await SubmitGSTData(values, updateId, setSuperAdminGSTData, dispatch);
       toast.success(data?.message);
       // setOperatorID(null);
       setmodalIsOpen1(false);
@@ -89,13 +97,13 @@ export default function AddGST({
       // toast.error("Failed to submit GST data");
     }
   };
-  
+
   // Additional logging to check state change
   useEffect(() => {
     console.log("modalIsOpen1 state changed:", modalIsOpen1);
+    console.log(updateId, "clientID111");
   }, [modalIsOpen1]);
-  
-  const [superadmingstdata, setSuperAdminGSTData] = useState("");
+
   const fetchGetUser = async () => {
     try {
       const data = await GetSuperAdminGSTById(
@@ -114,7 +122,9 @@ export default function AddGST({
       fetchGetUser();
     }
   }, [operatorID, setOperatorID, setSuperAdminGSTData]);
+
   console.log(superadmingstdata, "superadmingstdata4444");
+
   return (
     <div>
       <div className="">
@@ -122,9 +132,9 @@ export default function AddGST({
           <label className="text-[1.5vw] font-semibold text-[#1f4b7f] ">
             Add GST
           </label>
-          <button className="rounded-full font-semibold w-[6vw] h-[2vw] flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] border-[#34AE2A] text-[1.1vw] text-[#34AE2A] ">
+          {/* <button className="rounded-full font-semibold w-[6vw] h-[2vw] flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] border-[#34AE2A] text-[1.1vw] text-[#34AE2A] ">
             Save
-          </button>
+          </button> */}
         </div>
         <div className="pb-[1vw] ">
           <div className="border-b-[0.1vw] w-full border-[#1f4b7f] "></div>
@@ -132,12 +142,12 @@ export default function AddGST({
         <div>
           <Formik
             initialValues={{
-              gst: "",
-              state_code: "",
-              state: "",
-              head_office: "",
-              gst_file: null,
-              ctc: "",
+              gst: superadmingstdata?.gstin || "",
+              state_code: superadmingstdata?.state_code_number || "",
+              state: superadmingstdata?.state_name || "",
+              head_office: superadmingstdata?.head_office || "",
+              gst_file: superadmingstdata?.upload_gst || null,
+              ctc: superadmingstdata?.aggregate_turnover_exceeded || "",
             }}
             validationSchema={validationSchema}
             onSubmit={(values) => {
@@ -154,6 +164,7 @@ export default function AddGST({
               handleChange,
               errors,
               touched,
+              resetForm
             }) => (
               <Form onSubmit={handleSubmit}>
                 <div className="gap-y-[1.5vw] flex-col flex">
@@ -169,7 +180,7 @@ export default function AddGST({
                         type="text"
                         name="gst"
                         placeholder="Enter GSTIN"
-                        // value={values.firstname}
+                        value={values.gst}
                         className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                       />
                       <ErrorMessage
@@ -189,7 +200,7 @@ export default function AddGST({
                         type="text"
                         name="state_code"
                         placeholder="Enter State Code"
-                        // value={values.firstname}
+                        value={values.state_code}
                         className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                       />
                       <ErrorMessage
@@ -238,7 +249,7 @@ export default function AddGST({
                         type="text"
                         name="head_office"
                         placeholder="Enter Head Office"
-                        // value={values.firstname}
+                        value={values.head_office}
                         className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                       />
                       <ErrorMessage
@@ -341,13 +352,14 @@ export default function AddGST({
                               className="absolute right-[1vw]"
                             />
                           </button>
-
                           {values.gst_file && (
                             <div
                               onClick={() => setPreviewOpen(true)}
-                              className="cursor-pointer underline-offset-1 underline text-[#1F4B7F] text-[0.8vw]"
+                              className="cursor-pointer underline-offset-1 underline text-[#1F4B7F] text-[0.7vw]"
                             >
-                              {values.gst_file.name}
+                              {values.gst_file.name
+                                ? values.gst_file.name
+                                : values.gst_file}
                             </div>
                           )}
                           <ErrorMessage
@@ -428,7 +440,10 @@ export default function AddGST({
                   </div>
                   <div className="flex items-center w-full  justify-between ">
                     <div className="flex w-full justify-between gap-x-[1vw]">
-                      <button className="border-[#1F487C] w-[5vw] font-semibold text-[1vw] h-[2vw] rounded-full border-r-[0.2vw]  border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw]">
+                      <button
+                        type="button"
+                        className="border-[#1F487C] w-[5vw] font-semibold text-[1vw] h-[2vw] rounded-full border-r-[0.2vw]  border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw]"
+                        onClick={resetForm}>
                         Reset
                       </button>
                       <button

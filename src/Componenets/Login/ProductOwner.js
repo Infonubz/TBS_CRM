@@ -42,7 +42,29 @@ export default function ProductOwner({ setAuthtoken, setForgotPassword }) {
     return 0; // Invalid
   };
 
-  const handleSubmit = async (values, { setSubmitting, setAuthtoken }) => {
+  // const handleSubmit = async (values, { setSubmitting, setAuthtoken }) => {
+  //   const validationResult = validateInput(values.emailid_phone);
+
+  //   try {
+  //     const data = await ProductOwnerLogin(
+  //       values,
+  //       validationResult,
+  //       setAuthtoken
+  //     );
+  //     toast.success(data?.message);
+  //     console.log(data, "datadatadatadatadata");
+  //     if (data?.token) {
+  //       navigate("/dashboard");
+  //       window.location.reload();
+  //     }
+  //   } catch (error) {
+  //     toast.error(error.message);
+  //   } finally {
+  //     setSubmitting(false);
+  //   }
+  // };
+
+  const handleSubmit = async (values, { setSubmitting, setFieldError, setAuthtoken }) => {
     const validationResult = validateInput(values.emailid_phone);
 
     try {
@@ -51,14 +73,21 @@ export default function ProductOwner({ setAuthtoken, setForgotPassword }) {
         validationResult,
         setAuthtoken
       );
+
       toast.success(data?.message);
       console.log(data, "datadatadatadatadata");
+
       if (data?.token) {
         navigate("/dashboard");
         window.location.reload();
       }
     } catch (error) {
-      toast.error(error.message);
+      if (error.response && error.response.status === 401) {
+        setFieldError("password", "Invalid Password / Username");
+        // toast.error("Invalid Password / Username"); 
+      } else {
+        toast.error(error.message);
+      }
     } finally {
       setSubmitting(false);
     }
@@ -75,21 +104,20 @@ export default function ProductOwner({ setAuthtoken, setForgotPassword }) {
       <p className="text-[#1F487C] text-[1vw] py-[2vw]">
         Welcome Back, Please login to your account
       </p>
-
       <Formik
         initialValues={{
           emailid_phone: "",
           password: "",
         }}
         validationSchema={validationSchema}
-        onSubmit={(values, { setSubmitting }) => {
-          handleSubmit(values, { setSubmitting, setAuthtoken });
+        onSubmit={(values, { setSubmitting, setFieldError, setAuthtoken }) => {
+          handleSubmit(values, { setSubmitting, setFieldError, setAuthtoken });
         }}
       >
         {({ isSubmitting }) => (
           <Form>
             <div className="gap-y-[1.5vw] flex-col flex">
-              <div className="col-span-1">
+              <div className="col-span-1 relative">
                 <label className="text-[#1F487C] text-[1.1vw] ">
                   Email / Phone
                   <span className="text-[1vw] text-red-600 pl-[0.2vw]">*</span>
@@ -98,13 +126,13 @@ export default function ProductOwner({ setAuthtoken, setForgotPassword }) {
                   type="text"
                   name="emailid_phone"
                   placeholder="Enter Email ID / Phone number"
-                  className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                  className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                 />
                 <ErrorMessage
-                  name="emailid_phone"
-                  component="div"
-                  className="text-red-500 text-[0.8vw]"
-                />
+                    name="emailid_phone"
+                    component="div"
+                    className="text-red-500 text-[0.8vw] absolute bottom-[-1.5vw]"
+                  />
               </div>
               <div className="col-span-1 ">
                 <label className="text-[#1F487C] text-[1.1vw] ">
@@ -116,7 +144,7 @@ export default function ProductOwner({ setAuthtoken, setForgotPassword }) {
                     type={showPassword ? "text" : "password"}
                     name="password"
                     placeholder="Enter Password"
-                    className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                    className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                   />
                   <div
                     className="absolute right-[1vw] cursor-pointer"
@@ -128,17 +156,17 @@ export default function ProductOwner({ setAuthtoken, setForgotPassword }) {
                       <FaEyeSlash className="text-[1.5vw] text-[#1F487C]" />
                     )}
                   </div>
+                  <ErrorMessage
+                    name="password"
+                    component="div"
+                    className="text-red-500 text-[0.8vw] absolute bottom-[-1.5vw]"
+                  />
                 </div>
-                <ErrorMessage
-                  name="password"
-                  component="div"
-                  className="text-red-500 text-[0.8vw]"
-                />
               </div>
               <div className="flex justify-between items-center">
                 <div>
                   <Checkbox
-                    onChange={(e) => {}}
+                    onChange={(e) => { }}
                     className="text-[#1F4B7F] text-[1vw] "
                   >
                     Remember me

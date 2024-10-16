@@ -3,6 +3,7 @@ import { ErrorMessage, Field, Form, Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import * as Yup from "yup";
+import dayjs from "dayjs";
 import {
   GetEmpProffesionalById,
   submitEmployeeProffesionalData,
@@ -28,6 +29,7 @@ const validationSchema = Yup.object().shape({
   branch: Yup.string().required("Please select an Branch"),
   join_date: Yup.date().required("Joining Date Required"), // Validation schema for select field
 });
+
 export default function AddProfessionalDetails({
   setCurrentpage,
   EmployeeID,
@@ -38,11 +40,28 @@ export default function AddProfessionalDetails({
 }) {
   const [enable, setEnable] = useState(false);
   const dispatch = useDispatch();
+
   const handleSubmit = async (values) => {
     console.log("Form values on submit:", values); // Log form values
     if (EmployeeID && enable == false) {
       console.log("Existing EmployeeID, setting current page to 3");
       setCurrentpage(4);
+    } else if (EmployeeID) {
+      try {
+        console.log("No EmployeeID, submitting data");
+        const data = await submitEmployeeProffesionalData(
+          values,
+          EmployeeID,
+          dispatch
+        );
+        toast.success(data);
+        setCurrentpage(4);
+
+        console.log("Data submitted successfully:", data);
+      } catch (error) {
+        console.error("Error uploading data", error);
+        toast.error("Error uploading data");
+      }
     } else {
       try {
         console.log("No EmployeeID, submitting data");
@@ -63,9 +82,14 @@ export default function AddProfessionalDetails({
 
   console.log(EmployeeID, "EmployeeIDEmployeeID");
   const [empproffesionaldata, setEmpProffesionalData] = useState("");
+
   const fetchGetUser = async () => {
     try {
-      const data = await GetEmpProffesionalById(EmployeeID);
+      const data = await GetEmpProffesionalById(
+        EmployeeID,
+        setEmployeeID,
+        setEmpProffesionalData
+      );
       setEmpProffesionalData(data);
       console.log("Fetched user data:", data);
     } catch (error) {
@@ -79,7 +103,9 @@ export default function AddProfessionalDetails({
       fetchGetUser();
     }
   }, [EmployeeID, documentback]);
+
   console.log(empproffesionaldata, "empproffesionaldata");
+
   return (
     <div>
       <div className="border-l-[0.1vw] px-[2vw] overflow-y-scroll h-[28vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f]">
@@ -112,20 +138,22 @@ export default function AddProfessionalDetails({
             initialValues={{
               branch: empproffesionaldata ? empproffesionaldata.branch : "",
               join_date: empproffesionaldata
-                ? empproffesionaldata.join_date
+                ? dayjs(empproffesionaldata?.join_date).format("YYYY-MM-DD")
                 : "",
               designation: empproffesionaldata
                 ? empproffesionaldata.designation
                 : "",
-              emailid: empproffesionaldata ? empproffesionaldata.emailid : "",
+              emailid: empproffesionaldata
+                ? empproffesionaldata.official_email_id
+                : "",
               experiance: empproffesionaldata
-                ? empproffesionaldata.experiance
+                ? empproffesionaldata.years_of_experience
                 : "",
               department: empproffesionaldata
                 ? empproffesionaldata.department
                 : "",
               report_manager: empproffesionaldata
-                ? empproffesionaldata.report_manager
+                ? empproffesionaldata.reporting_manager
                 : "",
             }}
             validationSchema={validationSchema}
@@ -225,10 +253,10 @@ export default function AddProfessionalDetails({
                       <Field
                         as="select"
                         name="branch"
-                        value={values.status}
+                        value={values.branch}
                         onChange={(e) => {
                           handleChange(e);
-                          localStorage.setItem("status", e.target.value);
+                          localStorage.setItem("branch", e.target.value);
                         }}
                         disabled={
                           EmployeeID || documentback
@@ -275,7 +303,7 @@ export default function AddProfessionalDetails({
                         type="text"
                         name="emailid"
                         placeholder="Enter Email Address"
-                        // value={values.firstname}
+                        value={values.emailid}
                         disabled={
                           EmployeeID || documentback
                             ? enable
@@ -310,7 +338,7 @@ export default function AddProfessionalDetails({
                         type="text"
                         name="experiance"
                         placeholder="Year of Experiance"
-                        // value={values.firstname}
+                        value={values.experiance}
                         disabled={
                           EmployeeID || documentback
                             ? enable
@@ -343,7 +371,7 @@ export default function AddProfessionalDetails({
                         type="text"
                         name="department"
                         placeholder="Enter Department"
-                        // value={values.firstname}
+                        value={values.department}
                         disabled={
                           EmployeeID || documentback
                             ? enable
@@ -378,7 +406,7 @@ export default function AddProfessionalDetails({
                         type="text"
                         name="report_manager"
                         placeholder="Enter Name"
-                        // value={values.firstname}
+                        value={values.report_manager}
                         disabled={
                           EmployeeID || documentback
                             ? enable
@@ -403,7 +431,7 @@ export default function AddProfessionalDetails({
                   </div>
                   <div className="flex items-center justify-between py-[1vw]">
                     <div>
-                      <h1 className="text-[#1F4B7F] text-[0.8vw] font-semibold">
+                      <h1 className="text-[#1F4B7F] text-[0.7vw] font-semibold">
                         *You must fill in all fields to be able to continue
                       </h1>
                     </div>
@@ -418,7 +446,7 @@ export default function AddProfessionalDetails({
                         Back
                       </button>
                       <button
-                        className="bg-[#1F487C] font-semibold rounded-full w-[7vw] h-[2vw] text-[1vw] text-white"
+                        className="bg-[#1F487C] font-semibold rounded-full w-[11vw] h-[2vw] text-[1vw] text-white"
                         type="submit"
                         // onClick={() => setCurrentpage(4)}
                       >

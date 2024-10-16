@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { GetProductOwnerData } from "../../../Api/Login/AllLogin";
 import { EditUserSettings, UpdateEditUserSettings } from "../../../Api/Settings/UserSettings/EditProfile";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const EditProfile = () => {
  
@@ -74,6 +75,14 @@ const EditProfile = () => {
   // useEffect(() => {
   //   GetProductOwnerData(dispatch);
   // }, []);
+
+
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleTogglePassword = () => {
+    setShowPassword(!showPassword);
+  };
   
   return (
     <div>
@@ -260,7 +269,7 @@ const EditProfile = () => {
                     Password
                   </label>
                 </div>
-                <div className="">
+                {/* <div className="">
                   <Field
                     type="text"
                     name="password"
@@ -274,7 +283,31 @@ const EditProfile = () => {
                     component="div"
                     className="text-red-500 text-[0.8vw]"
                   />
-                </div>
+                </div> */}
+
+<div className="relative">
+      <Field
+        type={showPassword ? "text" : "password"}
+        name="password"
+        placeholder="Enter your password"
+        readOnly
+        className="cursor-not-allowed customize-placeholder border-r-[0.25vw] pl-[1vw] border-l-[0.03vw] border-t-[0.03vw] border-b-[0.25vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[2.8vw] w-[100%] rounded-md outline-none"
+      />
+      <ErrorMessage
+        name="password"
+        component="div"
+        className="text-red-500 text-[0.8vw]"
+      />
+      <button
+        type="button"
+        onClick={handleTogglePassword}
+        className="absolute right-2 text-[#1F487C] top-1/2 transform -translate-y-1/2"
+      >
+        {showPassword ?  <FaEye /> : <FaEyeSlash /> }
+      </button>
+    </div>
+
+
                 {/* <div className="">
                   <Field
                     type="date"

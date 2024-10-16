@@ -19,7 +19,8 @@ export default function SystemSettingList() {
   const [userid, setUserid] = useState();
   return (
     <div className="scroll-container ">
-      {sessionStorage.getItem("type_id") == "SPA101" ? (
+      {/* {sessionStorage.getItem("type_id") == "SPA101" ? ( */}
+      {localStorage.getItem("type_id") == "SPA101" ? (
         <>
           <Collapse
             className="bg-[#1F487C] rounded-2xl border border-[#1F487C]  shadow-xl"
@@ -124,7 +125,7 @@ export default function SystemSettingList() {
                 <CompanySettings
                   companyData={companyData}
                   setCompanyData={setCompanyData}
-                  // userid = {setUserid}
+                // userid = {setUserid}
                 />
               </div>
             ),

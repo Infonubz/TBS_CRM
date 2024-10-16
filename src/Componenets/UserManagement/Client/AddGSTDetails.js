@@ -9,8 +9,8 @@ import { toast } from "react-toastify";
 import {
   GetSuperAdminData,
   GetSuperAdminGSTById,
-  SubmitGSTData,
-} from "../../../Api/UserManagement/SuperAdmin";
+  SubmitClientGSTData,
+} from "../../../Api/UserManagement/Client";
 import { useDispatch } from "react-redux";
 import { GetClientGSTById } from "../../../Api/UserManagement/Client";
 
@@ -33,37 +33,51 @@ export default function AddGSTDetails({
   setCurrentpage,
   SPA_ID,
   operatorID,
+  clientID,
+  setClientID,
   setOperatorID,
   setmodalIsOpen,
+  setModalIsOpen,
   setGstback,
 }) {
   const [modalIsOpen1, setmodalIsOpen1] = useState(false);
+
   const closeModal = () => {
     setmodalIsOpen1(false);
   };
+
   const dispatch = useDispatch();
-  const handleSubmit = (values) => {
-    setmodalIsOpen(false);
-    // GetSuperAdminData(dispatch);
-    setOperatorID(null);
-    // console.log("hiihih");
-    // try {
-    //   const data = await SubmitGSTData(values);
-    //   // setmodalIsOpen1(false);
-    //   toast.success(data?.message);
-    //   // setCurrentpage(4);
-    //   // GetOffersData(dispatch);
-    //   console.log(data);
-    // } catch (error) {
-    //   console.error("Error uploading data", error);
-    // }
-  };
   const [superadmingstdata, setSuperAdminGSTData] = useState("");
+
+  const handleSubmit = async (values) => {
+    if (superadmingstdata?.state_name) {
+      setModalIsOpen(false);
+    } else {
+      try {
+        const data = await SubmitClientGSTData(
+          values,
+          clientID,
+          setSuperAdminGSTData,
+          dispatch
+        );
+        setModalIsOpen(false);
+        setmodalIsOpen1(false);
+        setSuperAdminGSTData(data);
+        toast.success(data?.message);
+        // setCurrentpage(4);
+        // GetOffersData(dispatch);
+        console.log(data);
+      } catch (error) {
+        console.error("Error uploading data", error);
+      }
+    }
+  };
+
   const fetchGetUser = async () => {
     try {
       const data = await GetClientGSTById(
-        operatorID,
-        setOperatorID,
+        clientID,
+        setClientID,
         setSuperAdminGSTData
       );
       setSuperAdminGSTData(data);
@@ -73,22 +87,18 @@ export default function AddGSTDetails({
   };
 
   useEffect(() => {
-    if (operatorID != null || sessionStorage.getItem("SPA_ID")) {
-      console.log("helloteam");
+    if (clientID != null) {
+      console.log(superadmingstdata, "superadmingstdata");
       fetchGetUser();
     }
-  }, [
-    operatorID,
-    setOperatorID,
-    setSuperAdminGSTData,
-    sessionStorage.getItem("SPA_ID"),
-  ]);
-  useEffect(() => {
-    if (modalIsOpen1 == false) {
-      fetchGetUser();
-    }
-  }, [modalIsOpen1]);
-  console.log(modalIsOpen1, "modalIsOpen1modalIsOpen1");
+  }, [clientID, setClientID, setSuperAdminGSTData]);
+
+  // useEffect(() => {
+  //   if (modalIsOpen1 == false) {
+  //     fetchGetUser();
+  //   }
+  // }, [modalIsOpen1]);
+
   return (
     <div>
       <div className="border-l-[0.1vw] relative px-[2vw] h-[28vw] ree border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f]">
@@ -101,13 +111,15 @@ export default function AddGSTDetails({
           </button> */}
           {/* <div className="w-full"> */}
           <button
-            className="text-white float-end flex items-center justify-center bg-[#1F4B7F] w-[7vw] h-[2vw] rounded-[0.5vw]"
+            className="text-white float-end flex items-center justify-center bg-[#1F4B7F] w-[7.5vw] h-[2vw] rounded-[0.5vw]"
             onClick={() => setmodalIsOpen1(true)}
           >
             <span>
               <FaPlus size={"1vw"} color="white" />
             </span>
-            <span className="text-[0.8vw] pl-[0.5vw]">Add GSTIN</span>
+            <span className="text-[0.8vw] pl-[0.5vw]">
+              {superadmingstdata?.state_name ? "Update GSTIN" : "Add GSTIN"}
+            </span>
           </button>
           {/* </div> */}
         </div>
@@ -117,8 +129,12 @@ export default function AddGSTDetails({
         <div>
           <Formik
             initialValues={{
-              gst: "",
-              ctc: "",
+              gst: superadmingstdata?.gstin || "",
+              state_code: superadmingstdata?.state_code_number || "",
+              state: superadmingstdata?.state_name || "",
+              head_office: superadmingstdata?.head_office || "",
+              gst_file: superadmingstdata?.upload_gst || null,
+              ctc: superadmingstdata?.aggregate_turnover_exceeded || "",
             }}
             // validationSchema={validationSchema}
             onSubmit={(values) => {
@@ -227,25 +243,25 @@ export default function AddGSTDetails({
                       <div className="gap-y-[1vw] text-[#1F4B7F] text-[1vw]">
                         <div className="grid grid-cols-2 ">
                           <div className="font-semibold">State:</div>
-                          <div>{superadmingstdata.state_name}</div>
+                          <div>{superadmingstdata?.state_name}</div>
                         </div>
                         <div className="grid grid-cols-2 mt-[1vw]">
                           <div className="font-semibold">
                             State Code Number:
                           </div>
-                          <div>{superadmingstdata.state_code_number}</div>
+                          <div>{superadmingstdata?.state_code_number}</div>
                         </div>
                         <div className="grid grid-cols-2 mt-[1vw]">
                           <div className="font-semibold">GSTIN:</div>
-                          <div>{superadmingstdata.gstin}</div>
+                          <div>{superadmingstdata?.gstin}</div>
                         </div>
                         <div className="grid grid-cols-2 mt-[1vw]">
                           <div className="font-semibold">Head Office:</div>
-                          <div>{superadmingstdata.head_office}</div>
+                          <div>{superadmingstdata?.head_office}</div>
                         </div>
                         <div className="grid grid-cols-2 mt-[1vw]">
                           <div className="font-semibold">Upload Documents:</div>
-                          <div>{superadmingstdata.upload_gst}</div>
+                          <div>{superadmingstdata?.upload_gst}</div>
                         </div>
                       </div>
                     ) : (
@@ -294,7 +310,7 @@ export default function AddGSTDetails({
                         type="submit"
                         // onClick={() => setCurrentpage(4)}
                       >
-                        {operatorID ? "Update" : "Submit"}
+                        {superadmingstdata?.state_name ? "Update" : "Submit"}
                       </button>
                     </div>
                   </div>
@@ -313,6 +329,8 @@ export default function AddGSTDetails({
       >
         <AddGST
           //  adminUser={adminUser}
+          clientID={clientID}
+          setClientID={setClientID}
           setmodalIsOpen1={setmodalIsOpen1}
           modalIsOpen1={modalIsOpen1}
         />

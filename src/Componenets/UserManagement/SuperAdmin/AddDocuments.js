@@ -126,13 +126,16 @@ export default function AddDocuments({
         ); // Replace with actual API call function
         toast.success(data?.message);
         setCurrentpage(5); // Assuming setCurrentPage is a function in your component
+        console.log('Checking_checking')
+
       }
     } catch (error) {
       console.error("Error uploading data", error);
       toast.error("Failed to submit document. Please try again."); // Notify user of error
-    } finally {
-      actions.setSubmitting(false);
     }
+    // finally {
+    //   actions.setSubmitting(false);
+    // }
   };
   console.log(currentpage, "currentpagecurrentpage");
   const handleCancel = () => setPreviewOpen(false);
@@ -166,11 +169,10 @@ export default function AddDocuments({
           </label>
           {operatorID || gstback ? (
             <button
-              className={`${
-                enable
-                  ? "bg-[#1f4b7f] text-white"
-                  : "text-[#1f4b7f] bg-white border-[#1f4b7f]"
-              } rounded-full font-semibold w-[10vw] h-[2vw] flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] text-[1.1vw] `}
+              className={`${enable
+                ? "bg-[#1f4b7f] text-white"
+                : "text-[#1f4b7f] bg-white border-[#1f4b7f]"
+                } rounded-full font-semibold w-[10vw] h-[2vw] flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] text-[1.1vw] `}
               onClick={() => setEnable(!enable)}
             >
               Enable to Edit
@@ -191,11 +193,13 @@ export default function AddDocuments({
             msme_doc: superadmindocumentdata.msme_doc || null,
           }}
           validationSchema={validationSchema}
-          onSubmit={handleSubmit}
+          onSubmit={(values) => {
+            handleSubmit(values)
+          }}
           enableReinitialize
         >
           {({ isSubmitting, isValid, setFieldValue, values, handleChange }) => (
-            <Form>
+            <Form >
               <div className="gap-y-[0.5vw] flex-col flex">
                 <div className="grid grid-cols-2 w-full gap-x-[1.5vw]">
                   <div className="col-span-1">
@@ -205,7 +209,7 @@ export default function AddDocuments({
                         *
                       </span>
                     </label>
-                    <div>
+                    <div className="relative">
                       <input
                         id="aadhar_front"
                         name="aadhar_front"
@@ -221,19 +225,16 @@ export default function AddDocuments({
                           );
                           handlePreview(files[0]);
                         }}
-                        disabled={
-                          operatorID || gstback
-                            ? enable
-                              ? false
-                              : true
-                            : false
-                        }
+                        disabled={operatorID || gstback ? (enable ? false : true) : false}
+
                       />
                       <button
+                        type="button"
                         className="border-r-[0.3vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none"
-                        onClick={() =>
-                          document.getElementById("aadhar_front").click()
-                        }
+                        onClick={(event) => {
+                          event.preventDefault(); 
+                          document.getElementById("aadhar_front").click();
+                        }}
                       >
                         <span className="opacity-50">Upload Aadhar Front</span>
                         <FaCloudUploadAlt
@@ -244,7 +245,12 @@ export default function AddDocuments({
                       </button>
                       {values.aadhar_front && (
                         <div
-                          onClick={() => setPreviewOpen(true)}
+                          onClick={() => {
+                            setPreviewImage(
+                              superadmindocumentdata?.aadar_front_doc
+                            );
+                            setPreviewOpen(true);
+                          }}
                           className="cursor-pointer underline-offset-1 underline text-[#1F4B7F] text-[0.7vw]"
                         >
                           {values.aadhar_front.name
@@ -272,18 +278,18 @@ export default function AddDocuments({
                         name="aadhar_front"
                         component="div"
                         style={{ color: "red" }}
-                        className="text-[0.8vw]"
+                        className="text-[0.8vw] absolute bottom-[-1.25vw]"
                       />
                     </div>
                   </div>
-                  <div className="col-span-1">
+                  {/* <div className="col-span-1">
                     <label className="text-[#1F4B7F] text-[1.1vw]">
                       Aadhar Card Back Page
                       <span className="text-[1vw] text-red-600 pl-[0.2vw]">
                         *
                       </span>
                     </label>
-                    <div>
+                    <div className="relative">
                       <input
                         id="aadhar_back"
                         name="aadhar_back"
@@ -291,6 +297,7 @@ export default function AddDocuments({
                         style={{ display: "none" }}
                         onChange={(event) => {
                           const files = Array.from(event.target.files);
+
                           // setFieldValue("aadhar_back", files);
                           setFieldValue(
                             "aadhar_back",
@@ -309,6 +316,7 @@ export default function AddDocuments({
                       <button
                         className="border-r-[0.3vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none"
                         onClick={() =>
+
                           document.getElementById("aadhar_back").click()
                         }
                       >
@@ -321,7 +329,12 @@ export default function AddDocuments({
                       </button>
                       {values.aadhar_back && (
                         <div
-                          onClick={() => setPreviewOpen(true)}
+                          onClick={() => {
+                            setPreviewImage(
+                              superadmindocumentdata?.aadar_back_doc
+                            );
+                            setPreviewOpen(true);
+                          }}
                           className="cursor-pointer underline-offset-1 underline text-[#1F4B7F] text-[0.7vw]"
                         >
                           {values.aadhar_back.name
@@ -333,10 +346,63 @@ export default function AddDocuments({
                         name="aadhar_back"
                         component="div"
                         style={{ color: "red" }}
-                        className="text-[0.8vw]"
+                        className="text-[0.8vw] absolute bottom-[-1.25vw]"
+                      />
+                    </div>
+                  </div> */}
+                  <div className="col-span-1">
+                    <label className="text-[#1F4B7F] text-[1.1vw]">
+                      Aadhar Card Back Page
+                      <span className="text-[1vw] text-red-600 pl-[0.2vw]">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        id="aadhar_back"
+                        name="aadhar_back"
+                        type="file"
+                        style={{ display: "none" }}
+                        onChange={(event) => {
+                          const files = Array.from(event.target.files);
+                          setFieldValue("aadhar_back", event.currentTarget.files[0]);
+                          handlePreview(files[0]);
+                        }}
+                        disabled={operatorID || gstback ? (enable ? false : true) : false}
+                      />
+                      <button
+                        type="button"
+                        className="border-r-[0.3vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none"
+                        onClick={(event) => {
+                          event.preventDefault(); 
+                          document.getElementById("aadhar_back").click();
+                        }}
+                      >
+                        <span className="opacity-50">Upload Aadhar Back</span>
+                        <FaCloudUploadAlt
+                          color="#1F487C"
+                          size={"2vw"}
+                          className="absolute right-[1vw]"
+                        />
+                      </button>
+                      {values.aadhar_back && (
+                        <div
+                          onClick={() => {
+                            setPreviewImage(superadmindocumentdata?.aadar_back_doc);
+                            setPreviewOpen(true);
+                          }}
+                          className="cursor-pointer underline-offset-1 underline text-[#1F4B7F] text-[0.7vw]"
+                        >
+                          {values.aadhar_back.name ? values.aadhar_back.name : values.aadhar_back}
+                        </div>
+                      )}
+                      <ErrorMessage
+                        name="aadhar_back"
+                        component="div"
+                        style={{ color: "red" }}
+                        className="text-[0.8vw] absolute bottom-[-1.25vw]"
                       />
                     </div>
                   </div>
+
                 </div>
                 <div className="grid grid-cols-2 gap-x-[1.5vw]">
                   <div className="col-span-1">
@@ -346,7 +412,7 @@ export default function AddDocuments({
                         *
                       </span>
                     </label>
-                    <div>
+                    <div className="relative">
                       <input
                         id="pan_front"
                         name="pan_front"
@@ -362,19 +428,16 @@ export default function AddDocuments({
                           );
                           handlePreview(files[0]);
                         }}
-                        disabled={
-                          operatorID || gstback
-                            ? enable
-                              ? false
-                              : true
-                            : false
-                        }
+                        disabled={operatorID || gstback ? (enable ? false : true) : false}
+
                       />
                       <button
+                        type="button"
                         className="border-r-[0.3vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none"
-                        onClick={() =>
-                          document.getElementById("pan_front").click()
-                        }
+                        onClick={(event) => {
+                          event.preventDefault(); 
+                          document.getElementById("pan_front").click();
+                        }}
                       >
                         <span className="opacity-50">Upload Pancard Front</span>
                         <FaCloudUploadAlt
@@ -385,7 +448,12 @@ export default function AddDocuments({
                       </button>
                       {values.pan_front && (
                         <div
-                          onClick={() => setPreviewOpen(true)}
+                          onClick={() => {
+                            setPreviewImage(
+                              superadmindocumentdata?.pancard_front_doc
+                            );
+                            setPreviewOpen(true);
+                          }}
                           className="cursor-pointer underline-offset-1 underline text-[#1F4B7F] text-[0.7vw]"
                         >
                           {values.pan_front.name
@@ -397,7 +465,7 @@ export default function AddDocuments({
                         name="pan_front"
                         component="div"
                         style={{ color: "red" }}
-                        className="text-[0.8vw]"
+                        className="text-[0.8vw] absolute bottom-[-1.25vw]"
                       />
                     </div>
                   </div>
@@ -408,7 +476,7 @@ export default function AddDocuments({
                         *
                       </span>
                     </label>
-                    <div>
+                    <div className="relative">
                       <input
                         id="pan_back"
                         name="pan_back"
@@ -424,19 +492,15 @@ export default function AddDocuments({
                           );
                           handlePreview(files[0]);
                         }}
-                        disabled={
-                          operatorID || gstback
-                            ? enable
-                              ? false
-                              : true
-                            : false
-                        }
+                        disabled={operatorID || gstback ? (enable ? false : true) : false}
                       />
                       <button
+                        type="button"
                         className="border-r-[0.3vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none"
-                        onClick={() =>
-                          document.getElementById("pan_back").click()
-                        }
+                        onClick={(event) => {
+                          event.preventDefault(); 
+                          document.getElementById("pan_back").click();
+                        }}
                       >
                         <span className="opacity-50">Upload Pancard Back</span>
                         <FaCloudUploadAlt
@@ -447,7 +511,12 @@ export default function AddDocuments({
                       </button>
                       {values.pan_back && (
                         <div
-                          onClick={() => setPreviewOpen(true)}
+                          onClick={() => {
+                            setPreviewImage(
+                              superadmindocumentdata?.pancard_back_doc
+                            );
+                            setPreviewOpen(true);
+                          }}
                           className="cursor-pointer underline-offset-1 underline text-[#1F4B7F] text-[0.7vw]"
                         >
                           {values.pan_back.name
@@ -459,7 +528,7 @@ export default function AddDocuments({
                         name="pan_back"
                         component="div"
                         style={{ color: "red" }}
-                        className="text-[0.8vw]"
+                        className="text-[0.8vw] absolute bottom-[-1.25vw]"
                       />
                     </div>
                   </div>
@@ -472,7 +541,7 @@ export default function AddDocuments({
                         *
                       </span>
                     </label>
-                    <div>
+                    <div className="relative">
                       <input
                         id="msme_doc"
                         name="msme_doc"
@@ -488,19 +557,16 @@ export default function AddDocuments({
                           );
                           handlePreview(files[0]);
                         }}
-                        disabled={
-                          operatorID || gstback
-                            ? enable
-                              ? false
-                              : true
-                            : false
-                        }
+                        disabled={operatorID || gstback ? (enable ? false : true) : false}
+
                       />
                       <button
+                        type="button"
                         className="border-r-[0.3vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none"
-                        onClick={() =>
-                          document.getElementById("msme_doc").click()
-                        }
+                        onClick={(event) => {
+                          event.preventDefault(); 
+                          document.getElementById("msme_doc").click();
+                        }}
                       >
                         <span className="opacity-50">Upload MSME Image</span>
                         <FaCloudUploadAlt
@@ -511,7 +577,10 @@ export default function AddDocuments({
                       </button>
                       {values.msme_doc && (
                         <div
-                          onClick={() => setPreviewOpen(true)}
+                          onClick={() => {
+                            setPreviewImage(superadmindocumentdata?.msme_doc);
+                            setPreviewOpen(true);
+                          }}
                           className="cursor-pointer underline-offset-1 underline text-[#1F4B7F] text-[0.7vw]"
                         >
                           {values.msme_doc.name
@@ -523,14 +592,14 @@ export default function AddDocuments({
                         name="msme_doc"
                         component="div"
                         style={{ color: "red" }}
-                        className="text-[0.8vw]"
+                        className="text-[0.8vw] absolute bottom-[-1vw]"
                       />
                     </div>
                   </div>
                   <div className="col-span-1"></div>
                 </div>
               </div>
-              <div className="flex items-center left-0 px-[1vw] w-full absolute bottom-0 gap-x-[2vw] justify-between py-[1vw]">
+              <div className="flex items-center left-0 px-[1vw] w-full absolute bottom-0 gap-x-[2vw] justify-between py-[0.5vw]">
                 <div>
                   <h1 className="text-[#1F4B7F] text-[0.7vw] font-semibold">
                     *You must fill in all fields to be able to continue
@@ -547,9 +616,9 @@ export default function AddDocuments({
                     Back
                   </button>
                   <button
-                    className="bg-[#1F487C] font-semibold rounded-full w-[10vw] h-[2vw] text-[1vw] text-white"
+                    className="bg-[#1F487C] font-semibold rounded-full w-[11vw] h-[2vw] text-[1vw] text-white"
                     type="submit"
-                    onClick={() => setCurrentpage(4)}
+                  // onClick={() => setCurrentpage(4)}
                   >
                     {operatorID || gstback
                       ? enable
@@ -570,7 +639,11 @@ export default function AddDocuments({
         footer={null}
         onCancel={handleCancel}
       >
-        <img alt="example" style={{ width: "100%" }} src={previewImage} />
+        <img
+          alt="example"
+          style={{ width: "100%" }}
+          src={`http://192.168.90.47:4000${previewImage}`}
+        />
       </Modal>
     </div>
   );

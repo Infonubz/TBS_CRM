@@ -1,5 +1,5 @@
 import axios from "axios";
-import { OFFERS_LIST } from "../../Store/Type";
+import { GET_RECENT_OFFERS, OFFERS_LIST } from "../../Store/Type";
 import { toast } from "react-toastify";
 import { GetEmployeeData } from "../UserManagement/Employee";
 import { GetOperatorData } from "../UserManagement/SuperAdmin";
@@ -16,6 +16,7 @@ const apiUrl = process.env.REACT_APP_API_URL;
 
 export const GetOffersData = async (dispatch) => {
   try {
+    // const response = await axios.get(`${apiUrl}/offers-deals-occupation/${occuTab}`);
     const response = await axios.get(`${apiUrl}/offers-deals`);
     dispatch({ type: OFFERS_LIST, payload: response.data });
     return response.data;
@@ -55,13 +56,42 @@ export const Deleteall = async (api, dispatch, module) => {
   }
 };
 
+// export const SubmitOfferExcel = async (file) => {
+//   const formData = new FormData();
+//   formData.append("xlsxFile", file);
+
+//   const excelEndpoint = `${apiUrl}/offers-deals-importExcel`;
+//   const method = "post";
+
+//   try {
+//     const response = await api({
+//       url: excelEndpoint,
+//       method: method,
+//       data: formData,
+//       headers: {
+//         "Content-Type": "multipart/form-data",
+//       },
+//     });
+//     if (response.data === "Error processing file") {
+//       toast.error("Error processing file");
+//     }
+//     else {
+//       toast.success(response.data);
+//     }
+//     console.log(response.data, 'multipartformdata')
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error uploading file:", error);
+//     toast.error("Failed to upload file");
+//     return null;
+//   }
+// };
+
 export const SubmitOfferExcel = async (file) => {
   const formData = new FormData();
   formData.append("xlsxFile", file);
-
   const excelEndpoint = `${apiUrl}/offers-deals-importExcel`;
   const method = "post";
-
   try {
     const response = await api({
       url: excelEndpoint,
@@ -71,7 +101,21 @@ export const SubmitOfferExcel = async (file) => {
         "Content-Type": "multipart/form-data",
       },
     });
-    toast.success(response.data);
+
+    console.log("Offers_Response", response);
+
+    if (response.status >= 200 && response.status < 300) {
+      if (typeof response.data === "string" && response.data.includes("Error")) {
+        toast.error(response.data); // Use the actual error message
+      } else {
+        toast.success(response.data);
+      }
+    }
+    // else {
+    //   // Handle non-2xx status codes
+    //   toast.error("Failed to upload file: " + response.statusText);
+    //   throw new Error(`Failed with status: ${response.status}`);
+    // }
     return response.data;
   } catch (error) {
     console.error("Error uploading file:", error);
@@ -79,6 +123,7 @@ export const SubmitOfferExcel = async (file) => {
     return null;
   }
 };
+
 
 export const SubmitOffersData = async (
   promotionvalues,
@@ -109,14 +154,40 @@ export const SubmitOffersData = async (
     "status",
     promotionvalues.status ? promotionvalues.status : null
   );
+  // formData.append(
+  //   "status_id",
+  //   promotionvalues.status == "Draft"
+  //     ? 1
+  //     : promotionvalues.status == "Paused"
+  //     ? 2
+  //     : 3
+  // ); // Assuming this is a fixed value
+
   formData.append(
     "status_id",
     promotionvalues.status == "Draft"
       ? 1
-      : promotionvalues.status == "Paused"
-      ? 2
-      : 3
-  ); // Assuming this is a fixed value
+      : promotionvalues.status == "Requested"
+        ? 2
+        : 3
+  );
+  formData.append(
+    "req_status",
+    promotionvalues.status == "Draft"
+      ? "Draft"
+      : promotionvalues.status == "Requested"
+        ? "Pending"
+        : "Approved"
+  );
+  formData.append(
+    "req_status_id",
+    promotionvalues.status == "Draft"
+      ? 0
+      : promotionvalues.status == "Requested"
+        ? 1
+        : 3
+  );
+
   formData.append(
     "offer_desc",
     promotionvalues.promotion_description
@@ -127,14 +198,34 @@ export const SubmitOffersData = async (
     "offer_img",
     promotionvalues.file ? promotionvalues.file : null
   );
-  formData.append("occupation", offerlist?.occupation);
+  formData.append("occupation_id", offerlist?.occupation);
+  formData.append(
+    "occupation",
+    offerlist?.occupation == 1
+      ? "Business"
+      : offerlist?.occupation == 2
+        ? "General Public"
+        : offerlist?.occupation == 3
+          ? "Handicapped"
+          : offerlist?.occupation == 4
+            ? "Pilgrim"
+            : offerlist?.occupation == 5
+              ? "Senior Citizen"
+              : offerlist?.occupation == 6
+                ? "Student"
+                : offerlist?.occupation == 7
+                  ? "Tourist"
+                  : ""
+  );
   formData.append("theme", offerlist?.offer_bgImgae);
-  formData.append("tbs_user_id", sessionStorage.getItem("USER_ID"));
+  // formData.append("tbs_user_id", sessionStorage.getItem("USER_ID"));
+  formData.append("tbs_user_id", localStorage.getItem("USER_ID"));
+
   // formData.append("image_size", promotionvalues.file_size);
   // formData.append("image_type", promotionvalues.file_type);
   console.log(
     updatedata,
-    "updatedataupdatedataupdatedataupdatedataupdatedataupdatedataupdatedata"
+    "ADD_UPDATE_OFFERS_DATA"
   );
   const url = updatedata
     ? `${apiUrl}/offers-deals/${updatedata}`
@@ -193,7 +284,19 @@ export const handleoffersearch = async (e, dispatch) => {
     return null;
   }
 };
+export const GetRecentOffers = async (dispatch) => {
+  try {
+    const response = await axios.get(`${apiUrl}/recentOffers`);
+    dispatch({ type: GET_RECENT_OFFERS, payload: response.data });
+    console.log(response, "response from recent offers");
 
+    return response.data;
+  } catch (error) {
+    handleError(error);
+
+    // return null;
+  }
+};
 const handleError = (error) => {
   console.error("Error details:", error);
   let errorMessage = "An error occurred";

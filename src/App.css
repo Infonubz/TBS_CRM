@@ -1,42 +1,82 @@
 /* Define the style for odd rows */
-.ant-table-tbody > tr:nth-child(odd) > td {
-  background-color: #e9edf2; /* Replace with your desired color */
+.ant-table-tbody>tr:nth-child(odd)>td {
+  background-color: #e9edf2;
+  /* Replace with your desired color */
 }
 
 /* Define the style for odd rows in the table header */
-.custom-table .ant-table-thead > tr.ant-table-row-selected > th,
-.custom-table .ant-table-thead > tr:hover:not(.ant-table-row-selected) > th {
-  background-color: #1f4b7f; /* Header background color */
+.custom-table .ant-table-thead>tr.ant-table-row-selected>th,
+.custom-table .ant-table-thead>tr:hover:not(.ant-table-row-selected)>th {
+  background-color: #1f4b7f;
+  /* Header background color */
 }
 
 /* Define the hover style for the sorted column header */
-.custom-table .ant-table-thead > tr > th:hover {
-  background-color: green; /* Change to your desired hover color */
+.custom-table .ant-table-thead>tr>th:hover {
+  background-color: green;
+  /* Change to your desired hover color */
 }
 
 /* Ensure the background color alternation in header even after sorting */
-.custom-table .ant-table-tbody > tr:hover > td {
-  background-color: #1f4b7f; /* Body cell background color on hover */
+/* .custom-table .ant-table-tbody>tr:hover>td {
   height: 6.5vh;
-}
+} */
 
 /* Additional styles for the table header */
-.custom-table .ant-table-thead > tr > th {
-  background-color: #1f4b7f; /* Header background color */
-  color: white; /* Header text color */
-  transition: none; /* Disable transitions to prevent height changes */
+.custom-table .ant-table-thead>tr>th {
+  background-color: #1f4b7f;
+  /* Header background color */
+  color: white;
+  /* Header text color */
+  transition: none;
+  /* Disable transitions to prevent height changes */
 }
 
+:where(.custom-table).ant-table-wrapper .ant-table-thead>tr>th,
+:where(.custom-table).ant-table-wrapper .ant-table-thead>tr>td {
+  position: relative;
+  color: rgba(0, 0, 0, 0.88);
+  font-weight: 600;
+  text-align: start;
+  background: #fafafa;
+  border-bottom: 0px solid #f0f0f0;
+  transition: background 0.2s ease;
+}
+
+.custom-table .ant-table-thead>tr>th.ant-table-header:hover {
+  transform: none !important;
+  /* Prevent scaling */
+  transition: none !important;
+  /* Remove transition effect */
+}
+
+.custom-table .ant-table-thead th {
+  transition: none !important;
+  /* Remove transition */
+  transform: none !important;
+  /* Prevent scaling */
+}
+
+.custom-table .ant-table-thead th:hover {
+  transform: none !important;
+  /* Prevent hover scaling */
+}
+
+
 /* Ensure no additional height on hover */
-.custom-table .ant-table-thead > tr:hover > th {
-  height: auto; /* Ensure height remains auto */
+.custom-table .ant-table-thead>tr:hover>th {
+  /* height: auto; */
+  /* Ensure height remains auto */
 }
 
 /* Remove border and padding on hover for sort icons */
 .custom-table .ant-table-column-sorters:hover {
-  background-color: #1f4b7f; /* Maintain header background color on hover */
-  border: none; /* Remove border */
-  padding: 0; /* Remove padding */
+  background-color: #1f4b7f;
+  /* Maintain header background color on hover */
+  border: none;
+  /* Remove border */
+  padding: 0;
+  /* Remove padding */
 }
 
 /* Additional styles to ensure no padding and background for the inner elements */
@@ -59,7 +99,7 @@
 }
 
 /* Remove border from the header when hovering */
-.custom-table .ant-table-thead > tr > th:hover {
+.custom-table .ant-table-thead>tr>th:hover {
   border: none;
   box-shadow: none;
   outline: none;
@@ -67,33 +107,23 @@
 
 /* Specific styles for the sort icon container */
 .custom-table .ant-table-column-sorters {
-  background-color: #1f4b7f; /* Ensure the background color is consistent */
+  background-color: #1f4b7f;
+  /* Ensure the background color is consistent */
   border: none;
 }
 
 /* Additional styles */
 :where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper .ant-table-cell,
-:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper
-  .ant-table-thead
-  > tr
-  > th,
-:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper
-  .ant-table-tbody
-  > tr
-  > th,
-:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper
-  .ant-table-tbody
-  > tr
-  > td,
-:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper tfoot > tr > th,
-:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper tfoot > tr > td {
+:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper .ant-table-thead>tr>th,
+:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper .ant-table-tbody>tr>th,
+:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper .ant-table-tbody>tr>td,
+:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper tfoot>tr>th,
+:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper tfoot>tr>td {
   padding: 0.4vw;
 }
 
-:where(.css-dev-only-do-not-override-zg0ahe).ant-pagination
-  .ant-pagination-prev,
-:where(.css-dev-only-do-not-override-zg0ahe).ant-pagination
-  .ant-pagination-next {
+:where(.css-dev-only-do-not-override-zg0ahe).ant-pagination .ant-pagination-prev,
+:where(.css-dev-only-do-not-override-zg0ahe).ant-pagination .ant-pagination-next {
   background-color: #1f4b7f;
   color: white;
 }
@@ -102,39 +132,32 @@
   color: white;
 }
 
-:where(.css-dev-only-do-not-override-zg0ahe).ant-pagination
-  .ant-pagination-item-active {
+:where(.css-dev-only-do-not-override-zg0ahe).ant-pagination .ant-pagination-item-active {
   background-color: #1f4b7f;
   color: white;
 }
 
-:where(.css-dev-only-do-not-override-zg0ahe).ant-pagination
-  .ant-pagination-item-active {
+:where(.css-dev-only-do-not-override-zg0ahe).ant-pagination .ant-pagination-item-active {
   border: none;
 }
 
-:where(.css-dev-only-do-not-override-zg0ahe).ant-pagination
-  .ant-pagination-item-active
-  a {
+:where(.css-dev-only-do-not-override-zg0ahe).ant-pagination .ant-pagination-item-active a {
   color: white;
   background-color: #1f4b7f;
   border-radius: "0.2vw";
 }
 
-:where(.css-dev-only-do-not-override-zg0ahe).ant-pagination
-  .ant-pagination-item {
+:where(.css-dev-only-do-not-override-zg0ahe).ant-pagination .ant-pagination-item {
   background-color: white;
   color: #1f4b7f;
   border: none;
 }
 
-:where(.css-dev-only-do-not-override-zg0ahe).ant-pagination
-  .ant-pagination-item {
+:where(.css-dev-only-do-not-override-zg0ahe).ant-pagination .ant-pagination-item {
   border: none;
 }
 
-:where(.css-dev-only-do-not-override-zg0ahe).ant-upload-wrapper
-  .ant-upload-drag {
+:where(.css-dev-only-do-not-override-zg0ahe).ant-upload-wrapper .ant-upload-drag {
   border-left: 0.1vw solid;
   border-top: 0.1vw solid;
   border-right: 0.3vw solid;
@@ -154,60 +177,26 @@
   border-color: #1f4b7f;
 }
 
-.ant-collapse-large
-  > .ant-collapse-item
-  > .ant-collapse-content
-  > .ant-collapse-content-box {
+.ant-collapse-large>.ant-collapse-item>.ant-collapse-content>.ant-collapse-content-box {
   padding: 0px;
 }
 
-.ant-collapse .ant-collapse-item:last-child > .ant-collapse-content {
+.ant-collapse .ant-collapse-item:last-child>.ant-collapse-content {
   border-radius: 0 0 1rem 1rem;
 }
 
-.ant-table-wrapper
-  .ant-table-container
-  table
-  > thead
-  > tr:first-child
-  > *:last-child {
+.ant-table-wrapper .ant-table-container table>thead>tr:first-child>*:last-child {
   border-start-end-radius: 2px;
 }
 
-:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper
-  .ant-table.ant-table-middle
-  .ant-table-title,
-:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper
-  .ant-table.ant-table-middle
-  .ant-table-footer,
-:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper
-  .ant-table.ant-table-middle
-  .ant-table-cell,
-:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper
-  .ant-table.ant-table-middle
-  .ant-table-thead
-  > tr
-  > th,
-:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper
-  .ant-table.ant-table-middle
-  .ant-table-tbody
-  > tr
-  > th,
-:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper
-  .ant-table.ant-table-middle
-  .ant-table-tbody
-  > tr
-  > td,
-:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper
-  .ant-table.ant-table-middle
-  tfoot
-  > tr
-  > th,
-:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper
-  .ant-table.ant-table-middle
-  tfoot
-  > tr
-  > td {
+:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper .ant-table.ant-table-middle .ant-table-title,
+:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper .ant-table.ant-table-middle .ant-table-footer,
+:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper .ant-table.ant-table-middle .ant-table-cell,
+:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper .ant-table.ant-table-middle .ant-table-thead>tr>th,
+:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper .ant-table.ant-table-middle .ant-table-tbody>tr>th,
+:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper .ant-table.ant-table-middle .ant-table-tbody>tr>td,
+:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper .ant-table.ant-table-middle tfoot>tr>th,
+:where(.css-dev-only-do-not-override-zg0ahe).ant-table-wrapper .ant-table.ant-table-middle tfoot>tr>td {
   padding: 0.5vw;
 }
 
@@ -215,23 +204,15 @@
   font-size: 1vw;
 }
 
-.ant-collapse-large
-  > .ant-collapse-item
-  > .ant-collapse-content
-  > .ant-collapse-content-box {
+.ant-collapse-large>.ant-collapse-item>.ant-collapse-content>.ant-collapse-content-box {
   padding: 0px;
 }
 
-.ant-collapse .ant-collapse-item:last-child > .ant-collapse-content {
+.ant-collapse .ant-collapse-item:last-child>.ant-collapse-content {
   border-radius: 0 0 1rem 1rem;
 }
 
-.ant-table-wrapper
-  .ant-table-container
-  table
-  > thead
-  > tr:first-child
-  > *:last-child {
+.ant-table-wrapper .ant-table-container table>thead>tr:first-child>*:last-child {
   border-start-end-radius: 2px;
 }
 
@@ -239,10 +220,7 @@ body {
   font-family: "Inter", sans-serif;
 }
 
-.ant-input-search
-  > .ant-input-group
-  > .ant-input-group-addon:last-child
-  .ant-input-search-button {
+.ant-input-search>.ant-input-group>.ant-input-group-addon:last-child .ant-input-search-button {
   display: none;
 }
 
@@ -272,7 +250,7 @@ body {
   box-shadow: 0 10px 9px rgba(0, 0, 0, 0.25);
 }
 
-.ant-collapse-large > .ant-collapse-item > .ant-collapse-header {
+.ant-collapse-large>.ant-collapse-item>.ant-collapse-header {
   padding: 0.5vw 1vw;
   padding-inline-start: 16px;
 }
@@ -290,35 +268,28 @@ body {
 }
 
 .ant-table-cell {
-  padding: 0.4vw !important; /* Adjust the value as needed */
+  padding: 0.4vw !important;
+  /* Adjust the value as needed */
 }
 
-:where(.css-dev-only-do-not-override-m4timi).ant-pagination
-  .ant-pagination-prev
-  .ant-pagination-item-link,
-:where(.css-dev-only-do-not-override-m4timi).ant-pagination
-  .ant-pagination-next
-  .ant-pagination-item-link {
+:where(.css-dev-only-do-not-override-m4timi).ant-pagination .ant-pagination-prev .ant-pagination-item-link,
+:where(.css-dev-only-do-not-override-m4timi).ant-pagination .ant-pagination-next .ant-pagination-item-link {
   background-color: #1f4b7f;
 }
 
-:where(.css-dev-only-do-not-override-m4timi).ant-pagination
-  .ant-pagination-item-active
-  a {
+:where(.css-dev-only-do-not-override-m4timi).ant-pagination .ant-pagination-item-active a {
   background-color: #1f4b7f;
   color: white;
   border: none;
 }
 
-:where(.css-dev-only-do-not-override-m4timi).ant-pagination
-  .ant-pagination-item {
+:where(.css-dev-only-do-not-override-m4timi).ant-pagination .ant-pagination-item {
   background-color: white;
   color: #1f4b7f;
   border: none;
 }
 
-:where(.css-dev-only-do-not-override-m4timi).ant-pagination
-  .ant-pagination-item-active {
+:where(.css-dev-only-do-not-override-m4timi).ant-pagination .ant-pagination-item-active {
   border: none;
 }
 
@@ -341,36 +312,54 @@ body {
 }
 
 .custom-table {
-  border-radius: 1vw; /* Adjust the value as needed */
-  overflow: hidden; /* This is important to ensure the rounded corners are visible */
+  border-radius: 1vw;
+  /* Adjust the value as needed */
+  overflow: hidden;
+  /* This is important to ensure the rounded corners are visible */
   border-top: 0.1vw solid #1f4b7f;
   border-left: 0.1vw solid #1f4b7f;
   border-right: 0.3vw solid #1f4b7f;
   border-bottom: 0.3vw solid #1f4b7f;
 }
 
+/* :where(.css-dev-only-do-not-override-m4timi).ant-table-wrapper table {
+  width: 100%;
+  text-align: start;
+  border-radius: 1vw;
+  border: #120dae solid;
+  border-collapse: separate;
+  border-spacing: 0;
+} */
+
+
 .custom-table .ant-table-content {
-  border-radius: 1vw; /* Ensure the table content follows the border radius */
+  border-radius: 1vw;
+  /* Ensure the table content follows the border radius */
 }
 
-.custom-table .ant-table-thead > tr > th {
-  background-color: #1f4b7f;
-  color: white; /* Adjust the text color as needed */
+.custom-table .ant-table-thead>tr>th {
+  background-color: #1f4b7f !important;
+  color: white;
+  /* Adjust the text color as needed */
 }
 
-:where(.css-dev-only-do-not-override-m4timi)
-  .ant-table-wrapper
-  .ant-table-column-sorters::after {
-  padding: 0 !important; /* Remove padding */
-  margin: 0 !important; /* Optionally remove margin */
-  background: none !important; /* Ensure no background color */
-  border: none !important; /* Ensure no border */
+:where(.css-dev-only-do-not-override-m4timi) .ant-table-wrapper .ant-table-column-sorters::after {
+  padding: 0 !important;
+  /* Remove padding */
+  margin: 0 !important;
+  /* Optionally remove margin */
+  background: none !important;
+  /* Ensure no background color */
+  border: none !important;
+  /* Ensure no border */
 }
 
 /* Remove background color and border on hover for the sort icon */
 .custom-table .ant-table-column-sorters:hover {
-  background-color: #1f4b7f; /* Maintain header background color on hover */
-  border: none; /* Remove border */
+  background-color: #1f4b7f;
+  /* Maintain header background color on hover */
+  border: none;
+  /* Remove border */
 }
 
 /* Additional styles to ensure no padding and background for the inner elements */
@@ -393,7 +382,7 @@ body {
 }
 
 /* Remove border from the header when hovering */
-.custom-table .ant-table-thead > tr > th:hover {
+.custom-table .ant-table-thead>tr>th:hover {
   border: none;
   box-shadow: none;
   outline: none;
@@ -401,13 +390,15 @@ body {
 
 /* Specific styles for the sort icon container */
 .custom-table .ant-table-column-sorters {
-  background-color: #1f4b7f; /* Ensure the background color is consistent */
+  background-color: #1f4b7f;
+  /* Ensure the background color is consistent */
   border: none;
 }
 
 /* In your CSS file */
 iframe {
-  touch-action: none; /* Disables double-tap zoom */
+  touch-action: none;
+  /* Disables double-tap zoom */
 }
 
 html {
@@ -415,28 +406,35 @@ html {
   touch-action: manipulation;
   -ms-content-zooming: none;
   -ms-user-select: none;
-  overflow: hidden; /* Prevents scrolling */
+  overflow: hidden;
+  /* Prevents scrolling */
 }
+
 .ant-table-cell {
   padding: 0.3vw !important;
 }
+
 .ant-table-row .ant-table-row-level-0 {
   height: 6.5vh;
 }
 
 /* Example CSS */
 .ant-table thead th {
-  height: 6.5vh; /* Adjust height as per your requirement */
+  height: 6.5vh;
+  /* Adjust height as per your requirement */
 }
 
 /* Example CSS */
-.ant-table-tbody > tr > td {
-  height: 6.5vh; /* Adjust height as per your requirement */
+.ant-table-tbody>tr>td {
+  height: 6.5vh;
+  /* Adjust height as per your requirement */
 }
 
-.custom-table .ant-table-thead > tr > th:hover {
-  height: 6.5vh; /* Ensure header height remains consistent */
+.custom-table .ant-table-thead>tr>th:hover {
+  /* height: 6.5vh; */
+  /* Ensure header height remains consistent */
 }
+
 .hover-img:hover {
   border-radius: 0.5vw;
   border-top: 0.1vw solid #1f4b7f;
@@ -444,6 +442,7 @@ html {
   border-right: 0.2vw solid #1f4b7f;
   border-bottom: 0.2vw solid #1f4b7f;
 }
+
 /* styles.css (or Pagination.module.css if using CSS Modules) */
 
 .pagination .page-item .page-link {
@@ -459,33 +458,36 @@ html {
   /* border-color: #00bfff; */
   color: white;
 }
+
 ::-webkit-scrollbar {
-  width: 0.3vw; /* Set the width of the scrollbar */
+  width: 0.3vw;
+  /* Set the width of the scrollbar */
   border-radius: 0.5vw;
   padding: 0 0.5vw;
 }
+
 /* Track */
 ::-webkit-scrollbar-track {
-  background: #f1f1f1; /* Color of the track (background behind the scrollbar) */
+  background: #f1f1f1;
+  /* Color of the track (background behind the scrollbar) */
   border-radius: 0.5vw;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #1f487c; /* Color of the scrollbar handle */
+  background: #1f487c;
+  /* Color of the scrollbar handle */
   border-radius: 0.5vw;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #1f487c; /* Color of the scrollbar handle when hovered */
+  background: #1f487c;
+  /* Color of the scrollbar handle when hovered */
 }
-:where(.css-dev-only-do-not-override-m4timi).ant-pagination
-  .ant-pagination-prev
-  .ant-pagination-item-link,
-:where(.css-dev-only-do-not-override-m4timi).ant-pagination
-  .ant-pagination-next
-  .ant-pagination-item-link {
+
+:where(.css-dev-only-do-not-override-m4timi).ant-pagination .ant-pagination-prev .ant-pagination-item-link,
+:where(.css-dev-only-do-not-override-m4timi).ant-pagination .ant-pagination-next .ant-pagination-item-link {
   /* height: 2.5vw;
     width: 2.5vw; */
   height: 4vh;
@@ -526,6 +528,7 @@ html {
   margin-left: -1px;
   height: 1vw;
   background-color: #fff;
+
   &:hover {
     z-index: 2;
     color: #7ab300;
@@ -534,24 +537,36 @@ html {
     border-color: #dee2e6;
   }
 }
+
 .page-link.active {
   background-color: red;
   border-color: red;
   color: white;
 }
+
 .ant-select-outlined:not(.ant-select-customize-input) .ant-select-selector {
   background: white;
 }
-.ant-collapse-large > .ant-collapse-item > .ant-collapse-header {
+
+:where(.css-dev-only-do-not-override-m4timi).ant-select-single:not(.ant-select-customize-input) .ant-select-selector {
+  width: 100%;
+  height: 100%;
+  padding: 0vw 0vw 0vw 0vw !important;
+}
+
+.ant-collapse-large>.ant-collapse-item>.ant-collapse-header {
   height: 7.5vh;
 }
+
 .custom-dropdown {
   max-height: 15vh;
   overflow-y: auto;
 }
+
 .input-otp__field .ant-input {
   height: 1vw;
 }
+
 /* .custom-otp-input .ant-input {
   height: 1vw; 
   line-height: 1vw; 
@@ -569,6 +584,7 @@ html {
   transform: rotate(180deg);
   top: -1px;
 }
+
 .crop-image::after {
   content: "";
   display: inline-block;
@@ -581,6 +597,7 @@ html {
   transform: rotate(-90deg);
   bottom: -3px;
 }
+
 /* Dashboard.css */
 
 .reportClass {
@@ -638,8 +655,63 @@ html {
   object-fit: fill;
   object-position: center;
 }
+
 .bmail {
   .ant-select-outlined:not(.ant-select-customize-input) .ant-select-selector {
     border: none;
   }
+}
+
+.bmail {
+  .ant-select-outlined:not(.ant-select-customize-input) .ant-select-selector {
+    border: none;
+  }
+}
+
+.ql-editor {
+  border: 1px solid #1f4b7f;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  border-bottom-width: 3px;
+  border-right-width: 3px;
+  height: 20vw !important;
+}
+
+.ql-container .ql-snow {
+  border: 1px solid #1f4b7f;
+}
+
+.ql-toolbar.ql-snow {
+  border: 1px solid #1f4b7f !important;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  border-right-width: 3px !important;
+}
+
+.ql-container.ql-snow {
+  border: 0px solid #1f4b7f !important;
+}
+
+/* .ql-snow .ql-editor {
+  color: #1f4b7f;
+} */
+
+
+.ql-snow.ql-toolbar button svg,
+.ql-snow .ql-toolbar button svg {
+  float: left;
+  height: 1.5vw !important;
+}
+
+.rmsc .dropdown-container {
+  position: relative !important;
+  outline: none !important;
+  background-color: var(--rmsc-bg) !important;
+  border: 0px 0px 3px 0px solid #1f4b7f !important;
+  border-radius: var(--rmsc-radius) !important;
+}
+
+
+:where(.css-dev-only-do-not-override-m4timi).ant-table-wrapper .ant-table-thead th.ant-table-column-sort {
+  background: #1f487c;
 }

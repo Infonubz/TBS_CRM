@@ -311,11 +311,10 @@ export default function Roles() {
               <p className="text-white h-[6vh] rounded-tr-[0.8vw] rounded-tl-[0.8vw] bg-[#1F487C] font-medium text-[1.3vw] pt-[0.3vw] pb-[0.1vw]">
                 <div className="flex ml-[0.5vw]">
                   <div
-                    className={`cursor-pointer ${
-                      tabType == "OP-EMPRole"
-                        ? "border-b-[0.30vw] font-medium border-[#ffffff]"
-                        : ""
-                    }`}
+                    className={`cursor-pointer ${tabType == "OP-EMPRole"
+                      ? "border-b-[0.30vw] font-medium border-[#ffffff]"
+                      : ""
+                      }`}
                     onClick={() => setTabType("OP-EMPRole")}
                   >
                     <p className="text-[1.1vw] text-[#ffffff] text-center">
@@ -323,11 +322,10 @@ export default function Roles() {
                     </p>
                   </div>
                   <div
-                    className={`cursor-pointer ml-[2vw] ${
-                      tabType == "PRO-EMPRole"
-                        ? "border-b-[0.30vw] font-medium border-[#ffffff]"
-                        : ""
-                    }`}
+                    className={`cursor-pointer ml-[2vw] ${tabType == "PRO-EMPRole"
+                      ? "border-b-[0.30vw] font-medium border-[#ffffff]"
+                      : ""
+                      }`}
                     onClick={() => setTabType("PRO-EMPRole")}
                   >
                     <p className="text-[1.1vw] text-[#ffffff] text-center">
@@ -411,31 +409,38 @@ export default function Roles() {
               </p>
               <div className="h-[24vh]  w-[35vw] flex flex-col ">
                 {permissions.map((permission, index) => (
-                  <div key={index}>
-                    <div className="flex h-[6vh] border-t border-[#1F487C] items-center">
-                      <div className="flex items-center px-[0.5vw] justify-between  w-full">
-                        <div className="flex items-center w-full">
-                          <span className="">
-                            <IoMdAdd
-                              className="w-[1.3vw] h-[1.3vw]"
-                              color="#1F487C"
-                            />
-                          </span>
+                  <div>
+                    {permission.userCount === undefined ?
+                      null
+                      :
+                      <>
+                        <div key={index}>
+                          <div className="flex h-[6vh] border-t border-[#1F487C] items-center">
+                            <div className="flex items-center px-[0.5vw] justify-between  w-full">
+                              <div className="flex items-center w-full">
+                                <span className="">
+                                  <IoMdAdd
+                                    className="w-[1.3vw] h-[1.3vw]"
+                                    color="#1F487C"
+                                  />
+                                </span>
 
-                          <span className="">
-                            <p className={`text-[1vw] font-medium`}>
-                              {permission.name}
-                            </p>
-                          </span>
-                        </div>
-                        <div className="">
-                          <div className="flex rounded-[2vh] bg-[#D9D9D9] items-center justify-center w-[5vw] text-[1vw] py-[0.3vh]">
-                            {" "}
-                            {`${permission.userCount} User`}
+                                <span className="">
+                                  <p className={`text-[1vw] font-medium`}>
+                                    {permission.name}
+                                  </p>
+                                </span>
+                              </div>
+                              <div className="">
+                                <div className="flex rounded-[2vh] bg-[#D9D9D9] items-center justify-center w-[5vw] text-[1vw] py-[0.3vh]">
+                                  {" "}
+                                  {`${permission.userCount} User`}
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </div>
+                      </>}
                   </div>
                 ))}
               </div>
@@ -498,10 +503,11 @@ export default function Roles() {
                   <div className="w-full h-[8vh] px-[1vw] flex justify-between items-center">
                     <div className="text-[#1f4b7f]  flex text-[1.1vw] gap-[0.5vw]">
                       <span>Showing</span>
-                      <span className="font-bold">1 - {pageSize}</span>
+                      <span className="font-bold">{currentItems && currentItems?.length > 0
+                        ? <div>{indexOfFirstItem + 1} - {indexOfFirstItem + currentItems?.length}</div> : "0"}</span>
                       <span>from</span>
                       <span className="font-bold">
-                        {getrolelist?.length > 0 && getrolelist?.length}
+                        {getrolelist?.length > 0 ? getrolelist?.length : 0}
                       </span>
                       <span>data</span>
                     </div>

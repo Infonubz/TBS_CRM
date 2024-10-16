@@ -10,7 +10,7 @@ import { IoMailUnreadOutline } from "react-icons/io5";
 import { FaLanguage, FaMailBulk } from "react-icons/fa";
 import { MdOutlineSms } from "react-icons/md";
 
-const ConfigurationIndex = () => {
+const Index = () => {
   return (
     <div>
       <Collapse
@@ -205,4 +205,4 @@ const ConfigurationIndex = () => {
   );
 };
 
-export default ConfigurationIndex;
+export default Index;
