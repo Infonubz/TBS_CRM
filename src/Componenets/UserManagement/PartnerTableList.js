@@ -30,6 +30,7 @@ const PartnerTableList = ({
   PartnerID,
   setPartnerID,
   get_partner_list,
+  updatedata
 }) => {
   const [sortedInfo, setSortedInfo] = useState({});
   const [viewmodal, setViewModal] = useState(false);

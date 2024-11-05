@@ -27,7 +27,7 @@ export default function EmployeeGridView({
 
   const apiUrl = process.env.REACT_APP_API_URL;
 
-  const user = sessionStorage.getItem("USER_ID");
+  const user = localStorage.getItem("USER_ID");
 
   const handleEdit = (tbs_pro_emp_id) => {
     SetUpdateData(tbs_pro_emp_id);
@@ -67,7 +67,7 @@ export default function EmployeeGridView({
                     : "bg-white"
                 }  h-[16vw] border-[#1f4b7f] border-l-[0.1vw] cursor-pointer border-r-[0.3vw] border-b-[0.3vw] border-t-[0.1vw] rounded-[0.5vw]`}
                 onMouseEnter={() => {
-                  if (user.startsWith("tbs-pro")) {
+                  if (user?.startsWith("tbs-pro")) {
                     setHoverId(item.tbs_pro_emp_id);
                     console.log(item.tbs_pro_emp_id, "----owner id");
                   } else {
@@ -98,7 +98,7 @@ export default function EmployeeGridView({
                           <div>
                             <a
                               onClick={() => {
-                                if (user.startsWith("tbs-pro")) {
+                                if (user?.startsWith("tbs-pro")) {
                                   handleEdit(item.tbs_pro_emp_id);
                                   console.log(
                                     item.tbs_pro_emp_id,
@@ -117,7 +117,7 @@ export default function EmployeeGridView({
                           <div>
                             <a
                               onClick={() => {
-                                if (user.startsWith("tbs-pro")) {
+                                if (user?.startsWith("tbs-pro")) {
                                   handleDelete(item.tbs_pro_emp_id);
                                   console.log(
                                     item.tbs_pro_emp_id,
@@ -138,14 +138,14 @@ export default function EmployeeGridView({
                       trigger="click"
                       open={
                         openPopovers[
-                          user.startsWith("tbs-pro")
+                          user?.startsWith("tbs-pro")
                             ? item.tbs_pro_emp_id
                             : item.tbs_op_emp_id
                         ] || false
                       }
                       onOpenChange={() =>
                         togglePopover(
-                          user.startsWith("tbs-pro")
+                          user?.startsWith("tbs-pro")
                             ? item.tbs_pro_emp_id
                             : item.tbs_op_emp_id
                         )
@@ -161,7 +161,7 @@ export default function EmployeeGridView({
                             : "text-[#1f4b7f]"
                         } cursor-pointer rounded-[0.5vw]`}
                         onMouseEnter={() => {
-                          if (user.startsWith("tbs-pro")) {
+                          if (user?.startsWith("tbs-pro")) {
                             setHoverId(item.tbs_pro_emp_id);
                             console.log(item.tbs_pro_emp_id, "----owner id");
                           } else {
@@ -264,7 +264,7 @@ export default function EmployeeGridView({
           setDeleteModalIsOpen={setDeleteEmpModalIsOpen}
           title={"Want to delete this User"}
           api={
-            user.startsWith("tbs-pro")
+            user?.startsWith("tbs-pro")
               ? `${apiUrl}/pro-emp-personal-details/${EmployeeID}`
               : `${apiUrl}/emp-personal-details/${EmployeeID}`
           }

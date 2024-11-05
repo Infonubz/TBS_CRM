@@ -55,11 +55,15 @@ export default function AddPersonalDetails({
 }) {
   const [enable, setEnable] = useState(false);
   const dispatch = useDispatch();
+console.log(EmployeeID,"idididi");
 
   const handleSubmit = async (values) => {
+    console.log(EmployeeID,"idididi");
     if (EmployeeID && enable == false) {
       setCurrentpage(2);
     } else {
+      console.log("hell hwohdifghdkjfj");
+      
       try {
         const data = await submitPersonalData(
           values,
@@ -79,6 +83,8 @@ export default function AddPersonalDetails({
   };
 
   const [emppersonaldata, setEmpPersonalData] = useState("");
+  console.log(emppersonaldata,"datadata");
+  
 
   const fetchGetUser = async () => {
     try {
@@ -151,18 +157,18 @@ export default function AddPersonalDetails({
         <div>
           <Formik
             initialValues={{
-              firstname: emppersonaldata.emp_first_name || "",
-              lastname: emppersonaldata.emp_last_name || "",
-              phone: emppersonaldata.phone || "",
-              emailid: emppersonaldata.email_id || "",
-              alt_phone: emppersonaldata.alternate_phone || "",
-              dob: emppersonaldata.date_of_birth
-                ? dayjs(emppersonaldata.date_of_birth).format("YYYY-MM-DD")
+              firstname: emppersonaldata?.emp_first_name || "",
+              lastname: emppersonaldata?.emp_last_name || "",
+              phone: emppersonaldata?.phone || "",
+              emailid: emppersonaldata?.email_id || "",
+              alt_phone: emppersonaldata?.alternate_phone || "",
+              dob: emppersonaldata?.date_of_birth
+                ? dayjs(emppersonaldata?.date_of_birth).format("YYYY-MM-DD")
                 : "",
-              gender: emppersonaldata.gender || "",
-              blood: emppersonaldata.blood_group || "",
-              role: emppersonaldata.role_type || "",
-              role_id: emppersonaldata.role_type_id || "",
+              gender: emppersonaldata?.gender || "",
+              blood: emppersonaldata?.blood_group || "",
+              role: emppersonaldata?.role_type || "",
+              role_id: emppersonaldata?.role_type_id || "",
             }}
             validationSchema={validationSchema}
             onSubmit={(values) => {
@@ -215,40 +221,6 @@ export default function AddPersonalDetails({
                         className="text-red-500 text-[0.8vw]"
                       />
                     </div>
-                    <div className="col-span-1">
-                      <label className="text-[#1F4B7F] text-[1.1vw] ">
-                        Employee Last Name
-                        <span className="text-[1vw] text-red-600 pl-[0.2vw]">
-                          *
-                        </span>
-                      </label>
-                      <Field
-                        type="text"
-                        name="lastname"
-                        placeholder="Enter Last Name"
-                        // value={values.firstname}
-                        disabled={
-                          EmployeeID || addressback
-                            ? enable
-                              ? false
-                              : true
-                            : false
-                        }
-                        className={`${EmployeeID || addressback
-                          ? enable == false
-                            ? " cursor-not-allowed"
-                            : ""
-                          : ""
-                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
-                      />
-                      <ErrorMessage
-                        name="lastname"
-                        component="div"
-                        className="text-red-500 text-[0.8vw]"
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 w-full gap-x-[2vw]">
                     <div className="col-span-1 ">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         Phone
@@ -282,6 +254,40 @@ export default function AddPersonalDetails({
                       </div>
                       <ErrorMessage
                         name="phone"
+                        component="div"
+                        className="text-red-500 text-[0.8vw]"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 w-full gap-x-[2vw]">
+                  <div className="col-span-1">
+                      <label className="text-[#1F4B7F] text-[1.1vw] ">
+                        Alternate Phone
+                        <span className="text-[1vw] text-red-600 pl-[0.2vw]">
+                          *
+                        </span>
+                      </label>
+                      <Field
+                        type="text"
+                        name="alt_phone"
+                        placeholder="Enter Alternate Number"
+                        // value={values.firstname}
+                        disabled={
+                          EmployeeID || addressback
+                            ? enable
+                              ? false
+                              : true
+                            : false
+                        }
+                        className={`${EmployeeID || addressback
+                          ? enable == false
+                            ? " cursor-not-allowed"
+                            : ""
+                          : ""
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                      />
+                      <ErrorMessage
+                        name="alt_phone"
                         component="div"
                         className="text-red-500 text-[0.8vw]"
                       />
@@ -320,38 +326,7 @@ export default function AddPersonalDetails({
                     </div>
                   </div>
                   <div className="grid grid-cols-2 w-full gap-x-[2vw]">
-                    <div className="col-span-1">
-                      <label className="text-[#1F4B7F] text-[1.1vw] ">
-                        Alternate Phone
-                        <span className="text-[1vw] text-red-600 pl-[0.2vw]">
-                          *
-                        </span>
-                      </label>
-                      <Field
-                        type="text"
-                        name="alt_phone"
-                        placeholder="Enter Alternate Number"
-                        // value={values.firstname}
-                        disabled={
-                          EmployeeID || addressback
-                            ? enable
-                              ? false
-                              : true
-                            : false
-                        }
-                        className={`${EmployeeID || addressback
-                          ? enable == false
-                            ? " cursor-not-allowed"
-                            : ""
-                          : ""
-                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
-                      />
-                      <ErrorMessage
-                        name="alt_phone"
-                        component="div"
-                        className="text-red-500 text-[0.8vw]"
-                      />
-                    </div>
+                  
                     <div className="col-span-1">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         Date of Birth
@@ -387,8 +362,6 @@ export default function AddPersonalDetails({
                         className="text-red-500 text-[0.8vw]"
                       />
                     </div>
-                  </div>
-                  <div className="grid grid-cols-2 w-full gap-x-[2vw]">
                     <div className="col-span-1">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         Gender
@@ -429,6 +402,9 @@ export default function AddPersonalDetails({
                         className="text-red-500 text-[0.8vw]"
                       />
                     </div>
+                  </div>
+                  <div className="grid grid-cols-2 w-full gap-x-[2vw]">
+                 
                     <div className="col-span-1">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         Blood Group
@@ -461,8 +437,6 @@ export default function AddPersonalDetails({
                         className="text-red-500 text-[0.8vw]"
                       />
                     </div>
-                  </div>
-                  <div className="grid grid-cols-2 w-full gap-x-[2vw]">
                     <div className="col-span-1">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         Role Type
@@ -522,6 +496,9 @@ export default function AddPersonalDetails({
                         className="text-red-500 text-[0.8vw]"
                       />
                     </div>
+                  </div>
+                  {/* <div className="grid grid-cols-2 w-full gap-x-[2vw]">
+                 
                     <div className="col-span-1 relative">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         Profile Image
@@ -573,7 +550,7 @@ export default function AddPersonalDetails({
                         </div>
                       )}
                     </div>
-                  </div>
+                  </div> */}
                   <div className="flex items-center justify-between py-[1vw]">
                     <div>
                       <h1 className="text-[#1F4B7F] text-[0.7vw] font-semibold">

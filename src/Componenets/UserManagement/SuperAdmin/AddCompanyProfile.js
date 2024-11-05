@@ -13,6 +13,7 @@ import {
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { FaUpload } from "react-icons/fa";
+import ImageCropper from "./ImageCropper";
 
 const validationSchema = Yup.object().shape({
   phone: Yup.string()
@@ -52,42 +53,43 @@ const validationSchema = Yup.object().shape({
   password: Yup.string(),
   aadhar: Yup.string()
     .matches(/^[0-9]{12}$/, "Aadhar number must be exactly 12 digits")
-    .required("Aadhar Number is required"),
+    .required("Aadhar Number is required")
+    .max(12,"Aadhar number must be exactly 12 digits"),
   pan: Yup.string()
     .matches(
       /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
       "PAN number must be in the format: ABCDE1234F"
     )
     .required("Pan Number is required"),
-  profileimg: Yup.mixed()
-    .required("File is empty")
-    .test("required", "A file is required", function (value) {
-      const { isEdit } = this.options.context;
-      if (!isEdit && !value) {
-        return false;
-      }
-      return true;
-    })
-    .test("file_size", "File size is too large", function (value) {
-      if (value && value.size > 2000000) {
-        // 2MB
-        return false;
-      }
-      return true;
-    })
-    .test("file_type", "Unsupported File Format", function (value) {
-      if (typeof value === "string") {
-        // If value is a string (file path), skip file type validation
-        return true;
-      }
-      if (
-        value &&
-        ["image/jpeg", "image/png", "image/jpg"].includes(value.type)
-      ) {
-        return true;
-      }
-      return false;
-    }),
+  // profileimg: Yup.mixed()
+  //   .required("File is empty")
+  //   .test("required", "A file is required", function (value) {
+  //     const { isEdit } = this.options.context;
+  //     if (!isEdit && !value) {
+  //       return false;
+  //     }
+  //     return true;
+  //   })
+  //   .test("file_size", "File size is too large", function (value) {
+  //     if (value && value.size > 2000000) {
+  //       // 2MB
+  //       return false;
+  //     }
+  //     return true;
+  //   })
+  //   .test("file_type", "Unsupported File Format", function (value) {
+  //     if (typeof value === "string") {
+  //       // If value is a string (file path), skip file type validation
+  //       return true;
+  //     }
+  //     if (
+  //       value &&
+  //       ["image/jpeg", "image/png", "image/jpg"].includes(value.type)
+  //     ) {
+  //       return true;
+  //     }
+  //     return false;
+  //   }),
 });
 export default function AddSuperAdmin({
   setCurrentpage,
@@ -99,11 +101,16 @@ export default function AddSuperAdmin({
   addressback,
   operator_id,
   setOperator_Id,
+  fileList,
+  profileImage,
+  setProfileImage,
+  updatedata,
+  setEnableUpload
 }) {
   const dispatch = useDispatch();
 
   const handleSubmit = async (values) => {
-    console.log(enable, "hiiiiiiiiii");
+    console.log(values, "hiiiiiiiiii");
     if (operatorID && enable == false) {
       setCurrentpage(2);
     } else {
@@ -112,7 +119,8 @@ export default function AddSuperAdmin({
           values,
           operatorID,
           enable,
-          dispatch
+          dispatch,
+          fileList
         );
         toast.success(data?.message);
         setCurrentpage(2);
@@ -122,6 +130,7 @@ export default function AddSuperAdmin({
       } catch (error) {
         console.error("Error uploading data", error);
       }
+  
     }
     setsuperadmincompanydata({
       company_name: values.companyname,
@@ -165,16 +174,16 @@ export default function AddSuperAdmin({
     pancard_number: "",
     profileimg: ""
   });
-  console.log(superadmincompanydata, 'super_admin_company_data')
 
 
   const { Dragger } = Upload;
-  const [profileImage, setProfileImage] = useState("");
+  // const [profileImage, setProfileImage] = useState("");
+  console.log(profileImage, 'super_admin_company_data')
+
   const [previewUrl, setPreviewUrl] = useState("");
   const [draggerImage, setDraggerImage] = useState(false)
 
 
-  // console.log(superadmincompanydata?.profileimg, 'super_admin_company_data')
   const [enable, setEnable] = useState(false);
   const fetchGetUser = async () => {
     try {
@@ -201,6 +210,15 @@ export default function AddSuperAdmin({
     enable,
     addressback,
   ]);
+
+
+  const handleImageCrop = (croppedImage) => {
+    setsuperadmincompanydata(prevState => ({
+      ...prevState,
+      profileimg: croppedImage
+    }));
+  };
+
   return (
     <div>
       <div className="border-l-[0.1vw] px-[2vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f]">
@@ -217,7 +235,10 @@ export default function AddSuperAdmin({
                 ? "bg-[#1f4b7f] text-white"
                 : "text-[#1f4b7f] bg-white border-[#1f4b7f]"
                 } rounded-full font-semibold w-[10vw] h-[2vw] flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] text-[1.1vw] `}
-              onClick={() => setEnable(!enable)}
+              onClick={() =>{ 
+                setEnable(!enable)
+                setEnableUpload(false)
+              }}
             >
               Enable to Edit
             </button>
@@ -243,11 +264,16 @@ export default function AddSuperAdmin({
               // aadardoc: "",
               user_status: superadmincompanydata?.user_status || "",
               req_status: superadmincompanydata?.req_status || "",
-              profileimg: superadmincompanydata?.profileimg || "",
+              // profileimg: superadmincompanydata?.profileimg || "",
             }}
             validationSchema={validationSchema}
             onSubmit={(values) => {
-              handleSubmit(values);
+              console.log([superadmincompanydata]?.length,"lelelelelel");
+              
+              if(profileImage === true || updatedata ){
+                handleSubmit(values);
+              }
+        
 
             }}
             enableReinitialize
@@ -447,7 +473,7 @@ export default function AddSuperAdmin({
                       />
                     </div>
                   </div> */}
-                  <div className="grid grid-cols-2 w-full gap-x-[2vw]">
+                  <div className="grid grid-cols-2 w-full gap-x-[2vw] relative mb-[.7vw]">
                     <div className="col-span-1">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         Aadhar Card Number
@@ -528,90 +554,16 @@ export default function AddSuperAdmin({
 
 
 
-                  </div>
-
-                  <div className="col-span-1 flex flex-col">
-                    <label className="text-[#1F4B7F] text-[1.1vw] font-semibold">
-                      Company Logo
-                    </label>
-                    <Field name="profileimg">
-                      {({ field, form }) => (
-                        <>
-                          <Dragger
-                            onChange={() => setDraggerImage(true)}
-                            height={"7.2vw"}
-                            beforeUpload={(file) => {
-                              console.log(file, "filefilefilefile");
-                              setFieldValue("profileimg", file);
-                              setProfileImage(file.name);
-                              setsuperadmincompanydata({
-                                ...superadmincompanydata,
-                                offer_name: file,
-                              });
-                              setFieldValue("fileType", file.type);
-                              setFieldValue("fileSize", file.size);
-                              const reader = new FileReader();
-
-                              reader.onloadend = () => {
-                                setPreviewUrl(reader.result); // Set the preview URL
-                              };
-
-                              reader.readAsDataURL(file);
-                              return false; // Prevent automatic upload
-                            }}
-                            showUploadList={false} // Disable the default upload list
-                            className="custom-dragger mt-[0.5vw] relative"
-                            style={{
-                              backgroundSize: "cover",
-                              backgroundPosition: "center",
-                              position: "relative",
-                            }}
-                            disabled={
-                              operatorID || addressback
-                                ? enable
-                                  ? false
-                                  : true
-                                : false
-                            }
-                          >
-                            <label className="flex items-center justify-center z-10 absolute top-[0.5vw]">
-                              <p className="text-[#1F4B7F] font-bold text-[1.1vw] pr-[1vw]"> {/* Added leading */}
-                                Drag and Drop
-                              </p>
-                              <FaUpload color="#1F4B7F" size={"1.2vw"} />
-                            </label>
-                            <div
-                              className="absolute top-0 left-0 w-full h-full"
-                              style={{
-                                backgroundImage: `url(${(superadmincompanydata?.profileimg
-                                  && draggerImage == false
-                                )
-                                  ? `http://192.168.90.47:4000${superadmincompanydata?.profileimg}`
-                                  : ""
-                                  // `http://192.168.90.47:4000${superadmincompanydata.profileimg}`
-                                  })`,
-                                backgroundSize: "cover",
-                                backgroundPosition: "center",
-                                opacity: "30%",
-                                zIndex: 0,
-                              }}
-                            ></div>
-                          </Dragger>
-                        </>
-                      )}
-                    </Field>
-                    {profileImage && (
-                      <p className="text-[#1F4B7F] text-[0.8vw] mt-2">
-                        {profileImage}
-                      </p>
-                    )}
-                    {errors.file && touched.file && (
-                      <div className="text-red-500 text-[0.8vw]">
-                        {errors.file}
-                      </div>
-                    )}
+                    {
+                    updatedata ?  " " : (
+                    profileImage === false && <div className="text-red-700 text-[.7vw] absolute  bottom-[-3vw]">
+                     * Profile Image is required
+                    </div>)}
 
                   </div>
+                 
+
+              
                   <div className="flex items-center justify-between py-[1vw]">
                     <div>
                       <h1 className="text-[#1F4B7F] text-[0.7vw] font-semibold">

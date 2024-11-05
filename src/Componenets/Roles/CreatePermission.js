@@ -35,7 +35,7 @@ export default function CreatePermission({
     []
   );
   const [roleNames, setRoleNames] = useState([]);
-  console.log(roleNames,'roles_names_')
+  console.log(roleNames, "roles_names_");
   const [role_type_id, setRoleId] = useState("");
   const [viewMode, setViewMode] = useState("Product Owner");
   //const [viewMode, setViewMode] = useState("Operator");
@@ -341,11 +341,15 @@ export default function CreatePermission({
                   className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                 >
                   <option value="">Select Role</option>
-                  {roleNames?.map((roleName) => (
-                    <option key={roleName?.role_id} value={roleName?.role_type}>
-                      {roleName?.role_type}
-                    </option>
-                  ))}
+                  {roleNames?.length > 0 &&
+                    roleNames?.map((roleName) => (
+                      <option
+                        key={roleName?.role_id}
+                        value={roleName?.role_type}
+                      >
+                        {roleName?.role_type}
+                      </option>
+                    ))}
                 </Field>
               )}
 

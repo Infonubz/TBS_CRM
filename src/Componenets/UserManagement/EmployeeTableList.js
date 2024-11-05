@@ -42,7 +42,7 @@ const EmployeeTableList = ({
 
   const get_operator_list = useSelector((state) => state.crm.operator_list);
 
-  const user = sessionStorage.getItem("USER_ID");
+  const user = localStorage.getItem("USER_ID");
 
   const [employee_id, setemployee_id] = useState(null);
 
@@ -200,7 +200,7 @@ const EmployeeTableList = ({
                 onClick={() => {
                   setModalIsOpen(true);
 
-                  if (user.startsWith("tbs-pro")) {
+                  if (user?.startsWith("tbs-pro")) {
                     SetUpdateData(row.tbs_pro_emp_id);
                     setemployee_id(row.tbs_pro_emp_id);
                     setEmployeeID(row.tbs_pro_emp_id);

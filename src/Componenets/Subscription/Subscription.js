@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Table, Pagination } from "antd";
+import { Table, Pagination, Spin, ConfigProvider } from "antd";
 import { IoEyeOutline } from "react-icons/io5";
 import { IoSearch } from "react-icons/io5";
 import { DownOutlined } from "@ant-design/icons";
@@ -7,11 +7,13 @@ import { Dropdown, Space, Typography } from "antd";
 import { IoEyeOffOutline } from "react-icons/io5";
 import Backdrop from "../../asserts/CRMbg.png";
 import "../../App.css";
-import { GetSubscriptionList, handleAdsearch } from "../../Api/Subscription/Subscription";
+import {
+  GetSubscriptionList,
+  handleAdsearch,
+} from "../../Api/Subscription/Subscription";
 import { useDispatch, useSelector } from "react-redux";
 import dayjs from "dayjs";
 import { GetOperatorDataById } from "../../Api/UserManagement/UserManagement";
-// import { faAngleDoubleLeft, faAngleDoubleRight, faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import {
   faChevronLeft,
   faChevronRight,
@@ -20,6 +22,10 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ReactPaginate from "react-js-pagination";
+import { LiaSearchSolid } from "react-icons/lia";
+import { DatePicker } from "antd";
+import { IoIosArrowDropdownCircle } from "react-icons/io";
+import { IoIosArrowDropupCircle } from "react-icons/io";
 
 export default function Subscription({ }) {
   const [expandedRowKey, setExpandedRowKey] = useState(null);
@@ -29,9 +35,12 @@ export default function Subscription({ }) {
   const [operatorData, setOperatorData] = useState();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [spinning, setSpinning] = useState(false);
 
   const getSubscriptionlist =
     useSelector((state) => state.crm.subscription_list) || [];
+
+  console.log(getSubscriptionlist, 'getsubscription')
 
   const paginatedData =
     Array.isArray(getSubscriptionlist) &&
@@ -40,6 +49,7 @@ export default function Subscription({ }) {
       currentPage * pageSize
     );
 
+  console.log(operatorData, 'operator_data')
   const [activePage, setActivePage] = useState(1);
   const itemsPerPage = 10; // Number of items to display per page
 
@@ -58,6 +68,7 @@ export default function Subscription({ }) {
   //   setCurrentPage(page);
   //   setPageSize(pageSize);
   // };
+
   const handlePageChange = (pageNumber) => {
     setActivePage(pageNumber);
   };
@@ -83,7 +94,8 @@ export default function Subscription({ }) {
     setExpandedRowKey(record.key === expandedRowKey ? null : record.key);
   };
 
-  const fetchGetPermission = async () => {
+
+  const fetchGetSubscription = async () => {
     try {
       const data = await GetOperatorDataById(
         updatedata,
@@ -103,35 +115,78 @@ export default function Subscription({ }) {
     { key: "3", label: "Item 3" },
   ];
 
+  const { RangePicker } = DatePicker;
+
+
   const columns = [
+
     {
       title: (
         <div
-          className="w-[3vw] text-[1.2vw] flex items-center justify-center"
-          style={{ color: "whitex", width: "5vw" }}
+          className="text-[1.2vw] text-center"
+          style={{ color: "white" }}
         >
-          USER ID
+          Logo
         </div>
       ),
-      dataIndex: "tbs_operator_id",
-      key: "tbs_operator_id",
+      width: "7vw",
+      render: (row, rowdta, index) => {
+        const pageNo = (activePage - 1) * itemsPerPage + index + 1;
+        return (
+          <div className="flex justify-center text-[#1F4B7F] text-[1vw] py-[0.5vw]">
+            <img
+              src={`http://192.168.90.47:4000${row?.profile_img}`}
+              alt=""
+              className="w-[2vw] h-[2vw] border-[0.1vw] border-slate-200 rounded-full"
+            />
+          </div>
+        );
+      },
     },
     {
       title: (
-        <div className="text-[1.2vw]  flex items-center justify-center" style={{ color: "whitex" }}>
-          PRODUCT KEY
+        <div
+          className="text-[1.2vw] text-center "
+          style={{ color: "white" }}
+        >
+          Operator Name
+        </div>
+      ),
+      width: "15vw",
+      render: (row, rowdta, index) => {
+        console.log(row, "row852852");
+        console.log(rowdta, "rowdta852852");
+
+
+        const pageNo = (activePage - 1) * itemsPerPage + index + 1;
+        return (
+          <div className="flex items-center justify-center text-[#1F4B7F] font-bold  text-[1vw]">
+            <h1 className="">{row.company_name}</h1>
+          </div>
+        );
+      },
+    },
+
+    {
+      title: (
+        <div
+          className="text-[1.2vw]  text-center"
+          style={{ color: "white" }}
+        >
+          Product Key
         </div>
       ),
       dataIndex: "generate_key",
       key: "generate_key",
+      width: '16vw',
       render: (text, row) => (
-        <div className="flex w-full">
-          <div className="w-[14vw]">
+        <div className="flex items-center justify-center w-full mr-[0.5vw] text-[#1F4B7F] font-bold text-[1vw]">
+          <div className="w-[10vw]">
             <span className=" w-full text-[1vw]">
               {!showHalfMap[row.tbs_operator_id] ? maskProductKey(text) : text}
             </span>
           </div>
-          <div className="cursor-pointer" onClick={(e) => e.stopPropagation()}>
+          <div className="cursor-pointer flex justify-center items-center" onClick={(e) => e.stopPropagation()}>
             <button onClick={() => toggleShowHalf(row.tbs_operator_id)}>
               {eyeIcon[row.tbs_operator_id] ? (
                 <IoEyeOutline style={{ height: "1.3vw", width: "1.3vw" }} />
@@ -143,96 +198,155 @@ export default function Subscription({ }) {
         </div>
       ),
     },
+
     {
       title: (
-        <div className="text-[1.2vw]  flex items-center justify-center" style={{ color: "whitex" }}>
-          ACTIVATED DATE
-        </div>
-      ),
-      dataIndex: "created_date",
-    },
-    {
-      title: (
-        <div className="text-[1.2vw]  flex items-center justify-center" style={{ color: "whitex" }}>
-          PLAN NAME
+        <div
+          className="text-[1.2vw] text-center "
+          style={{ color: "white" }}
+        >
+          Plan Name
         </div>
       ),
       dataIndex: "plan_name",
+      width: '12vw',
+      render: (text) => (
+        <div className="flex items-center justify-start px-[2vw] font-bold text-[#1F4B7F] text-[1vw]">
+          {/* Replace #desiredColor with your desired color */}
+        </div>
+      ),
     },
     {
       title: (
-        <div className="text-[1.2vw]  flex items-center justify-center" style={{ color: "whitex" }}>
-          ENDED DATE
+        <div
+          className="text-[1.2vw]  text-center"
+          style={{ color: "white" }}
+        >
+          Plan Type
         </div>
       ),
-      dataIndex: "end_date",
+      dataIndex: "created_date",
+      width: "12vw",
+      render: (text) => (
+        <div className="flex items-center justify-start text-[#1F4B7F] font-bold px-[2vw] text-[1vw]">
+        </div>
+      ),
     },
     {
       title: (
-        <div className="text-[1.2vw]  flex items-center justify-center" style={{ color: "whitex" }}>
-          PLAN TYPE
+        <div
+          className="text-[1.2vw] text-center "
+          style={{ color: "white" }}
+        >
+          Activated Date
         </div>
       ),
-      dataIndex: "plan_type",
+      dataIndex: "created_date",
+      width: "12vw",
+      render: (text) => (
+        <div className="flex justify-center items-center text-[#1F4B7F] px-[2vw]  font-bold text-[1vw]">
+          <span className="text-[1vw] text-[#1F487C]">{text}</span>{" "}
+        </div>
+      ),
     },
+    {
+      title: (
+        <div
+          className="text-[1.2vw] text-center"
+          style={{ color: "white" }}
+        >
+          Expiry Date
+        </div>
+      ),
+      dataIndex: "expiriy_date",
+      width: "12vw",
+      render: (text, row) => (
+        <div className="flex justify-between items-center text-[#1F4B7F] px-[2vw] font-bold text-[1vw]">
+          <span className="text-[1vw] flex items-center justify-center text-[#1F487C]">{text}</span>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleRowClick(row);
+            }}
+            className=""
+          >
+            {row.key === expandedRowKey ? (
+              <IoIosArrowDropupCircle style={{ height: "1.3vw", width: "1.3vw" }} />
+            ) : (
+              <IoIosArrowDropdownCircle style={{ height: "1.3vw", width: "1.3vw" }} />
+            )}
+          </button>
+        </div>
+      ),
+    },
+
   ];
 
-  const data = paginatedData?.map((item) => ({
-    key: item.tbs_operator_id,
-    tbs_operator_id: item.tbs_operator_id,
-    generate_key: item.generate_key,
-    created_date: dayjs(item?.created_date).format("DD MMM YY"),
-    plan_name: item.plan_name,
-    end_date: dayjs(item?.end_date).format("DD MMM YY"),
-    plan_type: item.plan_type,
-    hidden_details: (
-      <div>
-        <div className="grid grid-cols-3">
-          <div className="flex items-center">
-            <div className="grid grid-cols-2 gap-x-[2vw]">
-              <img
-                src={`http://192.168.90.47:4000${item?.profileimg}`}
-                alt=""
-                className="w-[6vw] h-[6vw] border-[0.1vw] border-slate-200 rounded-full"
-              />
-              <div className="grid grid-rows-2">
-                <span className="font-bold text-[1.5vw]">Name</span>
-                <span className="font-light text-[1vw]">
-                  {item?.owner_name}
-                </span>
-              </div>
-            </div>
+  const data =
+    currentItems?.length > 0 &&
+    currentItems?.map((item) => ({
+      key: item.tbs_operator_id,
+      s_no: 1,
+      tbs_operator_id: item.tbs_operator_id,
+      generate_key: item.generate_key,
+      created_date: dayjs(item?.created_date).format("DD MMM, YYYY"),
+      plan_name: item.plan_name,
+      expiriy_date: dayjs(item?.expiriy_date).format("DD MMM, YYYY"),
+      plan_type: item.plan_type,
+      company_name: item.company_name,
+      profile_img: item.profileimg,
+      gst_number: item.gstin,
+      hidden_details: (
+
+        <div className="grid grid-cols-5 items-center py-[1vw]">
+          <div className="col-span-1 flex flex-col gap-[1vw] justify-center items-center border-r-[0.1vw] border-[#1F487C] w-full h-full">
+            <img
+              src={`http://192.168.90.47:4000${item?.profileimg}`}
+              alt=""
+              className="w-[6vw] h-[6vw] border-[0.1vw] border-slate-200 rounded-full"
+            />
+            <span className="font-bold text-[#1F487C] text-[1.5vw]">
+              {item?.owner_name}
+            </span>
           </div>
-          <div>
-            <div className="grid grid-rows-4 gap-y-[1vw]">
-              <p className="text-slate-400 font-semibold text-[0.9vw]">
+          <div className=" col-span-2 px-[5vw]  border-r-[0.1vw] border-[#1F487C] w-full h-full">
+            <div className=" grid grid-rows-5 gap-y-[0.4vw]">
+              <p className="text-[#1F487C] font-semibold text-[1.2vw] text-center">
                 CLIENT INFORMATION
               </p>
-              <div className="grid grid-cols-2 gap-x-[2vw] text-[0.85vw]">
-                <span>Contact Number</span>
-                <span className="font-semibold">{item?.phone}</span>
+              <div className="flex gap-x-[2vw] text-[1vw] text-[#1F487C] justify-between">
+                <span className="font-semibold order-first">GST Number</span>
+                <span className="order-last">
+                  {item?.gstin}
+                  {/* <p className="">29GGGGG1314R9Z6</p> */}
+                </span>
               </div>
-              <div className="grid grid-cols-2 gap-x-[2vw] text-[0.85vw]">
-                <span>Type of Business</span>
-                <span className="font-semibold">
+              <div className="flex justify-between gap-x-[2vw] text-[1vw] text-[#1F487C]">
+                <span className="font-semibold order-first">Type of Business</span>
+                <span className="order-last">
                   {item?.type_of_constitution}
                 </span>
               </div>
-              <div className="grid grid-cols-2 gap-x-[2vw] text-[0.85vw]">
-                <span>Current Subscription</span>
-                {/* <span className="font-semibold">Half-Yearly Plan</span> */}
+              <div className=" flex justify-between gap-x-[2vw] text-[1vw] text-[#1F487C] ">
+                <span className="font-semibold order-first">Contact Number</span>
+                <span className="order-last">{item?.phone}</span>
               </div>
-              <div className="grid grid-cols-2 gap-x-[2vw] text-[0.85vw]">
-                <span>Member Since</span>
-                <span className="font-semibold">{`${dayjs(
+              <div className="flex justify-between gap-x-[2vw] text-[1vw] text-[#1F487C]">
+                <span className="font-semibold order-first">Current Subscription</span>
+                {/* <span className="font-semibold">Half-Yearly Plan</span> */}
+                <span className="order-last">{item?.phone}</span>
+              </div>
+              <div className="flex justify-between gap-x-[2vw] text-[1vw] text-[#1F487C]">
+                <span className="order-first font-semibold">Member Since</span>
+                <span className="order-last">{`${dayjs(
                   item?.created_date
-                ).format("DD MMM YY")}`}</span>
+                ).format("DD MMM, YYYY")}`}</span>
               </div>
             </div>
           </div>
-          <div className="grid grid-rows-2 gap-y-[5vw]">
-            <div className="grid grid-rows-2">
-              <span className="text-slate-400 font-semibold text-[0.9vw]">
+          <div className=" col-span-2 grid grid-rows-2 gap-y-[1vw]">
+            <div className="flex flex-col text-center">
+              <span className="text-[#1F487C] font-semibold text-[1.2vw]">
                 PRODUCT KEY
               </span>
               <span className="text-green-600 font-bold text-[1.2vw]">
@@ -240,47 +354,47 @@ export default function Subscription({ }) {
               </span>
             </div>
 
-            <div className="grid grid-cols-3 gap-x-[1.5vw]">
-              <div className="grid grid-rows-2">
-                <span className="text-green-600 font-bold text-[1.2vw]">
-                  {item?.tbs_operator_id}
-                </span>
-                <span className="text-slate-400 font-semibold text-[0.9vw]">
-                  User ID
-                </span>
-              </div>
-              <div className="grid grid-rows-2">
-                <span className="text-green-600 font-bold text-[1.2vw]">
-                  {/* 6, April, 2023 */}
-                </span>
-                <span className="text-slate-400 font-semibold text-[0.9vw]">
-                  Activated Date
-                </span>
-              </div>
-              <div className="grid grid-rows-2">
-                <span className="text-green-600 font-bold text-[1.2vw]">
-                  {/* 221 */}
-                </span>
-                <span className="text-slate-400 font-semibold text-[0.9vw]">
-                  Days Left
-                </span>
+            <div className=" px-[3vw]">
+              <div className="bg-[#1F487C] rounded-lg">
+                <div className="grid grid-cols-3 border-b-[0.1vw] border-white py-[0.75vw] ">
+                  <span className="text-white font-normal text-[1vw] w-full border-r-[0.1vw] text-center border-white">
+                    User ID
+                  </span>
+                  <span className="text-white font-normal text-[1vw] w-full border-r-[0.1vw] text-center border-white">
+                    Activated Date
+                  </span>
+                  <span className="text-white font-normal text-[1vw] w-full text-center">
+                    Days Left
+                  </span>
+                </div>
+                <div className="grid grid-cols-3 gap-x-[1.5vw] justify-items-center py-[0.25vw]">
+                  <span className="text-white font-normal text-[1vw]">
+                    {item?.tbs_operator_id}
+                  </span>
+                  <span className="text-white font-normal text-[1vw]">
+                    {`${dayjs(item?.created_date).format("DD MMM, YYYY")}`}
+                  </span>
+                  <span className="text-white font-normal text-[1vw]">
+                    221
+                  </span>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    ),
-  }));
 
+      ),
+    }));
   const dispatch = useDispatch();
 
   useEffect(() => {
-    GetSubscriptionList(dispatch);
+    setSpinning(true);
+    GetSubscriptionList(dispatch, setSpinning);
   }, []);
 
   useEffect(() => {
     if (updatedata != null) {
-      fetchGetPermission();
+      fetchGetSubscription();
     }
   }, [updatedata]);
 
@@ -293,7 +407,7 @@ export default function Subscription({ }) {
         backgroundPosition: "center",
       }}
     >
-      <div className="px-[5vw]  w-full ">
+      <div className="px-[5vw] w-full h-[90vw]">
         <div className="flex justify-between items-center ">
           <h1 className="text-[#1F4B7F] pt-[0.5vw] text-[1.5vw] font-bold">
             SUBSCRIPTION
@@ -302,14 +416,14 @@ export default function Subscription({ }) {
         </div>
         <div className="flex justify-between">
           <div className="relative flex items-center pb-[0.5vw]">
-            <IoSearch
-              className="absolute left-[22.5vw]"
+            <LiaSearchSolid
+              className="absolute left-[0.75vw]"
               size={"1vw"}
               color="#1F4B7F"
             />
             <input
               type="text"
-              className="bg-white outline-none pl-[2vw] w-[25vw] h-[2.5vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw] border-r-[0.2vw] border-b-[0.2vw]"
+              className="bg-white outline-none pl-[2.5vw] placeholder-[#1F487C] placeholder:opacity-75 w-[15vw] h-[2.5vw] text-[0.9vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.75vw] border-r-[0.2vw] border-b-[0.2vw]"
               placeholder="Search By Plan"
               onChange={(e) => {
                 Search(e);
@@ -317,88 +431,113 @@ export default function Subscription({ }) {
             />
           </div>
           <div className="order-last">
-            <Dropdown
-              menu={{
-                items,
-                selectable: true,
-                defaultSelectedKeys: ["3"],
-              }}
-            >
-              <Typography.Link>
-                <Space className="text-[#8B909A]">
-                  Filter By Range
-                  <DownOutlined />
-                </Space>
-              </Typography.Link>
-            </Dropdown>
+
+            <div className="reqman">
+              <ConfigProvider
+                theme={{
+                  token: {
+                    fontSize: 14,
+                    lineHeight: 0,
+                  },
+                  components: {
+                    DatePicker: {
+                      colorText: '#1F487C',
+                    },
+                  },
+                }}
+              >
+                <RangePicker
+                  allowClear={true}
+                  autoFocus={false}
+                  className="custom-range-picker bg-white outline-none pl-[1.5vw] w-[17vw] h-[2.5vw] text-[0.9vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.75vw] border-r-[0.2vw] border-b-[0.2vw]"
+                  disabledDate={(current) => current < dayjs().startOf('day')}
+                />
+              </ConfigProvider>
+            </div>
+
           </div>
         </div>
-
-        <Table
-          className="custom-table"
-          columns={columns}
-          dataSource={data}
-          pagination={false}
-          expandedRowRender={(record) => (
-            <p style={{ margin: 0 }}>{record?.hidden_details}</p>
+        <div className="h-[72.3vh]">
+          {spinning ? (
+            <div className="absolute inset-0 flex justify-center items-center  z-10">
+              <Spin size="large" />
+            </div>
+          ) : (
+            <Table
+              className="custom-table"
+              columns={columns}
+              dataSource={data}
+              pagination={false}
+              scroll={{ y: "65vh", x: "175vh" }}
+              expandedRowRender={(record) => (
+                <p style={{ margin: 0 }}>{record?.hidden_details}</p>
+              )}
+              expandRowByClick={true}
+              onRow={(record) => ({
+                onClick: () => handleRowClick(record),
+              })}
+              rowClassName={(row) =>
+                row?.key === expandedRowKey ? "expanded-row" : ""
+              }
+              expandIcon={() => null}
+              expandIconColumnIndex={-1}
+              expandedRowKeys={expandedRowKey ? [expandedRowKey] : []}
+            />
           )}
-          expandRowByClick={true}
-          onRow={(record) => ({
-            onClick: () => handleRowClick(record),
-          })}
-          rowClassName={(row) =>
-            row?.key === expandedRowKey ? "expanded-row" : ""
-          }
-        />
+        </div>
+        {getSubscriptionlist?.length > 10 && (
+          <div className=" mt-[1vw] justify-between flex items-center ">
+            <div className="text-[#1f4b7f] flex text-[1.1vw] gap-[0.5vw] ">
+              <span>Showing</span>
+              <span className="font-bold">
+                {currentItems && currentItems?.length > 0 ? (
+                  <div>
+                    {indexOfFirstItem + 1} -{" "}
+                    {indexOfFirstItem + currentItems?.length}
+                  </div>
+                ) : (
+                  "0"
+                )}
+              </span>
+              <span>from</span>
+              <span className="font-bold">
+                {" "}
+                {getSubscriptionlist?.length > 0
+                  ? getSubscriptionlist?.length
+                  : 0}
+              </span>
+              <span>data</span>
+            </div>
+            <div>
+
+              <ReactPaginate
+                activePage={activePage}
+                itemsCountPerPage={itemsPerPage}
+                totalItemsCount={getSubscriptionlist?.length}
+                pageRangeDisplayed={5}
+                onChange={handlePageChange}
+                itemClass="page-item"
+                linkClass="page-link"
+                activeClass="active"
+                prevPageText={
+                  <FontAwesomeIcon icon={faChevronLeft} size="1vw" />
+                }
+                nextPageText={
+                  <FontAwesomeIcon icon={faChevronRight} size="1vw" />
+                }
+                firstPageText={
+                  <FontAwesomeIcon icon={faAngleDoubleLeft} size="1vw" />
+                }
+                lastPageText={
+                  <FontAwesomeIcon icon={faAngleDoubleRight} size="1vw" />
+                }
+              />
+            </div>
+          </div>
+        )}
       </div>
 
-      <div className="px-[2.5vw] absolute bottom-[7vw] w-[95%] justify-between flex right-[2vw] items-center ">
-        <div className="text-[#1f4b7f] flex text-[1.1vw] gap-[0.5vw] ">
-          <span>Showing</span>
-          <span className="font-bold">{currentItems && currentItems?.length > 0
-            ? <div>{indexOfFirstItem + 1} - {indexOfFirstItem + currentItems?.length}</div> : "0"}</span>
-          <span>from</span>
-          <span className="font-bold"> {getSubscriptionlist?.length > 0 ? getSubscriptionlist?.length : 0}</span>
-          <span>data</span>
-        </div>
-        <div>
-          {/* <Pagination
-            current={currentPage}
-            pageSize={pageSize}
-            total={getSubscriptionlist?.length}
-            onChange={handlePageChange}
-            onShowSizeChange={handlePageChange}
-          /> */}
-          <ReactPaginate
-            activePage={activePage}
-            itemsCountPerPage={itemsPerPage}
-            totalItemsCount={getSubscriptionlist?.length}
-            pageRangeDisplayed={5}
-            onChange={handlePageChange}
-            itemClass="page-item"
-            linkClass="page-link"
-            activeClass="active"
-            prevPageText={
-              <FontAwesomeIcon icon={faChevronLeft} size="1vw" />
-            }
-            nextPageText={
-              <FontAwesomeIcon icon={faChevronRight} size="1vw" />
-            }
-            firstPageText={
-              <FontAwesomeIcon
-                icon={faAngleDoubleLeft}
-                size="1vw"
-              />
-            }
-            lastPageText={
-              <FontAwesomeIcon
-                icon={faAngleDoubleRight}
-                size="1vw"
-              />
-            }
-          />
-        </div>
-      </div>
+      <div></div>
     </div>
   );
 }

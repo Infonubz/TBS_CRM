@@ -167,9 +167,12 @@ export const OperatorLogin = async (values, validationResult) => {
       console.log(response?.data?.error, "=== response");
       throw new Error("Invalid response from server");
     } else {
+      console.log(response.data.token,"asdfghjkl");
+      
       sessionStorage.setItem("SPA_ID", response.data.id);
       sessionStorage.setItem("USER_ID", response.data.id);
       sessionStorage.setItem("token", response.data.token);
+      localStorage.setItem("token", response.data.token);
       sessionStorage.setItem("user_name", response.data.user_name);
       sessionStorage.setItem("type_id", response.data.type_id);
       sessionStorage.setItem("type_name", response.data.type_name);

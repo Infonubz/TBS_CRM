@@ -61,8 +61,8 @@ const validationSchema = Yup.object().shape({
       return false;
     }),
   start_date: Yup.date()
-    .required('Start Date is required')
-    .min(new Date(), 'Start Date cannot be in the past'),
+    .required('Start Date is required'),
+    // .min(new Date(), 'Start Date cannot be in the past'),
   expiry_date: Yup.date()
     .required('Expiry Date is required')
     .min(Yup.ref('start_date'), 'Expiry Date must be after Start Date'),
@@ -105,6 +105,7 @@ export default function AddPromotion({
   const closemodal = () => {
     setBgImage(false);
     setCurrentPromo("");
+    setPromotionId(null)
   };
 
   useEffect(() => {
@@ -212,7 +213,7 @@ export default function AddPromotion({
         { label: "Draft", value: "Draft" },
         { label: "Active", value: "Active" },
       ];
-    } else if (typeid == "EMP101") {
+    } else if (type_Id == "EMP101") {
       return [
         { label: "Select Status", value: "" },
         { label: "Draft", value: "Draft" },

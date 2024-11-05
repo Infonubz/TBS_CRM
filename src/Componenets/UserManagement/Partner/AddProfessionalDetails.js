@@ -6,6 +6,7 @@ import * as Yup from "yup";
 import { GetEmpProffesionalById, submitEmployeeProffesionalData } from "../../../Api/UserManagement/Employee";
 import { toast } from "react-toastify";
 import { GetPatProffesionalById, submitPartnerProffesionalData } from "../../../Api/UserManagement/Partner";
+import { useDispatch } from "react-redux";
 
 const validationSchema = Yup.object().shape({
   emailid: Yup.string()
@@ -49,12 +50,14 @@ export default function AddProfessionalDetails({
     }
   };
   const [empproffesionaldata, setEmpProffesionalData] = useState("");
+  const dispatch = useDispatch()
   const fetchGetUser = async () => {
     try {
       const data = await GetPatProffesionalById(
         EmployeeID,
         setEmployeeID,
-        setEmpProffesionalData
+        setEmpProffesionalData,
+        dispatch
       );
       setEmpProffesionalData(data);
     } catch (error) {

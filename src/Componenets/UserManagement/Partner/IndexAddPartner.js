@@ -17,6 +17,8 @@ import {
   GetPartnerData
 } from "../../../Api/UserManagement/Partner";
 import { RiUser3Fill } from "react-icons/ri";
+import ImgCrop from "antd-img-crop";
+import AddressIndex from "./AddressIndex";
 
 // import AddRegisterAddress from "./AddRegisterAddress";
 // import AddBusinessDetails from "./AddBusinessDetails";
@@ -35,6 +37,7 @@ export default function AddParner({
   PartnerID,
   setPartnerID,
   setModalIsOpen,
+  updatedata
 }) {
   const [currentpage, setCurrentpage] = useState(1);
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -45,6 +48,8 @@ export default function AddParner({
   const [proffesionaback, setProffesionalBack] = useState(false);
   const [documentback, setDocumentBack] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [enableUpload, setEnableUpload] = useState(false);
+  const [profileImage, setProfileImage] = useState(false);
   console.log(selectedFile, 'selected_file')
   const dispatch = useDispatch();
 
@@ -52,7 +57,7 @@ export default function AddParner({
     try {
       const data = await GetPartnerProfile(PartnerID);
       console.log(data, "data")
-      setSelectedFile(data?.profile_img);
+      setSelectedFile(data.profile_img);
     } catch (error) {
       console.error("Error fetching additional user data", error);
     }
@@ -70,7 +75,14 @@ export default function AddParner({
   };
 
   const handleChange = ({ fileList: newFileList }) => {
+    console.log(newFileList, "newFileList");
     setFileList(newFileList);
+    if (newFileList?.length > 0) {
+      setProfileImage(true);
+    } else {
+      setProfileImage(false);
+    }
+    // SubmitProfileData(newFileList[0], dispatch);
   };
 
   const handleCancel = () => setPreviewOpen(false);
@@ -109,6 +121,14 @@ export default function AddParner({
   };
 
   const [partnerData, setPartnerData] = useState('')
+
+  useEffect(() => {
+    if (updatedata) {
+      setEnableUpload(true);
+    } else {
+      setEnableUpload(false);
+    }
+  }, []);
 
  
   return (
@@ -180,7 +200,7 @@ export default function AddParner({
                     </span>
                   )}
                 </label> */}
-                {PartnerProfileImg === 'null' || PartnerProfileImg === null || PartnerProfileImg === undefined || PartnerProfileImg === 'undefined' ? (
+                {/* {PartnerProfileImg === 'null' || PartnerProfileImg === null || PartnerProfileImg === undefined || PartnerProfileImg === 'undefined' ? (
                   < div >
                     <RiUser3Fill size='1vw'
                       color="#1F487C"
@@ -193,7 +213,36 @@ export default function AddParner({
                     src={`http://192.168.90.47:4000${PartnerProfileImg}`}
                     alt="Photo"
                     className="h-[7vw] w-[7vw] cursor-pointer flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.3vw] border-[#1f4b7f] rounded-[0.5vw]" />
-                )}
+                )} */}
+
+<div className="relative">
+                  <ImgCrop
+                    showGrid
+                    rotationSlider
+                    showReset
+                    onImageCrop={(file) => {}}
+                  >
+                    <Upload
+                      action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                      listType="picture-card"
+                      fileList={fileList}
+                      onChange={handleChange}
+                      onPreview={handlePreview}
+                      disabled={enableUpload}
+                    >
+                      {fileList?.length < 1 && "+ Upload"}
+                    </Upload>
+                  </ImgCrop>
+
+                  {fileList.length === 0 &&
+                    selectedFile && ( // Check if there are no files in the fileList and selectedFile is set
+                      <img
+                        src={`http://192.168.90.47:4000${selectedFile}`}
+                        alt="Photo"
+                        className="w-[5vw] h-[5vw] object-cover rounded-[0.2vw] top-[.7vw] left-[.7vw] absolute opacity-25 z-[1] pointer-events-none"
+                      />
+                    )}
+                </div>
 
                 <Modal
                   visible={previewOpen}
@@ -253,16 +302,29 @@ export default function AddParner({
                   setModalIsOpen={setModalIsOpen}
                   setProffesionalBack={setProffesionalBack}
                   proffesionaback={proffesionaback}
+                  fileList={fileList}
+                  profileImage={profileImage}
+                  setProfileImage={setProfileImage}
+                  updatedata={updatedata}
+                  setEnableUpload={setEnableUpload}
                 />
               ) : currentpage == 2 ? (
-                <AddRegisterAddress
-                  setCurrentpage={setCurrentpage}
-                  PartnerID={PartnerID}
-                  setPartnerID={setPartnerID}
-                  setAddressBack={setAddressBack}
-                  addressback={addressback}
-                  setModalIsOpen={setModalIsOpen}
-                />
+                // <AddRegisterAddress
+                //   setCurrentpage={setCurrentpage}
+                //   PartnerID={PartnerID}
+                //   setPartnerID={setPartnerID}
+                //   setAddressBack={setAddressBack}
+                //   addressback={addressback}
+                //   setModalIsOpen={setModalIsOpen}
+                // />
+                <AddressIndex 
+                setAddressBack={setAddressBack}
+                setCurrentpage={setCurrentpage}
+                 addressback={addressback}
+                 PartnerID={PartnerID}
+                 proffesionaback={proffesionaback}
+                 setPartnerID={setPartnerID}
+                 />
               ) : (
                 // : currentpage == 3 ? (
                 //   <AddProfessionalDetails
@@ -277,11 +339,15 @@ export default function AddParner({
                 // )
                 <AddDocuments
                   setCurrentpage={setCurrentpage}
+                  currentpage={currentpage}
+                  addressback={addressback}
                   PartnerID={PartnerID}
                   setPartnerID={setPartnerID}
                   setDocumentBack={setDocumentBack}
                   documentback={documentback}
                   setModalIsOpen={setModalIsOpen}
+                  updatedata={updatedata}
+                  
                 />
               )}
             </div>

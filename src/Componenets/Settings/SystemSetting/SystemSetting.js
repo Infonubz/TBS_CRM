@@ -17,14 +17,27 @@ import CompanySettings from "./CompanySettings";
 export default function SystemSettingList() {
   const [companyData, setCompanyData] = useState();
   const [userid, setUserid] = useState();
+
+  const [active, setActive] = useState("0");
+
+  const handleCollapseChange = (key) => {
+    if (active !== key) {
+      setActive(key);
+    }
+  };
+  console.log(active, 'active_KEY');
+
   return (
     <div className="scroll-container ">
       {/* {sessionStorage.getItem("type_id") == "SPA101" ? ( */}
       {localStorage.getItem("type_id") == "SPA101" ? (
         <>
+
           <Collapse
             className="bg-[#1F487C] rounded-2xl border border-[#1F487C]  shadow-xl"
             size="large"
+            activeKey={active}
+            onChange={() => handleCollapseChange("1")} 
             expandIcon={({ isActive }) =>
               isActive ? (
                 <IoIosArrowUp

@@ -12,7 +12,7 @@ import { GetPartnerData } from "../UserManagement/Partner";
 import { GetAdsData } from "../Ads/Ads";
 import { GetPromotionData } from "../Promotion/Promotion";
 const apiUrl = process.env.REACT_APP_API_URL;
-
+const typeid = localStorage.getItem("token");
 const api = axios.create({
   headers: {
     "Content-Type": "application/json",
@@ -20,7 +20,9 @@ const api = axios.create({
 });
 export const GetRolesData = async (dispatch) => {
   try {
-    const response = await axios.get(`${apiUrl}/role`);
+    const response = await axios.get(
+      `${apiUrl}/role/${typeid === "OP101" ? 1 : 3}`
+    );
     dispatch({ type: GET_ROLES, payload: response.data });
     return response.data;
   } catch (error) {

@@ -103,6 +103,7 @@ export default function AddGST({
     console.log("modalIsOpen1 state changed:", modalIsOpen1);
     console.log(updateId, "clientID111");
   }, [modalIsOpen1]);
+console.log(operatorID,"operatorIDoperatorID");
 
   const fetchGetUser = async () => {
     try {

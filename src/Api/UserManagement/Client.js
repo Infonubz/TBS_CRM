@@ -64,7 +64,10 @@ export const submitClientComapanyData = async (
   companyvalues,
   enable,
   clientID,
-  dispatch
+  dispatch,
+  fileList,
+  setCurrentId,
+  currentId
 ) => {
   // const payload = {
   //   company_name: companyvalues.company_name,
@@ -87,7 +90,9 @@ export const submitClientComapanyData = async (
   formData.append("type_of_constitution", companyvalues.constitution);
   formData.append("business_background", companyvalues.business);
   formData.append("web_url", companyvalues.web_url);
-  formData.append("company_logo", companyvalues.company_logo);
+  if (fileList[0]?.originFileObj) {
+    formData.append("company_logo", fileList[0].originFileObj);
+}
 
 
   // Now `formData` is ready to be used
@@ -114,6 +119,7 @@ export const submitClientComapanyData = async (
       },
     });
     sessionStorage.setItem("CLI_ID", response?.data?.id);
+    setCurrentId(response?.data?.id)
     GetClientData(dispatch);
     GetClientProfile(sessionStorage.getItem("CLI_ID") === null || sessionStorage.getItem("CLI_ID") === 'null' || sessionStorage.getItem("CLI_ID") === undefined || sessionStorage.getItem("CLI_ID") === 'undefined' ? clientID : sessionStorage.getItem("CLI_ID"), dispatch)
     console.log(response, "responseresponse");
@@ -172,6 +178,8 @@ export const SubmitClientAddressData = async (
 
 export const SubmitClientGSTData = async (documentsdata, clientID, setSuperAdminGSTData, dispatch) => {
   console.log(documentsdata, "documentsdata");
+  const getid =  sessionStorage.getItem("CLIENT_ID")?sessionStorage.getItem("CLIENT_ID") : sessionStorage.getItem("CLI_ID");
+
   const formData = new FormData();
   formData.append(
     "aggregate_turnover_exceeded",
@@ -189,7 +197,7 @@ export const SubmitClientGSTData = async (documentsdata, clientID, setSuperAdmin
   //   : `${apiUrl}/client-gst`;
   // const method = clientID ? "put" : "post";
 
-  const url = `${apiUrl}/client-gst/${clientID}`;
+  const url = `${apiUrl}/client-gst/${getid}`;
   const method = "put";
 
   try {
@@ -203,10 +211,11 @@ export const SubmitClientGSTData = async (documentsdata, clientID, setSuperAdmin
     });
     //GetClientData(dispatch);
     setSuperAdminGSTData("");
+    GetClientGSTById(clientID,clientID,setSuperAdminGSTData)
     //   GetSuperAdminGSTById();
     // GetOperatorData(dispatch)
     console.log(response, "responseresponse");
-    return response.data;
+    return response.data ;
   } catch (error) {
     handleError(error);
     return null;
@@ -219,14 +228,14 @@ export const GetClientGSTById = async (
   setSuperAdminGSTData
 ) => {
   console.log(clientID, "ahsgxdahsjksaxbj");
-  const getid = sessionStorage.getItem("CLI_ID");
+  const getid = sessionStorage.getItem("CLIENT_ID") ? sessionStorage.getItem("CLIENT_ID") : sessionStorage.getItem("CLI_ID");
   try {
     const response = await api.get(
-      `${apiUrl}/client-gst/${clientID}`
+      `${apiUrl}/client-gst/${getid}`
     );
     console.log(response, "responseresponse");
     // setOperatorID(null);
-    setSuperAdminGSTData(response.data);
+    setSuperAdminGSTData && setSuperAdminGSTData(response.data);
     return response?.data;
   } catch (error) {
     handleError(error);
@@ -245,7 +254,7 @@ export const GetCompanyDetailsById = async (
     const response = await api.get(`${apiUrl}/client-details/${clientID ? clientID : sessionStorage.getItem('CLI_ID')}`);
     console.log(response, "responseresponse_client");
     sessionStorage.setItem('CLIENT_ID', response.data[0]?.tbs_client_id)
-    //setClientID(null);
+    // setClientID(response.data[0]?.tbs_client_id);
     setClientData("");
     return response?.data[0];
   } catch (error) {

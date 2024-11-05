@@ -45,7 +45,9 @@ const validationSchema = Yup.object().shape({
         // If value is a string (file path), skip file type validation
         return true;
       }
-      if (value && ["image/jpeg", "image/png", "image/jpg"].includes(value.type)
+      if (
+        value &&
+        ["image/jpeg", "image/png", "image/jpg"].includes(value.type)
       ) {
         return true;
       }
@@ -63,6 +65,8 @@ export default function AddGST({
   setModalIsOpen,
   setmodalIsOpen1,
   modalIsOpen1,
+  superadmingstdata,
+  setSuperAdminGSTData,
 }) {
   const props = {
     name: "file",
@@ -94,7 +98,7 @@ export default function AddGST({
     reader?.readAsDataURL(file);
   };
 
-  const [superadmingstdata, setSuperAdminGSTData] = useState("");
+  // const [superadmingstdata, setSuperAdminGSTData] = useState("");
   const dispatch = useDispatch();
 
   const updateId = clientID ? clientID : client_id;
@@ -102,11 +106,17 @@ export default function AddGST({
   const handleSubmit = async (values) => {
     console.log("Subm65656", updateId);
     try {
-      const data = await SubmitClientGSTData(values, updateId, setSuperAdminGSTData, dispatch);
-      toast.success(data?.message);
+      const data = await SubmitClientGSTData(
+        values,
+        updateId,
+        setSuperAdminGSTData,
+        dispatch
+      );
+      toast.success(data?.message || "Gst details updated successfully");
       // setOperatorID(null);
       setmodalIsOpen1(false);
       // setModalIsOpen(false)
+      setSuperAdminGSTData(data);
       // setCurrentpage(2); // Uncomment this if you want to navigate to page 2
       console.log("Success gst");
     } catch (error) {
@@ -114,15 +124,6 @@ export default function AddGST({
       // toast.error("Failed to submit GST data");
     }
   };
-
-  // Additional logging to check state change
-  useEffect(() => {
-    console.log(updateId, "clientID111");
-
-    console.log("modalIsOpen1 state changed:", modalIsOpen1);
-  }, [modalIsOpen1]);
-
-
 
   const fetchGetUser = async () => {
     try {
@@ -137,6 +138,13 @@ export default function AddGST({
       console.error("Error fetching additional user data", error);
     }
   };
+
+  // Additional logging to check state change
+  useEffect(() => {
+    console.log(updateId, "clientID111");
+
+    console.log("modalIsOpen1 state changed:", modalIsOpen1);
+  }, [modalIsOpen1]);
 
   useEffect(() => {
     if (clientID != null) {

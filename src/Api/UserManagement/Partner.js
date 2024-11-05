@@ -1,5 +1,5 @@
 import axios from "axios";
-import { GET_PARTNER_LIST, PARTNER_BYID } from "../../Store/Type";
+import { GET_PARTNER_LIST, PARTNER_BYID, PARTNER_DATA_BYID } from "../../Store/Type";
 import { toast } from "react-toastify";
 const api = axios.create({
   headers: {
@@ -39,6 +39,7 @@ export const GetPartnerProfile = async (PartnerID, dispatch) => {
   console.log(PartnerID, "operatorID852");
 
   const endpoint = `${apiUrl}/partner_ProfileImg/${PartnerID !== 'null' ? PartnerID : sessionStorage.getItem('PARTNER_ID')}`;
+
 
   try {
     const response = await axios.get(endpoint);
@@ -144,7 +145,8 @@ export const submitPartnerPersonalData = async (
   personalvalues,
   PartnerID,
   enable,
-  dispatch
+  dispatch,
+  fileList
 ) => {
   // const payload = {
   //   partner_first_name: personalvalues.firstname,
@@ -164,7 +166,11 @@ export const submitPartnerPersonalData = async (
   formData.append('alternate_phone', personalvalues.alt_phone);
   formData.append('date_of_birth', personalvalues.dob);
   formData.append('gender', personalvalues.gender);
-  formData.append('profile_img', personalvalues.profile_img)
+  if (fileList[0]?.originFileObj) {
+    formData.append('profile_img', fileList[0].originFileObj)
+}
+  formData.append('occupation',personalvalues.occupation)
+  formData.append('occupation_id',1)
   // formData.append('blood_group', personalvalues.blood); // Uncomment if needed
 
   console.log(
@@ -206,21 +212,36 @@ export const submitPartnerPersonalData = async (
 };
 
 export const submitPartnerAddressData = async (
-  addressvalues,
-  PartnerID,
-  dispatch
+  // addressvalues,
+  // PartnerID,
+  // dispatch
+  PartnerID,values,currentValues
 ) => {
+  // const payload = {
+  //   temp_add: addressvalues.temp_address,
+  //   temp_country: addressvalues.temp_country,
+  //   temp_state: addressvalues.temp_state,
+  //   temp_city: addressvalues.temp_city,
+  //   temp_zip_code: addressvalues.temp_postal,
+  //   perm_add: addressvalues.per_address,
+  //   perm_country: addressvalues.per_country,
+  //   perm_state: addressvalues.per_state,
+  //   perm_city: addressvalues.per_city,
+  //   perm_zip_code: addressvalues.per_postal,
+  // };
   const payload = {
-    temp_add: addressvalues.temp_address,
-    temp_country: addressvalues.temp_country,
-    temp_state: addressvalues.temp_state,
-    temp_city: addressvalues.temp_city,
-    temp_zip_code: addressvalues.temp_postal,
-    perm_add: addressvalues.per_address,
-    perm_country: addressvalues.per_country,
-    perm_state: addressvalues.per_state,
-    perm_city: addressvalues.per_city,
-    perm_zip_code: addressvalues.per_postal,
+    temp_add: currentValues.address,
+    temp_country: currentValues.country,
+    temp_state: currentValues.state,
+    temp_city: currentValues.city,
+    temp_zip_code: currentValues.postalcode,
+    temp_region : currentValues.region,
+    perm_add: values.per_address,
+    perm_country: values.per_country,
+    perm_state: values.per_state,
+    perm_city: values.per_city,
+    perm_zip_code: values.per_postal,
+    perm_region : values.per_region,
   };
   console.log(
     PartnerID,
@@ -231,9 +252,7 @@ export const submitPartnerAddressData = async (
   //   : "${apiUrl}/operator_details";
 
   // const method = updatedata ? "put" : "post";
-  const url = `${apiUrl}/partner_address_details/${sessionStorage.getItem(
-    "PAT_ID"
-  )}`;
+  const url = `${apiUrl}/partner_address_details/${sessionStorage.getItem("PARTNER_ID")?sessionStorage.getItem("PARTNER_ID"):sessionStorage.getItem("PAT_ID")}`;
   const method = "put";
 
   try {
@@ -304,15 +323,15 @@ export const SubmitPatDocumentsData = async (
   dispatch
 ) => {
   const formData = new FormData();
-  formData.append("aadhar_card_doc", documentsdata.aadhar_doc);
-  formData.append("pan_card_doc", documentsdata.pan_doc);
-  //formData.append("work_experience_certificate", documentsdata.work_exp_doc);
-  formData.append("educational_certificate", documentsdata.edu_cer_doc);
-  formData.append("other_documents", documentsdata.other_doc);
   formData.append("aadhar_card_number", documentsdata.aadhar_number);
   formData.append("pan_card_number", documentsdata.pan_number);
+  formData.append("aadhar_card_front", documentsdata.aadhar_fr_doc);
+  formData.append("aadhar_card_back", documentsdata.aadhar_bk_doc);
+  formData.append("pan_card_front", documentsdata.pan_fr_doc);
+  formData.append("pan_card_back", documentsdata.pan_bk_doc);
+  //formData.append("work_experience_certificate", documentsdata.work_exp_doc);
 
-  const url = `${apiUrl}/partner-documents/${PartnerID}`;
+  const url = `${apiUrl}/partner-documents/${PartnerID ? PartnerID : sessionStorage.getItem("PARTNER_ID") ? sessionStorage.getItem("PARTNER_ID") : sessionStorage.getItem("PAT_ID") }`;
   const method = "put";
 
   try {
@@ -325,7 +344,7 @@ export const SubmitPatDocumentsData = async (
       },
     });
     console.log(response, "responseresponse");
-    return response.data;
+    return response.data || "Partner updated successfully";
   } catch (error) {
     handleError(error);
     return null;
@@ -354,12 +373,14 @@ export const GetPatAddressById = async (
 export const GetPatProffesionalById = async (
   PartnerID,
   setPartnerID,
-  setEmpProffesionalData
+  setEmpProffesionalData,
+  dispatch
 ) => {
   try {
     const response = await api.get(
       `${apiUrl}/emp-professional-details/${PartnerID}`
     );
+    // dispatch({ type: PARTNER_DATA_BYID, payload: response.data });
     console.log(response, "responseresponse");
     // SetUpdateData(null);
     setEmpProffesionalData("");
@@ -391,11 +412,12 @@ export const GetPatPersonalById = async (
 export const GetPatDocumentById = async (
   PartnerID,
   setPartnerID,
-  setEmpDocumentlData
+  setEmpDocumentlData,
+  updatedata
 ) => {
   try {
     const response = await api.get(
-      `${apiUrl}/partner-documents-details/${PartnerID}`
+      `${apiUrl}/partner-documents-details/${updatedata}`
     );
     console.log(response, "responseresponse");
     // SetUpdateData(null);

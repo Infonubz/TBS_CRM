@@ -1,5 +1,9 @@
 import axios from "axios";
-import { GET_OPERATOR_NAME, GET_RECENT_PROMOFILE, PROMOTION_DATA } from "../../Store/Type";
+import {
+  GET_OPERATOR_NAME,
+  GET_RECENT_PROMOFILE,
+  PROMOTION_DATA,
+} from "../../Store/Type";
 import { toast } from "react-toastify";
 
 const api = axios.create({
@@ -9,7 +13,7 @@ const api = axios.create({
 });
 const apiUrl = process.env.REACT_APP_API_URL;
 // const userType = sessionStorage.getItem("type_name");
-const userType = localStorage.getItem("type_name")
+const userType = localStorage.getItem("type_name");
 
 export const GetPromotionData = async (dispatch) => {
   try {
@@ -95,7 +99,9 @@ export const GetPromotionById = async (
 export const GetOperatorName = async (dispatch) => {
   try {
     // const response = await axios.get(`${apiUrl}/promo-operatorDetails`);
-    const response = await axios.get(`http://192.168.90.47:4000/api/request-management-status/2`);
+    const response = await axios.get(
+      `http://192.168.90.47:4000/api/request-management-status/2`
+    );
     dispatch({ type: GET_OPERATOR_NAME, payload: response.data });
     console.log(response?.data, "operator Name");
     return response.data;
@@ -113,11 +119,11 @@ export const SubmitPromotionData = async (
 ) => {
   const operator_details =
     userType !== "PRODUCTOWNER"
-      // ? sessionStorage.getItem("user_name")
-      ? localStorage.getItem("user_name")
+      ? // ? sessionStorage.getItem("user_name")
+        localStorage.getItem("user_name")
       : currentPromodata.operator_details;
   console.log(promotionId, "updatedataupdatedata");
-  console.log(currentPromodata, "currentPromodatacurrentPromodata");
+  console.log(currentPromodata.status, "currentPromodatacurrentPromodata");
   const formData = new FormData();
   formData.append("promo_name", currentPromodata.promotion_name);
   formData.append("operator_details", operator_details);
@@ -128,7 +134,11 @@ export const SubmitPromotionData = async (
   formData.append("promo_image", currentPromodata.file);
   formData.append(
     "promo_status_id",
-    currentPromodata.status == "Draft" ? 0 : 1
+    currentPromodata.status == "Draft"
+      ? 0
+      : currentPromodata.status == "Requested"
+      ? 1
+      : 2
   );
   formData.append("promo_status", currentPromodata.status);
   formData.append("user_id", currentPromodata.status == "Draft" ? -1 : 0);
@@ -136,7 +146,7 @@ export const SubmitPromotionData = async (
     "user_status",
     currentPromodata.status == "Draft" ? -1 : "Pending"
   );
-  formData.append("tbs_user_id", sessionStorage.getItem("USER_ID"));
+  formData.append("tbs_user_id", localStorage.getItem("USER_ID"));
   formData.append("background_image", promolist);
 
   const url = promotionId

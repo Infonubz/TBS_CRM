@@ -25,7 +25,7 @@ export default function ReqAdvertisement({ currentData, showtable }) {
   const [advertisementId, setAdvertisementId] = useState(null);
   const [updatedata, SetUpdateData] = useState(null);
 
-  console.log(updatedata,"upppppddddddddaaaaaaaaattt");
+  console.log(updatedata, "upppppddddddddaaaaaaaaattt");
   const UpdateStatus = (tbs_ad_id) => {
     setViewStatus(true);
     setAdvertisementId(tbs_ad_id);
@@ -58,8 +58,8 @@ export default function ReqAdvertisement({ currentData, showtable }) {
 
   const columns = [
     {
-      title: <h1 className="text-[1.2vw] font-semibold flex items-center justify-center">S.No</h1>,
-      width: "5vw",
+      title: <h1 className="text-[1.1vw] font-semibold flex items-center justify-center">S.No</h1>,
+      width: "4vw",
       render: (row, rowdta, index) => {
         return (
           <div className="flex items-center justify-center">
@@ -69,11 +69,22 @@ export default function ReqAdvertisement({ currentData, showtable }) {
       },
     },
     {
-      title: <h1 className="text-[1.2vw] font-semibold flex items-center justify-center">Name</h1>,
+      title: <h1 className="text-[1.1vw] font-semibold flex items-center justify-center">Client Details</h1>,
+      width: "10vw",
+      render: (row) => {
+        return (
+          <div>
+            <p className="text-[1vw] flex items-center pl-[1vw]">{row?.client_details}</p>
+          </div>
+        );
+      },
+    },
+    {
+      title: <h1 className="text-[1.1vw] font-semibold flex items-center justify-center">Ads Title</h1>,
       sorter: (a, b) => a.ad_title.localeCompare(b.ad_title),
       render: (row, rowdta, index) => {
         return (
-          <div className="flex items-center justify-center">
+          <div className="flex items-center pl-[1vw] text-[1vw]">
             {/* <h1 className="text-[1.1vw]">{row.promo_name}</h1> */}
             {row?.ad_title?.length > 15 ? (
               <Tooltip
@@ -90,127 +101,95 @@ export default function ReqAdvertisement({ currentData, showtable }) {
           </div>
         );
       },
-      width: "14vw",
+      width: "10vw",
     },
-
     {
-      title: <h1 className="text-[1.2vw] font-semibold flex items-center justify-center">Description</h1>,
+      title: <h1 className="text-[1.1vw] font-semibold flex items-center justify-center">Date</h1>,
+      sorter: (a, b) =>
+        dayjs(a.duration).valueOf() - dayjs(b.duration).valueOf(),
+      width: "12vw",
+      render: (row) => {
+        return (
+          <div>
+            <p className="text-[1vw] flex items-center pl-[1vw]"> {`${dayjs(row?.start_date).format(
+              "DD MMM YY")} - ${dayjs(row?.end_date).format("DD MMM YY")}`}</p>
+          </div>
+        );
+      },
+    },
+    {
+      title: <h1 className="text-[1.1vw] font-semibold flex items-center justify-center">Time Duration</h1>,
+      sorter: (a, b) =>
+        dayjs(a.duration).valueOf() - dayjs(b.duration).valueOf(),
+      width: "12vw",
+      render: (row) => {
+        return (
+          <div>
+            <p className="text-[1vw] flex items-center pl-[1vw]">{`${capitalizeFirstLetter(row?.hours)} Hrs - ${row?.duration}`}</p>
+          </div>
+        );
+      },
+    },
+    {
+      title: <h1 className="text-[1.1vw] font-semibold flex items-center justify-center">Description</h1>,
       sorter: (a, b) => a.promo_description.localeCompare(b.promo_description),
       render: (row, rowdta, index) => {
         return (
           // <div className="flex items-center">
           //   <h1 className="text-[1.1vw]">{row.promo_description}</h1>
           // </div>
-          <div className="flex items-center justify-center">
-            <h1 className="text-[1.1vw]">
+          <div className="flex items-center pl-[1vw]">
+            <h1 className="text-[1vw]">
               {/* {row.promo_description} */}
-              {row?.ad_description?.length > 15 ? (
+              {row?.ad_description?.length > 25 ? (
                 <Tooltip
                   placement="bottom"
                   title={row?.ad_description}
                   className="cursor-pointer"
                   color="#1F487C"
                 >
-                  {`${row?.ad_description?.slice(0, 15)}...`}
+                  {`${row?.ad_description?.slice(0, 25)}...`}
                 </Tooltip>
               ) : (
-                row?.ad_description?.slice(0, 15)
+                row?.ad_description?.slice(0, 25)
               )}
             </h1>
           </div>
         );
       },
-      width: "14vw",
-    },
-    {
-      title: <h1 className="text-[1.2vw] font-semibold flex items-center justify-center">Client</h1>,
-      width: "17vw",
-      render: (row) => {
-        return (
-          <div>
-            <p className="text-[1.1vw] flex items-center justify-center">{row?.client_details}</p>
-          </div>
-        );
-      },
-    },
-    {
-      title: <h1 className="text-[1.2vw] font-semibold flex items-center justify-center">Duration</h1>,
-      sorter: (a, b) =>
-        dayjs(a.duration).valueOf() - dayjs(b.duration).valueOf(),
       width: "15vw",
-      render: (row) => {
-        return (
-          <div>
-            <p className="text-[1.1vw] flex items-center justify-center"> {`${row?.hours}(${row?.duration})`}</p>
-          </div>
-        );
-      },
     },
+
     {
-      title: <h1 className="text-[1.2vw] font-semibold flex items-center justify-center">Usage</h1>,
+      title: <h1 className="text-[1.1vw] font-semibold flex items-center justify-center">Limit / Day</h1>,
       sorter: (a, b) => a.usage_per_day - b.usage_per_day,
-      width: "7vw",
+      width: "8vw",
       render: (row) => {
         return (
           <div>
-            <p className="text-[1.1vw] flex items-center justify-center">{row.usage_per_day}</p>
+            <p className="text-[1vw] flex items-center justify-center">{row.usage_per_day}</p>
           </div>
         );
       },
     },
     {
-      title: (
-        <div className="flex items-center justify-center font-bold text-[1.2vw]">Card</div>
-      ),
-      width: "10vw",
-      render: (row) => {
-        // setAdsId(row.tbs_ad_id);
-        console.log(row, "rowrowrowrow");
-        return (
-          <div className="flex items-center justify-center">
-            <button
-              type="button"
-              className="text-white bg-[#727070] flex items-center justify-center rounded-[0.5vw]  text-[1vw] w-[5vw] py-[0.2vw]  
-               "
-              onClick={() => {
-                setViewAdModal(true);
-                // setAdvertisementId(row.tbs_ad_id);
-                SetUpdateData(row.tbs_ad_id);
-                console.log(row.tbs_ad_id, "advertisementId1111");
-              }}
-              // onClick={() => {
-              //   setViewOfferModal(true);
-              //   setViewID(row.tbs_operator_id);
-              // }}
-            >
-              <span>
-                <FaEye size={"1vw"} color="white" />
-              </span>
-              <span className="pl-[0.5vw]">View</span>
-            </button>
-          </div>
-        );
-      },
-    },
-    {
-      title: <h1 className="text-[1.2vw] font-semibold flex items-center justify-center">Status</h1>,
-      width: "10vw",
+      title: <h1 className="text-[1.1vw] font-semibold flex items-center justify-center">Status</h1>,
+      width: "8 vw",
       render: (row) => {
         return (
           <div className="flex items-center justify-center">
             {row?.status_id != null ? (
               <button
-                className={`${
-                  row.req_status_id == 1
-                    ? "bg-[#FF9900]"
-                    : row.req_status_id == 3
+                className={`${row.req_status_id == 1
+                  ? "bg-[#FF9900]"
+                  : row.req_status_id == 3
                     ? "bg-[#34AE2A]"
                     : row.req_status_id == 5
-                    ? "bg-[#FD3434]"
-                    : row.req_status_id == 2
-                    ? "bg-[#2A99FF]"
-                    : "bg-[#646262]"
-                } rounded-[0.5vw] text-[1.1vw]  font-bold text-white w-[8vw] py-[0.2vw]`}
+                      ? "bg-[#FD3434]"
+                      : row.req_status_id == 2
+                        ? "bg-[#2A99FF]"
+                        : "bg-[#646262]"
+                  } rounded-[0.5vw] text-[1.1vw]  font-bold text-white w-[8vw] py-[0.2vw]`}
                 onClick={() => {
                   UpdateStatus(row.tbs_ad_id);
                   console.log(row.tbs_ad_id, "row1");
@@ -225,6 +204,38 @@ export default function ReqAdvertisement({ currentData, showtable }) {
         );
       },
     },
+    {
+      title: (
+        <div className="flex items-center justify-center font-bold text-[1.1vw]">Action</div>
+      ),
+      width: "5vw",
+      render: (row) => {
+        // setAdsId(row.tbs_ad_id);
+        console.log(row, "rowrowrowrow");
+        return (
+          <div className="flex items-center justify-center">
+            <button
+              type="button"
+              // className="text-white bg-[#727070] flex items-center justify-center rounded-[0.5vw]  text-[1vw] w-[5vw] py-[0.2vw]"  
+              onClick={() => {
+                setViewAdModal(true);
+                // setAdvertisementId(row.tbs_ad_id);
+                SetUpdateData(row.tbs_ad_id);
+                console.log(row.tbs_ad_id, "advertisementId1111");
+              }}
+            // onClick={() => {
+            //   setViewOfferModal(true);
+            //   setViewID(row.tbs_operator_id);
+            // }}
+            >
+              <FaEye size={"1.5vw"} color="#1F487C" />
+
+            </button>
+          </div>
+        );
+      },
+    },
+
     // {
     //   title: <h1 className="text-[1.2vw] font-semibold">Actions</h1>,
     //   width: "10vw",
@@ -295,8 +306,8 @@ export default function ReqAdvertisement({ currentData, showtable }) {
         show={viewmodal}
         closeicon={false}
         onClose={closeModal}
-        // height="180px"
-        // width="950px"
+      // height="180px"
+      // width="950px"
       >
         <ViewAd updatedata={updatedata} />
       </ModalPopup>

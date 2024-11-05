@@ -44,6 +44,7 @@ function App() {
   // window.onbeforeunload = function () {
   //   localStorage.clear();
   // }
+console.log(authtoken,"authtoken852");
 
   return (
     <Router>

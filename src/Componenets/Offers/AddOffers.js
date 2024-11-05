@@ -66,8 +66,8 @@ const validationSchema = Yup.object().shape({
     .required("Code is required")
     .max(18, "Max 18 characters only"),
   start_date: Yup.date()
-    .required('Start Date is required')
-    .min(new Date(), 'Start Date cannot be in the past'),
+    .required('Start Date is required'),
+    // .min(new Date(), 'Start Date cannot be in the past'),
   expiry_date: Yup.date()
     .required('Expiry Date is required')
     .min(Yup.ref('start_date'), 'Expiry Date must be after Start Date'),
@@ -459,7 +459,7 @@ export default function AddOffer({
                 <div className="grid grid-cols-2 gap-[1vw] pt-[1vw]">
                   <div className="col-span-1 flex-col flex">
                     <label className="text-[#1F4B7F] text-[1.1vw] font-semibold">
-                      Usage
+                      Offer Usage Persons Count
                       <span className="text-red-500 text-[1vw] pl-[0.2vw]">
                         *
                       </span>

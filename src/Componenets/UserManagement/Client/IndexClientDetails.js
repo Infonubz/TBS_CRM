@@ -6,9 +6,7 @@ import { Upload, Image, Progress, Modal } from "antd";
 import { BiPlus } from "react-icons/bi";
 import AddRegisterAddress from "./AddRegisterAddress";
 import AddGSTDetails from "./AddGSTDetails";
-import {
-  SubmitProfileData,
-} from "../../../Api/UserManagement/SuperAdmin";
+import { SubmitProfileData } from "../../../Api/UserManagement/SuperAdmin";
 import { useLocation } from "react-router";
 import { useDispatch } from "react-redux";
 import AddCompanyDetails from "./AddCompanyDetails";
@@ -20,6 +18,7 @@ import {
 } from "../../../Api/UserManagement/Client";
 import { toast } from "react-toastify";
 import { RiUser3Fill } from "react-icons/ri";
+import ImgCrop from "antd-img-crop";
 
 const getBase64 = (file) =>
   new Promise((resolve, reject) => {
@@ -34,6 +33,7 @@ export default function ClientIndex({
   setClientID,
   clientID,
   setModalIsOpen,
+  updatedata,
 }) {
   const [currentpage, setCurrentpage] = useState(1);
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -41,6 +41,26 @@ export default function ClientIndex({
   const [previewTitle, setPreviewTitle] = useState("");
   const [fileList, setFileList] = useState([]);
   const [client_id, setClient_Id] = useState(null);
+  const [profileImage, setProfileImage] = useState(false);
+  const [enableUpload, setEnableUpload] = useState(false);
+  const [apiMethod, setApiMethod] = useState(false);
+  const [addressback, setAddressBack] = useState(false);
+  const [businessback, setBusinessBack] = useState(false);
+  const [documentback, setDocumentBack] = useState(false);
+  const [gstback, setGstback] = useState(false);
+  const location = useLocation();
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [SPA_ID, SetSPAID] = useState(null);
+  //const [superadmindata, setSuperAdminData] = useState("");
+  const [clientdata, setClientData] = useState("");
+
+  const dispatch = useDispatch();
+  const ClientCompanyLogo = sessionStorage.getItem("ClientCompanyLogo");
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    setSelectedFile(file);
+  };
 
   const handlePreview = async (file) => {
     if (!file.url && !file.preview) {
@@ -53,12 +73,15 @@ export default function ClientIndex({
     );
   };
 
-  const dispatch = useDispatch();
-
   const handleChange = ({ fileList: newFileList }) => {
     console.log(newFileList, "newFileList");
     setFileList(newFileList);
-    SubmitProfileData(newFileList[0], dispatch);
+    if (newFileList?.length > 0) {
+      setProfileImage(true);
+    } else {
+      setProfileImage(false);
+    }
+    // SubmitProfileData(newFileList[0], dispatch);
   };
 
   const handleCancel = () => setPreviewOpen(false);
@@ -71,9 +94,6 @@ export default function ClientIndex({
   );
 
   console.log(currentpage == 1, "shcjsbd");
-  const [SPA_ID, SetSPAID] = useState(null);
-  //const [superadmindata, setSuperAdminData] = useState("");
-  const [clientdata, setClientData] = useState("");
 
   const fetchGetClient = async () => {
     try {
@@ -87,20 +107,6 @@ export default function ClientIndex({
       console.error("Error fetching additional user data", error);
     }
   };
-
-  useEffect(() => {
-    if (clientID != null) {
-      fetchGetClient();
-    }
-  }, [clientID, setClientID, setClientData]);
-
-  console.log(clientdata, "clientdata");
-  const [addressback, setAddressBack] = useState(false);
-  const [businessback, setBusinessBack] = useState(false);
-  const [documentback, setDocumentBack] = useState(false);
-  const [gstback, setGstback] = useState(false);
-  const location = useLocation();
-  const [selectedFile, setSelectedFile] = useState(null);
 
   const getprofile = async () => {
     try {
@@ -123,29 +129,43 @@ export default function ClientIndex({
   //     console.error("Error fetching additional user data", error);
   //   }
   // };
+  useEffect(() => {
+    if (updatedata) {
+      setEnableUpload(true);
+    } else {
+      setEnableUpload(false);
+    }
+  }, []);
 
   useEffect(() => {
     if (clientID != null) {
       getprofile();
     }
     console.log(clientID, "clientID");
-
   }, []);
+
+  useEffect(() => {
+    if (clientID != null) {
+      fetchGetClient();
+    }
+  }, [clientID, setClientID, setClientData]);
+
+  console.log(clientdata, "clientdata");
 
   console.log(location.pathname == "/settings", "locationlocationlocation");
 
-  const ClientCompanyLogo = sessionStorage.getItem('ClientCompanyLogo')
-
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    setSelectedFile(file);
-  };
+  // useEffect(()=>{
+  //   if(selectedFile){
+  //     setFileList(selectedFile)
+  //   }
+  // },[selectedFile])
 
   return (
     <div>
       <div
-        className={`w-full h-full ${location.pathname != "/settings" ? "py-0" : "py-[1vw] px-[1vw]"
-          }`}
+        className={`w-full h-full ${
+          location.pathname != "/settings" ? "py-0" : "py-[1vw] px-[1vw]"
+        }`}
       >
         {location.pathname != "/settings" ? (
           <div className="w-full h-[3vw] flex">
@@ -154,10 +174,10 @@ export default function ClientIndex({
                 currentpage == 1
                   ? 35
                   : currentpage == 2
-                    ? 70
-                    : currentpage == 3
-                      ? 100
-                      : 100
+                  ? 70
+                  : currentpage == 3
+                  ? 100
+                  : 100
               }
               size="1.2vw"
               strokeColor="#1F4B7F"
@@ -199,7 +219,7 @@ export default function ClientIndex({
                 >
                   {fileList.length >= 1 ? null : uploadButton}
                 </Upload> */}
-                {ClientCompanyLogo === 'null' || ClientCompanyLogo === null ? (
+                {/* {ClientCompanyLogo === 'null' || ClientCompanyLogo === null ? (
                   <div>
                     <RiUser3Fill size='1vw'
                       color="#1F487C"
@@ -212,7 +232,37 @@ export default function ClientIndex({
                     src={`http://192.168.90.47:4000${ClientCompanyLogo}`}
                     alt="Photo"
                     className="h-[7vw] w-[7vw] cursor-pointer flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.3vw] border-[#1f4b7f] rounded-[0.5vw]" />
-                )}
+                )} */}
+
+                <div className="relative">
+                  <ImgCrop
+                    showGrid
+                    rotationSlider
+                    showReset
+                    onImageCrop={(file) => {}}
+                  >
+                    <Upload
+                      action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                      listType="picture-card"
+                      fileList={fileList}
+                      onChange={handleChange}
+                      onPreview={handlePreview}
+                      disabled={enableUpload}
+                    >
+                      {fileList?.length < 1 && "+ Upload"}
+                    </Upload>
+                  </ImgCrop>
+
+                  {fileList.length === 0 &&
+                    selectedFile && ( // Check if there are no files in the fileList and selectedFile is set
+                      <img
+                        src={`http://192.168.90.47:4000${selectedFile}`}
+                        alt="Photo"
+                        className="w-[5vw] h-[5vw] object-cover rounded-[0.2vw] top-[.7vw] left-[.7vw] absolute opacity-25 z-[1] pointer-events-none"
+                      />
+                    )}
+                </div>
+
                 {/* <input
                   id="fileInput"
                   type="file"
@@ -249,14 +299,15 @@ export default function ClientIndex({
                 <div className="">
                   <div className="bg-[#D9D9D9] rounded-t-full rounded-b-full w-[0.7vw] h-[11vw] relative">
                     <div
-                      className={`absolute rounded-t-full rounded-b-full w-[0.7vw] h-[2vw] bg-[#1f4b7f] ${currentpage == 1
-                        ? "top-0"
-                        : currentpage == 2
+                      className={`absolute rounded-t-full rounded-b-full w-[0.7vw] h-[2vw] bg-[#1f4b7f] ${
+                        currentpage == 1
+                          ? "top-0"
+                          : currentpage == 2
                           ? "top-[4.5vw]"
                           : currentpage == 3
-                            ? "bottom-0"
-                            : "bottom-0"
-                        }`}
+                          ? "bottom-0"
+                          : "bottom-0"
+                      }`}
                     ></div>
                   </div>
                 </div>
@@ -288,6 +339,11 @@ export default function ClientIndex({
                   addressback={addressback}
                   client_id={client_id}
                   setClient_Id={setClient_Id}
+                  fileList={fileList}
+                  profileImage={profileImage}
+                  setProfileImage={setProfileImage}
+                  updatedata={updatedata}
+                  setEnableUpload={setEnableUpload}
                 />
               ) : currentpage == 2 ? (
                 <AddRegisterAddress

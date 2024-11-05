@@ -37,6 +37,7 @@ export const Deleteall = async (api, dispatch) => {
     console.log(response.data, "response.data5555");
     toast.success(response.data);
     GetAdsData(dispatch);
+    GetMobileAds(dispatch)
     return response.data;
   } catch (error) {
     handleError(error);
@@ -202,7 +203,7 @@ export const SubmitAdsData = async (
 //   }
 // };
 
-export const SubmitAdsMobile = async (advalues, updatedata, dispatch) => {
+export const SubmitAdsMobile = async (advalues, updatedata, duration, hours, adsdata, dispatch) => {
   console.log(advalues.file, "promotionvalues.file");
 
   const mbleFormData = new FormData();
@@ -214,12 +215,14 @@ export const SubmitAdsMobile = async (advalues, updatedata, dispatch) => {
   mbleFormData.append("usage_per_day", advalues.usage_per_day);
   mbleFormData.append("status", advalues.status);
   mbleFormData.append("mobad_vdo", advalues.file);
-  mbleFormData.append("mobad_file_size", advalues.file.size);
-  mbleFormData.append("mobad_file_type", advalues.file.type);
+  mbleFormData.append("mobad_file_size", advalues.file.size || adsdata.mobad_file_size);
+  mbleFormData.append("mobad_file_type", advalues.file.type || adsdata.mobad_file_type);
   mbleFormData.append("page_name", advalues.page_name);
   mbleFormData.append("tbs_client_id", advalues.tbs_client_id);
   // mbleFormData.append("tbs_user_id", sessionStorage.getItem("USER_ID"));
   mbleFormData.append("tbs_user_id", localStorage.getItem("USER_ID"));
+  mbleFormData.append("duration", duration);
+  mbleFormData.append("hours", hours);
   mbleFormData.append(
     "page_id",
     advalues.page_name == "Home"
@@ -270,7 +273,6 @@ export const SubmitAdsMobile = async (advalues, updatedata, dispatch) => {
       },
     });
     GetMobileAds(dispatch);
-    GetAdsData(dispatch);
     console.log(response, "responseresponse");
     return response.data;
   } catch (error) {
@@ -332,6 +334,7 @@ export const handleMbleAdsearch = async (e, dispatch) => {
       return response.data[0];
     } else {
       GetAdsData(dispatch);
+      GetMobileAds(dispatch)
     }
   } catch (error) {
     handleError(error);
@@ -341,7 +344,8 @@ export const handleMbleAdsearch = async (e, dispatch) => {
 
 export const GetClientList = async (dispatch) => {
   try {
-    const response = await axios.get(`${apiUrl}/ads-clientDetails`);
+    // const response = await axios.get(`${apiUrl}/ads-clientDetails`);
+    const response = await axios.get(`${apiUrl}/getActiveClients/1`);
     dispatch({ type: GET_ADS_CLIENT, payload: response.data });
     return response.data;
   } catch (error) {

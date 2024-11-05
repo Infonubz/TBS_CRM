@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { IoIosArrowUp } from "react-icons/io";
 import { RiArrowRightSLine } from "react-icons/ri";
 import { FiAlertCircle } from "react-icons/fi";
@@ -12,9 +12,21 @@ import EditProfile from "./EditProfile";
 import ForgotPassword from "./ForgotPassword";
 
 export default function UserSettingList() {
+
+  const [active, setActive] = useState("0");
+
+  const handleCollapseChange = (key) => {
+    if (active !== key) {
+      setActive(key);
+    }
+  };
+  console.log(active, 'active_KEY');
+
   return (
     <div>
       <Collapse
+        activeKey={active}
+        onChange={() => handleCollapseChange("1")}
         className="bg-[#1F487C] rounded-2xl border border-[#1F487C]  shadow-[0_9px_9px_rgba(0,0,0,0.45)] shadow-xl"
         size="large"
         expandIcon={({ isActive }) =>
@@ -109,6 +121,8 @@ export default function UserSettingList() {
         ]}
       /> */}
       <Collapse
+        activeKey={active}
+        onChange={() => handleCollapseChange("2")}
         className="bg-[#1F487C] rounded-2xl border border-[#1F487C] mt-[1vw] shadow-[0_9px_9px_rgba(0,0,0,0.45)] shadow-xl"
         size="large"
         expandIcon={({ isActive }) =>
@@ -127,7 +141,7 @@ export default function UserSettingList() {
         expandIconPosition="right"
         items={[
           {
-            key: "1",
+            key: "2",
             label: (
               <div className="flex items-center h-[5vh]">
                 <div className="col-span-2 pt-[0.3vw]">
@@ -151,7 +165,8 @@ export default function UserSettingList() {
                 </div>
               </div>
             ),
-            children: <ForgotPassword />,          },
+            children: <ForgotPassword />,
+          },
         ]}
       />
       {/* <Collapse

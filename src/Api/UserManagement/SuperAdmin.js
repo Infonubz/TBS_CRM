@@ -82,7 +82,8 @@ export const SubmitCompanyData = async (
   companyvalue,
   operatorID,
   enable,
-  dispatch
+  dispatch,
+  fileList
 ) => {
 
   const formData = new FormData();
@@ -99,7 +100,7 @@ export const SubmitCompanyData = async (
   formData.append('req_status', 'pending');
   formData.append('user_status_id', 0);
   formData.append('req_status_id', 0);
-  formData.append('profileimg', companyvalue.profileimg)
+  formData.append('profileimg', fileList[0]?.originFileObj)
 
 
   // const payload = {
@@ -337,7 +338,7 @@ export const SubmitGSTData = async (documentsdata, operatorID, setSuperAdminGSTD
 
   const url = operatorID
     ? `${apiUrl}/operator_details/${operatorID}`
-    : `${apiUrl}/operator_details/${sessionStorage.getItem('SPA_ID')}`;
+    : `${apiUrl}/operator_details/${sessionStorage.getItem('OPERATE_ID')}`;
   const method = operatorID ? "put" : "post";
   // const url = `${apiUrl}/operator_details/${operatorID}`;
   // const method = "post";

@@ -31,6 +31,8 @@ const TableList = ({
   operatorID,
   setDeleteOpModalIsOpen,
   deleteOpmodalIsOpen,
+  update,
+  setUpdate
 }) => {
   const [sortedInfo, setSortedInfo] = useState({});
   const [statusModal, setStatusModal] = useState(false);

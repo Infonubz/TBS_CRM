@@ -10,7 +10,7 @@ const api = axios.create({
 
 const apiUrl = process.env.REACT_APP_API_URL;
 
-const user = sessionStorage.getItem("USER_ID");
+const user = localStorage.getItem("USER_ID");
 
 export const GetEmployeeData = async (dispatch) => {
   const endpoint = user?.startsWith("tbs-pro")
@@ -86,7 +86,7 @@ export const submitPersonalData = async (
   EmployeeID,
   dispatch
 ) => {
-  const dynamicId = user.startsWith("tbs-pro") ? "owner_id" : "tbs_operator_id";
+  const dynamicId = user?.startsWith("tbs-pro") ? "owner_id" : "tbs_operator_id";
   // const payload = {
   //   emp_first_name: personalvalues.firstname,
   //   emp_last_name: personalvalues.lastname,
@@ -114,7 +114,7 @@ export const submitPersonalData = async (
   formData.append("role_type", personalvalues.role);
   formData.append("role_type_id", personalvalues.role_id);
   formData.append("profile_img", personalvalues.profile_img);
-  formData.append(dynamicId, sessionStorage.getItem("USER_ID"));
+  formData.append("owner_id", localStorage.getItem("USER_ID"));
 
   // Now `formData` is ready to be used
 
@@ -123,10 +123,10 @@ export const submitPersonalData = async (
   //   : "${apiUrl}/operator_details";
 
   // const method = updatedata ? "put" : "post";
-  const submiturl = user.startsWith("tbs-pro")
+  const submiturl = user?.startsWith("tbs-pro")
     ? `${apiUrl}/pro-emp-personal-details`
     : `${apiUrl}/emp-personal-details`;
-  const updateurl = user.startsWith("tbs-pro")
+  const updateurl = user?.startsWith("tbs-pro")
     ? `${apiUrl}/pro-emp-personal-details/${EmployeeID}`
     : `${apiUrl}/emp-personal-detail/${EmployeeID}`;
 
@@ -346,7 +346,7 @@ export const GetEmpPersonalById = async (
   setEmployeeID,
   setEmpPersonalData
 ) => {
-  const endpoint = user.startsWith("tbs-pro")
+  const endpoint = user?.startsWith("tbs-pro")
     ? `${apiUrl}/pro-emp-personal-details/${EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
     }`
     : `${apiUrl}/emp-personal-details/${EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
@@ -357,7 +357,9 @@ export const GetEmpPersonalById = async (
     console.log(response, "responseresponse");
     // SetUpdateData(null);
     setEmpPersonalData("");
-    sessionStorage.setItem('EmployeeProfileImg', response.data[0].profile_img)
+    console.log(response,"ressssssssss");
+    
+    // sessionStorage.setItem('EmployeeProfileImg', response.data[0].profile_img)
     return response?.data;
   } catch (error) {
     handleError(error);

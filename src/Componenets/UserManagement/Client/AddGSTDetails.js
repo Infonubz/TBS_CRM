@@ -41,13 +41,13 @@ export default function AddGSTDetails({
   setGstback,
 }) {
   const [modalIsOpen1, setmodalIsOpen1] = useState(false);
+  const [superadmingstdata, setSuperAdminGSTData] = useState("");
+
+  const dispatch = useDispatch();
 
   const closeModal = () => {
     setmodalIsOpen1(false);
   };
-
-  const dispatch = useDispatch();
-  const [superadmingstdata, setSuperAdminGSTData] = useState("");
 
   const handleSubmit = async (values) => {
     if (superadmingstdata?.state_name) {
@@ -72,6 +72,7 @@ export default function AddGSTDetails({
       }
     }
   };
+  console.log(clientID, "clientididid");
 
   const fetchGetUser = async () => {
     try {
@@ -87,10 +88,10 @@ export default function AddGSTDetails({
   };
 
   useEffect(() => {
-    if (clientID != null) {
-      console.log(superadmingstdata, "superadmingstdata");
-      fetchGetUser();
-    }
+    console.log(clientID, "clientididid");
+
+    console.log(superadmingstdata, "superadmingstdata");
+    fetchGetUser();
   }, [clientID, setClientID, setSuperAdminGSTData]);
 
   // useEffect(() => {
@@ -333,6 +334,8 @@ export default function AddGSTDetails({
           setClientID={setClientID}
           setmodalIsOpen1={setmodalIsOpen1}
           modalIsOpen1={modalIsOpen1}
+          superadmingstdata={superadmingstdata}
+          setSuperAdminGSTData={setSuperAdminGSTData}
         />
       </ModalPopup>
     </div>

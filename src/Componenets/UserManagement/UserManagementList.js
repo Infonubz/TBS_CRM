@@ -363,7 +363,7 @@ export default function Discounts() {
   const [PartnerActivePage, setPartnerActivePage] = useState(1);
   const partnerItemsPerPage = 10;
   const indexOfLastPartnerItem = PartnerActivePage * partnerItemsPerPage;
-  const indexOfFirstPartnerItem = indexOfLastOperatorItem - partnerItemsPerPage;
+  const indexOfFirstPartnerItem = indexOfLastPartnerItem - partnerItemsPerPage;
   const currentPartnerItems =
     get_partner_list?.length > 0 &&
     get_partner_list?.slice(indexOfFirstPartnerItem, indexOfLastPartnerItem);
@@ -485,7 +485,69 @@ export default function Discounts() {
                 USER MANAGEMENT
               </h1>
               <div className="pb-[0.5vw] flex justify-between h-full items-center">
-                <div className="flex items-center gap-[2vw]">
+                <div className="flex items-center gap-[.7vw]">
+                <div className="flex border-[#1F4B7F] h-[5vh] ">
+                  <button
+                    className={`${view == 'list' ? "bg-[#1F487C]" : "bg-[white]"} px-[0.75vw] rounded-l-xl border-[0.2vw] border-r-0  border-[#1F487C]`}
+                    style={{
+                      transition: "all 1s",
+                    }}
+                    onClick={() => setView('list')}>
+                    <IoMdMenu color={`${view === 'list' ? "white" : "#1F487C"}`} />
+                  </button>
+                  <button
+                    className={`${view == 'grid' ? "bg-[#1F487C]" : "bg-[white]"} px-[0.75vw] rounded-r-xl border-[0.2vw] border-l-0  border-[#1F487C]`}
+                    style={{
+                      transition: "all 1s",
+                    }}
+                    onClick={() => setView('grid')}>
+                    <IoGrid color={`${view == 'grid' ? "white" : "#1F487C"}`} />
+                  </button>
+                </div>
+                {/* <div className="flex border-[#1F4B7F] h-[5vh] border-l-[0.2vw] border-t-[0.2vw] rounded-l-[0.7vw] rounded-r-[0.7vw] border-r-[0.2vw] border-b-[0.2vw]">
+                    <button
+                      className={`${view == "list" ? "bg-[#1F4B7F]" : "bg-white"
+                        } flex px-[.5vw] justify-center gap-[0.3vw] items-center rounded-tl-[0.4vw]   rounded-bl-[0.4vw] `}
+                      style={{
+                        transition: "all 1s",
+                      }}
+                      onClick={() => setView("list")}
+                    >
+                      <span>
+                        <IoMdMenu
+                          size={"1.2vw"}
+                          color={`${view == "list" ? "white" : "#1F4B7F"}`}
+                        />
+                      </span>
+                      <span
+                        className={`${view == "list" ? "text-white" : "text-[#1F4B7F]"
+                          }  text-[1.1vw]`}
+                      >
+                      
+                      </span>
+                    </button>
+                    <button
+                      className={`${view == "grid" ? "bg-[#1F4B7F]" : "bg-white"
+                        } flex px-[0.5vw] justify-center gap-[0.3vw] items-center rounded-r-[0.4vw]`}
+                      style={{
+                        transition: "all 1s",
+                      }}
+                      onClick={() => setView("grid")}
+                    >
+                      <span>
+                        <IoGrid
+                          size={"1.1vw"}
+                          color={`${view == "grid" ? "white" : "#1F4B7F"}`}
+                        />
+                      </span>
+                      <span
+                        className={`${view == "grid" ? "text-white" : "text-[#1F4B7F]"
+                          }  text-[1.1vw]`}
+                      >
+                        
+                      </span>
+                    </button>
+                  </div> */}
                   <div className="relative flex items-center ">
                     <input
                       type="text"
@@ -499,7 +561,7 @@ export default function Discounts() {
                       color="#1F4B7F"
                     />
                   </div>
-                  <div className="flex items-center gap-x-[1.8vw] ">
+                  <div className="flex items-center gap-x-[2vw] ">
                     {user?.startsWith("tbs-pro") && (
                       <div
                         className={` cursor-pointer ${adminUser == "super_admin"
@@ -552,7 +614,7 @@ export default function Discounts() {
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-x-[0.5vw] h-full ">
+                <div className="flex items-center gap-x-[1vw] h-full ">
                   <ExportButton
                     dataArray={
                       adminUser == "employee"
@@ -589,7 +651,7 @@ export default function Discounts() {
                       <span className="text-white text-[1.1vw]">Import</span>
                     </button>
                   </div>
-                  <div className="flex border-[#1F4B7F] h-[5vh] border-l-[0.1vw] border-t-[0.1vw] rounded-l-[0.5vw] rounded-r-[0.5vw] border-r-[0.2vw] border-b-[0.2vw]">
+                  {/* <div className="flex border-[#1F4B7F] h-[5vh] border-l-[0.1vw] border-t-[0.1vw] rounded-l-[0.5vw] rounded-r-[0.5vw] border-r-[0.2vw] border-b-[0.2vw]">
                     <button
                       className={`${view == "list" ? "bg-[#1F4B7F]" : "bg-white"
                         } flex px-[1vw] justify-center gap-[0.5vw] items-center rounded-tl-[0.4vw]   rounded-bl-[0.3vw] `}
@@ -632,7 +694,7 @@ export default function Discounts() {
                         Grid View
                       </span>
                     </button>
-                  </div>
+                  </div> */}
                   <button
                     className="bg-[#1F4B7F] flex w-[10vw] h-[5vh] justify-center gap-[0.5vw] items-center rounded-[0.5vw]"
                     // onClick={() => handleAdd()}
@@ -735,6 +797,7 @@ export default function Discounts() {
                     setOperatorID={setOperatorID}
                     operatorID={operatorID}
                     setPartnerID={setPartnerID}
+                    // update={update}
                   />
                 )
               ) : adminUser == "partner" ? (
@@ -746,6 +809,7 @@ export default function Discounts() {
                     SetUpdateData={SetUpdateData}
                     PartnerID={PartnerID}
                     setPartnerID={setPartnerID}
+                    updatedata={updatedata}
                   />
                 ) : (
                   <PartnerTableList
@@ -755,6 +819,7 @@ export default function Discounts() {
                     SetUpdateData={SetUpdateData}
                     PartnerID={PartnerID}
                     setPartnerID={setPartnerID}
+                    updatedata={updatedata}
                   />
                 )
               ) : adminUser == "client" ? (
@@ -1023,18 +1088,21 @@ export default function Discounts() {
               operatorID={operatorID}
               setOperatorID={setOperatorID}
               setModalIsOpen={setModalIsOpen}
+              updatedata={updatedata}
             />
           ) : adminUser == "partner" ? (
             <AddParner
               setModalIsOpen={setModalIsOpen}
               PartnerID={PartnerID}
               setPartnerID={setPartnerID}
+              updatedata={updatedata}
             />
           ) : adminUser == "client" ? (
             <ClientIndex
               setModalIsOpen={setModalIsOpen}
               clientID={clientID}
               setClientID={setClientID}
+              updatedata={updatedata}
             />
           ) : (
             <AddEmployee

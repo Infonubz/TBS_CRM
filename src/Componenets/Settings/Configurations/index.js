@@ -9,12 +9,28 @@ import BulkMail from "./BulkMail";
 import { IoMailUnreadOutline } from "react-icons/io5";
 import { FaLanguage, FaMailBulk } from "react-icons/fa";
 import { MdOutlineSms } from "react-icons/md";
-
+import { PiCalculatorFill } from "react-icons/pi";
+import AboutUs from "./AboutUs";
+import ReferEarn from "./ReferEarn";
+import { act, useState } from "react";
 const Index = () => {
+
+  const [active, setActive] = useState("0");
+
+  const handleCollapseChange = (key) => {
+    if (active !== key) {
+      setActive(key);
+    }
+  };
+  console.log(active, 'active_KEY');
+
+
   return (
     <div>
       <Collapse
-        className="bg-[#1F487C] rounded-2xl border border-[#1F487C]  shadow-[0_9px_9px_rgba(0,0,0,0.45)] shadow-xl"
+        activeKey={active}
+        onChange={() => handleCollapseChange("1")}
+        className="bg-[#1F487C] rounded-2xl border border-[#1F487C]  "
         size="large"
         expandIcon={({ isActive }) =>
           isActive ? (
@@ -76,10 +92,12 @@ const Index = () => {
             />
           )
         }
+        activeKey={active}
+        onChange={() => handleCollapseChange("2")}
         expandIconPosition="right"
         items={[
           {
-            key: "1",
+            key: "2",
             label: (
               <div className="flex items-center h-[5vh]">
                 <div className="col-span-2 pt-[0.3vw]">
@@ -110,6 +128,8 @@ const Index = () => {
       <Collapse
         className="bg-[#1F487C] rounded-2xl border border-[#1F487C] mt-[1vw] shadow-[0_9px_9px_rgba(0,0,0,0.45)] shadow-xl"
         size="large"
+        activeKey={active}
+        onChange={() => handleCollapseChange("3")}
         expandIcon={({ isActive }) =>
           isActive ? (
             <IoIosArrowUp
@@ -126,7 +146,7 @@ const Index = () => {
         expandIconPosition="right"
         items={[
           {
-            key: "1",
+            key: "3",
             label: (
               <div className="flex items-center h-[5vh]">
                 <div className="col-span-2 pt-[0.3vw]">
@@ -157,6 +177,8 @@ const Index = () => {
       <Collapse
         className="bg-[#1F487C] rounded-2xl border border-[#1F487C] mt-[1vw] shadow-[0_9px_9px_rgba(0,0,0,0.45)] shadow-xl"
         size="large"
+        activeKey={active}
+        onChange={() => handleCollapseChange("4")}
         expandIcon={({ isActive }) =>
           isActive ? (
             <IoIosArrowUp
@@ -173,7 +195,7 @@ const Index = () => {
         expandIconPosition="right"
         items={[
           {
-            key: "1",
+            key: "4",
             label: (
               <div className="flex items-center h-[5vh]">
                 <div className="col-span-2 pt-[0.3vw]">
@@ -198,6 +220,106 @@ const Index = () => {
               </div>
             ),
             children: <Language />,
+          },
+        ]}
+      />
+      <Collapse
+        className="bg-[#1F487C] rounded-2xl border border-[#1F487C] mt-[1vw] shadow-[0_9px_9px_rgba(0,0,0,0.45)] shadow-xl"
+        size="large"
+        activeKey={active}
+        onChange={() => handleCollapseChange("5")}
+        expandIcon={({ isActive }) =>
+          isActive ? (
+            <IoIosArrowUp
+              className="mt-[0.5vw]"
+              style={{ color: "#FFFFFF", height: "2vw", width: "1.8vw" }}
+            />
+          ) : (
+            <RiArrowRightSLine
+              className="mt-[1.5vw]"
+              style={{ color: "#FFFFFF", height: "2vw", width: "1.8vw" }}
+            />
+          )
+        }
+        expandIconPosition="right"
+        items={[
+          {
+            key: "5",
+            label: (
+              <div className="flex items-center h-[5vh]">
+                <div className="col-span-2 pt-[0.3vw]">
+                  <span className="">
+                    <PiCalculatorFill
+                      style={{
+                        color: "#FFFFFF",
+                        height: "2.3vw",
+                        width: "2.3vw",
+                      }}
+                    />
+                  </span>
+                </div>
+                <div className="col-span-2 pl-[1vw]">
+                  <span className="text-[#FFFFFF] font-medium text-[1.1vw]">
+                    Legal Documents
+                  </span>
+                  <p className="text-[#FFFFFF] text-[0.8vw]">
+                    Manage your about us, Privacy Policy, Terms & Condition,
+                    User Agreement
+                  </p>
+                </div>
+              </div>
+            ),
+            children: <AboutUs />,
+          },
+        ]}
+      />
+      <Collapse
+        className="bg-[#1F487C] rounded-2xl border border-[#1F487C] mt-[1vw] shadow-[0_9px_9px_rgba(0,0,0,0.45)] shadow-xl"
+        size="large"
+        activeKey={active}
+        onChange={() => handleCollapseChange("6")}
+        expandIcon={({ isActive }) =>
+          isActive ? (
+            <IoIosArrowUp
+              className="mt-[0.5vw]"
+              style={{ color: "#FFFFFF", height: "2vw", width: "1.8vw" }}
+            />
+          ) : (
+            <RiArrowRightSLine
+              className="mt-[1.5vw]"
+              style={{ color: "#FFFFFF", height: "2vw", width: "1.8vw" }}
+            />
+          )
+        }
+        expandIconPosition="right"
+        items={[
+          {
+            key: "6",
+            label: (
+              <div className="flex items-center h-[5vh]">
+                <div className="col-span-2 pt-[0.3vw]">
+                  <span className="">
+                    <PiCalculatorFill
+                      style={{
+                        color: "#FFFFFF",
+                        height: "2.3vw",
+                        width: "2.3vw",
+                      }}
+                    />
+                  </span>
+                </div>
+                <div className="col-span-2 pl-[1vw]">
+                  <span className="text-[#FFFFFF] font-medium text-[1.1vw]">
+                    Refer and Earn
+                  </span>
+                  {/* <p className="text-[#FFFFFF] text-[0.8vw]">
+                    Manage your about us, Privacy Policy, Terms & Condition, User Agreement
+                  </p> */}
+                </div>
+              </div>
+            ),
+            children: <ReferEarn />,
+            // children: <AboutUs />,
           },
         ]}
       />

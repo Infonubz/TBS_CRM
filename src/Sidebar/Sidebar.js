@@ -31,8 +31,6 @@ import { CgProfile } from "react-icons/cg";
 import { useSelector } from "react-redux";
 
 export default function Sidebar() {
-
-
   const unreadCounts = 0;
 
   const getnotificationlist = useSelector(
@@ -51,13 +49,13 @@ export default function Sidebar() {
   console.log(unreadCountss, "this is sidebar");
 
   const [selectedIcon, setSelectedIcon] = useState(() => {
-    return sessionStorage.getItem('selectedIcon') || 'dashboard';
+    return sessionStorage.getItem("selectedIcon") || "dashboard";
   });
   const navigation = useNavigate();
 
   const handleIconClick = (iconName, page) => {
     setSelectedIcon(iconName);
-    sessionStorage.setItem('selectedIcon', iconName);
+    sessionStorage.setItem("selectedIcon", iconName);
     navigation(`/${page}`);
   };
 
@@ -81,6 +79,8 @@ export default function Sidebar() {
   const colseSupport = () => {
     setIsSupportOpen(false);
   };
+  const currenttypeid = sessionStorage.getItem("type_id");
+  console.log(currenttypeid, "currenttypeidcurrenttypeid");
 
   console.log(isNotificationOpen, "vvvvddcddd");
   return (
@@ -93,8 +93,9 @@ export default function Sidebar() {
             <div className="flex items-center gap-[2vw]">
               <Tooltip title="Dashboard" color="#1F4B7F">
                 <div
-                  className={`icon-container ${selectedIcon === "dashboard" ? "selected" : ""
-                    }`}
+                  className={`icon-container ${
+                    selectedIcon === "dashboard" ? "selected" : ""
+                  }`}
                   onClick={() => handleIconClick("dashboard", "dashboard")}
                 >
                   <RiDashboardFill color="white" size={"2.5vw"} />
@@ -153,53 +154,61 @@ export default function Sidebar() {
               </Tooltip>
               <Tooltip title="User Management" color="#1F4B7F">
                 <div
-                  className={`icon-container ${selectedIcon === "users" ? "selected" : ""
-                    }`}
+                  className={`icon-container ${
+                    selectedIcon === "users" ? "selected" : ""
+                  }`}
                   onClick={() => handleIconClick("users", "usermanagement")}
                 >
                   <FaUsers color="white" size={"2.5vw"} />
                 </div>
               </Tooltip>
-              <Tooltip title="Request Management" color="#1F4B7F">
-                <div
-                  className={`icon-container ${selectedIcon === "request" ? "selected" : ""
+              {currenttypeid !== "OP101" && (
+                <Tooltip title="Request Management" color="#1F4B7F">
+                  <div
+                    className={`icon-container ${
+                      selectedIcon === "request" ? "selected" : ""
                     }`}
-                  onClick={() =>
-                    handleIconClick("request", "requestmanagement")
-                  }
-                >
-                  {/* <HiOutlineClipboardDocumentList
+                    onClick={() =>
+                      handleIconClick("request", "requestmanagement")
+                    }
+                  >
+                    {/* <HiOutlineClipboardDocumentList
                     color="white"
                     size={"2.5vw"}
                   /> */}
-                  <img
-                    src={request_management}
-                    className="h-[2vw] w-[2vw]"
-                  />
-                </div>
-              </Tooltip>
-              <Tooltip title="Offers & Deals" color="#1F4B7F">
-                <div
-                  className={`icon-container ${selectedIcon === "discount" ? "selected" : ""
+                    <img src={request_management} className="h-[2vw] w-[2vw]" />
+                  </div>
+                </Tooltip>
+              )}
+              {currenttypeid !== "OP101" && (
+                <Tooltip title="Offers & Deals" color="#1F4B7F">
+                  <div
+                    className={`icon-container ${
+                      selectedIcon === "discount" ? "selected" : ""
                     }`}
-                  onClick={() => handleIconClick("discount", "discounts")}
-                >
-                  <RiDiscountPercentFill color="white" size={"2.5vw"} />
-                </div>
-              </Tooltip>
-              <Tooltip title="Advertisement" color="#1F4B7F">
-                <div
-                  className={`icon-container ${selectedIcon === "advertisement" ? "selected" : ""
+                    onClick={() => handleIconClick("discount", "discounts")}
+                  >
+                    <RiDiscountPercentFill color="white" size={"2.5vw"} />
+                  </div>
+                </Tooltip>
+              )}
+              {currenttypeid !== "OP101" && (
+                <Tooltip title="Advertisement" color="#1F4B7F">
+                  <div
+                    className={`icon-container ${
+                      selectedIcon === "advertisement" ? "selected" : ""
                     }`}
-                  onClick={() => handleIconClick("advertisement", "ads")}
-                >
-                  <RiAdvertisementFill color="white" size={"2.5vw"} />
-                </div>
-              </Tooltip>
+                    onClick={() => handleIconClick("advertisement", "ads")}
+                  >
+                    <RiAdvertisementFill color="white" size={"2.5vw"} />
+                  </div>
+                </Tooltip>
+              )}
               <Tooltip title="Promotion" color="#1F4B7F">
                 <div
-                  className={`icon-container ${selectedIcon === "Promotion" ? "selected" : ""
-                    }`}
+                  className={`icon-container ${
+                    selectedIcon === "Promotion" ? "selected" : ""
+                  }`}
                   onClick={() => handleIconClick("Promotion", "promotion")}
                 >
                   {/* <MdOutlineSpeakerNotes color="white" size={"2.5vw"} /> */}
@@ -208,8 +217,9 @@ export default function Sidebar() {
               </Tooltip>
               <Tooltip title="Roles & Responsibilities" color="#1F4B7F">
                 <div
-                  className={`icon-container ${selectedIcon === "userGear" ? "selected" : ""
-                    }`}
+                  className={`icon-container ${
+                    selectedIcon === "userGear" ? "selected" : ""
+                  }`}
                   onClick={() => handleIconClick("userGear", "roles")}
                 >
                   <FaUserGear color="white" size={"2.5vw"} />
@@ -225,23 +235,27 @@ export default function Sidebar() {
                   <BiSolidReport color="white" size={"2.5vw"} />
                 </div>
               </Tooltip> */}
-              <Tooltip title="Subscription" color="#1F4B7F">
-                <div
-                  className={`icon-container ${selectedIcon === "subscription" ? "selected" : ""
+              {currenttypeid !== "OP101" && (
+                <Tooltip title="Subscription" color="#1F4B7F">
+                  <div
+                    className={`icon-container ${
+                      selectedIcon === "subscription" ? "selected" : ""
                     }`}
-                  onClick={() =>
-                    handleIconClick("subscription", "subscription")
-                  }
-                >
-                  <MdSubscriptions color="white" size={"2.5vw"} />
-                </div>
-              </Tooltip>
+                    onClick={() =>
+                      handleIconClick("subscription", "subscription")
+                    }
+                  >
+                    <MdSubscriptions color="white" size={"2.5vw"} />
+                  </div>
+                </Tooltip>
+              )}
             </div>
             <div className="flex items-center gap-[1vw]">
               <Tooltip title="Settings" color="#1F4B7F">
                 <div
-                  className={`icon-container ${selectedIcon === "settings" ? "selected" : ""
-                    }`}
+                  className={`icon-container ${
+                    selectedIcon === "settings" ? "selected" : ""
+                  }`}
                   onClick={() => handleIconClick("settings", "settings")}
                 >
                   <IoMdSettings color="white" size={"2.5vw"} />
@@ -249,8 +263,9 @@ export default function Sidebar() {
               </Tooltip>
               <Tooltip title="Notification" color="#1F4B7F">
                 <div
-                  className={`icon-container ${selectedIcon === "notification" ? "selected" : ""
-                    }`}
+                  className={`icon-container ${
+                    selectedIcon === "notification" ? "selected" : ""
+                  }`}
                   onClick={
                     openNotification
                     // handleIconClick("notification", "notification")
@@ -260,18 +275,23 @@ export default function Sidebar() {
                   <div className="relative">
                     <IoIosNotifications color="white" size={"2.5vw"} />
                   </div>
-                  {unreadCountss > 0 ?
+                  {unreadCountss > 0 ? (
                     <div className="h-[1.5vw] w-[1.5vw] absolute bottom-[1.5vw] left-[1.3vw] rounded-xl bg-red-600 text-white">
-                      <span className="flex flex-col items-center text-[1vw]">{unreadCountss}</span>
+                      <span className="flex flex-col items-center text-[1vw]">
+                        {unreadCountss}
+                      </span>
                     </div>
-                    : ""}
+                  ) : (
+                    ""
+                  )}
                 </div>
                 {/* </div> */}
               </Tooltip>
               <Tooltip title="Support" color="#1F4B7F">
                 <div
-                  className={`icon-container ${selectedIcon === "support" ? "selected" : ""
-                    }`}
+                  className={`icon-container ${
+                    selectedIcon === "support" ? "selected" : ""
+                  }`}
                   onClick={
                     openSupport
                     // handleIconClick("support", "support")
@@ -305,9 +325,9 @@ export default function Sidebar() {
                           onClick={() => {
                             sessionStorage.removeItem("token");
                             sessionStorage.removeItem("selectedIcon");
-                            localStorage.removeItem("token")
+                            localStorage.removeItem("token");
                             navigation("/");
-                            // window.location.reload();
+                            window.location.reload();
                           }}
                         >
                           Logout
@@ -316,8 +336,8 @@ export default function Sidebar() {
                     </div>
                   }
                   trigger="click"
-                // open={openPopovers[row.ad_id] || false}
-                // onOpenChange={() => togglePopover(row.ad_id)}
+                  // open={openPopovers[row.ad_id] || false}
+                  // onOpenChange={() => togglePopover(row.ad_id)}
                 >
                   <div className="flex items-center cursor-pointer">
                     <label className="text-[1.2vw] text-white cursor-pointer  font-semibold">
@@ -340,8 +360,8 @@ export default function Sidebar() {
               show={isNotificationOpen}
               closeicon={false}
               onClose={closeNotification}
-            // height="90%"
-            // width="30vw"
+              // height="90%"
+              // width="30vw"
             >
               {/* <div className="overflow-auto mt-6 max-h-[70vh]">
         {content.map((item, index) => (
@@ -359,8 +379,8 @@ export default function Sidebar() {
             show={isSupportOpen}
             closeicon={false}
             onClose={colseSupport}
-          // height="90%"
-          // width="30vw"
+            // height="90%"
+            // width="30vw"
           >
             {/* <div>
         <div className="flex justify-center text-[#1f487c] font-bold"><h1>GEt In Touch</h1></div>

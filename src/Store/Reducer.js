@@ -43,6 +43,9 @@ import {
   GET_REQ_ADS,
   OPERATOR_BYID,
   PARTNER_BYID,
+  BIN_DATA,
+  TBS_INFO,
+  REFER_EARN,
 } from "./Type";
 
 const initialState = {
@@ -81,7 +84,10 @@ const initialState = {
   notification_count: "",
   req_man_offers: [],
   get_req_ads: [],
-  operator_byid: {}
+  operator_byid: {},
+  bin_data: [],
+  tbs_info: {},
+  refer_earn:[]
 };
 
 export const crmreducer = (state = initialState, action) => {
@@ -89,7 +95,7 @@ export const crmreducer = (state = initialState, action) => {
 
   switch (type) {
     case PROMOTION_DATA:
-      console.log(payload, 'PROMOTION_DATA')
+      console.log(payload, "PROMOTION_DATA");
       return {
         ...state,
         promotion_data: payload,
@@ -105,19 +111,19 @@ export const crmreducer = (state = initialState, action) => {
         user_management_user_list: payload,
       };
     case OFFERS_LIST:
-      console.log(payload, 'OFFERS_LIST')
+      console.log(payload, "OFFERS_LIST");
       return {
         ...state,
         offers_list: payload,
       };
     case SUPER_ADMIN_LIST:
-      console.log(payload, 'super_admin_list')
+      console.log(payload, "super_admin_list");
       return {
         ...state,
         super_admin_list: payload,
       };
     case OPERATOR_LIST:
-      console.log(payload, 'operator_list_payload')
+      console.log(payload, "operator_list_payload");
       return {
         ...state,
         operator_list: payload,
@@ -339,7 +345,24 @@ export const crmreducer = (state = initialState, action) => {
         ...state,
         partner_byid: payload,
       };
+    case BIN_DATA:
+      return {
+        ...state,
+        bin_data: payload,
+      };
 
+    case TBS_INFO:
+      console.log(payload, "tbs_info");
+      return {
+        ...state,
+        tbs_info: payload,
+      };
+    case REFER_EARN:
+      console.log(payload, "refer_earn");
+      return {
+        ...state,
+        refer_earn: payload,
+      };
     default:
       return state;
   }

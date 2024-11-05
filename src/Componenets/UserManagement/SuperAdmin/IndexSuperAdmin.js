@@ -20,6 +20,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import USERPROFILE from '../../../asserts/Image.png'
 import { RiUser3Fill } from "react-icons/ri";
+import ImgCrop from "antd-img-crop";
 const getBase64 = (file) =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -33,6 +34,7 @@ export default function SuperAdminIndex({
   setOperatorID,
   operatorID,
   setModalIsOpen,
+  updatedata
 }) {
   const [currentpage, setCurrentpage] = useState(1);
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -40,6 +42,21 @@ export default function SuperAdminIndex({
   const [previewTitle, setPreviewTitle] = useState("");
   const [fileList, setFileList] = useState([]);
   const [operator_id, setOperator_Id] = useState(null);
+  const [profileImage,setProfileImage] = useState(false)
+  const [enableUpload,setEnableUpload] = useState(false)
+
+  console.log("fileListfileLisfileListt",fileList);
+  
+
+useEffect(()=>{
+  if(updatedata){
+    setEnableUpload(true)
+  }
+  else{
+    setEnableUpload(false)
+  }
+},[])
+
 
   const handlePreview = async (file) => {
     if (!file.url && !file.preview) {
@@ -59,16 +76,25 @@ export default function SuperAdminIndex({
   const dispatch = useDispatch();
 
   const handleChange = async ({ fileList: newFileList }) => {
-    console.log(newFileList, "newFileList");
+    console.log(newFileList[0]?.originFileObj,"helldjfhdjkfhdkjf",newFileList?.length, "ereffgdfqe");
     setFileList(newFileList);
+    if(newFileList?.length > 0){
+
+      setProfileImage(true)
+    }
+    else{
+      setProfileImage(false)
+    }
     // SubmitProfileData(newFileList[0], dispatch);
 
-    try {
-      const data = await OperatorProfile(newFileList[0]);
-      // setSuperAdminData(data);
-    } catch (error) {
-      console.error("Error fetching additional user data", error);
-    }
+    // try {
+    //   const data = await OperatorProfile(newFileList[0]);
+    //   // setSuperAdminData(data);
+    //   console.log(data);
+      
+    // } catch (error) {
+    //   console.error("Error fetching additional user data", error);
+    // }
   };
 
   const handleCancel = () => setPreviewOpen(false);
@@ -125,7 +151,7 @@ export default function SuperAdminIndex({
   const location = useLocation();
   const [selectedFile, setSelectedFile] = useState(null);
   console.log(selectedFile, 'selected_file')
-  
+
   const getprofile = async () => {
     try {
       const data = await GetOperatorProfile(operatorID, dispatch);
@@ -152,9 +178,12 @@ export default function SuperAdminIndex({
     "locationlocationlocation"
   );
 
+  console.log(profileImage,"imagkjhdfkjdhfk");
+  
+
   const handleFileChange = (event) => {
     const file = event.target.files[0];
-    setSelectedFile(file); 
+    setSelectedFile(file);
   };
 
 
@@ -219,17 +248,33 @@ export default function SuperAdminIndex({
                   {fileList.length >= 1 ? null : uploadButton}
                 </Upload> */}
 
-                {/* <img
-                  src={`${operatorProfileImage
-                    ? `http://192.168.90.47:4000${operatorProfileImage}`
-                    : `${USERPROFILE}`
-                    } `}
-                  alt="Photo"
-                  className="w-[5vw] h-[5vw] object-cover rounded-[0.2vw]"
-                /> */}
+<div className="relative">
+  <ImgCrop showGrid rotationSlider showReset onImageCrop={(file) => {
+      
+    }}>
+    <Upload
+      action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+      listType="picture-card"
+      fileList={fileList}
+      onChange={handleChange}
+      onPreview={handlePreview}
+      disabled={enableUpload}
+    >
+      {fileList?.length < 1 && "+ Upload"}
+    </Upload>
+  </ImgCrop>
+
+  {fileList.length === 0 && selectedFile && (  // Check if there are no files in the fileList and selectedFile is set
+    <img
+      src={`http://192.168.90.47:4000${selectedFile}`}
+      alt="Photo"
+      className="w-[5vw] h-[5vw] object-cover rounded-[0.2vw] top-[.7vw] left-[.7vw] absolute opacity-25 z-[1] pointer-events-none"
+    />
+  )}
+</div>
 
 
-                {operatorProfileImage === 'null' || operatorProfileImage === null ? (
+                {/* {operatorProfileImage === 'null' || operatorProfileImage === null ? (
                   <div>
                     <RiUser3Fill size='1vw'
                       color="#1F487C"
@@ -242,7 +287,7 @@ export default function SuperAdminIndex({
                     src={`http://192.168.90.47:4000${operatorProfileImage}`}
                     alt="Photo"
                     className="h-[7vw] w-[7vw] cursor-pointer flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.3vw] border-[#1f4b7f] rounded-[0.5vw]" />
-                )}
+                )} */}
 
                 <Modal
                   visible={previewOpen}
@@ -309,6 +354,11 @@ export default function SuperAdminIndex({
                   addressback={addressback}
                   operator_id={operator_id}
                   setOperator_Id={setOperator_Id}
+                  fileList={fileList}
+                  profileImage={profileImage}
+                  setProfileImage={setProfileImage}
+                  updatedata={updatedata}
+                  setEnableUpload={setEnableUpload}
                 />
               ) : currentpage == 2 ? (
                 <AddRegisterAddress

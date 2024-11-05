@@ -35,35 +35,35 @@ const validationSchema = Yup.object().shape({
   web_url: Yup.string().required("Web URL is required"),
   business: Yup.string().required("Please select an Business"),
   constitution: Yup.string().required("Please select an Constitution"),
-  company_logo: Yup.mixed()
-    .required("File is empty")
-    .test("required", "A file is required", function (value) {
-      const { isEdit } = this.options.context;
-      if (!isEdit && !value) {
-        return false;
-      }
-      return true;
-    })
-    .test("file_size", "File size is too large", function (value) {
-      if (value && value.size > 2000000) {
-        // 2MB
-        return false;
-      }
-      return true;
-    })
-    .test("file_type", "Unsupported File Format", function (value) {
-      if (typeof value === "string") {
-        // If value is a string (file path), skip file type validation
-        return true;
-      }
-      if (
-        value &&
-        ["image/jpeg", "image/png", "image/jpg"].includes(value.type)
-      ) {
-        return true;
-      }
-      return false;
-    }),
+  // company_logo: Yup.mixed()
+  //   .required("File is empty")
+  //   .test("required", "A file is required", function (value) {
+  //     const { isEdit } = this.options.context;
+  //     if (!isEdit && !value) {
+  //       return false;
+  //     }
+  //     return true;
+  //   })
+  //   .test("file_size", "File size is too large", function (value) {
+  //     if (value && value.size > 2000000) {
+  //       // 2MB
+  //       return false;
+  //     }
+  //     return true;
+  //   })
+  //   .test("file_type", "Unsupported File Format", function (value) {
+  //     if (typeof value === "string") {
+  //       // If value is a string (file path), skip file type validation
+  //       return true;
+  //     }
+  //     if (
+  //       value &&
+  //       ["image/jpeg", "image/png", "image/jpg"].includes(value.type)
+  //     ) {
+  //       return true;
+  //     }
+  //     return false;
+  //   }),
 });
 export default function AddCompanyDetails({
   setCurrentpage,
@@ -72,9 +72,32 @@ export default function AddCompanyDetails({
   addressback,
   client_id,
   setClient_Id,
+  fileList,
+  profileImage,
+  setProfileImage,
+  updatedata,
+  setEnableUpload,
 }) {
   const [enable, setEnable] = useState(false);
+  // const [profileImage, setProfileImage] = useState("");
+  const [draggerImage, setDraggerImage] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState("");
+  const [currentId,setCurrentId] = useState("")
+  const [clicompanydata, setCliComapanyData] = useState({
+    company_name: "",
+    owner_name: "",
+    phone: "",
+    emailid: "",
+    type_of_constitution: "",
+    business_background: "",
+    web_url: "",
+    company_logo: "",
+  });
+
   const dispatch = useDispatch();
+
+console.log(addressback,clientID,enable,"backbafdkfsdkf");
+
 
   const handleSubmit = async (values) => {
     if (clientID && enable == false) {
@@ -85,15 +108,19 @@ export default function AddCompanyDetails({
           values,
           enable,
           clientID,
-          dispatch
+          dispatch,
+          fileList,
+          setCurrentId,
+          currentId
         );
         // setModalIsOpen(false);
         toast.success(data?.message);
         setCurrentpage(2);
         setClient_Id(data?.id);
-        GetClientProfile(clientID, dispatch)
+        GetClientProfile(clientID, dispatch);
         // GetOffersData(dispatch);
         console.log(data, "Comapny data");
+        setEnable(!enable);
       } catch (error) {
         console.error("Error uploading data", error);
       }
@@ -106,20 +133,10 @@ export default function AddCompanyDetails({
       type_of_constitution: values.constitution,
       business_background: values.business,
       web_url: values.web_url,
-      company_logo: values.company_logo
-    })
+      company_logo: values.company_logo,
+    });
+    setEnableUpload(true);
   };
-
-  const [clicompanydata, setCliComapanyData] = useState({
-    company_name: "",
-    owner_name: "",
-    phone: "",
-    emailid: "",
-    type_of_constitution: "",
-    business_background: "",
-    web_url: "",
-    company_logo: ""
-  });
 
   const fetchGetUser = async () => {
     try {
@@ -142,11 +159,7 @@ export default function AddCompanyDetails({
 
   console.log(clicompanydata, "clicompanydata555");
 
-
   const { Dragger } = Upload;
-  const [profileImage, setProfileImage] = useState("");
-  const [draggerImage, setDraggerImage] = useState(false)
-  const [previewUrl, setPreviewUrl] = useState("");
 
   return (
     <div>
@@ -157,11 +170,15 @@ export default function AddCompanyDetails({
           </label>
           {clientID || addressback ? (
             <button
-              className={`${enable
-                ? "bg-[#1f4b7f] text-white"
-                : "text-[#1f4b7f] bg-white border-[#1f4b7f]"
-                } rounded-full font-semibold w-[10vw] h-[2vw] flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] text-[1.1vw] `}
-              onClick={() => setEnable(!enable)}
+              className={`${
+                enable
+                  ? "bg-[#1f4b7f] text-white"
+                  : "text-[#1f4b7f] bg-white border-[#1f4b7f]"
+              } rounded-full font-semibold w-[10vw] h-[2vw] flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] text-[1.1vw] `}
+              onClick={() => {
+                setEnable(!enable);
+                setEnableUpload(false);
+              }}
             >
               Enable to Edit
             </button>
@@ -190,7 +207,9 @@ export default function AddCompanyDetails({
             }}
             validationSchema={validationSchema}
             onSubmit={(values) => {
-              handleSubmit(values);
+              if (profileImage === true || updatedata) {
+                handleSubmit(values);
+              }
             }}
             enableReinitialize
           >
@@ -202,7 +221,7 @@ export default function AddCompanyDetails({
               values,
               handleChange,
               errors,
-              touched
+              touched,
             }) => (
               <Form onSubmit={handleSubmit}>
                 <div className="gap-y-[1.5vw] flex-col flex">
@@ -226,12 +245,13 @@ export default function AddCompanyDetails({
                               : true
                             : false
                         }
-                        className={`${clientID || addressback
-                          ? enable == false
-                            ? " cursor-not-allowed"
+                        className={`${
+                          clientID || addressback
+                            ? enable == false
+                              ? " cursor-not-allowed"
+                              : ""
                             : ""
-                          : ""
-                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                        } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                       />
                       <ErrorMessage
                         name="company_name"
@@ -258,12 +278,13 @@ export default function AddCompanyDetails({
                               : true
                             : false
                         }
-                        className={`${clientID || addressback
-                          ? enable == false
-                            ? " cursor-not-allowed"
+                        className={`${
+                          clientID || addressback
+                            ? enable == false
+                              ? " cursor-not-allowed"
+                              : ""
                             : ""
-                          : ""
-                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                        } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                       />
                       <ErrorMessage
                         name="owner_name"
@@ -293,12 +314,13 @@ export default function AddCompanyDetails({
                                 : true
                               : false
                           }
-                          className={`${clientID || addressback
-                            ? enable == false
-                              ? " cursor-not-allowed"
+                          className={`${
+                            clientID || addressback
+                              ? enable == false
+                                ? " cursor-not-allowed"
+                                : ""
                               : ""
-                            : ""
-                            } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                         />
                         {/* <button className="absolute right-[0.5vw] text-[1vw] text-white w-[5vw] bg-[#1F4B7F] rounded-full h-[1.7vw]">
                           Verify
@@ -329,12 +351,13 @@ export default function AddCompanyDetails({
                               : true
                             : false
                         }
-                        className={`${clientID || addressback
-                          ? enable == false
-                            ? " cursor-not-allowed"
+                        className={`${
+                          clientID || addressback
+                            ? enable == false
+                              ? " cursor-not-allowed"
+                              : ""
                             : ""
-                          : ""
-                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                        } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                       />
                       <ErrorMessage
                         name="emailid"
@@ -366,12 +389,13 @@ export default function AddCompanyDetails({
                               : true
                             : false
                         }
-                        className={`${clientID || addressback
-                          ? enable == false
-                            ? " cursor-not-allowed"
+                        className={`${
+                          clientID || addressback
+                            ? enable == false
+                              ? " cursor-not-allowed"
+                              : ""
                             : ""
-                          : ""
-                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                        } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                       >
                         <option
                           label="Select Constitution"
@@ -427,12 +451,13 @@ export default function AddCompanyDetails({
                               : true
                             : false
                         }
-                        className={`${clientID || addressback
-                          ? enable == false
-                            ? " cursor-not-allowed"
+                        className={`${
+                          clientID || addressback
+                            ? enable == false
+                              ? " cursor-not-allowed"
+                              : ""
                             : ""
-                          : ""
-                          } custom-dropdown border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                        } custom-dropdown border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                       >
                         <option
                           label="Select Constitution"
@@ -544,7 +569,7 @@ export default function AddCompanyDetails({
                     </div>
                   </div>
                   <div className="grid grid-cols-2 w-full gap-x-[2vw]">
-                    <div className="col-span-1">
+                    <div className="col-span-2">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         Web URL
                         <span className="text-[1vw] text-red-600 pl-[0.2vw]">
@@ -563,12 +588,13 @@ export default function AddCompanyDetails({
                               : true
                             : false
                         }
-                        className={`${clientID || addressback
-                          ? enable == false
-                            ? " cursor-not-allowed"
+                        className={`${
+                          clientID || addressback
+                            ? enable == false
+                              ? " cursor-not-allowed"
+                              : ""
                             : ""
-                          : ""
-                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                        } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                       />
                       <ErrorMessage
                         name="web_url"
@@ -576,89 +602,17 @@ export default function AddCompanyDetails({
                         className="text-red-500 text-[0.8vw]"
                       />
                     </div>
-                    <div className="col-span-1 relative">
-                      <label className="text-[#1F4B7F] text-[1.1vw] ">
-                        Company Logo                      </label>
-                      <Field name="company_logo">
-                        {({ field, form }) => (
-                          <>
-                            <Dragger
-                              onChange={() => setDraggerImage(true)}
-                              height={"7.2vw"}
-                              beforeUpload={(file) => {
-                                console.log(file, "filefilefilefile");
-                                setFieldValue("company_logo", file);
-                                setProfileImage(file.name);
-                                setCliComapanyData({
-                                  ...clicompanydata,
-                                  cliCmp_logo: file,
-                                });
-                                setFieldValue("fileType", file.type);
-                                setFieldValue("fileSize", file.size);
-                                const reader = new FileReader();
-
-                                reader.onloadend = () => {
-                                  setPreviewUrl(reader.result); // Set the preview URL
-                                };
-
-                                reader.readAsDataURL(file);
-                                return false; // Prevent automatic upload
-                              }}
-                              showUploadList={false} // Disable the default upload list
-                              className=" mt-[0.5vw] relative"
-                              style={{
-                                backgroundSize: "cover",
-                                backgroundPosition: "center",
-                                position: "relative",
-                              }}
-                              disabled={
-                                clientID || addressback
-                                  ? enable
-                                    ? false
-                                    : true
-                                  : false
-                              }
-                            >
-                              <label className="flex items-center justify-center z-10 absolute top-[0.5vw]">
-                                <p className="text-[#1F4B7F] font-bold text-[1.1vw] pr-[1vw]"> {/* Added leading */}
-                                  Drag and Drop
-                                </p>
-                                <FaUpload color="#1F4B7F" size={"1.2vw"} />
-                              </label>
-                              <div
-                                className="absolute top-0 left-0 w-full h-full"
-                                style={{
-                                  backgroundImage: `url(${(clicompanydata?.company_logo
-                                    && draggerImage == false
-                                  )
-                                    ? `http://192.168.90.47:4000${clicompanydata?.company_logo}`
-                                    : ""
-                                    // `http://192.168.90.47:4000${superadmincompanydata.profileimg}`
-                                    })`,
-                                  backgroundSize: "cover",
-                                  backgroundPosition: "center",
-                                  opacity: "30%",
-                                  zIndex: 0,
-                                }}
-                              ></div>
-                            </Dragger>
-                          </>
-                        )}
-                      </Field>
-                      {profileImage && (
-                        <p className="text-[#1F4B7F] text-[0.8vw] mt-2">
-                          {profileImage}
-                        </p>
-                      )}
-                      {errors.file && touched.file && (
-                        <div className="text-red-500 text-[0.8vw]">
-                          {errors.file}
-                        </div>
-                      )}
-                    </div>
                   </div>
 
-                  <div className="flex items-center justify-between py-[1vw]">
+                  <div className="flex items-center justify-between py-[1vw] relative">
+                    {updatedata
+                      ? " "
+                      : profileImage === false && (
+                          <div className="text-red-700 text-[.7vw] top-[-.3vw] absolute">
+                            * Profile Image is required
+                          </div>
+                        )}
+
                     <div>
                       <h1 className="text-[#1F4B7F] text-[0.7vw] font-semibold">
                         *You must fill in all fields to be able to continue
@@ -671,7 +625,7 @@ export default function AddCompanyDetails({
                       <button
                         className="bg-[#1F487C] font-semibold rounded-full w-[10vw] h-[2vw] text-[1vw] text-white"
                         type="submit"
-                      // onClick={() => setCurrentpage(2)}
+                        // onClick={() => setCurrentpage(2)}
                       >
                         {clientID || addressback
                           ? enable
