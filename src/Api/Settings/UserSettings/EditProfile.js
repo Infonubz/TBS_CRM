@@ -1,5 +1,6 @@
 import axios from "axios";
 import { USER_SETTINGS_EDIT } from "../../../Store/Type";
+import { toast } from "react-toastify";
 
 const api = axios.create({
   headers: {
@@ -29,6 +30,7 @@ export const UpdateEditUserSettings = async (id, owname, dispatch) => {
     });
     dispatch({ type: USER_SETTINGS_EDIT, payload: response.data });
     sessionStorage.setItem("user_name", owname);
+    toast.success(response?.data?.message);
     window.location.reload();
   } catch (err) {
     console.log(err);

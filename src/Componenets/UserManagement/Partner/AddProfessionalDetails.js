@@ -126,7 +126,7 @@ export default function AddProfessionalDetails({
                         value={values.expiry_date}
                         onChange={(e) => {
                           handleChange(e);
-                          localStorage.setItem("dob", e.target.value);
+                          sessionStorage.setItem("dob", e.target.value);
                         }}
                         className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                       />
@@ -171,7 +171,7 @@ export default function AddProfessionalDetails({
                         value={values.status}
                         onChange={(e) => {
                           handleChange(e);
-                          localStorage.setItem("status", e.target.value);
+                          sessionStorage.setItem("status", e.target.value);
                         }}
                         className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                       >

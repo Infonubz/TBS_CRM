@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Grid, Space, Table } from "antd";
+import { Button, Grid, Space, Table, Tooltip } from "antd";
 import { render } from "@testing-library/react";
 import { MdModeEditOutline, MdPadding } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
@@ -34,6 +34,8 @@ const PartnerTableList = ({
 }) => {
   const [sortedInfo, setSortedInfo] = useState({});
   const [viewmodal, setViewModal] = useState(false);
+  const [userName,setUserName] = useState()
+  const [partnerStatusId,setPartnerStatusId]= useState()
 
   const handleChange = (pagination, filters, sorter) => {
     console.log("Various parameters", pagination, filters, sorter);
@@ -67,13 +69,26 @@ const PartnerTableList = ({
                 ? `http://192.168.90.47:4000${row?.profile_img}`
                 : UserProfile
                 } `}
-              alt="Photo"
+                 alt="Profile"
               className="w-[2.15vw] h-[2.15vw] object-cover rounded-[0.2vw]"
             />
           </div>
         );
       },
       width: "6vw",
+    },
+    {
+      title: <div className="flex items-center justify-center font-bold text-[1.2vw]">Partner Id</div>,
+      key: "id",
+      ellipsis: true,
+      width: "9vw",
+      render: (text, row) => {
+        return (
+          <div className="flex items-center justify-center">
+            <p className="text-[1.1vw] text-[#1F4B7F]">{row.tbs_partner_id}</p>
+          </div>
+        );
+      },
     },
     {
       title: <div className="flex items-center justify-center  font-bold text-[1.2vw]">Partner Name</div>, // dataIndex: "name",
@@ -87,11 +102,23 @@ const PartnerTableList = ({
       },
       width: "12vw",
       sortOrder: sortedInfo.columnKey === "name" && sortedInfo.order,
-      render: (row) => (
-        <div className="flex items-center justify-center">
-          <p className="text-[1.1vw]">{`${row?.partner_first_name} ${row.partner_last_name}`}</p>
-        </div>
-      ),
+      // render: (row) => (
+      //   <div className="flex items-center justify-center">
+      //     <p className="text-[1.1vw] text-[#1F4B7F]">{`${capitalizeFirstLetter(row?.partner_first_name)} ${row.partner_last_name}`}</p>
+      //   </div>
+      // ),
+      render: (row) => {
+        const fullname = `${capitalizeFirstLetter(row?.partner_first_name)} ${row.partner_last_name}`
+        return (
+          <div className="flex items-center justify-center">
+            <p className="text-[1.1vw] text-[#1F4B7F]">{
+              fullname?.length > 16 ? <Tooltip placement="top"
+                title={`${capitalizeFirstLetter(row?.partner_first_name)} ${row.partner_last_name}`}
+                className="cursor-pointer">{fullname?.slice(0, 16) + ".."}</Tooltip> : fullname
+            }</p>
+          </div>
+        )
+      }
     },
 
     {
@@ -104,7 +131,7 @@ const PartnerTableList = ({
       render: (text, row) => {
         return (
           <div className="flex items-center justify-center">
-            <p className="text-[1.1vw]">{row.phone}</p>
+            <p className="text-[1.1vw] text-[#1F4B7F]">{row.phone}</p>
           </div>
         );
       },
@@ -119,9 +146,27 @@ const PartnerTableList = ({
       width: "15vw",
       render: (row) => {
         return (
-          <div className="flex items-center justify-center">
-            <p className="text-[1.1vw]">{row.emailid}</p>
-          </div>
+          // <div className="flex items-center justify-center">
+          //   <p className="text-[1.1vw] text-[#1F4B7F]">{row.emailid}</p>
+          // </div>
+          <div flex items-center justify-center>
+          {row?.emailid?.length > 20 ? (
+            <Tooltip
+              placement="top"
+              title={row?.emailid}
+              className="cursor-pointer"
+            >
+              <div className="text-[1.1vw] text-center text-[#1f4b7f]">
+                {" "}
+                {`${row?.emailid?.slice(0, 20)}...`}
+              </div>
+            </Tooltip>
+          ) : (
+            <div className="text-[1.1vw] text-center text-[#1f4b7f]">
+              {row?.emailid?.slice(0, 20)}
+            </div>
+          )}
+        </div>
         );
       },
     },
@@ -136,7 +181,7 @@ const PartnerTableList = ({
       render: (row) => {
         return (
           <div className="flex items-center justify-center">
-            <p className="text-[1.1vw]">
+            <p className="text-[1.1vw] text-[#1F4B7F]">
               {dayjs(row.created_date).format("MMM DD hh:mm a")}
             </p>
           </div>
@@ -155,19 +200,22 @@ const PartnerTableList = ({
           <div className="flex items-center justify-center">
             <button
               className={`${row.partner_status_id == 0
-                ? "bg-[#FF6B00]"
-                : row.partner_status_id == 1
+                ? "bg-[#646262] cursor-not-allowed" 
+                 : row.partner_status_id == 1
+                  ? "bg-[#FF6B00] cursor-not-allowed"
+                : row.partner_status_id == 2
                   ? "bg-[#38ac2c]"
-                  : row.partner_status_id == 2
+                  : row.partner_status_id == 3
                     ? "bg-[#FD3434]"
-                    : "bg-[#2A99FF]"
+                    : "bg-[#2A99FF] cursor-not-allowed"
                 } ${row.partner_status_id == 0
                   ? "cursor-not-allowed"
                   : "cursor-pointer"
                 } h-[1.8vw] text-[1.1vw] text-white w-[8vw] rounded-[0.5vw]`}
               onClick={() => {
-                if (row.partner_status_id === 1) {
+                if (row.partner_status_id === 2 ||row.partner_status_id === 3 ) {
                   setViewModal(true);
+                  setPartnerStatusId(row.partner_status_id )
                   setPartnerID(row?.tbs_partner_id);
                 }
               }}
@@ -216,6 +264,7 @@ const PartnerTableList = ({
                 onClick={() => {
                   setDeleteModalIsOpen(true);
                   setPartnerID(row?.tbs_partner_id);
+                  setUserName(`${row?.partner_first_name} ${" "} ${row?.partner_last_name}`)
                 }}
               />
 
@@ -270,7 +319,7 @@ const PartnerTableList = ({
       >
         <DeleteList
           setDeleteModalIsOpen={setDeleteModalIsOpen}
-          title={"Want to delete this User"}
+          title={`Want to delete this User  ${capitalizeFirstLetter(userName)}`}
           api={`${apiUrl}/partner_details/${PartnerID}`}
           module={"partner"}
         />
@@ -286,6 +335,7 @@ const PartnerTableList = ({
         <PartnerStatusUpdate
           PartnerID={PartnerID}
           setViewModal={setViewModal}
+          partnerStatusId={partnerStatusId}
         />
       </ModalPopup>
     </>

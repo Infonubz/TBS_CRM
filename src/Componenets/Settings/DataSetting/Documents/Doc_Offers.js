@@ -50,36 +50,39 @@ export default function Offers() {
 
   const columns = [
     {
-      title: <span className="text-[1vw]">Name</span>,
+      title: <span className="text-[1.25vw] font-bold text-[#1F487C] flex items-center justify-center">Name</span>,
       // dataIndex: "name",
       //sorter: (a, b) => a.name.length - b.name.length,
       render: (row) => (
-        <div className="flex items-center">
+        <div className="flex items-center justify-center">
           <p className="text-[1vw]">{row?.offer_name}</p>
         </div>
       ),
+      width: '20vw'
     },
     {
-      title: <span className="text-[1vw]">Modified</span>,
+      title: <span className="text-[1.25vw] font-bold text-[#1F487C] flex items-center justify-center">Modified</span>,
       // dataIndex: "modified",
       //defaultSortOrder: "descend",
       sorter: (a, b) => a.updated_date - b.updated_date,
       render: (row) => (
-        <div className="flex items-center">
+        <div className="flex items-center justify-center">
           <p className="text-[1vw]">{`${dayjs(row?.updated_date).format(
             "DD MMM, YY"
           )}`}</p>
         </div>
       ),
+      width: '15vw'
     },
     {
-      title: <span className="text-[1vw]">Size</span>,
+      title: <span className="text-[1.25vw] font-bold text-[#1F487C] flex items-center justify-center">Size</span>,
       //dataIndex: "size",
       render: (row) => (
-        <div className="flex items-center">
-          <p className="text-[1vw]">{row?.image_size}</p>
+        <div className="flex items-center justify-center">
+          <p className="text-[1vw]">{(row?.image_size / 1024).toFixed(1)} KB</p>
         </div>
       ),
+      width: '15vw'
     },
   ];
 
@@ -96,6 +99,7 @@ export default function Offers() {
             onRow={(record) => ({
               onClick: () => handleOnClick(record),
             })}
+            scroll={{ y: '25vw' }}
           />
         </div>
         <div className="flex flex-col space-y-[1vw]">
@@ -172,15 +176,17 @@ export default function Offers() {
                 {selectItems?.image_file?.filename}
               </div>
               <div className="">
-                <Image_Video 
-                fileUrl={fileUrl} 
-                filename={filename}
-                selectItems ={selectItems} />
+                <Image_Video
+                  fileUrl={fileUrl}
+                  filename={filename}
+                  selectItems={selectItems} />
                 {/* <MdDownloadForOffline onClick={handleDownload} color="#4283e5" size="2vw" /> */}
               </div>
             </div>
             <div className="text-[1vw] text-[#818181]">
-              Size:{selectItems?.image_file?.size}
+              {selectItems ?
+                <p> Size:{(selectItems?.image_size / 1024).toFixed(2)} KB</p>
+                : <p>Size:{""}</p>}
             </div>
           </div>
         </div>

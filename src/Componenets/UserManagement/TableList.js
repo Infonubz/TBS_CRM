@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Grid, Space, Table } from "antd";
+import { Button, Grid, Space, Table, Tooltip } from "antd";
 import { render } from "@testing-library/react";
 import { MdModeEditOutline, MdPadding } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
@@ -32,12 +32,13 @@ const TableList = ({
   setDeleteOpModalIsOpen,
   deleteOpmodalIsOpen,
   update,
-  setUpdate
+  setUpdate,
 }) => {
   const [sortedInfo, setSortedInfo] = useState({});
   const [statusModal, setStatusModal] = useState(false);
-  const [statusId, setStatusId] = useState()
-  const [userId, setUserId] = useState()
+  const [statusId, setStatusId] = useState();
+  const [userId, setUserId] = useState();
+  const [userName, setUserName] = useState();
   const handleChange = (pagination, filters, sorter) => {
     console.log("Various parameters", pagination, filters, sorter);
 
@@ -46,18 +47,20 @@ const TableList = ({
   const get_operator_list = useSelector((state) => state.crm.operator_list);
 
   const UpdateStatus = (statusid, userid) => {
-    setStatusModal(true)
-    setStatusId(statusid)
-    setUserId(userid)
-  }
+    setStatusModal(true);
+    setStatusId(statusid);
+    setUserId(userid);
+  };
   const CloseStatusModal = () => {
-    setStatusModal(false)
-  }
-  console.log(operatorID, '5102024')
+    setStatusModal(false);
+  };
+  console.log(operatorID, "5102024");
   const columns = [
     {
       title: (
-        <div className="flex justify-center items-center font-bold text-[1.2vw]">Photo</div>
+        <div className="flex justify-center items-center font-bold text-[1.2vw]">
+          Photo
+        </div>
       ),
       // dataIndex: "photo",
       // key: "photo",
@@ -68,11 +71,12 @@ const TableList = ({
         return (
           <div className="flex justify-center items-center">
             <img
-              src={`${row?.profileimg
-                ? `http://192.168.90.47:4000${row?.profileimg}`
-                : UserProfile
-                } `}
-              alt="Photo"
+              src={`${
+                row?.profileimg
+                  ? `http://192.168.90.47:4000${row?.profileimg}`
+                  : UserProfile
+              } `}
+              alt="Profile"
               className="w-[2.15vw] h-[2.15vw] object-cover rounded-[0.2vw]"
             />
           </div>
@@ -81,7 +85,36 @@ const TableList = ({
       width: "6vw",
     },
     {
-      title: <div className="flex items-center justify-center  font-bold text-[1.2vw]">Company Name</div>, // dataIndex: "name",
+      title: (
+        <div className="flex items-center justify-center  font-bold text-[1.2vw]">
+          Operator Id
+        </div>
+      ), // dataIndex: "name",
+      key: "name",
+      // sorter: (a, b) => {
+      //   const nameA = a.owner_name.toUpperCase();
+      //   const nameB = b.owner_name.toUpperCase();
+      //   return nameA.localeCompare(nameB);
+      // },
+      width: "9vw",
+      sortOrder: sortedInfo.columnKey === "name" && sortedInfo.order,
+      render: (row) => (
+        <div className="flex items-center justify-center">
+          {console.log(
+            row.tbs_operator_id,
+            "ooooooooooooopppppppppppppppppiiiiiidddd"
+          )}
+          {/* <p className="text-[1.1vw]">{`${row?.owner_name}`}</p> */}
+          <p className="text-[1.1vw] text-[#1F4B7F]">{`${row?.tbs_operator_id}`}</p>
+        </div>
+      ),
+    },
+    {
+      title: (
+        <div className="flex items-center justify-center  font-bold text-[1.2vw]">
+          Company Name
+        </div>
+      ), // dataIndex: "name",
       key: "name",
       sorter: (a, b) => {
         const nameA = a.owner_name.toUpperCase();
@@ -91,21 +124,38 @@ const TableList = ({
       width: "12vw",
       sortOrder: sortedInfo.columnKey === "name" && sortedInfo.order,
       render: (row) => (
-        <div className="flex items-center">
-          {console.log(row.tbs_operator_id, "ooooooooooooopppppppppppppppppiiiiiidddd")}
+        <div className="flex items-center text-[1.1vw] text-[#1F4B7F] justify-center">
+          {console.log(
+            row.tbs_operator_id,
+            "ooooooooooooopppppppppppppppppiiiiiidddd"
+          )}
           {/* <p className="text-[1.1vw]">{`${row?.owner_name}`}</p> */}
-          <p className="text-[1.1vw]">{`${row?.company_name}`}</p>
+          {/* <p className="text-[1.1vw] text-[#1F4B7F]">{`${capitalizeFirstLetter(row?.company_name)}`}</p> */}
+          {row?.company_name?.length > 17 ? (
+            <Tooltip title={capitalizeFirstLetter(row?.company_name)}>
+              <span>{`${capitalizeFirstLetter(row?.company_name).slice(
+                0,
+                17
+              )}...`}</span>
+            </Tooltip>
+          ) : (
+            <span>{capitalizeFirstLetter(row?.company_name)}</span>
+          )}
         </div>
       ),
     },
 
     {
-      title: <div className="flex items-center justify-center font-bold text-[1.2vw]">Mobile</div>,
+      title: (
+        <div className="flex items-center justify-center font-bold text-[1.2vw]">
+          Mobile
+        </div>
+      ),
       key: "mobile",
       //sorter: (a, b) => a.mobilenumber?.length - b.mobilenumber?.length,
       sorter: (a, b) => {
-        const phoneA = a.phone ? a.phone.replace(/\D/g, '') : '';
-        const phoneB = b.phone ? b.phone.replace(/\D/g, '') : '';
+        const phoneA = a.phone ? a.phone.replace(/\D/g, "") : "";
+        const phoneB = b.phone ? b.phone.replace(/\D/g, "") : "";
         return phoneA.localeCompare(phoneB);
       },
 
@@ -114,14 +164,18 @@ const TableList = ({
       width: "10vw",
       render: (text, row) => {
         return (
-          <div className="flex items-center">
-            <p className="text-[1.1vw]">{row.phone}</p>
+          <div className="flex items-center justify-center">
+            <p className="text-[1.1vw] text-[#1F4B7F]">{row.phone}</p>
           </div>
         );
       },
     },
     {
-      title: <div className="flex items-center justify-center  font-bold text-[1.2vw]">Email</div>,
+      title: (
+        <div className="flex items-center justify-center  font-bold text-[1.2vw]">
+          Email
+        </div>
+      ),
       key: "email",
       sorter: (a, b) =>
         (a.emailid ? a.emailid.length : 0) - (b.emailid ? b.emailid.length : 0),
@@ -130,14 +184,36 @@ const TableList = ({
       width: "15vw",
       render: (row) => {
         return (
-          <div className="flex items-center">
-            <p className="text-[1.1vw]">{row.emailid}</p>
+          // <div className="flex items-center justify-center">
+          //   <p className="text-[1.1vw] text-[#1F4B7F]">{row.emailid}</p>
+          // </div>
+          <div flex items-center justify-center>
+            {row?.emailid?.length > 20 ? (
+              <Tooltip
+                placement="top"
+                title={row?.emailid}
+                className="cursor-pointer"
+              >
+                <div className="text-[1.1vw] text-center text-[#1f4b7f]">
+                  {" "}
+                  {`${row?.emailid?.slice(0, 20)}...`}
+                </div>
+              </Tooltip>
+            ) : (
+              <div className="text-[1.1vw] text-center text-[#1f4b7f]">
+                {row?.emailid?.slice(0, 20)}
+              </div>
+            )}
           </div>
         );
       },
     },
     {
-      title: <div className="flex items-center justify-center  font-bold text-[1.2vw]">Created</div>,
+      title: (
+        <div className="flex items-center justify-center  font-bold text-[1.2vw]">
+          Created
+        </div>
+      ),
       key: "created_date",
       sorter: (a, b) => new Date(a.created_date) - new Date(b.created_date),
       sortOrder: sortedInfo.columnKey === "created_date" && sortedInfo.order,
@@ -145,8 +221,8 @@ const TableList = ({
       width: "10vw",
       render: (row) => {
         return (
-          <div className="flex  items-center">
-            <p className="text-[1.1vw]">
+          <div className="flex  items-center justify-center">
+            <p className="text-[1.1vw] text-[#1F4B7F]">
               {dayjs(row.created_date).format("DD MMM, YY")}
             </p>
           </div>
@@ -155,7 +231,9 @@ const TableList = ({
     },
     {
       title: (
-        <div className="flex items-center justify-center font-bold text-[1.2vw]">Status</div>
+        <div className="flex items-center justify-center font-bold text-[1.2vw]">
+          Status
+        </div>
       ),
       // dataIndex: "status",
       // key: "status",
@@ -164,15 +242,27 @@ const TableList = ({
         return (
           <div className="flex items-center justify-center">
             <button
-              className={`${row.user_status_id == 0
-                ? "bg-[#FF6B00] cursor-not-allowed"
-                : row.user_status_id == 1
-                  ? "bg-[#38ac2c]"
-                  : "bg-[#FD3434] cursor-not-allowed"
-                } h-[1.8vw] text-[1.1vw] text-white w-[7vw] rounded-[0.5vw]`}
+              className={`${
+                // row.user_status_id == 0
+                //   ? "bg-[#FF6B00] cursor-not-allowed"
+                //   : row.user_status_id == 1
+                //   ? "bg-[#38ac2c]"
+                //   : row.user_status_id == 2
+                //   ? "bg-[#FD3434] cursor-not-allowed"
+                //   : "bg-[#2A99FF] cursor-not-allowed"
+                row.user_status_id == 0
+                  ? " bg-[#646262]  cursor-not-allowed"
+                  : row.user_status_id == 1
+                  ? " bg-[#FF6B00] cursor-not-allowed "
+                  : row.user_status_id == 2
+                  ? " bg-[#38ac2c] "
+                  : row.user_status_id == 3
+                  ? " bg-[#FD3434]"
+                  : "bg-[#2A99FF] cursor-not-allowed"
+              } h-[1.8vw] text-[1.1vw] text-white w-[7vw] rounded-[0.5vw]`}
               // onClick={()=>UpdateStatus(row.user_status_id,row.tbs_operator_id)}
               onClick={() => {
-                if (row.user_status_id === 1) {
+                if (row.user_status_id === 2 || row.user_status_id === 3) {
                   UpdateStatus(row.user_status_id, row.tbs_operator_id);
                 }
               }}
@@ -185,7 +275,9 @@ const TableList = ({
     },
     {
       title: (
-        <div className="flex items-center justify-center font-bold text-[1.2vw]">Action</div>
+        <div className="flex items-center justify-center font-bold text-[1.2vw]">
+          Action
+        </div>
       ),
       // dataIndex: "action",
       // key: "action",
@@ -221,6 +313,7 @@ const TableList = ({
                 onClick={() => {
                   setDeleteOpModalIsOpen(true);
                   setOperatorID(row?.tbs_operator_id);
+                  setUserName(row?.company_name);
                 }}
               />
 
@@ -267,16 +360,18 @@ const TableList = ({
         className="custom-table"
       />
 
-
       <ModalPopup
         show={statusModal}
         onClose={CloseStatusModal}
         height="17vw"
         width="30vw"
-        closeicon={false}>
-        <TableListStatusChange statusId={statusId} userId={userId} setStatusModal={setStatusModal} />
-
-
+        closeicon={false}
+      >
+        <TableListStatusChange
+          statusId={statusId}
+          userId={userId}
+          setStatusModal={setStatusModal}
+        />
       </ModalPopup>
       <ModalPopup
         show={deleteOpmodalIsOpen}
@@ -287,7 +382,9 @@ const TableList = ({
       >
         <DeleteList
           setDeleteModalIsOpen={setDeleteOpModalIsOpen}
-          title={"Want to delete this Operator"}
+          title={`Want to delete this Operator ${capitalizeFirstLetter(
+            userName
+          )}`}
           api={`${apiUrl}/operators/${operatorID}`}
           module={"operator"}
         />

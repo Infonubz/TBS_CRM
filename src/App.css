@@ -366,8 +366,8 @@ body {
 .custom-dragger {
   border-top: 0.1vw solid #1f4b7f;
   border-left: 0.1vw solid #1f4b7f;
-  border-right: 0.3vw solid #1f4b7f;
-  border-bottom: 0.3vw solid #1f4b7f;
+  border-right: 0.25vw solid #1f4b7f;
+  border-bottom: 0.25vw solid #1f4b7f;
   border-radius: 0.5vw;
 }
 
@@ -812,6 +812,74 @@ html {
   padding: 0;
 }
 .custom-range-picker .ant-picker-input > input::placeholder {
-  color: #1F487C; /* Replace with your desired placeholder color */
-  opacity: 0.75;  /* Optional: adjust opacity if needed */
+  color: #1f487c; /* Replace with your desired placeholder color */
+  opacity: 0.75; /* Optional: adjust opacity if needed */
+}
+:where(.css-dev-only-do-not-override-m4timi).ant-popover .ant-popover-inner {
+  padding: 0;
+  border-radius: 0.5vw;
+}
+:where(.css-dev-only-do-not-override-m7vext).ant-picker-outlined:hover {
+  border-color: #1f487c;
+}
+:where(.css-dev-only-do-not-override-m7vext).ant-picker-outlined:focus,
+:where(.css-dev-only-do-not-override-m7vext).ant-picker-outlined:focus-within {
+  border-color: #1f487c;
+  font-size: 1vw;
+}
+:where(.css-dev-only-do-not-override-m7vext).ant-picker
+  .ant-picker-input
+  > input {
+  font-size: 1vw;
+}
+/* .px-\[1vw\] {
+  padding-left: 0;
+} */
+
+:where(.css-dev-only-do-not-override-m4timi).ant-select-outlined:not(
+    .ant-select-disabled
+  ):not(.ant-select-customize-input):not(.ant-pagination-size-changer):hover
+  .ant-select-selector {
+  border-color: #1f487c;
+}
+.ant-select-focused:where(
+    .css-dev-only-do-not-override-m4timi
+  ).ant-select-outlined:not(.ant-select-disabled):not(
+    .ant-select-customize-input
+  ):not(.ant-pagination-size-changer)
+  .ant-select-selector {
+  border-color: #1f487c;
+}
+.ant-select-outlined:not(.ant-select-customize-input) .ant-select-selector {
+  border-radius: 0.2vw;
+}
+.ant-select-outlined:not(.ant-select-customize-input) .ant-select-selector {
+  border-radius: 0.1vw;
+}
+:where(.css-dev-only-do-not-override-m4timi).ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload.ant-upload-select, :where(.css-dev-only-do-not-override-m4timi).ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload.ant-upload-select {
+  width: 6vw !important;
+  height: 6vw !important;
+  text-align: center;
+  vertical-align: top;
+  background-color: rgba(0, 0, 0, 0.02);
+  border: 1px dashed #d9d9d9;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+:where(.css-dev-only-do-not-override-m4timi).ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload-list.ant-upload-list-picture-card .ant-upload-list-item-container, :where(.css-dev-only-do-not-override-m4timi).ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload-list.ant-upload-list-picture-card .ant-upload-list-item-container, :where(.css-dev-only-do-not-override-m4timi).ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload-list.ant-upload-list-picture-circle .ant-upload-list-item-container, :where(.css-dev-only-do-not-override-m4timi).ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload-list.ant-upload-list-picture-circle .ant-upload-list-item-container {
+  display: inline-block;
+  width: 7vw;
+  height: 7vw;
+  vertical-align: top;
+}
+
+:where(.css-dev-only-do-not-override-m4timi).ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload.ant-upload-select >.ant-upload, :where(.css-dev-only-do-not-override-m4timi).ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload.ant-upload-select >.ant-upload {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  font-size: 1vw;
 }

@@ -5,10 +5,7 @@ import { toast } from "react-toastify";
 import * as Yup from "yup";
 import { ProductOwnerLogin } from "../../Api/Login/AllLogin";
 import { useNavigate } from "react-router";
-import product_owner_bg from "../../asserts/product_owner_bg1.png";
-import product_owner from "../../asserts/product_owner1.png";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import logo from "../../asserts/crmlogo.png";
 
 const emailOrPhoneValidation = Yup.string().test(
   "emailOrPhone",
@@ -26,10 +23,12 @@ const validationSchema = Yup.object().shape({
 });
 
 export default function ProductOwner({ setAuthtoken, setForgotPassword }) {
-  console.log(emailOrPhoneValidation, "emailOrPhoneValidation");
+
+
   const navigate = useNavigate();
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const phoneRegex = /^\d{10}$/;
+  const [showPassword, setShowPassword] = useState(false);
+  // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  // const phoneRegex = /^\d{10}$/;
 
   const validateInput = (input) => {
     const emailRegex = /\S+@\S+\.\S+/;
@@ -92,7 +91,6 @@ export default function ProductOwner({ setAuthtoken, setForgotPassword }) {
       setSubmitting(false);
     }
   };
-  const [showPassword, setShowPassword] = useState(false);
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -100,9 +98,9 @@ export default function ProductOwner({ setAuthtoken, setForgotPassword }) {
 
   return (
     <div className="absolute right-0 top-0 bg-[#E5FFF1] h-full w-[38vw] rounded-tr-[2vw] rounded-br-[2vw] bg-opacity-80 flex flex-col items-center justify-center">
-      <label className="text-[#1F487C] font-bold text-[2vw] ">Login</label>
+      <label className="text-[#1F487C] font-bold text-[2vw] ">PRODUCT OWNER</label>
       <p className="text-[#1F487C] text-[1vw] py-[2vw]">
-        Welcome Back, Please login to your account
+        Welcome Back, Please sign in to your account
       </p>
       <Formik
         initialValues={{

@@ -5,6 +5,8 @@ import {
   PROMOTION_DATA,
 } from "../../Store/Type";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
+import { useState } from "react";
 
 const api = axios.create({
   headers: {
@@ -13,11 +15,14 @@ const api = axios.create({
 });
 const apiUrl = process.env.REACT_APP_API_URL;
 // const userType = sessionStorage.getItem("type_name");
-const userType = localStorage.getItem("type_name");
-
-export const GetPromotionData = async (dispatch) => {
+const userType = sessionStorage.getItem("type_name");
+const typeID = sessionStorage.getItem("type_id");
+const userID = sessionStorage.getItem("USER_ID");
+export const GetPromotionData = async (dispatch, CurrentTab) => {
   try {
-    const response = await api.get(`${apiUrl}/promo`);
+    const response = await api.get(
+      `${apiUrl}/promo${typeID === "OP101" ? `/${userID}` : ""}`
+    );
     dispatch({ type: PROMOTION_DATA, payload: response.data });
     return response.data;
   } catch (error) {
@@ -115,12 +120,24 @@ export const SubmitPromotionData = async (
   promolist,
   currentPromodata,
   promotionId,
-  dispatch
+  dispatch,
+  promo_background
 ) => {
+  // const promo_background = useSelector((state) => state.crm.promo_bg);
+  // console.log(promo_background, "promo_background852");
+  // const storedFileData = sessionStorage.getItem("promo_bg");
+  // if (storedFileData) {
+  //   const { name, lastModified, type, size } = JSON.parse(storedFileData);
+
+  //   // Create a new File object
+  //   const reconstructedFile = new File([], name, { type, lastModified });
+  //   console.log(reconstructedFile,"reconstructedFile");
+  // }
+  // const [Bg_Promo, setBgPromo] = useState("");
   const operator_details =
     userType !== "PRODUCTOWNER"
       ? // ? sessionStorage.getItem("user_name")
-        localStorage.getItem("user_name")
+        sessionStorage.getItem("user_name")
       : currentPromodata.operator_details;
   console.log(promotionId, "updatedataupdatedata");
   console.log(currentPromodata.status, "currentPromodatacurrentPromodata");
@@ -129,14 +146,14 @@ export const SubmitPromotionData = async (
   formData.append("operator_details", operator_details);
   formData.append("start_date", currentPromodata.start_date);
   formData.append("expiry_date", currentPromodata.expiry_date);
-  formData.append("usage", currentPromodata.usage);
+  formData.append("usage", promolist.usage);
   formData.append("promo_description", currentPromodata.promotion_description);
   formData.append("promo_image", currentPromodata.file);
   formData.append(
     "promo_status_id",
     currentPromodata.status == "Draft"
       ? 0
-      : currentPromodata.status == "Requested"
+      : currentPromodata.status == "Posted"
       ? 1
       : 2
   );
@@ -146,8 +163,10 @@ export const SubmitPromotionData = async (
     "user_status",
     currentPromodata.status == "Draft" ? -1 : "Pending"
   );
-  formData.append("tbs_user_id", localStorage.getItem("USER_ID"));
-  formData.append("background_image", promolist);
+  formData.append("tbs_user_id", sessionStorage.getItem("USER_ID"));
+  formData.append("background_image", promo_background);
+  formData.append("promo_value", currentPromodata?.promo_value);
+  formData.append("promo_code", currentPromodata?.promo_code);
 
   const url = promotionId
     ? `${apiUrl}/promo/${promotionId}`

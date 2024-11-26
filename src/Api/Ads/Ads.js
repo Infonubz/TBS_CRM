@@ -1,5 +1,10 @@
 import axios from "axios";
-import { GET_ADS, GET_ADS_CLIENT, GET_MOBILE_ADS, GET_RECENT_ADS } from "../../Store/Type";
+import {
+  GET_ADS,
+  GET_ADS_CLIENT,
+  GET_MOBILE_ADS,
+  GET_RECENT_ADS,
+} from "../../Store/Type";
 import { toast } from "react-toastify";
 
 const api = axios.create({
@@ -8,10 +13,12 @@ const api = axios.create({
   },
 });
 const apiUrl = process.env.REACT_APP_API_URL;
+const typeId = sessionStorage.getItem("type_id");
 
 export const GetAdsData = async (dispatch) => {
   try {
-    const response = await axios.get(`${apiUrl}/ads-all`);
+    const response =
+      typeId == "PRO101" ? await axios.get(`${apiUrl}/ads-all`) : " ";
     dispatch({ type: GET_ADS, payload: response.data });
     return response.data;
   } catch (error) {
@@ -22,7 +29,8 @@ export const GetAdsData = async (dispatch) => {
 
 export const GetMobileAds = async (dispatch) => {
   try {
-    const response = await axios.get(`${apiUrl}/mobads-all`);
+    const response =
+      typeId == "PRO101" ? await axios.get(`${apiUrl}/mobads-all`) : " ";
     dispatch({ type: GET_MOBILE_ADS, payload: response.data });
     return response.data;
   } catch (error) {
@@ -37,14 +45,13 @@ export const Deleteall = async (api, dispatch) => {
     console.log(response.data, "response.data5555");
     toast.success(response.data);
     GetAdsData(dispatch);
-    GetMobileAds(dispatch)
+    GetMobileAds(dispatch);
     return response.data;
   } catch (error) {
     handleError(error);
     return null;
   }
 };
-
 
 export const SubmitAdsData = async (
   advalues,
@@ -54,7 +61,7 @@ export const SubmitAdsData = async (
   adsdata,
   dispatch
 ) => {
-  console.log(advalues, "promotionvalues.file");
+  console.log(advalues.status, "promotionvalues.file");
 
   const webFormData = new FormData();
   webFormData.append("client_details", advalues.client_details);
@@ -63,14 +70,20 @@ export const SubmitAdsData = async (
   webFormData.append("end_date", advalues.end_date);
   webFormData.append("ad_description", advalues.ad_description);
   webFormData.append("usage_per_day", advalues.usage_per_day);
-  webFormData.append("status", advalues.status);
+  webFormData.append("ads_status", advalues.status);
   webFormData.append("ad_video", advalues.file);
-  webFormData.append("ad_file_size", advalues.file.size || adsdata.ad_file_size);
-  webFormData.append("ad_file_type", advalues.file.type || adsdata.ad_file_type);
+  webFormData.append(
+    "ad_file_size",
+    advalues.file.size || adsdata.ad_file_size
+  );
+  webFormData.append(
+    "ad_file_type",
+    advalues.file.type || adsdata.ad_file_type
+  );
   webFormData.append("page_name", advalues.page_name);
   webFormData.append("tbs_client_id", advalues.tbs_client_id);
   // webFormData.append("tbs_user_id", sessionStorage.getItem("USER_ID"));
-  webFormData.append("tbs_user_id", localStorage.getItem("USER_ID"));
+  webFormData.append("tbs_user_id", sessionStorage.getItem("USER_ID"));
   webFormData.append("duration", duration);
   webFormData.append("hours", hours);
   if (ad_id) {
@@ -81,36 +94,31 @@ export const SubmitAdsData = async (
     advalues.page_name == "Home"
       ? 1
       : advalues.page_name == "Dashboard"
-        ? 2
-        : advalues.page_name == "Filter"
-          ? 3
-          : 4
-  );
-  // webFormData.append(
-  //   "status_id",
-  //   advalues.status == "Draft" ? 1 : advalues.status == "Paused" ? 2 : 3
-  // );
-  webFormData.append(
-    "status_id",
-    advalues.status == "Draft" ? 1 : advalues.status == "Requested" ? 2 : 3
-  );
-  webFormData.append(
-    "req_status",
-    advalues.status == "Draft"
-      ? "Draft"
-      : advalues.status == "Requested"
-        ? "Pending"
-        : "Approved"
-  );
-  webFormData.append(
-    "req_status_id",
-    advalues.status == "Draft" ? 0 : advalues.status == "Requested" ? 1 : 3
+      ? 2
+      : advalues.page_name == "Filter"
+      ? 3
+      : 4
   );
 
-  console.log(
-    ad_id,
-    "updatedataupdatedata"
+  webFormData.append(
+    "ads_status_id",
+    advalues.status == "Draft" ? 0 : advalues.status == "Requested" ? 1 : 2
   );
+
+  webFormData.append(
+    "ads_req_status",
+    advalues.status === "Draft"
+      ? "Draft"
+      : advalues.status === "Requested"
+      ? "Pending"
+      : "Approved"
+  );
+  webFormData.append(
+    "ads_req_status_id",
+    advalues.status === "Draft" ? 0 : advalues.status === "Requested" ? 1 : 3
+  );
+
+  console.log(ad_id, "updatedataupdatedata");
   const url = ad_id ? `${apiUrl}/ads/${ad_id}` : `${apiUrl}/ads`;
   const method = ad_id ? "put" : "post";
 
@@ -203,7 +211,14 @@ export const SubmitAdsData = async (
 //   }
 // };
 
-export const SubmitAdsMobile = async (advalues, updatedata, duration, hours, adsdata, dispatch) => {
+export const SubmitAdsMobile = async (
+  advalues,
+  updatedata,
+  duration,
+  hours,
+  adsdata,
+  dispatch
+) => {
   console.log(advalues.file, "promotionvalues.file");
 
   const mbleFormData = new FormData();
@@ -213,14 +228,20 @@ export const SubmitAdsMobile = async (advalues, updatedata, duration, hours, ads
   mbleFormData.append("end_date", advalues.end_date);
   mbleFormData.append("mobad_description", advalues.ad_description);
   mbleFormData.append("usage_per_day", advalues.usage_per_day);
-  mbleFormData.append("status", advalues.status);
+  mbleFormData.append("ads_status", advalues.status);
   mbleFormData.append("mobad_vdo", advalues.file);
-  mbleFormData.append("mobad_file_size", advalues.file.size || adsdata.mobad_file_size);
-  mbleFormData.append("mobad_file_type", advalues.file.type || adsdata.mobad_file_type);
+  mbleFormData.append(
+    "mobad_file_size",
+    advalues.file.size || adsdata.mobad_file_size
+  );
+  mbleFormData.append(
+    "mobad_file_type",
+    advalues.file.type || adsdata.mobad_file_type
+  );
   mbleFormData.append("page_name", advalues.page_name);
   mbleFormData.append("tbs_client_id", advalues.tbs_client_id);
   // mbleFormData.append("tbs_user_id", sessionStorage.getItem("USER_ID"));
-  mbleFormData.append("tbs_user_id", localStorage.getItem("USER_ID"));
+  mbleFormData.append("tbs_user_id", sessionStorage.getItem("USER_ID"));
   mbleFormData.append("duration", duration);
   mbleFormData.append("hours", hours);
   mbleFormData.append(
@@ -228,30 +249,30 @@ export const SubmitAdsMobile = async (advalues, updatedata, duration, hours, ads
     advalues.page_name == "Home"
       ? 1
       : advalues.page_name == "Dashboard"
-        ? 2
-        : advalues.page_name == "Filter"
-          ? 3
-          : 4
+      ? 2
+      : advalues.page_name == "Filter"
+      ? 3
+      : 4
   );
   // mbleFormData.append(
   //   "status_id",
   //   advalues.status == "Draft" ? 1 : advalues.status == "Paused" ? 2 : 3
   // );
   mbleFormData.append(
-    "status_id",
-    advalues.status == "Draft" ? 1 : advalues.status == "Requested" ? 2 : 3
+    "ads_status_id",
+    advalues.status == "Draft" ? 0 : advalues.status == "Requested" ? 1 : 2
   );
   mbleFormData.append(
-    "req_status",
-    advalues.status == "Draft"
+    "ads_req_status",
+    advalues.status === "Draft"
       ? "Draft"
-      : advalues.status == "Requested"
-        ? "Pending"
-        : "Approved"
+      : advalues.status === "Requested"
+      ? "Pending"
+      : "Approved"
   );
   mbleFormData.append(
-    "req_status_id",
-    advalues.status == "Draft" ? 0 : advalues.status == "Requested" ? 1 : 3
+    "ads_req_status_id",
+    advalues.status === "Draft" ? 0 : advalues.status === "Requested" ? 1 : 3
   );
 
   console.log(
@@ -273,6 +294,7 @@ export const SubmitAdsMobile = async (advalues, updatedata, duration, hours, ads
       },
     });
     GetMobileAds(dispatch);
+    GetAdsData(dispatch);
     console.log(response, "responseresponse");
     return response.data;
   } catch (error) {
@@ -281,14 +303,15 @@ export const SubmitAdsMobile = async (advalues, updatedata, duration, hours, ads
   }
 };
 
-export const GetAdsById = async (updatedata, SetUpdateData, setAdData) => {
+export const GetAdsById = async (updatedata, showtable, setAdData) => {
   console.log(updatedata, "ahsgxdahsjksaxbj");
+  const url = showtable == 4 ? "ads" : showtable == 6 ? "mobads" : "ads"
   try {
-    const response = await api.get(`${apiUrl}/ads/${updatedata}`);
+    const response = await api.get(`${apiUrl}/${url}/${updatedata}`);
     console.log(response, "responseresponse");
     // SetUpdateData(null);
     // setAdData("");
-    return response?.data;
+    return showtable == 4 ? response?.data : showtable == 6 ? response.data[0] : response?.data  ;
   } catch (error) {
     handleError(error);
     return null;
@@ -334,7 +357,7 @@ export const handleMbleAdsearch = async (e, dispatch) => {
       return response.data[0];
     } else {
       GetAdsData(dispatch);
-      GetMobileAds(dispatch)
+      GetMobileAds(dispatch);
     }
   } catch (error) {
     handleError(error);

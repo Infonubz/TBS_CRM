@@ -67,7 +67,8 @@ export const submitClientComapanyData = async (
   dispatch,
   fileList,
   setCurrentId,
-  currentId
+  currentId,
+  setClientID
 ) => {
   // const payload = {
   //   company_name: companyvalues.company_name,
@@ -120,6 +121,7 @@ export const submitClientComapanyData = async (
     });
     sessionStorage.setItem("CLI_ID", response?.data?.id);
     setCurrentId(response?.data?.id)
+    setClientID(response?.data?.id ? response?.data?.id : clientID)
     GetClientData(dispatch);
     GetClientProfile(sessionStorage.getItem("CLI_ID") === null || sessionStorage.getItem("CLI_ID") === 'null' || sessionStorage.getItem("CLI_ID") === undefined || sessionStorage.getItem("CLI_ID") === 'undefined' ? clientID : sessionStorage.getItem("CLI_ID"), dispatch)
     console.log(response, "responseresponse");
@@ -209,7 +211,7 @@ export const SubmitClientGSTData = async (documentsdata, clientID, setSuperAdmin
         "Content-Type": "multipart/form-data",
       },
     });
-    //GetClientData(dispatch);
+    GetClientData(dispatch);
     setSuperAdminGSTData("");
     GetClientGSTById(clientID,clientID,setSuperAdminGSTData)
     //   GetSuperAdminGSTById();

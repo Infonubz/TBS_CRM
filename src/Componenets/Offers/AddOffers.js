@@ -1,4 +1,4 @@
-import { DatePicker, Upload } from "antd";
+import { ConfigProvider, DatePicker, Upload, Select } from "antd";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { LiaSave } from "react-icons/lia";
@@ -21,132 +21,149 @@ import dayjs from "dayjs";
 import { FaUpload } from "react-icons/fa";
 import ModalPopup from "../Common/Modal/Modal";
 import BackgroundView from "./BackgroundImage";
-// const validationSchema = Yup.object().shape({
-//   promotion_name: Yup.string().required("Promotion Name is required"),
-//   promotion_description: Yup.string().required(
-//     "Promotion Description is required"
-//   ),
-//   file: Yup.mixed()
-//     .required("A file is required")
-//     .test("fileSize", "File size is too large", function (value) {
-//       const { offerdata } = this.parent;
-//       console.log(offerdata, "offerdataofferdata");
-//       if (offerdata && offerdata.image_size && !value) {
-//         return true;
-//       }
-//       return value && value.size <= 2000000; // 2MB
-//     })
-//     .test("fileType", "Unsupported File Format", function (value) {
-//       const { offerdata } = this.parent;
-//       if (offerdata && offerdata.image_type && !value) {
-//         return true;
-//       }
-//       return (
-//         value &&
-//         ["image/jpeg", "image/png", "application/pdf"].includes(value.type)
-//       );
-//     }),
-// });
-const validationSchema = Yup.object().shape({
-  usage: Yup.string()
-    .required("usage is required")
-    .min(1, "usage must be at least 1")
-    .max(100, "usage cannot exceed 100")
-    .matches(/^[0-9]+$/, 'Only numbers are allowed'),
-  promotion_name: Yup.string()
-    .required("Offer Name is required")
-    // .min(1, "usage must be at least 1")
-    .max(17, "Max 17 characters only"),
-  promotion_description: Yup.string()
-    .required("Offer Description Name is required")
-    .max(57, "Max 57 characters only"),
-  status: Yup.string()
-    .required('This field is required'),
-  code: Yup.string()
-    .required("Code is required")
-    .max(18, "Max 18 characters only"),
-  start_date: Yup.date()
-    .required('Start Date is required'),
-    // .min(new Date(), 'Start Date cannot be in the past'),
-  expiry_date: Yup.date()
-    .required('Expiry Date is required')
-    .min(Yup.ref('start_date'), 'Expiry Date must be after Start Date'),
-  file: Yup.mixed()
-    .required("File is empty")
-    .test("required", "A file is required", function (value) {
-      const { isEdit } = this.options.context;
-      if (!isEdit && !value) {
-        return false;
-      }
-      return true;
-    })
-    .test("file_size", "File size is too large", function (value) {
-      if (value && value.size > 2000000) {
-        // 2MB
-        return false;
-      }
-      return true;
-    })
-    .test("file_type", "Unsupported File Format", function (value) {
-      if (typeof value === "string") {
-        // If value is a string (file path), skip file type validation
-        return true;
-      }
-      if (
-        value &&
-        ["image/jpeg", "image/png", "image/jpg"].includes(value.type)
-      ) {
-        return true;
-      }
-      return false;
-    }),
-});
+import { IoMdArrowDropdown } from "react-icons/io";
+import { GetRedeemOffersById } from "../../Api/Offers/RedeemOffers";
+
+
 export default function AddOffer({
   setModalIsOpen,
   updatedata,
   SetUpdateData,
   setOfferData,
   offerdata,
+  offerType,
+  setOfferType
 }) {
+
+  const validationSchema = Yup.object().shape({
+    // usage: Yup.string()
+    //   .required("usage is required")
+    //   .min(1, "usage must be at least 1")
+    //   .max(100, "usage cannot exceed 100")
+    //   .matches(/^[0-9]+$/, 'Only numbers are allowed'),
+    promotion_name: Yup.string()
+      .required("Offer Name is required")
+      .max(17, "Max 17 characters only"),
+    promotion_description: Yup.string()
+      .required("Offer Description Name is required")
+      .max(57, "Max 57 characters only"),
+    status: Yup.string()
+      .required('This field is required'),
+    code: Yup.string()
+      .required("Code is required")
+      .max(18, "Max 18 characters only"),
+    // value: Yup.number()
+    //   .typeError('Must be a number')
+    //   .max(9999, 'Must be at most 4 digits long')
+    //   .required('This field is required'),
+    start_date: Yup.string(),
+    expiry_date: Yup.string(),
+    file: Yup.mixed()
+      .required("File is empty")
+      .test("required", "A file is required", function (value) {
+        const { isEdit } = this.options.context;
+        if (!isEdit && !value) {
+          return false;
+        }
+        return true;
+      }).test("file_size", "File size is too large", function (value) {
+        if (value && value.size > 2000000) {
+          // 2MB
+          return false;
+        }
+        return true;
+      })
+      .test("file_type", "Unsupported File Format", function (value) {
+        if (typeof value === "string") {
+          // If value is a string (file path), skip file type validation
+          return true;
+        }
+        if (
+          value &&
+          ["image/jpeg", "image/png", "image/jpg"].includes(value.type)
+        ) {
+          return true;
+        }
+        return false;
+      })
+  }).test(
+    "both-required",
+    "Start Date and End Date are required",
+    function (value) {
+      const { start_date, expiry_date } = value || {};
+      if (!start_date && !expiry_date) {
+        return this.createError({
+          path: "start_date",
+          message: "Start Date and End Date are required",
+        });
+      }
+      return true;
+    }
+  )
+
+
+
   const { Dragger } = Upload;
   const [fileName, setFileName] = useState("");
   const dispatch = useDispatch();
+
+  console.log(offerType, 'view_offer_type')
+
+  const [error, setError] = useState('')
+
   const handleSubmit = async (values) => {
-    console.log(values, "vvvvvvvvaaaaaaaaaaalllllllllla");
 
-    setCurrentOfferdata({
-      offer_name: values.promotion_name,
-      offer_code: values.code,
-      start_date: values.start_date,
-      expiry_date: values.expiry_date,
-      offer_desc: values.promotion_description,
-      offer_image: values.file,
-    });
+    if (!offerlist.occupation) {
+      setError('Please select the category')
+    } else {
+      console.log(values, "vvvvvvvvaaaaaaaaaaalllllllllla");
+
+      dispatch({
+        type: PROMOTION_DATA,
+        payload: values,
+      });
+      setAllValues(values);
 
 
-    // if (offerlist.offer_bgImgae) {
-    //   try {
-    //     const data = await SubmitOffersData(values, updatedata, dispatch);
-    //     setModalIsOpen(false);
-    //     toast.success(data?.message);
-    //     GetOffersData(dispatch);
-    //     console.log(data);
-    //   } catch (error) {
-    //     console.error("Error uploading data", error);
-    //   }
-    // } else {
-    //   setBgImage(true);
-    // }
-    setBgImage(true);
+      setCurrentOfferdata({
+        offer_name: values.promotion_name,
+        offer_code: values.code,
+        start_date: values.start_date,
+        expiry_date: values.expiry_date,
+        offer_desc: values.promotion_description,
+        offer_image: values.file,
+      });
+      setBgImage(true);
+    }
+
+
   };
 
   const fetchGetOffers = async () => {
-    try {
-      const data = await GetOffersById(updatedata, SetUpdateData, setOfferData);
-      console.log(data.offer_name, "datadata");
-      setOfferData(data);
-    } catch (error) {
-      console.error("Error fetching additional user data", error);
+    if (offerType === 'discount') {
+      try {
+        const data = await GetOffersById(updatedata, SetUpdateData, setOfferData);
+        console.log(data, "datadata");
+        setOfferData(data);
+        setOfferlist(prevState => ({
+          ...prevState,
+          occupation: data.occupation_id,
+        }));
+      } catch (error) {
+        console.error("Error fetching additional user data", error);
+      }
+    } else {
+      try {
+        const data = await GetRedeemOffersById(updatedata, SetUpdateData, setOfferData);
+        console.log(data, "datadata");
+        setOfferData(data);
+        setOfferlist(prevState => ({
+          ...prevState,
+          occupation: data.occupation_id,
+        }));
+      } catch (error) {
+        console.error("Error fetching additional user data", error);
+      }
     }
   };
 
@@ -205,6 +222,7 @@ export default function AddOffer({
   };
   const [bgimage, setBgImage] = useState(false);
   const [currentoffers, setCurrentOffer] = useState([]);
+
   console.log(currentoffers, 'current_offer_data')
 
   const closemodal = () => {
@@ -221,17 +239,26 @@ export default function AddOffer({
     offer_desc: "",
     offer_image: [],
   });
+
+  console.log(currentofferdata, 'current_offers_data');
+
   // const [fileName, setFileName] = useState('');
   const [previewUrl, setPreviewUrl] = useState("");
 
   console.log(previewUrl, "binaryDatabinaryData");
+
+
   const [offerlist, setOfferlist] = useState({
     occupation: "",
     offer_bgImgae: "",
+    occupation_name: '',
   });
+
+
+  console.log(offerlist, 'offers_list')
   const [allvalues, setAllValues] = useState("");
   // const typeid = sessionStorage.getItem("type_id");
-  const typeid = localStorage.getItem("type_id");
+  const typeid = sessionStorage.getItem("type_id");
 
   const getStatusOptions = () => {
     if (typeid == "PRO101") {
@@ -256,6 +283,8 @@ export default function AddOffer({
 
   const [minExpiryDate, setMinExpiryDate] = useState(new Date().toISOString().split("T")[0]);
 
+  const { RangePicker } = DatePicker;
+
   return (
     <>
       <Formik
@@ -270,6 +299,7 @@ export default function AddOffer({
             : "",
           usage: offerdata ? offerdata.usage : "",
           status: offerdata ? offerdata.status : "",
+          value: offerdata ? offerdata.offer_value : " ",
           promotion_description: offerdata ? offerdata.offer_desc : "",
           file: offerdata ? offerdata.offer_img : "",
           file_type: offerdata?.image_size || "",
@@ -277,12 +307,7 @@ export default function AddOffer({
         }}
         validationSchema={validationSchema}
         onSubmit={(values) => {
-          dispatch({
-            type: PROMOTION_DATA,
-            payload: values,
-          });
           handleSubmit(values);
-          setAllValues(values);
         }}
         enableReinitialize
       >
@@ -329,7 +354,7 @@ export default function AddOffer({
               </div>
               <div className=" ">
                 <div className="grid grid-cols-2 gap-[1vw] pt-[1vw]">
-                  <div className="col-span-1">
+                  <div className=" relative col-span-1">
                     <label className="text-[#1F4B7F] text-[1.1vw] font-semibold">
                       Offer Name
                       <span className="text-[1vw] text-red-600 pl-[0.2vw]">
@@ -340,25 +365,25 @@ export default function AddOffer({
                       type="text"
                       name="promotion_name"
                       id="promotion_name"
-                      placeholder="Offer Name"
+                      placeholder="Enter Offer Name"
                       value={values.promotion_name}
                       onChange={(e) => {
                         handleChange(e);
-                        localStorage.setItem("promotion_name", e.target.value);
+                        sessionStorage.setItem("promotion_name", e.target.value);
                         setCurrentOfferdata({
                           ...currentofferdata,
                           offer_name: e.target.value,
                         });
                       }}
-                      className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                      className="border-r-[0.2vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-xl outline-none px-[1vw]"
                     />
                     <ErrorMessage
                       name="promotion_name"
                       component="div"
-                      className="text-red-500 text-[0.8vw]"
+                      className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]"
                     />
                   </div>
-                  <div className="col-span-1">
+                  <div className="relative col-span-1">
                     <label className="text-[#1F4B7F] text-[1.1vw] font-semibold">
                       Offer Code
                     </label>
@@ -368,7 +393,7 @@ export default function AddOffer({
                     <Field
                       type="text"
                       name="code"
-                      placeholder="Code"
+                      placeholder="Enter Offer Code"
                       value={values.code}
                       onChange={(e) => {
                         handleChange(e);
@@ -377,16 +402,16 @@ export default function AddOffer({
                           offer_code: e.target.value,
                         });
                       }}
-                      className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                      className="border-r-[0.2vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-xl outline-none px-[1vw]"
                     />
                     <ErrorMessage
                       name="code"
                       component="div"
-                      className="text-red-500 text-[0.8vw]"
+                      className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]"
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-[1vw] pt-[1vw]">
+                {/* <div className="grid grid-cols-2 gap-[1vw] pt-[1vw]">
                   <div className="col-span-1 flex-col flex">
                     <label className="text-[#1F4B7F] text-[1.1vw] font-semibold">
                       Start Date
@@ -455,33 +480,90 @@ export default function AddOffer({
                       className="text-red-500 text-[0.8vw]"
                     />
                   </div>
-                </div>
+                </div> */}
+
+
                 <div className="grid grid-cols-2 gap-[1vw] pt-[1vw]">
-                  <div className="col-span-1 flex-col flex">
+                  <div className="relative col-span-1 flex-col flex">
                     <label className="text-[#1F4B7F] text-[1.1vw] font-semibold">
-                      Offer Usage Persons Count
-                      <span className="text-red-500 text-[1vw] pl-[0.2vw]">
-                        *
-                      </span>
+                      Category
+                      <span className="text-red-500 text-[1vw] pl-[0.2vw]">*</span>
                     </label>
-                    <Field
-                      type="text"
-                      name="usage"
-                      placeholder="Usage Count"
-                      value={values.usage}
-                      onChange={(e) => {
-                        handleChange(e);
-                        localStorage.setItem("usage", e.target.value);
+                    <ConfigProvider
+                      theme={{
+                        components: {
+                          Select: {
+                            optionActiveBg: '#aebed1',
+                            optionSelectedColor: '#FFF',
+                            optionSelectedBg: '#aebed1',
+                            optionHeight: '2',
+                          },
+                        },
                       }}
-                      className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
-                    />
-                    <ErrorMessage
-                      name="usage"
-                      component="div"
-                      className="text-red-500 text-[0.8vw]"
-                    />
+                    >
+                      <Select
+                        showSearch
+                        className="custom-select bg-white outline-none w-full mt-[0.5vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
+                        placeholder="Select Categories"
+                        optionFilterProp="label"
+                        value={offerlist.occupation || 0} // Dynamically update the value based on selected occupation
+                        onChange={(value, option) => {
+                          setOfferlist({
+                            ...offerlist,
+                            occupation: value,
+                            occupation_name: option.label, // Update both value and label
+                          });
+                          setError('')
+                        }}
+                        suffixIcon={
+                          <span style={{ fontSize: '1vw', color: '#1f487c' }}>
+                            <IoMdArrowDropdown size="2vw" />
+                          </span>
+                        }
+                        style={{
+                          padding: 4,
+                        }}
+                        options={[
+                          {
+                            value: 0,
+                            label: <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">Select Occupation</div>,
+                            disabled: true
+                          },
+                          {
+                            value: 1,
+                            label: <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">Business</div>,
+                          },
+                          {
+                            value: 2,
+                            label: <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">General Public</div>,
+                          },
+                          {
+                            value: 3,
+                            label: <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">Handicapped</div>,
+                          },
+                          {
+                            value: 4,
+                            label: <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">Pilgrim</div>,
+                          },
+                          {
+                            value: 5,
+                            label: <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">Senior Citizen</div>,
+                          },
+                          {
+                            value: 6,
+                            label: <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">Student</div>,
+                          },
+                          {
+                            value: 7,
+                            label: <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">Tourist</div>,
+                          },
+                        ]}
+                      />
+                    </ConfigProvider>
+                    <div className="absolute bottom-[-1.2vw] text-[0.8vw] text-red-500">{error}</div>
                   </div>
-                  <div className="col-span-1 flex flex-col">
+
+                  <div className="relative col-span-1 flex flex-col">
                     <label className="text-[#1F4B7F] text-[1.1vw] font-semibold">
                       Status
                       <span className="text-red-500 text-[1vw] pl-[0.2vw]">
@@ -494,9 +576,9 @@ export default function AddOffer({
                       value={values.status}
                       onChange={(e) => {
                         handleChange(e);
-                        localStorage.setItem("status", e.target.value);
+                        sessionStorage.setItem("status", e.target.value);
                       }}
-                      className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                      className="border-r-[0.2vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-xl outline-none px-[1vw]"
                     >
                       {/* <option label="Select Status" value="" className="" />
                       <option label="Draft" value="Draft" className="" />
@@ -513,12 +595,119 @@ export default function AddOffer({
                     <ErrorMessage
                       name="status"
                       component="div"
-                      className="text-red-500 text-[0.8vw]"
+                      className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]"
                     />
                   </div>
                 </div>
+
+
                 <div className="grid grid-cols-2 gap-[1vw] pt-[1vw]">
-                  <div className="col-span-1 flex-col flex">
+                  <div className="relative reqman col-span-1 flex flex-col">
+                    <label className="text-[#1F4B7F] text-[1.1vw] font-bold">
+                      Duration
+                      <span className="text-[1vw] text-red-600 pl-[0.2vw]">
+                        *
+                      </span>
+                    </label>
+                    <Field name="date_range">
+                      {({ field }) => (
+                        <ConfigProvider
+                          theme={{
+                            token: {
+                              fontSize: 13,
+                              lineHeight: 0,
+                            },
+                            components: {
+                              DatePicker: {
+                                cellWidth: 21,
+                                cellHeight: 20,
+                              },
+                            },
+                          }}
+                        >
+                          <RangePicker
+                            allowClear={true}
+                            autoFocus={false}
+                            onChange={(dates) => {
+                              const [startDate, endDate] = dates || [
+                                null,
+                                null,
+                              ];
+                              setFieldValue(
+                                "start_date",
+                                startDate
+                                  ? startDate.format("YYYY-MM-DD")
+                                  : ""
+                              );
+                              setFieldValue(
+                                "expiry_date",
+                                endDate ? endDate.format("YYYY-MM-DD") : ""
+                              );
+                            }}
+                            value={[
+                              values.start_date
+                                ? dayjs(values.start_date)
+                                : null,
+                              values.expiry_date ? dayjs(values.expiry_date) : null,
+                            ]}
+                            className="ads-date border-r-[0.2vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-blue border-[#1F487C]
+text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.75vw] outline-none px-[1vw] placeholder-[#1F487C]"
+                            disabledDate={(current) =>
+                              current < dayjs().startOf("day")
+                            }
+                          />
+                        </ConfigProvider>
+                      )}
+                    </Field>
+                    <ErrorMessage
+                      name="start_date"
+                      component="div"
+                      className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]"
+                    />
+                    <ErrorMessage
+                      name="expiry_date"
+                      component="div"
+                      className="text-red-500 text-[0.8vw] "
+                    />
+                  </div>
+                  {offerType === 'discount' ?
+                    <div>
+                      <div className="relative col-span-1 flex flex-col">
+                        <label className="text-[#1F4B7F] text-[1.1vw] font-semibold">
+                          Offer Value
+                          <span className="text-[1vw] text-red-600 pl-[0.2vw]">
+                            *
+                          </span>
+                        </label>
+                        <Field
+                          type="number"
+                          name="value"
+                          id="value"
+                          placeholder="Enter Offer Value"
+                          value={values.value}
+                          onChange={(e) => {
+                            handleChange(e);
+                            setCurrentOfferdata({
+                              ...currentofferdata,
+                              value: e.target.value,
+                            });
+                          }}
+                          className="placeholder-[#1F487C] border-r-[0.2vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-xl outline-none px-[1vw]"
+                        />
+                        <ErrorMessage
+                          name="value"
+                          component="div"
+                          className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]"
+                        />
+
+                      </div>
+                    </div>
+                    : ''
+                  }
+                </div>
+
+                <div className="grid grid-cols-2 gap-[1vw] pt-[1vw]">
+                  <div className=" relative col-span-1 flex-col flex">
                     <label className="text-[#1F4B7F] text-[1.1vw] font-semibold">
                       Offer Description
                       <span className="text-red-500 text-[1vw] pl-[0.2vw]">
@@ -532,7 +721,7 @@ export default function AddOffer({
                       value={values.promotion_description}
                       onChange={(e) => {
                         handleChange(e);
-                        localStorage.setItem(
+                        sessionStorage.setItem(
                           "promotion_description",
                           e.target.value
                         );
@@ -543,12 +732,12 @@ export default function AddOffer({
                       }}
                       rows="4"
                       cols="50"
-                      className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.1vw] w-[100%] h-full rounded-[0.5vw] outline-none px-[1vw]"
+                      className="border-r-[0.2vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[1vw] w-[100%] h-full rounded-xl outline-none px-[1vw] pt-[0.75vw]"
                     />
                     <ErrorMessage
                       name="promotion_description"
                       component="div"
-                      className="text-red-500 text-[0.8vw]"
+                      className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]"
                     />
                   </div>
                   <div className=" relative col-span-1 flex flex-col">
@@ -570,7 +759,7 @@ export default function AddOffer({
                               setFileName(file.name); // Set the file name
                               setCurrentOfferdata({
                                 ...currentofferdata,
-                                offer_name: file,
+                                offer_image: file,
                               });
                               setFieldValue("file_type", file.type);
                               setFieldValue("file_size", file.size);
@@ -584,7 +773,7 @@ export default function AddOffer({
                               return false; // Prevent automatic upload
                             }}
                             showUploadList={false} // Disable the default upload list
-                            className="custom-dragger mt-[0.5vw] relative"
+                            className="border-r-[0.2vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] border-[#1F487C] rounded-xl"
                             style={{
                               backgroundSize: "cover",
                               backgroundPosition: "center",
@@ -682,7 +871,7 @@ export default function AddOffer({
                     ) : <ErrorMessage
                       name="file"
                       component="div"
-                      className="text-red-500 text-[0.8vw] absolute bottom-[-1.3vw]"
+                      className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]"
                     />}
                   </div>
                 </div>
@@ -697,7 +886,7 @@ export default function AddOffer({
                       value={values.status}
                       onChange={(e) => {
                         handleChange(e);
-                        localStorage.setItem("status", e.target.value);
+                        sessionStorage.setItem("status", e.target.value);
                       }}
                       className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                     >
@@ -726,7 +915,7 @@ export default function AddOffer({
                       value={values.promotion_description}
                       onChange={(e) => {
                         handleChange(e);
-                        localStorage.setItem(
+                        sessionStorage.setItem(
                           "promotion_description",
                           e.target.value
                         );
@@ -750,12 +939,12 @@ export default function AddOffer({
             </Form>
           </>
         )}
-      </Formik>
+      </Formik >
       <ModalPopup
         show={bgimage}
         onClose={closemodal}
         height="30vw"
-        width="40vw"
+        width="50vw"
         closeicon={false}
       >
         <BackgroundView
@@ -773,6 +962,7 @@ export default function AddOffer({
           updatedata={updatedata}
           offerdata={offerdata}
           draggerImage={draggerImage}
+          offerType={offerType}
         />
       </ModalPopup>
     </>

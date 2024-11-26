@@ -6,24 +6,30 @@ import {
   RiDiscountPercentFill,
 } from "react-icons/ri";
 import "./index.css";
-import { IoHelpCircle, IoHelpCircleOutline, IoSearch } from "react-icons/io5";
+import {
+  IoHelpCircle,
+  //IoHelpCircleOutline,
+  IoSearch,
+} from "react-icons/io5";
 import { FaUsers } from "react-icons/fa";
 import { FaUserGear } from "react-icons/fa6";
-import { BiSolidReport } from "react-icons/bi";
+//import { BiSolidReport } from "react-icons/bi";
 import { useNavigate } from "react-router";
-import { IoIosLogOut, IoIosNotifications, IoMdSettings } from "react-icons/io";
-import { HiOutlineClipboardDocumentList } from "react-icons/hi2";
+import {
+  //IoIosLogOut,
+  IoIosNotifications,
+  IoMdSettings,
+} from "react-icons/io";
+//import { HiOutlineClipboardDocumentList } from "react-icons/hi2";
 import {
   MdLogout,
-  MdOutlineSpeakerNotes,
+  //MdOutlineSpeakerNotes,
   MdSubscriptions,
 } from "react-icons/md";
 import { Popover, Tooltip } from "antd";
 import promotionicon from "../asserts/Promotion.png";
 import request_management from "../asserts/Request_Managment.png";
-
-import { LiaSave } from "react-icons/lia";
-
+//import { LiaSave } from "react-icons/lia";
 import Notification from "../Componenets/Notification/Notification";
 import Support from "../Componenets/Support/Support";
 import NotificationPopup from "../Componenets/Notification/NotificationPopup";
@@ -31,27 +37,47 @@ import { CgProfile } from "react-icons/cg";
 import { useSelector } from "react-redux";
 
 export default function Sidebar() {
-  const unreadCounts = 0;
-
+  //const unreadCounts = 0;
   const getnotificationlist = useSelector(
     (state) => state.crm.notification_count
   );
-
   // const {unread_count}=getnotificationlist
   const [unreadCountss, setunreadCountss] = useState(0);
-
-  useEffect(() => {
-    if (getnotificationlist !== undefined) {
-      setunreadCountss(getnotificationlist);
-    }
-  }, [getnotificationlist]);
-
-  console.log(unreadCountss, "this is sidebar");
-
   const [selectedIcon, setSelectedIcon] = useState(() => {
     return sessionStorage.getItem("selectedIcon") || "dashboard";
   });
   const navigation = useNavigate();
+  const [searchInput, setSearchInput] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [isSupportOpen, setIsSupportOpen] = useState(false);
+
+  const storedModulePermissions = sessionStorage.getItem("module_permission");
+  const currenttypeid = sessionStorage.getItem("type_id");
+  const modulePermissions = storedModulePermissions
+    ? JSON.parse(storedModulePermissions)
+    : [];
+
+  const showPromotionsIcon = modulePermissions?.some(
+    (permission) => permission.module_name === "Promotions"
+  );
+  const showAdvertisement = modulePermissions?.some(
+    (permission) => permission.module_name === "Advertisement"
+  );
+  const showRoles = modulePermissions?.some(
+    (permission) => permission.module_name === "Roles"
+  );
+  const showOffers = modulePermissions?.some(
+    (permission) => permission.module_name === "Offers & Deals"
+  );
+  const showClient = modulePermissions?.some(
+    (permission) => permission.module_name === "Client - (UM)"
+  );
+  const showEmployee = modulePermissions?.some(
+    (permission) => permission.module_name === "Employee - (UM)"
+  );
+  const showPartner = modulePermissions?.some(
+    (permission) => permission.module_name === "Partner - (UM)"
+  );
 
   const handleIconClick = (iconName, page) => {
     setSelectedIcon(iconName);
@@ -59,9 +85,6 @@ export default function Sidebar() {
     navigation(`/${page}`);
   };
 
-  const [searchInput, setSearchInput] = useState(false);
-  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-  const [isSupportOpen, setIsSupportOpen] = useState(false);
   const closeNotification = () => {
     setIsNotificationOpen(false);
   };
@@ -79,10 +102,13 @@ export default function Sidebar() {
   const colseSupport = () => {
     setIsSupportOpen(false);
   };
-  const currenttypeid = sessionStorage.getItem("type_id");
-  console.log(currenttypeid, "currenttypeidcurrenttypeid");
 
-  console.log(isNotificationOpen, "vvvvddcddd");
+  useEffect(() => {
+    if (getnotificationlist !== undefined) {
+      setunreadCountss(getnotificationlist);
+    }
+  }, [getnotificationlist]);
+
   return (
     <div className="fixed w-full ">
       <div className="relative">
@@ -152,17 +178,23 @@ export default function Sidebar() {
                   <IoSearch size={"1.5vw"} color="white" />
                 </div>
               </Tooltip>
-              <Tooltip title="User Management" color="#1F4B7F">
-                <div
-                  className={`icon-container ${
-                    selectedIcon === "users" ? "selected" : ""
-                  }`}
-                  onClick={() => handleIconClick("users", "usermanagement")}
-                >
-                  <FaUsers color="white" size={"2.5vw"} />
-                </div>
-              </Tooltip>
-              {currenttypeid !== "OP101" && (
+              {(showClient ||
+                showEmployee ||
+                showPartner ||
+                currenttypeid === "PRO101" ||
+                currenttypeid === "OP101") && (
+                <Tooltip title="User Management" color="#1F4B7F">
+                  <div
+                    className={`icon-container ${
+                      selectedIcon === "users" ? "selected" : ""
+                    }`}
+                    onClick={() => handleIconClick("users", "usermanagement")}
+                  >
+                    <FaUsers color="white" size={"2.5vw"} />
+                  </div>
+                </Tooltip>
+              )}
+              {currenttypeid === "PRO101" && (
                 <Tooltip title="Request Management" color="#1F4B7F">
                   <div
                     className={`icon-container ${
@@ -176,11 +208,15 @@ export default function Sidebar() {
                     color="white"
                     size={"2.5vw"}
                   /> */}
-                    <img src={request_management} className="h-[2vw] w-[2vw]" />
+                    <img
+                      src={request_management}
+                      alt="request management"
+                      className="h-[2vw] w-[2vw]"
+                    />
                   </div>
                 </Tooltip>
               )}
-              {currenttypeid !== "OP101" && (
+              {(showOffers || currenttypeid === "PRO101") && (
                 <Tooltip title="Offers & Deals" color="#1F4B7F">
                   <div
                     className={`icon-container ${
@@ -192,7 +228,7 @@ export default function Sidebar() {
                   </div>
                 </Tooltip>
               )}
-              {currenttypeid !== "OP101" && (
+              {(showAdvertisement || currenttypeid === "PRO101") && (
                 <Tooltip title="Advertisement" color="#1F4B7F">
                   <div
                     className={`icon-container ${
@@ -204,27 +240,39 @@ export default function Sidebar() {
                   </div>
                 </Tooltip>
               )}
-              <Tooltip title="Promotion" color="#1F4B7F">
-                <div
-                  className={`icon-container ${
-                    selectedIcon === "Promotion" ? "selected" : ""
-                  }`}
-                  onClick={() => handleIconClick("Promotion", "promotion")}
-                >
-                  {/* <MdOutlineSpeakerNotes color="white" size={"2.5vw"} /> */}
-                  <img src={promotionicon} className="h-[2.5vw] w-[2.5vw]" />
-                </div>
-              </Tooltip>
-              <Tooltip title="Roles & Responsibilities" color="#1F4B7F">
-                <div
-                  className={`icon-container ${
-                    selectedIcon === "userGear" ? "selected" : ""
-                  }`}
-                  onClick={() => handleIconClick("userGear", "roles")}
-                >
-                  <FaUserGear color="white" size={"2.5vw"} />
-                </div>
-              </Tooltip>
+              {(showPromotionsIcon ||
+                currenttypeid === "PRO101" ||
+                currenttypeid === "OP101") && (
+                <Tooltip title="Promotion" color="#1F4B7F">
+                  <div
+                    className={`icon-container ${
+                      selectedIcon === "Promotion" ? "selected" : ""
+                    }`}
+                    onClick={() => handleIconClick("Promotion", "promotion")}
+                  >
+                    {/* <MdOutlineSpeakerNotes color="white" size={"2.5vw"} /> */}
+                    <img
+                      src={promotionicon}
+                      alt="promotion icon"
+                      className="h-[2.5vw] w-[2.5vw]"
+                    />
+                  </div>
+                </Tooltip>
+              )}
+              {(showRoles ||
+                currenttypeid === "PRO101" ||
+                currenttypeid === "OP101") && (
+                <Tooltip title="Roles & Responsibilities" color="#1F4B7F">
+                  <div
+                    className={`icon-container ${
+                      selectedIcon === "userGear" ? "selected" : ""
+                    }`}
+                    onClick={() => handleIconClick("userGear", "roles")}
+                  >
+                    <FaUserGear color="white" size={"2.5vw"} />
+                  </div>
+                </Tooltip>
+              )}
               {/* <Tooltip title="Report" color="#1F4B7F">
                 <div
                   className={`icon-container ${
@@ -235,7 +283,7 @@ export default function Sidebar() {
                   <BiSolidReport color="white" size={"2.5vw"} />
                 </div>
               </Tooltip> */}
-              {currenttypeid !== "OP101" && (
+              {currenttypeid === "PRO101" && (
                 <Tooltip title="Subscription" color="#1F4B7F">
                   <div
                     className={`icon-container ${
@@ -311,7 +359,7 @@ export default function Sidebar() {
                 </div>
               </Tooltip>
               <div className="border-r-[0.2vw] border-white h-[2.5vw]"></div>
-              <div className="w-[7vw]">
+              <div className="w-[10vw]">
                 <Popover
                   placement="top"
                   content={
@@ -325,7 +373,8 @@ export default function Sidebar() {
                           onClick={() => {
                             sessionStorage.removeItem("token");
                             sessionStorage.removeItem("selectedIcon");
-                            localStorage.removeItem("token");
+                            sessionStorage.removeItem("token");
+                            sessionStorage.clear();
                             navigation("/");
                             window.location.reload();
                           }}
@@ -341,7 +390,7 @@ export default function Sidebar() {
                 >
                   <div className="flex items-center cursor-pointer">
                     <label className="text-[1.2vw] text-white cursor-pointer  font-semibold">
-                      {localStorage.getItem("user_name")}
+                      {sessionStorage.getItem("user_name")}
                       {/* {sessionStorage.getItem("user_name")} */}
                     </label>
                     <span className="pl-[0.5vw]">

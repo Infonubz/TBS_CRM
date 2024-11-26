@@ -87,7 +87,7 @@ export default function AddRegisterAddress({
   return (
 
     <div>
-      <div className="border-l-[0.1vw] h-[28vw] overflow-y-scroll px-[2vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f]">
+      <div className="border-l-[0.1vw] h-[28vw] overflow-y-scroll px-[2vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] mt-[1vw] border-[#1f4b7f]">
         <div className="h-[4vw] w-full flex items-center justify-between ">
           <label className="text-[1.5vw] font-semibold text-[#1f4b7f] ">
             Registered Address
@@ -258,7 +258,7 @@ export default function AddRegisterAddress({
                           value={values.temp_country}
                           onChange={(e) => {
                             handleChange(e);
-                            localStorage.setItem("status", e.target.value);
+                            sessionStorage.setItem("status", e.target.value);
                           }}
                           disabled={
                             PartnerID || proffesionaback
@@ -311,7 +311,7 @@ export default function AddRegisterAddress({
                           value={values.per_country}
                           onChange={(e) => {
                             handleChange(e);
-                            localStorage.setItem("status", e.target.value);
+                            sessionStorage.setItem("status", e.target.value);
                           }}
                           disabled={
                             PartnerID || proffesionaback
@@ -366,7 +366,7 @@ export default function AddRegisterAddress({
                           value={values.temp_state}
                           onChange={(e) => {
                             handleChange(e);
-                            localStorage.setItem("status", e.target.value);
+                            sessionStorage.setItem("status", e.target.value);
                           }}
                           disabled={
                             PartnerID || proffesionaback
@@ -411,7 +411,7 @@ export default function AddRegisterAddress({
                           value={values.per_state}
                           onChange={(e) => {
                             handleChange(e);
-                            localStorage.setItem("status", e.target.value);
+                            sessionStorage.setItem("status", e.target.value);
                           }}
                           disabled={
                             PartnerID || proffesionaback
@@ -458,7 +458,7 @@ export default function AddRegisterAddress({
                           value={values.temp_city}
                           onChange={(e) => {
                             handleChange(e);
-                            localStorage.setItem("status", e.target.value);
+                            sessionStorage.setItem("status", e.target.value);
                           }}
                           disabled={
                             PartnerID || proffesionaback
@@ -511,7 +511,7 @@ export default function AddRegisterAddress({
                           value={values.per_city}
                           onChange={(e) => {
                             handleChange(e);
-                            localStorage.setItem("status", e.target.value);
+                            sessionStorage.setItem("status", e.target.value);
                           }}
                           disabled={
                             PartnerID || proffesionaback

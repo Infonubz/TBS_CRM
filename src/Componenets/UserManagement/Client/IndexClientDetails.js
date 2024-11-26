@@ -10,6 +10,8 @@ import { SubmitProfileData } from "../../../Api/UserManagement/SuperAdmin";
 import { useLocation } from "react-router";
 import { useDispatch } from "react-redux";
 import AddCompanyDetails from "./AddCompanyDetails";
+import umbuslogo from "../../../asserts/umbuslogo.png"
+import pencilshape from '../../../asserts/pencilicon.png'
 import {
   ClientProfile,
   GetClientProfile,
@@ -150,7 +152,7 @@ export default function ClientIndex({
     }
   }, [clientID, setClientID, setClientData]);
 
-  console.log(clientdata, "clientdata");
+  console.log(clientID,updatedata, "clientdata");
 
   console.log(location.pathname == "/settings", "locationlocationlocation");
 
@@ -203,7 +205,7 @@ export default function ClientIndex({
                 <div className="border-b-[0.1vw] border-[#1f4b7f] w-[15vw]"></div>
               </div>
 
-              <div className="flex items-center flex-col">
+              <div className="flex items-center flex-col relative">
                 {/* <Upload
                   action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
                   listType="picture-card"
@@ -257,7 +259,7 @@ export default function ClientIndex({
                     selectedFile && ( // Check if there are no files in the fileList and selectedFile is set
                       <img
                         src={`http://192.168.90.47:4000${selectedFile}`}
-                        alt="Photo"
+                        alt="Profile"
                         className="w-[5vw] h-[5vw] object-cover rounded-[0.2vw] top-[.7vw] left-[.7vw] absolute opacity-25 z-[1] pointer-events-none"
                       />
                     )}
@@ -293,22 +295,31 @@ export default function ClientIndex({
                     src={previewImage}
                   />
                 </Modal>
+                {updatedata
+                      ? " "
+                      : profileImage === false && (
+                          <div className="text-red-700 text-[.7vw] bottom-[-1.2vw] absolute">
+                            * Profile Image is required
+                          </div>
+                        )}
               </div>
 
               <div className="flex gap-[3vw] pt-[2vw] px-[7.5vw]">
                 <div className="">
                   <div className="bg-[#D9D9D9] rounded-t-full rounded-b-full w-[0.7vw] h-[11vw] relative">
                     <div
-                      className={`absolute rounded-t-full rounded-b-full w-[0.7vw] h-[2vw] bg-[#1f4b7f] ${
+                      className={`absolute w-[3.4vw] h-[1.5vw] ${
                         currentpage == 1
-                          ? "top-0"
+                          ? "top-[.2vw]"
                           : currentpage == 2
-                          ? "top-[4.5vw]"
+                          ? "top-[4.8vw]"
                           : currentpage == 3
                           ? "bottom-0"
                           : "bottom-0"
                       }`}
-                    ></div>
+                    >
+                       <img src={pencilshape} alt='icon' className="h-[1.2vw] w-[3.4vw]" />
+                    </div>
                   </div>
                 </div>
                 <div className="flex">
@@ -327,11 +338,14 @@ export default function ClientIndex({
                 </div>
               </div>
             </div>
-            <div className="col-span-4">
+            <div className="col-span-4 relative">
+            <div className="w-[5vw] h-[5vw] bg-white shadow-lg rounded-full absolute left-[16.6vw] top-[-1.5vw] flex justify-center items-center z-[1]"><img className="" src={umbuslogo} alt="buslogo"/></div>
+
               {currentpage == 1 ? (
                 <AddCompanyDetails
                   setCurrentpage={setCurrentpage}
                   SetSPAID={SetSPAID}
+                  setClientID={setClientID}
                   SPA_ID={SPA_ID}
                   clientdata={clientdata}
                   clientID={clientID}
@@ -358,6 +372,8 @@ export default function ClientIndex({
                   addressback={addressback}
                   setBusinessBack={setBusinessBack}
                   businessback={businessback}
+                  updatedata={updatedata}
+                  gstback={gstback}
                 />
               ) : (
                 currentpage == 3 && (

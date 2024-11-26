@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { GetAllReqManOffers, ReqPromoStatusChange } from '../../Api/RequestManagement/RequestManagement';
 import ReqPromoStatusUpdate from './ReqPromoStatusUpdate';
 import ReqOffersStatusUpdate from './ReqOffersStatusUpdate';
+import { FaEye } from 'react-icons/fa';
 
 export default function ReqOffers({ currentData }) {
 
@@ -42,7 +43,7 @@ export default function ReqOffers({ currentData }) {
       render: (row, rowdta, index) => {
         // console.log(row.tbs_offer_id,'iffiddd');
         return (
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center text-[#1F4B7F]">
             <h1 className="pl-[1vw] text-[1.1vw]">{index + 1}</h1>
           </div>
         );
@@ -53,7 +54,7 @@ export default function ReqOffers({ currentData }) {
       sorter: (a, b) => a.offer_name.localeCompare(b.offer_name),
       render: (row, rowdta, index) => {
         return (
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center text-[#1F4B7F]">
             {/* <h1 className="text-[1.1vw]">{row.offer_name}</h1> */}
             {row?.offer_name?.length > 15 ? (
               <Tooltip
@@ -80,7 +81,7 @@ export default function ReqOffers({ currentData }) {
       width: "17vw",
       render: (row) => {
         return (
-          <div className='flex items-center justify-center'>
+          <div className='flex items-center text-[#1F4B7F] justify-center'>
             {row?.code?.length > 15 ? (
               <Tooltip
                 placement="right"
@@ -111,7 +112,7 @@ export default function ReqOffers({ currentData }) {
       width: "15vw",
       render: (row) => {
         return (
-          <div className='flex items-center justify-center'>
+          <div className='flex items-center text-[#1F4B7F] justify-center'>
             <p className="text-[1.1vw]">{`${dayjs(row?.created_date).format(
               "DD MMM, YY"
             )}`}</p>
@@ -126,7 +127,7 @@ export default function ReqOffers({ currentData }) {
       width: "15vw",
       render: (row) => {
         return (
-          <div className='flex items-center justify-center'>
+          <div className='flex items-center text-[#1F4B7F] justify-center'>
             <p className="text-[1.1vw] flex items-center justify-center">{`${dayjs(row?.updated_date).format(
               "DD MMM, YY"
             )}`}</p>
@@ -140,7 +141,7 @@ export default function ReqOffers({ currentData }) {
       width: "15vw",
       render: (row) => {
         return (
-          <div className='flex items-center justify-center'>
+          <div className='flex items-center text-[#1F4B7F] justify-center'>
             <p className="text-[1.1vw]">{`${dayjs(row?.start_date).format(
               "MMM DD"
             )} - ${dayjs(row?.expiry_date).format("MMM DD")}`}</p>
@@ -154,7 +155,7 @@ export default function ReqOffers({ currentData }) {
       render: (row) => {
         return (
           <div>
-            <p className="text-[1.1vw] flex items-center justify-center">{row.usage}</p>
+            <p className="text-[1.1vw] flex text-[#1F4B7F] items-center justify-center">{row.usage}</p>
           </div>
         );
       },
@@ -168,10 +169,10 @@ export default function ReqOffers({ currentData }) {
           <div className="flex items-center justify-center">
             <button
               className={`${row.status_id == 3
-                  ? "bg-[#34AE2A]"
-                  : row.status_id == 1
-                    ? "bg-[#FD3434]"
-                    : "bg-[#FF9900]"
+                ? "bg-[#34AE2A]"
+                : row.status_id == 1
+                  ? "bg-[#FD3434]"
+                  : "bg-[#FF9900]"
                 } rounded-[0.5vw] text-[1.1vw]  font-semibold text-white w-[7vw] py-[0.2vw]`}
             >
               {row.status == "Active" ? "Approved" : row.status}
@@ -189,7 +190,7 @@ export default function ReqOffers({ currentData }) {
         console.log(row, "rowrowrowrow");
         return (
           <div className="flex gap-[0.7vw] items-center justify-center">
-            <IoMdEye
+            {/* <IoMdEye
               size={"1.6vw"}
               color="#1F4B7F"
               className="cursor-pointer"
@@ -197,7 +198,12 @@ export default function ReqOffers({ currentData }) {
                 setOfferView(true);
                 setOfferImage(row.theme);
               }}
-            />
+            /> */}
+            <FaEye size={"1.5vw"} color="#1F487C" className="cursor-pointer"
+              onClick={() => {
+                setOfferView(true);
+                setOfferImage(row.theme);
+              }} />
             <MdEdit
               size={"1.3vw"}
               color="#1F4B7F"

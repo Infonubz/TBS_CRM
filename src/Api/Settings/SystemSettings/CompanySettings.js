@@ -30,7 +30,7 @@ export const SubmitCompanySetting = async (values, companyId, dispatch) => {
     user_id: sessionStorage.getItem("USER_ID"),
   };
   console.log(
-    values,
+    companyId,
     "updatedataupdatedataupdatedataupdatedataupdatedataupdatedataupdatedata"
   );
   const url = companyId
@@ -48,7 +48,7 @@ export const SubmitCompanySetting = async (values, companyId, dispatch) => {
       },
     });
     GetCompanySetting(dispatch);
-    console.log(response, "responseresponse");
+    console.log(payload, "responseresponse");
     return response.data;
   } catch (error) {
     handleError(error);

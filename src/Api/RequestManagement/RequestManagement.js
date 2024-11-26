@@ -2,6 +2,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import {
   GET_REQ_ADS,
+  GET_REQ_PARTNER,
   REQ_MAN_OFFERS,
   REQ_MANAGEMENT_DATE_FILTER,
   REQ_PROMOTION_DATA,
@@ -16,20 +17,33 @@ const api = axios.create({
 const apiUrl = process.env.REACT_APP_API_URL;
 
 export const GetRequestManagementData = async (dispatch, filter) => {
+  const reqFilter =
+    filter == "all"
+      ? 7
+      : filter == "pending"
+      ? 1
+      : filter == "approved"
+      ? 5
+      : filter == "on_hold"
+      ? 4
+      : filter == "rejected"
+      ? 6
+      : 7;
   try {
     const response = await api.get(
       `${apiUrl}/request-management-status/${
-        filter == "all"
-          ? 4
-          : filter == "pending"
-          ? 0
-          : filter == "verified"
-          ? 2
-          : filter == "under_review"
-          ? 1
-          : filter == "rejected"
-          ? 3
-          : 4
+        reqFilter
+        // filter == "all"
+        //   ? 7
+        //   : filter == "pending"
+        //   ? 0
+        //   : filter == "verified"
+        //   ? 2
+        //   : filter == "under_review"
+        //   ? 1
+        //   : filter == "rejected"
+        //   ? 3
+        //   : 7
       }`
     );
     dispatch({ type: REQUEST_MANAGEMENT_DATA, payload: response.data });
@@ -40,10 +54,38 @@ export const GetRequestManagementData = async (dispatch, filter) => {
   }
 };
 
-export const statuschange = async (valueid, value, currentid) => {
+export const PartnerStatusChange = async (
+  valueid,
+  value,
+  currentid,
+  inputValue
+) => {
   const payload = {
     req_status: value,
     req_status_id: valueid,
+    partner_status: valueid === 5 ? "Active" : value,
+    partner_status_id: valueid === 5 ? 2 : valueid,
+    comments: valueid === 5 ? "" : inputValue ? inputValue : "",
+  };
+  try {
+    const response = await axios.put(
+      `${apiUrl}/request-management-partner/${currentid}`,
+      payload
+    );
+    console.log(response.data, "responsepartner");
+    return response.data;
+  } catch (err) {
+    handleError(err);
+  }
+};
+
+export const statuschange = async (valueid, value, currentid, inputValue) => {
+  const payload = {
+    req_status: value,
+    req_status_id: valueid,
+    user_status: value,
+    user_status_id: valueid,
+    comments: valueid === 5 ? "" : inputValue ? inputValue : "",
   };
   console.log(value, valueid, "in the api");
 
@@ -100,12 +142,27 @@ export const ReqPromoStatusChange = async (valueid, value, currentid) => {
     return null;
   }
 };
-export const userStatusActivate = async (valuedata, currentid, dispatch) => {
-  console.log("call 2", valuedata, currentid);
+export const userStatusActivate = async (statusId, currentid, dispatch) => {
+  // console.log("call 2", valuedata, currentid);
+  // const payload = {
+  //   req_status: valuedata,
+  //   req_status_id:valuedata == "Active" ? 2 : 3,
+  //   user_status: valuedata,
+  //   user_status_id: valuedata == "Active" ? 2 : 3,
+  // };
   const payload = {
-    user_status: valuedata,
-    user_status_id: valuedata == "inactive" ? 2 : 1,
+    req_status: statusId === 3 ? "Active" : "Inactive",
+    req_status_id: statusId === 3 ? 2 : 3,
+    user_status: statusId === 3 ? "Active" : "Inactive",
+    user_status_id: statusId === 3 ? 2 : 3,
   };
+  const ReqPayload = {
+    req_status: statusId,
+    req_status_id: statusId == "Active" ? 2 : 3,
+    user_status: statusId,
+    user_status_id: statusId == "Active" ? 2 : 3,
+  };
+  const mainpayload = statusId === "Active" ? ReqPayload : payload;
   console.log("call 3", payload);
 
   const url = `${apiUrl}/operators-status/${currentid}`;
@@ -115,7 +172,7 @@ export const userStatusActivate = async (valuedata, currentid, dispatch) => {
     const response = await api({
       method,
       url,
-      data: payload,
+      data: mainpayload,
       headers: {
         "Content-Type": "application/json",
       },
@@ -149,6 +206,18 @@ export const GetRequestDataById = async (
   }
 };
 
+export const GetPartnerDataById = async (partnerid) => {
+  try {
+    const response = await axios.get(
+      `${apiUrl}/request-management-partnerId/${partnerid}`
+    );
+    console.log(response.data);
+    return response.data[0];
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 export const GetRequestStatusById = async (filter, setGetData) => {
   const url =
     filter === "pending"
@@ -176,16 +245,16 @@ export const GetReqPromotionData = async (dispatch, promofilter) => {
     const response = await api.get(
       `${apiUrl}/promo-status/${
         promofilter == "All"
-        ? 4
-        : promofilter == "Pending"
-        ? 0
-        : promofilter == "Approved"
-        ? 2
-        : promofilter == "Rejected"
-        ? 3
-        : promofilter == "Under Review"
-        ? 1
-        : 4
+          ? 4
+          : promofilter == "Pending"
+          ? 0
+          : promofilter == "Approved"
+          ? 2
+          : promofilter == "Rejected"
+          ? 3
+          : promofilter == "Under Review"
+          ? 1
+          : 4
       }`
     );
 
@@ -218,8 +287,20 @@ export const GetReqPromotionById = async (updatedata) => {
   }
 };
 
-export const GetReqOperatorByDate = async (dispatch, startDate, endDate) => {
+export const GetReqOperatorByDate = async (dispatch, startDate, endDate,filter) => {
   console.log("hello testing");
+  const reqFilter =
+  filter == "all"
+    ? 7
+    : filter == "pending"
+    ? 1
+    : filter == "approved"
+    ? 5
+    : filter == "on_hold"
+    ? 4
+    : filter == "rejected"
+    ? 6
+    : 7;
 
   try {
     // const response = await api.get(`${apiUrl}/filter-by-date`)
@@ -229,6 +310,7 @@ export const GetReqOperatorByDate = async (dispatch, startDate, endDate) => {
       {
         from: startDate,
         to: endDate,
+        req_status_id: reqFilter
       },
       {
         headers: {
@@ -244,16 +326,87 @@ export const GetReqOperatorByDate = async (dispatch, startDate, endDate) => {
   }
 };
 
-export const SearchReqOperator = async (e, dispatch) => {
+export const SearchReqOperator = async (e, filter, dispatch) => {
+  const reqFilter =
+    filter == "all"
+      ? 7
+      : filter == "pending"
+      ? 1
+      : filter == "approved"
+      ? 5
+      : filter == "on_hold"
+      ? 4
+      : filter == "rejected"
+      ? 6
+      : 7;
   try {
     if (e) {
-      const responce = await axios.get(`${apiUrl}/request-management/${e}`);
-      dispatch({ type: REQUEST_MANAGEMENT_DATA, payload: responce.data });
+      const response = await axios.post(`${apiUrl}/request-management-op`, {
+        req_status_id: reqFilter,
+        search_term: e,
+      });
+      dispatch({ type: REQUEST_MANAGEMENT_DATA, payload: response.data });
     } else {
-      GetRequestManagementData(dispatch);
+      GetRequestManagementData(dispatch, filter);
     }
   } catch (err) {
     console.log(err);
+  }
+};
+
+export const SearchReqPartner = async(e, filter, dispatch) => {
+  const reqFilter =
+    filter == "all"
+      ? 7
+      : filter == "pending"
+      ? 1
+      : filter == "approved"
+      ? 5
+      : filter == "on_hold"
+      ? 4
+      : filter == "rejected"
+      ? 6
+      : 7;
+  try {
+    if (e) {
+      const response = await axios.post(
+        `${apiUrl}/request-management-partnerSearch`,
+        {
+          req_status_id: reqFilter,
+          search_term: e,
+        }
+      );
+      dispatch({ type: GET_REQ_PARTNER, payload: response.data });
+    } else {
+      GetReqPartnerData(dispatch, filter);
+    }
+  } catch (err) {
+    handleError(err);
+  }
+};
+
+export const GetPartnerByDate = async (dispatch, sdate, edate,filter) => {
+  const reqFilter =
+  filter == "all"
+    ? 7
+    : filter == "pending"
+    ? 1
+    : filter == "approved"
+    ? 5
+    : filter == "on_hold"
+    ? 4
+    : filter == "rejected"
+    ? 6
+    : 7;
+  try {
+    const response = await axios.post(`${apiUrl}/filter-by-datePartner`, {
+      from: sdate,
+      to: edate,
+      req_status_id:reqFilter
+    });
+    dispatch({ type: GET_REQ_PARTNER, payload: response.data });
+  } catch (err) {
+    handleError(err);
   }
 };
 
@@ -383,12 +536,19 @@ export const ReqManOffersDateFilter = async (dispatch, fdate, tdate) => {
     console.log(err);
   }
 };
-export const GetRequestAdsData = async (dispatch, adfilter) => {
+export const GetRequestAdsData = async (dispatch, adfilter, showtable) => {
+  const url =
+    showtable == 4
+      ? "request-adStatus"
+      : showtable == 6
+      ? "request-mobile-adStatus"
+      : "";
   try {
+    // request-mobile-adStatus
     const response = await api.get(
-      `${apiUrl}/request-adStatus/${
+      `${apiUrl}/${url}/${
         adfilter == "all"
-          ? 6
+          ? 5
           : adfilter == "pending"
           ? 1
           : adfilter == "verified"
@@ -396,8 +556,8 @@ export const GetRequestAdsData = async (dispatch, adfilter) => {
           : adfilter == "under_review"
           ? 2
           : adfilter == "rejected"
-          ? 5
-          : 6
+          ? 4
+          : 5
       }`
     );
     dispatch({ type: GET_REQ_ADS, payload: response.data });
@@ -408,33 +568,46 @@ export const GetRequestAdsData = async (dispatch, adfilter) => {
     return null;
   }
 };
-export const SearchReqAdvertisement = async (e, dispatch) => {
+export const SearchReqAdvertisement = async (e, dispatch, showtable) => {
+  const url =
+    showtable == 4
+      ? "request-management-adSearch"
+      : "request-management-mobile-adSearch";
   try {
     if (e) {
-      const responce = await axios.get(`${apiUrl}/request-management-adSearch/${e}`);
+      const responce = await axios.get(`${apiUrl}/${url}/${e}`);
       dispatch({ type: GET_REQ_ADS, payload: responce.data });
     } else {
-      GetRequestAdsData(dispatch);
+      GetRequestAdsData(dispatch, 5, showtable);
     }
   } catch (err) {
     console.log(err);
   }
 };
-export const ReqAdsStatusChange = async (valueid, valuedata, adId, dispatch) => {
+export const ReqAdsStatusChange = async (
+  valueid,
+  valuedata,
+  adId,
+  dispatch,
+  showtable
+) => {
   const payload = {
-    req_status_id: valueid,
-    req_status: valuedata ,
-    status_id: valueid == 1 ? 2 : valueid == 2 ? 4 : valueid == 3 ? 3 : valueid == 5 ? 5 : 1,
-        status: valuedata == "Approved"
+    ads_req_status_id: valueid,
+    ads_req_status: valuedata,
+    ads_status_id: valueid == 3 ? 2 : valueid == 4 ? 4 : valueid == 2 ? 3 : 1,
+    ads_status:
+      valuedata == "Approved"
         ? "Active"
         : valuedata == "Rejected"
         ? "Rejected"
         : valuedata == "Under Review"
-        ? "Pending"
+        ? "Under Review"
         : "Requested",
   };
 
-  const url = `${apiUrl}/request-management-ad/${adId}`;
+  const webMbl =
+    showtable == 4 ? "request-management-ad" : "request-management-mobile-ad";
+  const url = `${apiUrl}/${webMbl}/${adId}`;
   const method = "put";
 
   try {
@@ -446,7 +619,7 @@ export const ReqAdsStatusChange = async (valueid, valuedata, adId, dispatch) => 
         "Content-Type": "application/json",
       },
     });
-    GetRequestAdsData(dispatch);
+    GetRequestAdsData(dispatch, 5, showtable);
     console.log(response, "responseresponse");
     return response.data;
   } catch (error) {
@@ -455,14 +628,19 @@ export const ReqAdsStatusChange = async (valueid, valuedata, adId, dispatch) => 
   }
 };
 
-
-
-export const GetReqAdsByDate = async (dispatch, startDate, endDate) => {
+export const GetReqAdsByDate = async (
+  dispatch,
+  startDate,
+  endDate,
+  showtable
+) => {
   console.log("hello testing");
+
+  const url = showtable == 4 ? "filter-by-dateAd" : "filter-by-datemobileAd";
 
   try {
     const response = await axios.post(
-      `${apiUrl}/filter-by-dateAd`,
+      `${apiUrl}/${url}`,
       {
         from: startDate,
         to: endDate,
@@ -480,6 +658,30 @@ export const GetReqAdsByDate = async (dispatch, startDate, endDate) => {
     console.log(err, "this is the error");
   }
 };
+
+export const GetReqPartnerData = async (dispatch, partnerFilter) => {
+  const reqFilter =
+    partnerFilter == "all"
+      ? 7
+      : partnerFilter == "pending"
+      ? 1
+      : partnerFilter == "approved"
+      ? 5
+      : partnerFilter == "on_hold"
+      ? 4
+      : partnerFilter == "rejected"
+      ? 6
+      : 7;
+  try {
+    const response = await axios.get(
+      `${apiUrl}/request-partnerStatus/${reqFilter}`
+    );
+    dispatch({ type: GET_REQ_PARTNER, payload: response.data });
+  } catch (err) {
+    handleError(err);
+  }
+};
+
 const handleError = (error) => {
   console.error("Error details:", error);
   let errorMessage = "An error occurred";

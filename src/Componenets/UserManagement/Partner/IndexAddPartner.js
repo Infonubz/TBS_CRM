@@ -16,8 +16,10 @@ import {
   GetPartnerProfile,
   GetPartnerData
 } from "../../../Api/UserManagement/Partner";
+import pencilshape from '../../../asserts/pencilicon.png'
 import { RiUser3Fill } from "react-icons/ri";
 import ImgCrop from "antd-img-crop";
+import umbuslogo from "../../../asserts/umbuslogo.png"
 import AddressIndex from "./AddressIndex";
 
 // import AddRegisterAddress from "./AddRegisterAddress";
@@ -63,6 +65,8 @@ export default function AddParner({
     }
   };
 
+  console.log(PartnerID,updatedata,"idjdjhsdgfsgfuyegjd");
+  
   const handlePreview = async (file) => {
     if (!file.url && !file.preview) {
       file.preview = await getBase64(file.originFileObj);
@@ -151,7 +155,7 @@ export default function AddParner({
             format={(percent) => `${percent}%`}
           />
         </div>
-        <div className="w-full h-[28vw]">
+        <div className="w-full h-full">
           <div className="grid grid-cols-7 w-full h-full">
             <div className="col-span-3 flex relative flex-col">
               <div className="flex flex-col px-[5vw]">
@@ -166,7 +170,7 @@ export default function AddParner({
                 <div className="border-b-[0.1vw] border-[#1f4b7f] w-[15vw]"></div>
               </div>
 
-              <div className="flex items-center flex-col">
+              <div className="flex items-center flex-col relative">
                 {/* <Upload
                   action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
                   listType="picture-card"
@@ -238,10 +242,11 @@ export default function AddParner({
                     selectedFile && ( // Check if there are no files in the fileList and selectedFile is set
                       <img
                         src={`http://192.168.90.47:4000${selectedFile}`}
-                        alt="Photo"
+                        alt="Profile"
                         className="w-[5vw] h-[5vw] object-cover rounded-[0.2vw] top-[.7vw] left-[.7vw] absolute opacity-25 z-[1] pointer-events-none"
                       />
                     )}
+      
                 </div>
 
                 <Modal
@@ -256,21 +261,30 @@ export default function AddParner({
                     src={previewImage}
                   />
                 </Modal>
+                {updatedata
+                        ? " "
+                        : profileImage === false && (
+                          <div className="text-red-700 text-[.7vw] bottom-[-1.2vw] absolute">
+                            * Profile Image is required
+                          </div>
+                        )}
               </div>
 
               <div className="flex gap-[3vw] pt-[2vw] px-[6.5vw]">
                 <div className="">
                   <div className="bg-[#D9D9D9] rounded-t-full rounded-b-full w-[0.7vw] h-[10vw] relative">
                     <div
-                      className={`absolute rounded-t-full rounded-b-full w-[0.7vw] h-[2.5vw] bg-[#1f4b7f] ${currentpage == 1
-                        ? "top-0"
+                      className={`absolute h-[1.5vw] w-[3.4vw] ${currentpage == 1
+                        ? "top-[.2vw]"
                         : currentpage == 2
-                          ? "top-[4vw]"
+                          ? "top-[4.2vw]"
                           : currentpage == 3
-                            ? "top-[8vw]"
+                            ? "top-[8.5vw]"
                             : "bottom-0"
                         }`}
-                    ></div>
+                    >
+                        <img src={pencilshape} alt='icon' className="h-[1.2vw] w-[3.4vw]" />
+                    </div>
                   </div>
                 </div>
                 <div className="flex">
@@ -291,7 +305,8 @@ export default function AddParner({
                 </div>
               </div>
             </div>
-            <div className="col-span-4">
+            <div className="col-span-4 relative">
+            <div className="w-[5vw] h-[5vw] bg-white shadow-lg rounded-full absolute left-[16.6vw] top-[-1.5vw] flex justify-center items-center z-[1]"><img className="" src={umbuslogo} alt="buslogo"/></div>
               {currentpage == 1 ? (
                 <AddPersonalDetails
                   setCurrentpage={setCurrentpage}
@@ -320,10 +335,12 @@ export default function AddParner({
                 <AddressIndex 
                 setAddressBack={setAddressBack}
                 setCurrentpage={setCurrentpage}
+                documentback={documentback}
                  addressback={addressback}
                  PartnerID={PartnerID}
                  proffesionaback={proffesionaback}
                  setPartnerID={setPartnerID}
+                 updatedata={updatedata}
                  />
               ) : (
                 // : currentpage == 3 ? (

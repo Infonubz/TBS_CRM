@@ -11,6 +11,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ModalPopup from "../Common/Modal/Modal";
 import DeleteList from "../Offers/DeleteList";
 import { Tooltip } from "antd";
+import { capitalizeFirstLetter } from "../Common/Captilization"; 
 
 export default function EmployeeGridView({
   currentData,
@@ -24,10 +25,11 @@ export default function EmployeeGridView({
   const [hoverid, setHoverId] = useState("");
   const [changeColor, setChangeColor] = useState();
   const [openPopovers, setOpenPopovers] = useState({});
+  const [userName,setUserName] = useState("")
 
   const apiUrl = process.env.REACT_APP_API_URL;
 
-  const user = localStorage.getItem("USER_ID");
+  const user = sessionStorage.getItem("USER_ID");
 
   const handleEdit = (tbs_pro_emp_id) => {
     SetUpdateData(tbs_pro_emp_id);
@@ -56,16 +58,13 @@ export default function EmployeeGridView({
   return (
     <>
       <div className="pt-[0.5vw]">
-        <div className="grid grid-cols-5 w-full gap-x-[3vw] gap-y-[1.5vw]">
+        <div className="grid grid-cols-5 w-full gap-x-[3vw] gap-y-[1.1vw]">
           {currentData?.length > 0 &&
-            currentData?.map((item) => (
+            currentData?.map((item) => { 
+                      const fullname = `${capitalizeFirstLetter(item?.emp_first_name)} ${item.emp_last_name}`
+              return(
               <div
-                className={`${
-                  hoverid === item.tbs_pro_emp_id ||
-                  hoverid === item.tbs_op_emp_id
-                    ? "bg-[#1f4b7f] text-white"
-                    : "bg-white"
-                }  h-[16vw] border-[#1f4b7f] border-l-[0.1vw] cursor-pointer border-r-[0.3vw] border-b-[0.3vw] border-t-[0.1vw] rounded-[0.5vw]`}
+                className={`  bg-white h-[16vw] border-[#1f4b7f] border-l-[0.1vw] cursor-pointer border-r-[0.3vw] border-b-[0.3vw] border-t-[0.1vw] rounded-[0.5vw]`}
                 onMouseEnter={() => {
                   if (user?.startsWith("tbs-pro")) {
                     setHoverId(item.tbs_pro_emp_id);
@@ -77,7 +76,12 @@ export default function EmployeeGridView({
                 }}
                 onMouseLeave={() => setHoverId("")}
                 style={{
-                  transition: "ease-in 0.5s",
+                  transition: "ease-in 0.2s",
+     
+                  boxShadow:
+                    hoverid === item.tbs_pro_emp_id ||  hoverid === item.tbs_op_emp_id
+                      ? "0.5vw 0.5vw 0.5vw #1f4b7f"
+                      : "none",
                 }}
               >
                 <div className="flex justify-center pl-[4vw] pt-[1vw]">
@@ -87,7 +91,7 @@ export default function EmployeeGridView({
                         ? `http://192.168.90.47:4000${item?.profile_img}`
                         : userimg
                     } `}
-                    alt="Photo"
+                      alt="Profile"
                     className="w-[5vw] h-[5vw] object-cover rounded-[0.2vw]"
                   />
                   <div className="text-right pl-[3vw]">
@@ -119,6 +123,7 @@ export default function EmployeeGridView({
                               onClick={() => {
                                 if (user?.startsWith("tbs-pro")) {
                                   handleDelete(item.tbs_pro_emp_id);
+                                  setUserName(`${item.emp_first_name}${" "}${item.emp_last_name}`)
                                   console.log(
                                     item.tbs_pro_emp_id,
                                     "----owner id"
@@ -126,6 +131,7 @@ export default function EmployeeGridView({
                                 } else {
                                   handleDelete(item.tbs_op_emp_id);
                                   console.log(item.tbs_op_emp_id, "----op id");
+                                  setUserName(`${item.emp_first_name}${" "}${item.emp_last_name}`)
                                 }
                               }}
                               className="flex pt-[0.1vw] items-center cursor-pointer text-[1vw] text-[#1F4B7F] hover:text-[#1f487c]"
@@ -154,22 +160,17 @@ export default function EmployeeGridView({
                       <FontAwesomeIcon
                         icon={faEllipsisVertical}
                         color="#1f487c"
-                        className={`${
-                          hoverid === item.tbs_pro_emp_id ||
-                          hoverid === item.tbs_op_emp_id
-                            ? "text-white"
-                            : "text-[#1f4b7f]"
-                        } cursor-pointer rounded-[0.5vw]`}
-                        onMouseEnter={() => {
-                          if (user?.startsWith("tbs-pro")) {
-                            setHoverId(item.tbs_pro_emp_id);
-                            console.log(item.tbs_pro_emp_id, "----owner id");
-                          } else {
-                            setHoverId(item.tbs_op_emp_id);
-                            console.log(item.tbs_op_emp_id, "----op id");
-                          }
-                        }}
-                        onMouseLeave={() => setHoverId("")}
+                        className={` text-[#1f4b7f] cursor-pointer rounded-[0.5vw]`}
+                        // onMouseEnter={() => {
+                        //   if (user?.startsWith("tbs-pro")) {
+                        //     setHoverId(item.tbs_pro_emp_id);
+                        //     console.log(item.tbs_pro_emp_id, "----owner id");
+                        //   } else {
+                        //     setHoverId(item.tbs_op_emp_id);
+                        //     console.log(item.tbs_op_emp_id, "----op id");
+                        //   }
+                        // }}
+                        // onMouseLeave={() => setHoverId("")}
                         style={{
                           height: "1.5vw",
                           width: "1.5vw",
@@ -179,16 +180,18 @@ export default function EmployeeGridView({
                   </div>
                 </div>
                 <div className="flex-col flex items-center justify-center gap-y-[0.5vw]">
-                  <h1 className="font-bold text-[1vw] pt-[0.7vw] ">{`${item.emp_first_name} ${item.emp_last_name}`}</h1>
-                  <div className="flex flex-col  justify-center gap-y-[0.8vw] mt-[1vw]">
+                  <h1 className="font-bold text-[1vw] mt-[.7vw] pt-[0.7vw] text-[#1f4b7f] ">
+                    {/* {`${capitalizeFirstLetter(item.emp_first_name)} ${item.emp_last_name}`} */}
+                    {
+              fullname?.length > 17 ? <Tooltip placement="top"
+                title={`${capitalizeFirstLetter(item?.emp_first_name)} ${item.emp_last_name}`}
+                className="cursor-pointer">{fullname?.slice(0, 17) + ".."}</Tooltip> : fullname
+            }
+                    </h1>
+                  <div className="flex flex-col  justify-center gap-y-[0.8vw] mt-[.5vw]">
                     <div className="flex flex-row items-center space-x-[0.5vw] ">
                       <div
-                        className={`${
-                          item.tbs_pro_emp_id != hoverid ||
-                          item.tbs_op_emp_id != hoverid
-                            ? "bg-[#1f487c]"
-                            : "bg-[#f6eeff]"
-                        }  w-[1.8vw] h-[1.8vw] items-center flex justify-center rounded-lg`}
+                        className={`  bg-[#f6eeff] w-[1.8vw] h-[1.8vw] items-center flex justify-center rounded-lg`}
                         style={{
                           transition: "ease-out 1s",
                         }}
@@ -196,23 +199,15 @@ export default function EmployeeGridView({
                         <FaPhone
                           size="1vw"
                           color={`${
-                            item.tbs_pro_emp_id != hoverid ||
-                            item.tbs_op_emp_id != hoverid
-                              ? "white"
-                              : "#1f487c"
+                            "#1f487c"
                           }`}
                         />
                       </div>
-                      <div className="text-[0.9vw]">{item.phone}</div>
+                      <div className="text-[0.9vw] text-[#1f4b7f]">{item.phone}</div>
                     </div>
                     <div className="flex flex-row items-center space-x-[0.5vw] ">
                       <div
-                        className={`${
-                          item.tbs_pro_emp_id != hoverid ||
-                          item.tbs_op_emp_id != hoverid
-                            ? "bg-[#1f487c]"
-                            : "bg-[#f6eeff]"
-                        }  w-[1.8vw] h-[1.8vw] items-center flex justify-center rounded-lg`}
+                        className={`bg-[#f6eeff] w-[1.8vw] h-[1.8vw] items-center flex justify-center rounded-lg`}
                         style={{
                           transition: "ease-out 1s",
                         }}
@@ -220,28 +215,25 @@ export default function EmployeeGridView({
                         <TbMailFilled
                           size="1vw"
                           color={`${
-                            item.tbs_pro_emp_id != hoverid ||
-                            item.tbs_op_emp_id != hoverid
-                              ? "white"
-                              : "#1f487c"
+                            "#1f487c"
                           }`}
                         />
                       </div>
                       {/* <div className="text-[0.9vw]">{item.email_id}</div> */}
                       {item?.email_id?.length > 15 ? (
                         <Tooltip
-                          placement="right"
+                          placement="top"
                           title={item?.email_id}
                           className="cursor-pointer"
                           // color="#1F487C"
                         >
-                          <div className="text-[0.9vw]">
+                          <div className="text-[0.9vw] text-[#1f4b7f]">
                             {" "}
                             {`${item?.email_id?.slice(0, 15)}...`}
                           </div>
                         </Tooltip>
                       ) : (
-                        <div className="text-[0.9vw]">
+                        <div className="text-[0.9vw] text-[#1f4b7f]">
                           {item?.email_id?.slice(0, 15)}
                         </div>
                       )}
@@ -250,7 +242,7 @@ export default function EmployeeGridView({
                   </div>
                 </div>
               </div>
-            ))}
+            )})}
         </div>
       </div>
       <ModalPopup
@@ -262,7 +254,7 @@ export default function EmployeeGridView({
       >
         <DeleteList
           setDeleteModalIsOpen={setDeleteEmpModalIsOpen}
-          title={"Want to delete this User"}
+          title={`Want to delete this User ${capitalizeFirstLetter(userName)}`}
           api={
             user?.startsWith("tbs-pro")
               ? `${apiUrl}/pro-emp-personal-details/${EmployeeID}`

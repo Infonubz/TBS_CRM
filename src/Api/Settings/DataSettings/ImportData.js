@@ -45,31 +45,82 @@ export const GetImportData = async (dispatch) => {
 //   }
 // };
 
-export const SubmitImportData = async (values, dispatch) => {
+// --------------------------------------------------------------------------------------------------------------
+
+// export const SubmitImportData = async (values, dispatch) => {
+//   const formData = new FormData();
+//   formData.append("select_fields", values.select_fields);
+//   formData.append("upload_files", values.upload_files);
+//   // Determine field_id based on select_fields value
+//   let field_id;
+//   switch (values.select_fields) {
+//     case "User management":
+//       field_id = 1;
+//       break;
+//     case "Offers & deals":
+//       field_id = 2;
+//       break;
+//     case "advertisement":
+//       field_id = 3;
+//       break;
+//     default:
+//       field_id = 4;
+//   }
+
+//   formData.append("field_id", field_id);
+//   try {
+//     let response;
+//     const existingData = await axios.get(
+//       `${apiUrl}/impdata/${field_id}`
+//     );
+//     console.log(existingData, "existingData existingData");
+
+//     if (existingData.status === 200 && existingData.data.length > 0) {
+//       const impId = existingData.data[0].imp_id;
+//       response = await axios.put(
+//         `${apiUrl}/impdata/${impId}`,
+//         formData,
+//         {
+//           headers: {
+//             "Content-Type": "multipart/form-data",
+//           },
+//         }
+//       );
+//     } else {
+//       response = await axios.post(
+//         `${apiUrl}/impdata`,
+//         formData,
+//         {
+//           headers: {
+//             "Content-Type": "multipart/form-data",
+//           },
+//         }
+//       );
+//     }
+
+//     await GetImportData(dispatch);
+//     toast.success(response.data);
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error submitting import data:", error);
+//     handleError(error);
+//     return null;
+//   }
+// };
+
+
+export const SubmitImportData = async (values, field_id, dispatch) => {
+
   const formData = new FormData();
   formData.append("select_fields", values.select_fields);
   formData.append("upload_files", values.upload_files);
-  // Determine field_id based on select_fields value
-  let field_id;
-  switch (values.select_fields) {
-    case "User management":
-      field_id = 1;
-      break;
-    case "Offers & deals":
-      field_id = 2;
-      break;
-    case "advertisement":
-      field_id = 3;
-      break;
-    default:
-      field_id = 4;
-  }
-
   formData.append("field_id", field_id);
+  console.log('Field_idssss');
+
   try {
     let response;
     const existingData = await axios.get(
-      `${apiUrl}/impdata/${field_id}`
+      `${apiUrl}/impdata/${values.field_id}`
     );
     console.log(existingData, "existingData existingData");
 
@@ -84,6 +135,8 @@ export const SubmitImportData = async (values, dispatch) => {
           },
         }
       );
+      console.log(response, 'importdata_fieldId')
+
     } else {
       response = await axios.post(
         `${apiUrl}/impdata`,
@@ -106,24 +159,62 @@ export const SubmitImportData = async (values, dispatch) => {
   }
 };
 
+
+// export const GetImportDataByField = async (value) => {
+//   console.log(value, "ahsgxdahsjksaxbj");
+//   let field_id;
+//   switch (value) {
+//     case "User management":
+//       field_id = 1;
+//       break;
+//     case "Offers & deals":
+//       field_id = 2;
+//       break;
+//     case "advertisement":
+//       field_id = 3;
+//       break;
+//     case "Promotion":
+//       field_id = 4;
+//       break;
+//     default:
+//       field_id = "";
+//   }
+//   const response = await api.get(`${apiUrl}/impdata/${field_id}`);
+//   try {
+//     console.log(response?.data, "responseresponse");
+//     return response;
+//   } catch (error) {
+//     handleError(error);
+//     return null;
+//   }
+// };
+
 export const GetImportDataByField = async (value) => {
   console.log(value, "ahsgxdahsjksaxbj");
   let field_id;
+  console.log(field_id, 'check_field_id_export')
+
   switch (value) {
-    case "User management":
+    case "User Management - Operator":
       field_id = 1;
       break;
-    case "Offers & deals":
+    case "User Management - Partner":
       field_id = 2;
       break;
-    case "advertisement":
+    case "User Management - Employee":
       field_id = 3;
       break;
-    case "Promotion":
+    case "User Management - Client":
       field_id = 4;
       break;
+    case "Offers & deals":
+      field_id = 5;
+      break;
+    case "advertisement":
+      field_id = 6;
+      break;
     default:
-      field_id = "";
+      field_id = 7
   }
   const response = await api.get(`${apiUrl}/impdata/${field_id}`);
   try {
@@ -134,6 +225,7 @@ export const GetImportDataByField = async (value) => {
     return null;
   }
 };
+
 
 const handleError = (error) => {
   console.error("Error details:", error);

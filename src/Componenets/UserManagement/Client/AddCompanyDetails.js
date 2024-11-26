@@ -1,4 +1,4 @@
-import { Progress, Upload } from "antd";
+import { ConfigProvider, Progress, Select, Upload } from "antd";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { FaCloudUploadAlt } from "react-icons/fa";
@@ -17,6 +17,8 @@ import {
 } from "../../../Api/UserManagement/Client";
 import "../../../App.css";
 import { FaUpload } from "react-icons/fa";
+import { IoMdArrowDropdown } from "react-icons/io";
+import { GetBusinessList } from "../../../Api/UserManagement/SuperAdmin";
 
 const validationSchema = Yup.object().shape({
   phone: Yup.string()
@@ -83,6 +85,7 @@ export default function AddCompanyDetails({
   const [draggerImage, setDraggerImage] = useState(false);
   const [previewUrl, setPreviewUrl] = useState("");
   const [currentId,setCurrentId] = useState("")
+  const [businessData,setBusinessData] = useState([])
   const [clicompanydata, setCliComapanyData] = useState({
     company_name: "",
     owner_name: "",
@@ -100,6 +103,8 @@ console.log(addressback,clientID,enable,"backbafdkfsdkf");
 
 
   const handleSubmit = async (values) => {
+    console.log(values,"clientvalues");
+    
     if (clientID && enable == false) {
       setCurrentpage(2);
     } else {
@@ -111,7 +116,8 @@ console.log(addressback,clientID,enable,"backbafdkfsdkf");
           dispatch,
           fileList,
           setCurrentId,
-          currentId
+          currentId,
+          setClientID
         );
         // setModalIsOpen(false);
         toast.success(data?.message);
@@ -150,11 +156,45 @@ console.log(addressback,clientID,enable,"backbafdkfsdkf");
       console.error("Error fetching additional user data", error);
     }
   };
+  const fetchBusiness = async () =>{
+    try{
+      const curdata = await GetBusinessList()
+      setBusinessData(curdata)
+    }
+    catch(err){
+      console.log(err);
+      
+    }
+  }
+
+
+  const defaultBusinessData = {
+    value: '',
+    label: (
+      <div className="text-[1vw] px-[0.2vw] pb-[0.1vw] text-gray-400">
+        Select Business
+      </div>
+    ),
+    disabled: true,
+  };
+  const getBusinessData = businessData.map((value) =>({
+    value: value.value,
+    label: (
+      <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+        {value.label}
+      </div>
+    ),
+    search:value.label
+
+  }))
+
+  const businessOptions = [defaultBusinessData,...getBusinessData]
 
   useEffect(() => {
     if (clientID != null || enable || addressback) {
       fetchGetUser();
     }
+    fetchBusiness()
   }, [clientID, setClientID, setCliComapanyData, enable, addressback]);
 
   console.log(clicompanydata, "clicompanydata555");
@@ -163,12 +203,12 @@ console.log(addressback,clientID,enable,"backbafdkfsdkf");
 
   return (
     <div>
-      <div className="border-l-[0.1vw] h-[28vw] overflow-y-scroll px-[2vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f]">
+      <div className="border-l-[0.1vw] h-[28vw] umselect  px-[2vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f] mt-[1.5vw]">
         <div className="h-[4vw] w-full flex items-center justify-between ">
           <label className="text-[1.5vw] font-semibold text-[#1f4b7f] ">
             Company Details
           </label>
-          {clientID || addressback ? (
+          {updatedata || addressback ? (
             <button
               className={`${
                 enable
@@ -220,13 +260,15 @@ console.log(addressback,clientID,enable,"backbafdkfsdkf");
               handleSubmit,
               values,
               handleChange,
+              resetForm,
               errors,
               touched,
             }) => (
               <Form onSubmit={handleSubmit}>
                 <div className="gap-y-[1.5vw] flex-col flex">
+                  <div className="overflow-y-auto h-[18.3vw] gap-y-[1.5vw] flex-col flex pb-[1vw]">
                   <div className="grid grid-cols-2 w-full gap-x-[2vw]">
-                    <div className="col-span-1">
+                    <div className="col-span-1 relative">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         Company Name
                         <span className="text-[1vw] text-red-600 pl-[0.2vw]">
@@ -239,14 +281,14 @@ console.log(addressback,clientID,enable,"backbafdkfsdkf");
                         placeholder="Enter Company Name"
                         value={values.company_name}
                         disabled={
-                          clientID || addressback
+                          updatedata || addressback
                             ? enable
                               ? false
                               : true
                             : false
                         }
                         className={`${
-                          clientID || addressback
+                          updatedata || addressback
                             ? enable == false
                               ? " cursor-not-allowed"
                               : ""
@@ -256,10 +298,10 @@ console.log(addressback,clientID,enable,"backbafdkfsdkf");
                       <ErrorMessage
                         name="company_name"
                         component="div"
-                        className="text-red-500 text-[0.8vw]"
+                        className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[.2vw]"
                       />
                     </div>
-                    <div className="col-span-1">
+                    <div className="col-span-1 relative">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         Owner Name
                         <span className="text-[1vw] text-red-600 pl-[0.2vw]">
@@ -272,14 +314,14 @@ console.log(addressback,clientID,enable,"backbafdkfsdkf");
                         placeholder="Enter Owner Name"
                         value={values.owner_name}
                         disabled={
-                          clientID || addressback
+                          updatedata || addressback
                             ? enable
                               ? false
                               : true
                             : false
                         }
                         className={`${
-                          clientID || addressback
+                          updatedata || addressback
                             ? enable == false
                               ? " cursor-not-allowed"
                               : ""
@@ -289,12 +331,12 @@ console.log(addressback,clientID,enable,"backbafdkfsdkf");
                       <ErrorMessage
                         name="owner_name"
                         component="div"
-                        className="text-red-500 text-[0.8vw]"
+                        className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[.2vw]"
                       />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 w-full gap-x-[2vw]">
-                    <div className="col-span-1 ">
+                    <div className="col-span-1 relative">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         Phone
                         <span className="text-[1vw] text-red-600 pl-[0.2vw]">
@@ -308,14 +350,14 @@ console.log(addressback,clientID,enable,"backbafdkfsdkf");
                           placeholder="Enter Number"
                           value={values.phone}
                           disabled={
-                            clientID || addressback
+                            updatedata || addressback
                               ? enable
                                 ? false
                                 : true
                               : false
                           }
                           className={`${
-                            clientID || addressback
+                            updatedata || addressback
                               ? enable == false
                                 ? " cursor-not-allowed"
                                 : ""
@@ -329,10 +371,10 @@ console.log(addressback,clientID,enable,"backbafdkfsdkf");
                       <ErrorMessage
                         name="phone"
                         component="div"
-                        className="text-red-500 text-[0.8vw]"
+                        className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[.2vw]"
                       />
                     </div>
-                    <div className="col-span-1">
+                    <div className="col-span-1 relative">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         Email ID
                         <span className="text-[1vw] text-red-600 pl-[0.2vw]">
@@ -345,14 +387,14 @@ console.log(addressback,clientID,enable,"backbafdkfsdkf");
                         placeholder="Enter Email Address"
                         value={values.emailid}
                         disabled={
-                          clientID || addressback
+                          updatedata || addressback
                             ? enable
                               ? false
                               : true
                             : false
                         }
                         className={`${
-                          clientID || addressback
+                          updatedata || addressback
                             ? enable == false
                               ? " cursor-not-allowed"
                               : ""
@@ -362,35 +404,35 @@ console.log(addressback,clientID,enable,"backbafdkfsdkf");
                       <ErrorMessage
                         name="emailid"
                         component="div"
-                        className="text-red-500 text-[0.8vw]"
+                        className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[.2vw]"
                       />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 w-full gap-x-[2vw]">
-                    <div className="col-span-1">
+                    <div className="col-span-1 relative">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         Type of Constitution
                         <span className="text-[1vw] text-red-600 pl-[0.2vw]">
                           *
                         </span>
                       </label>
-                      <Field
+                      {/* <Field
                         as="select"
                         name="constitution"
                         value={values.constitution}
                         onChange={(e) => {
                           handleChange(e);
-                          localStorage.setItem("constitution", e.target.value);
+                          sessionStorage.setItem("constitution", e.target.value);
                         }}
                         disabled={
-                          clientID || addressback
+                          updatedata || addressback
                             ? enable
                               ? false
                               : true
                             : false
                         }
                         className={`${
-                          clientID || addressback
+                          updatedata || addressback
                             ? enable == false
                               ? " cursor-not-allowed"
                               : ""
@@ -422,37 +464,125 @@ console.log(addressback,clientID,enable,"backbafdkfsdkf");
                           value="Public Sector"
                           className=""
                         />
-                      </Field>
+                      </Field> */}
+                          <ConfigProvider
+                        theme={{
+                          components: {
+                            Select: {
+                              optionActiveBg: '#aebed1',
+                              optionSelectedColor: '#FFF',
+                              optionSelectedBg: '#aebed1',
+                              optionHeight: '2',
+                            },
+                          },
+                        }}
+                      >
+                        <Select
+                          showSearch
+                          value={values.constitution}
+                          onChange={(value) => {
+                            handleChange({ target: { name: 'constitution', value } })
+                          }}
+                          disabled={
+                            updatedata || addressback
+                              ? enable
+                                ? false
+                                : true
+                              : false
+                          }
+                          name="constitution"
+                          className={`${updatedata || addressback
+                            ? enable == false
+                              ? " cursor-not-allowed"
+                              : ""
+                            : ""
+                            } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          // className="custom-select bg-white outline-none w-full mt-[0.5vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
+                          placeholder="Select constitution"
+                          filterOption={(input, option) => 
+                            option?.value?.toLowerCase()?.includes(input.toLowerCase()) // Make it case-insensitive
+                          }
+                          optionFilterProp="value"
+                          suffixIcon={<span style={{ fontSize: '1vw', color: '#1f487c' }}>
+                            <IoMdArrowDropdown size="2vw" />
+                          </span>}
+                          style={{ padding: 4 }}
+                          options={[
+                            {
+                              value: '',
+                              label: (
+                                <div className="text-[1vw] px-[0.2vw] pb-[0.1vw] text-gray-400">
+                                  Select Constitution
+                                </div>
+                              ),
+                              disabled: true,
+                            },
+                            {
+                              value: 'Proprietorship',
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  Proprietorship
+                                </div>
+                              ),
+                            },
+                            {
+                              value: 'Partnership',
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  Partnership
+                                </div>
+                              ),
+                            },
+                            {
+                              value: 'Private Limited',
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  Private Limited
+                                </div>
+                              ),
+                            },
+                            {
+                              value: 'Public Sector',
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  Public Sector
+                                </div>
+                              ),
+                            },
+                          ]}
+                              
+                        />
+                      </ConfigProvider>
                       <ErrorMessage
                         name="constitution"
                         component="div"
-                        className="text-red-500 text-[0.8vw]"
+                        className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[.2vw]"
                       />
                     </div>
-                    <div className="col-span-1">
+                    <div className="col-span-1 relative">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         Type of Business
                         <span className="text-[1vw] text-red-600 pl-[0.2vw]">
                           *
                         </span>
                       </label>
-                      <Field
+                      {/* <Field
                         as="select"
                         name="business"
                         value={values.business}
                         onChange={(e) => {
                           handleChange(e);
-                          localStorage.setItem("business", e.target.value);
+                          sessionStorage.setItem("business", e.target.value);
                         }}
                         disabled={
-                          clientID || addressback
+                          updatedata || addressback
                             ? enable
                               ? false
                               : true
                             : false
                         }
                         className={`${
-                          clientID || addressback
+                          updatedata || addressback
                             ? enable == false
                               ? " cursor-not-allowed"
                               : ""
@@ -560,16 +690,62 @@ console.log(addressback,clientID,enable,"backbafdkfsdkf");
                           value="Consumer Goods"
                           className=""
                         />
-                      </Field>
+                      </Field> */}
+                         <ConfigProvider
+                        theme={{
+                          components: {
+                            Select: {
+                              optionActiveBg: '#aebed1',
+                              optionSelectedColor: '#FFF',
+                              optionSelectedBg: '#aebed1',
+                              optionHeight: '2',
+                            },
+                          },
+                        }}
+                      >
+                        <Select
+                          showSearch
+                          value={values.business}
+                          onChange={(value) => {
+                            handleChange({ target: { name: 'business', value } })
+                          }}
+                          disabled={
+                            updatedata || addressback
+                              ? enable
+                                ? false
+                                : true
+                              : false
+                          }
+                          name="business"
+                          className={`${updatedata || addressback
+                            ? enable == false
+                              ? " cursor-not-allowed"
+                              : ""
+                            : ""
+                            } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          // className="custom-select bg-white outline-none w-full mt-[0.5vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
+                          placeholder="Select business"
+                          filterOption={(input, option) => 
+                            option?.value?.toLowerCase()?.includes(input.toLowerCase()) // Make it case-insensitive
+                          }
+                          optionFilterProp="value"
+                          suffixIcon={<span style={{ fontSize: '1vw', color: '#1f487c' }}>
+                            <IoMdArrowDropdown size="2vw" />
+                          </span>}
+                          style={{ padding: 4 }}
+                          options={businessOptions}                  
+                              
+                        />
+                      </ConfigProvider>
                       <ErrorMessage
                         name="business"
                         component="div"
-                        className="text-red-500 text-[0.8vw]"
+                        className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[.2vw]"
                       />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 w-full gap-x-[2vw]">
-                    <div className="col-span-2">
+                    <div className="col-span-2 relative">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         Web URL
                         <span className="text-[1vw] text-red-600 pl-[0.2vw]">
@@ -582,14 +758,14 @@ console.log(addressback,clientID,enable,"backbafdkfsdkf");
                         placeholder="Enter Web URL"
                         value={values.web_url}
                         disabled={
-                          clientID || addressback
+                          updatedata || addressback
                             ? enable
                               ? false
                               : true
                             : false
                         }
                         className={`${
-                          clientID || addressback
+                          updatedata || addressback
                             ? enable == false
                               ? " cursor-not-allowed"
                               : ""
@@ -599,12 +775,13 @@ console.log(addressback,clientID,enable,"backbafdkfsdkf");
                       <ErrorMessage
                         name="web_url"
                         component="div"
-                        className="text-red-500 text-[0.8vw]"
+                        className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[.2vw]"
                       />
                     </div>
                   </div>
+                  </div>
 
-                  <div className="flex items-center justify-between py-[1vw] relative">
+                  <div className="flex items-center justify-between  relative">
                     {updatedata
                       ? " "
                       : profileImage === false && (
@@ -619,7 +796,7 @@ console.log(addressback,clientID,enable,"backbafdkfsdkf");
                       </h1>
                     </div>
                     <div className="flex items-center gap-x-[1vw]">
-                      <button className="border-[#1F487C] w-[5vw] font-semibold text-[1vw] h-[2vw] rounded-full border-r-[0.2vw]  border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw]">
+                      <button type="button" onClick={resetForm} className="border-[#1F487C] w-[5vw] font-semibold text-[1vw] h-[2vw] rounded-full border-r-[0.2vw]  border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw]">
                         Reset
                       </button>
                       <button
@@ -627,7 +804,7 @@ console.log(addressback,clientID,enable,"backbafdkfsdkf");
                         type="submit"
                         // onClick={() => setCurrentpage(2)}
                       >
-                        {clientID || addressback
+                        {updatedata || addressback
                           ? enable
                             ? "Update & Continue"
                             : "Continue"

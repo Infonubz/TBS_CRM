@@ -16,18 +16,20 @@ import { useDispatch, useSelector } from "react-redux";
 import no_image_available from "../../asserts/No_image_available.jpg";
 import { REQUEST_MANAGEMENT_DATA } from "../../Store/Type";
 import {
+  GetPartnerDataById,
   GetRequestDataById
 } from "../../Api/RequestManagement/RequestManagement";
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 
 
-export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyData, setRequestData, requestData, statusFromEdit }) {
+export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyData, setRequestData, requestData, statusFromEdit,comments ,tabfilter}) {
   const [value, setValue] = useState(1);
   const [isUpdateStatus, setIsUpdateStatus] = useState(false);
   const [isDwldModal, setIsDwldModal] = useState(false);
   const [modalContent, setModalContent] = useState("download");
   const [dataValue, setDataValue] = useState();
+  const [isOperator,setIsOperator]= useState(false)
 
 
   console.log(requestData, "This is my status id");
@@ -65,9 +67,27 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
     }
   };
 
+  const fetchPartnerData = async() =>{
+    console.log("i am printindhfdhfdhfhf");
+    
+    try{
+      const data = await GetPartnerDataById(verifyData)
+      console.log(data,"partnerdatatatatatatdifhdfkhfs");  
+      setRequestData(data)
+    }
+    catch(err){
+      console.log(err);  
+    }
+  }
+
+
   useEffect(() => {
-    if (verifyData != null) {
+    if (verifyData != null && verifyData.startsWith("tbs-op")) {
       fetchGetRequest();
+      setIsOperator(true)
+    }
+    else if(verifyData != null && verifyData.startsWith("tbs-pat")){
+      fetchPartnerData();
     }
   }, [verifyData, setVerifyData, setRequestData]);
 
@@ -126,18 +146,27 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
     }
 
     zip.generateAsync({ type: 'blob' }).then(content => {
-      saveAs(content, `${requestData?.tbs_operator_id}.zip`); 
+      saveAs(content, `${isOperator ? requestData?.tbs_operator_id : requestData.tbs_partner_id}.zip`); 
     });
   };
 
   const fetchImages = async () => {
-    return [
+    return (
+    verifyData.startsWith("tbs-op") ?
+    [
       `http://192.168.90.47:4000${requestData?.aadar_front_doc}`,
       `http://192.168.90.47:4000${requestData?.aadar_back_doc}`,
       `http://192.168.90.47:4000${requestData?.pancard_front_doc}`,
       `http://192.168.90.47:4000${requestData?.pancard_back_doc}`,
-      `http://192.168.90.47:4000${requestData?.msme_doc}`,
-    ];
+      `http://192.168.90.47:4000${requestData?.msme_docs}`,
+    ] : 
+    [
+      `http://192.168.90.47:4000${requestData?.aadhar_card_front}`,
+      `http://192.168.90.47:4000${requestData?.aadhar_card_back}`,
+      `http://192.168.90.47:4000${requestData?.pan_card_front}`,
+      `http://192.168.90.47:4000${requestData?.pan_card_back}`,
+    ]
+  )
   };
 
   return (
@@ -146,15 +175,15 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
       <div className=" ">
         <Formik
           initialValues={{
-            owner_name: requestData?.owner_name || "",
-            aadharcard_number: requestData?.aadharcard_number || "",
-            pancard_number: requestData?.pancard_number || "",
+            owner_name: isOperator ? requestData?.owner_name : requestData.partner_first_name || "",
+            aadharcard_number: isOperator ? requestData?.aadharcard_number : requestData?.aadhar_card_number || "",
+            pancard_number: isOperator ? requestData?.pancard_number : requestData.pan_card_number  || "",
             msme_number: requestData?.msme_number || "",
-            aadar_front_doc: requestData?.aadar_front_doc || null,
-            aadar_back_doc: requestData?.aadar_back_doc || null,
-            pancard_front_doc: requestData?.pancard_front_doc || null,
-            pancard_back_doc: requestData?.pancard_back_doc || null,
-            msme_doc: requestData?.msme_doc || "",
+            aadar_front_doc: isOperator ? requestData?.aadar_front_doc : requestData?.aadhar_card_front || null,
+            aadar_back_doc: isOperator ? requestData?.aadar_back_doc : requestData.aadhar_card_back || null,
+            pancard_front_doc:  isOperator ? requestData?.pancard_front_doc : requestData.pan_card_front || null,
+            pancard_back_doc: isOperator ? requestData?.pancard_back_doc : requestData.pan_card_back || null,
+            msme_docs: requestData?.msme_docs || "",
           }}
           enableReinitialize
         >
@@ -164,8 +193,8 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
                 <div className="">
                   <div className=" grid grid-cols-5 w-full h-[30vw] relative">
                     <div className="col-span-2 w-full pr-[1vw] gapy-y-[1vw]">
-                      <div className="grid grid-rows-3 w-full h-full">
-                        <div className="row-span-1">
+                      <div className={`grid ${isOperator ? "grid-rows-3":"grid-rows-2"}  w-full h-full`}>
+                        <div className={`row-span-1 ${isOperator ? "":"flex  flex-col"}`}>
                           <p className="text-[1.2vw] font-bold text-[#1F487C]">
                             Aadhar Card Details:
                           </p>
@@ -175,7 +204,7 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
                             placeholder="Name"
                             value={capitalizeFirstLetter(values?.owner_name)}
                             disabled
-                            className="border-r-[0.3vw] cursor-not-allowed mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                            className={`border-r-[0.3vw] ${isOperator ? "":"mt-[1.5vw]"} cursor-not-allowed mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                           />
                           <Field
                             type="text"
@@ -183,10 +212,10 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
                             placeholder="Aadhar card Number"
                             value={values?.aadharcard_number}
                             disabled
-                            className="border-r-[0.3vw] cursor-not-allowed mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                            className={`border-r-[0.3vw] cursor-not-allowed ${isOperator ? "mt-[.5vw]":"mt-[1.5vw]"} border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                           />
                         </div>
-                        <div className="row-span-1">
+                        <div className={`row-span-1 ${isOperator ? "":"flex flex-col"}`}>
                           <p className="text-[1.2vw] font-bold text-[#1F487C]">
                             Pan Card Details:
                           </p>
@@ -196,7 +225,7 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
                             placeholder="Name"
                             value={capitalizeFirstLetter(values?.owner_name)}
                             disabled
-                            className="border-r-[0.3vw] mt-[0.5vw] cursor-not-allowed border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                            className={`border-r-[0.3vw] mt-[0.5vw] ${isOperator ? "":"mt-[1.5vw]"} cursor-not-allowed border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                           />
                           <Field
                             type="text"
@@ -204,10 +233,11 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
                             placeholder="Pan Card Number"
                             value={values?.pancard_number}
                             disabled
-                            className="border-r-[0.3vw] cursor-not-allowed mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                            className={`border-r-[0.3vw] cursor-not-allowed ${isOperator ? "mt-[.5vw]":"mt-[1.5vw]"} border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                           />
                         </div>
-                        <div className="row-span-1">
+                        {
+                          isOperator ?   <div className="row-span-1">
                           <p className="text-[1.2vw] font-bold text-[#1F487C]">
                             MSME Details:
                           </p>
@@ -227,7 +257,10 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
                             disabled
                             className="border-r-[0.3vw] cursor-not-allowed mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                           />
-                        </div>
+                        </div> : ""
+
+                        }
+                     
                       </div>
                     </div>
                     <div className="col-span-3 w-full flex-col flex gap-y-[1vw] h-full overflow-y-scroll px-[0.5vw] pb-[1vw]">
@@ -301,23 +334,28 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
                         onMouseEnter={() => setCurrentFile(4)}
                         onMouseLeave={() => setCurrentFile(null)}
                       />
-                      <img
-                        src={
-                          values?.msme_doc
-                            ? `http://192.168.90.47:4000${values?.msme_doc}`
-                            : no_image_available
-                        }
-                        alt="MSME"
-                        className={`w-full ${currentfile == 5
-                          ? "h-[30vw] object-fill"
-                          : "h-[10vw] object-cover"
-                          }  cursor-zoom-in border-[#1F487C] border-[0.2vw] border-dashed rounded-[1vw]`}
-                        style={{
-                          transition: "ease-in 0.5s",
-                        }}
-                        onMouseEnter={() => setCurrentFile(5)}
-                        onMouseLeave={() => setCurrentFile(null)}
-                      />
+                      {
+                          isOperator ? 
+                          <img
+                          src={
+                            values?.msme_docs
+                              ? `http://192.168.90.47:4000${values?.msme_docs}`
+                              : no_image_available
+                          }
+                          alt="MSME"
+                          className={`w-full ${currentfile == 5
+                            ? "h-[30vw] object-fill"
+                            : "h-[10vw] object-cover"
+                            }  cursor-zoom-in border-[#1F487C] border-[0.2vw] border-dashed rounded-[1vw]`}
+                          style={{
+                            transition: "ease-in 0.5s",
+                          }}
+                          onMouseEnter={() => setCurrentFile(5)}
+                          onMouseLeave={() => setCurrentFile(null)}
+                        /> 
+                        : ""
+                      }
+                     
                     </div>
                   </div>
 
@@ -473,8 +511,8 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
                       <div className="mt-[2vw] pb-[1vw] h-[7vw] w-[15vw]">
                         <img
                           src={
-                            values?.msme_doc
-                              ? `http://192.168.90.47:4000${values?.msme_doc}`
+                            values?.msme_docs
+                              ? `http://192.168.90.47:4000${values?.msme_docs}`
                               : no_image_available
                           }
                           alt="MSME"
@@ -486,7 +524,7 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
                   </div> */}
                   <div className="flex absolute pl-[1vw] pr-[0.5vw] left-0 bottom-0 justify-between items-center h-[3.5vw] bg-[#1F487C] w-full ">
                     <div className="flex items-center gap-x-[2vw]">
-                      <Radio.Group onChange={onChange} value={value}>
+                      {/* <Radio.Group onChange={onChange} value={value}>
                         <Radio value={1} className="text-white text-[1.2vw]">
                           Matched
                         </Radio>
@@ -496,9 +534,9 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
                         >
                           Not Matched
                         </Radio>
-                      </Radio.Group>
+                      </Radio.Group> */}
                     </div>
-                    {value == 2 ? (
+                    {/* {value == 2 ? (
                       <div className="">
                         <Field
                           // as="textarea"
@@ -517,7 +555,7 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
                       </div>
                     ) : (
                       ""
-                    )}
+                    )} */}
                     {/* <div className="col-span-2 pl-[2vw] pt-[0.5vw]">
                       <IoMdDownload
                         color="white"
@@ -549,14 +587,15 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
                       </button>
                       {/* {requestData.req_status_id==2?<span>hell</span>:<span> NO hell</span>} */}
                       <button
-                        className={`bg-[#34AE2A] ${requestData.req_status_id == 2 ? "opacity-50 cursor-not-allowed" : ""} rounded-[0.5vw] text-[1vw] text-white w-[8vw] h-[2.5vw]`}
+                        className={`bg-[#34AE2A] 
+                         rounded-[0.5vw] text-[1vw] text-white w-[8vw] h-[2.5vw]`}
                         onClick={() => {
                           setIsUpdateStatus(true);
                         }
                         }
-                        disabled={requestData.req_status_id == 2}
+                        // disabled={requestData.req_status_id == 2}
                       >
-                        {statusFromEdit == true ? <span>Update Status</span> : <span> Verify Status</span>}
+                        {requestData?.req_status_id == 2 ? <span>Update Status</span> : <span> Verify Status</span>}
                         {/* Verify Status */}
                       </button>
                     </div>
@@ -572,7 +611,7 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
         show={isUpdateStatus}
         closeicon={false}
         onClose={closeModal}
-        height="15vw"
+        height="22vw"
         width="30vw"
       >
         <Status_Update_Modal
@@ -583,6 +622,8 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
           setRequestData={setRequestData}
           requestData={requestData}
           setIsVerifyModal={setIsVerifyModal}
+          comments={comments}
+          tabfilter={tabfilter}
         />
       </ModalPopup>
 

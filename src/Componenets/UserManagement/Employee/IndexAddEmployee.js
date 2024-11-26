@@ -9,6 +9,8 @@ import AddPersonalDetails from "./AddPersonalDetails";
 import { useDispatch } from "react-redux";
 import AddProfessionalDetails from "./AddProfessionalDetails";
 import AddDocuments from "./AddDocuments";
+import pencilshape from '../../../asserts/pencilicon.png'
+import umbuslogo from "../../../asserts/umbuslogo.png"
 import AddRegisterAddress from "./AddRegisterAddress";
 import { useLocation } from "react-router";
 import {
@@ -18,6 +20,8 @@ import {
 } from "../../../Api/UserManagement/Employee";
 import { toast } from "react-toastify";
 import { RiUser3Fill } from "react-icons/ri";
+import ImgCrop from "antd-img-crop";
+import AddressIndex from "./AddressIndex";
 
 // import AddRegisterAddress from "./AddRegisterAddress";
 // import AddBusinessDetails from "./AddBusinessDetails";
@@ -36,14 +40,21 @@ export default function AddEmployee({
   EmployeeID,
   setEmployeeID,
   setModalIsOpen,
+  updatedata
 }) {
   const [currentpage, setCurrentpage] = useState(1);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
   const [fileList, setFileList] = useState([]);
+  const [enableUpload,setEnableUpload] = useState(false)
+  const [profileImage,setProfileImage] = useState(false)
+
   const dispatch = useDispatch();
 
+
+  console.log(EmployeeID,updatedata,"sdsgsdrrrh");
+  
   const handlePreview = async (file) => {
     if (!file.url && !file.preview) {
       file.preview = await getBase64(file.originFileObj);
@@ -55,8 +66,26 @@ export default function AddEmployee({
     );
   };
 
-  const handleChange = ({ fileList: newFileList }) => {
+  const handleChange = async ({ fileList: newFileList }) => {
+    console.log(newFileList[0]?.originFileObj,"helldjfhdjkfhdkjf",newFileList?.length, "ereffgdfqe");
     setFileList(newFileList);
+    if(newFileList?.length > 0){
+
+      setProfileImage(true)
+    }
+    else{
+      setProfileImage(false)
+    }
+    // SubmitProfileData(newFileList[0], dispatch);
+
+    // try {
+    //   const data = await OperatorProfile(newFileList[0]);
+    //   // setSuperAdminData(data);
+    //   console.log(data);
+      
+    // } catch (error) {
+    //   console.error("Error fetching additional user data", error);
+    // }
   };
 
   const handleCancel = () => setPreviewOpen(false);
@@ -99,8 +128,18 @@ export default function AddEmployee({
 
   useEffect(() => {
     getprofile();
-  }, []);
-  const EmployeeProfileImg = sessionStorage.getItem('EmployeeProfileImg')
+  }, [EmployeeID]);
+  // const EmployeeProfileImg = sessionStorage.getItem('EmployeeProfileImg')
+
+  
+useEffect(()=>{
+  if(updatedata){
+    setEnableUpload(true)
+  }
+  else{
+    setEnableUpload(false)
+  }
+},[])
 
   return (
     <div>
@@ -122,7 +161,7 @@ export default function AddEmployee({
             format={(percent) => `${percent}%`}
           />
         </div>
-        <div className="w-full h-[28vw]">
+        <div className="w-full h-full">
           <div className="grid grid-cols-7 w-full h-full">
             <div className="col-span-3 flex relative flex-col">
               <div className="flex flex-col px-[5vw]">
@@ -137,7 +176,7 @@ export default function AddEmployee({
                 <div className="border-b-[0.1vw] border-[#1f4b7f] w-[15vw]"></div>
               </div>
 
-              <div className="flex items-center flex-col">
+              <div className="flex items-center flex-col relative">
                 {/* <Upload
                   action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
                   listType="picture-card"
@@ -172,7 +211,34 @@ export default function AddEmployee({
                   )} */}
                 {/* </label> */}
 
-                {EmployeeProfileImg === null ? (
+                <div className="relative">
+                  <div className="">
+  <ImgCrop className="" showGrid rotationSlider showReset onImageCrop={(file) => {
+      
+    }}>
+    <Upload
+      action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+      listType="picture-card"
+      fileList={fileList}
+      onChange={handleChange}
+      onPreview={handlePreview}
+      disabled={enableUpload}
+    >
+      {fileList?.length < 1 && "+ Upload"}
+    </Upload>
+  </ImgCrop>
+  </div>
+
+  {fileList.length === 0 && selectedFile && (  // Check if there are no files in the fileList and selectedFile is set
+    <img
+      src={`http://192.168.90.47:4000${selectedFile}`}
+      alt="Profile"
+      className="w-[5vw] h-[5vw] object-cover rounded-[0.2vw] top-[.7vw] left-[.7vw] absolute opacity-25 z-[1] pointer-events-none"
+    />
+  )}
+</div>
+
+                {/* {EmployeeProfileImg === null ? (
                   <div>
                     <RiUser3Fill size='1vw'
                       color="#1F487C"
@@ -183,7 +249,7 @@ export default function AddEmployee({
                   <img src={`http://192.168.90.47:4000${EmployeeProfileImg}`}
                     alt="Photo"
                     className="h-[7vw] w-[7vw] cursor-pointer flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.3vw] border-[#1f4b7f] rounded-[0.5vw]" />
-                )}
+                )} */}
                 <Modal
                   visible={previewOpen}
                   title={previewTitle}
@@ -196,21 +262,28 @@ export default function AddEmployee({
                     src={previewImage}
                   />
                 </Modal>
+                {
+                    updatedata ?  " " : (
+                    profileImage === false && <div className="text-red-700 text-[.7vw] absolute  bottom-[-1.2vw]">
+                     * Profile Image is required
+                    </div>)}
               </div>
 
               <div className="flex gap-[3vw] pt-[2vw] px-[6.5vw]">
                 <div className="">
                   <div className="bg-[#D9D9D9] rounded-t-full rounded-b-full w-[0.7vw] h-[14vw] relative">
                     <div
-                      className={`absolute rounded-t-full rounded-b-full w-[0.7vw] h-[2.5vw] bg-[#1f4b7f] ${currentpage == 1
-                        ? "top-0"
+                      className={`absolute w-[3.5vw] h-[1.3vw] ${currentpage == 1
+                        ? "top-[.2vw]"
                         : currentpage == 2
-                          ? "top-[4vw]"
+                          ? "top-[4.3vw]"
                           : currentpage == 3
-                            ? "top-[8vw]"
+                            ? "top-[8.4vw]"
                             : "bottom-0"
                         }`}
-                    ></div>
+                    >
+                          <img src={pencilshape} alt='icon' className="h-[1.2vw] w-[3.4vw]" />
+                    </div>
                   </div>
                 </div>
                 <div className="flex">
@@ -240,17 +313,34 @@ export default function AddEmployee({
                   setAddressBack={setAddressBack}
                   addressback={addressback}
                   setModalIsOpen={setModalIsOpen}
+                  fileList={fileList}
+                  profileImage={profileImage}
+                  setProfileImage={setProfileImage}
+                  updatedata={updatedata}
+                  setEnableUpload={setEnableUpload}
                 />
               ) : currentpage == 2 ? (
-                <AddRegisterAddress
-                  setCurrentpage={setCurrentpage}
-                  EmployeeID={EmployeeID}
-                  setEmployeeID={setEmployeeID}
-                  setAddressBack={setAddressBack}
-                  setProffesionalBack={setProffesionalBack}
-                  proffesionaback={proffesionaback}
-                  setModalIsOpen={setModalIsOpen}
-                />
+                // <AddRegisterAddress
+                //   setCurrentpage={setCurrentpage}
+                //   EmployeeID={EmployeeID}
+                //   setEmployeeID={setEmployeeID}
+                //   setAddressBack={setAddressBack}
+                //   setProffesionalBack={setProffesionalBack}
+                //   proffesionaback={proffesionaback}
+                //   setModalIsOpen={setModalIsOpen}
+                // />
+                <AddressIndex
+                setCurrentpage={setCurrentpage}
+                EmployeeID={EmployeeID}
+                setEmployeeID={setEmployeeID}
+                setAddressBack={setAddressBack}
+                addressback={addressback}
+                setProffesionalBack={setProffesionalBack}
+                proffesionaback={proffesionaback}
+                updatedata={updatedata}
+                setModalIsOpen={setModalIsOpen}/>
+               
+
               ) : currentpage == 3 ? (
                 <AddProfessionalDetails
                   setCurrentpage={setCurrentpage}
@@ -260,6 +350,7 @@ export default function AddEmployee({
                   proffesionaback={proffesionaback}
                   documentback={documentback}
                   setModalIsOpen={setModalIsOpen}
+                  updatedata={updatedata}
                 />
               ) : (
                 <AddDocuments
@@ -269,6 +360,7 @@ export default function AddEmployee({
                   setDocumentBack={setDocumentBack}
                   documentback={documentback}
                   setModalIsOpen={setModalIsOpen}
+                  updatedata={updatedata}
                 />
               )}
             </div>

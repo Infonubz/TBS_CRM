@@ -529,7 +529,7 @@ const ReferEarn = () => {
                                                         value={values.referal_amount}
                                                         onChange={(e) => {
                                                             handleChange(e);
-                                                            localStorage.setItem(
+                                                            sessionStorage.setItem(
                                                                 "referal_amount",
                                                                 e.target.value
                                                             );

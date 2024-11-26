@@ -93,9 +93,10 @@ export default function Discounts() {
   const [deletemodalIsOpen, setDeleteModalIsOpen] = useState(false);
   const [deleteEmpmodalIsOpen, setDeleteEmpModalIsOpen] = useState(false);
   const [deleteOpmodalIsOpen, setDeleteOpModalIsOpen] = useState(false);
+  const [showPage,setShowPage] = useState(false)
 
   // const user = sessionStorage.getItem("USER_ID");
-  const user = localStorage.getItem("USER_ID")
+  const user = sessionStorage.getItem("USER_ID")
 
   console.log(get_partner_list, user, "get_partner_list");
 
@@ -352,7 +353,7 @@ export default function Discounts() {
   const employeeItemsPerPage = 10;
   const indexOfLastEmployeeItem = EmployeeActivePage * employeeItemsPerPage;
   const indexOfFirstEmployeeItem =
-    indexOfLastOperatorItem - employeeItemsPerPage;
+  indexOfLastEmployeeItem - employeeItemsPerPage;
   const currentEmployeeItems =
     get_employee_list.length > 0 &&
     get_employee_list?.slice(indexOfFirstEmployeeItem, indexOfLastEmployeeItem);
@@ -467,6 +468,22 @@ export default function Discounts() {
     setClientID(null);
   };
 
+ 
+  useEffect(() => {
+    if (adminUser == "super_admin" && get_operator_list?.length > 10) {
+      // console.log(currentOperatorItems?.length,"jajajajajajajajajaj") 
+      setShowPage(true);
+    } else if (adminUser == "partner" && get_partner_list?.length > 10) {
+      setShowPage(true);
+    } else if (adminUser == "client" && get_all_client?.length > 10) {
+      setShowPage(true);
+    } else if (adminUser == "employee" && get_employee_list?.length > 10) {
+      setShowPage(true);
+    } 
+    else{
+      setShowPage(false)
+    }
+  }, [adminUser, currentOperatorItems, currentPartnerItems, currentClientItems, currentEmployeeItems]); // Add these items to the dependencies
   return (
     <>
       <Spin size="large" spinning={loading} fullscreen />
@@ -551,8 +568,8 @@ export default function Discounts() {
                   <div className="relative flex items-center ">
                     <input
                       type="text"
-                      className="bg-white outline-none pl-[2vw] w-[17vw] h-[5vh] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw] border-r-[0.2vw] border-b-[0.2vw]"
-                      placeholder="Search Operator"
+                      className="bg-white outline-none pl-[2vw] w-[17vw] text-[#1f487c] h-[5vh] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw] border-r-[0.2vw] border-b-[0.2vw]"
+                      placeholder="Search.."
                       onChange={(e) => search(e)}
                     />
                     <IoSearch
@@ -872,7 +889,18 @@ export default function Discounts() {
                 <TableList currentData={currentData} />
               )} */}
             </div>
-            <div className="w-full h-[8vh] flex justify-between items-center">
+            {
+             ( currentOperatorItems?.length > 10 || currentPartnerItems?.length > 10 || currentClientItems?.length > 10 || currentEmployeeItems?.length > 10 ) ? ""
+             
+             :""
+            }
+
+            {
+
+            }
+            { showPage === true  && 
+
+            (<div className="w-full h-[8vh] flex justify-between items-center">
               <div className="text-[#1f4b7f] flex text-[1.1vw] gap-[0.5vw] ">
                 <span>Showing</span>
                 <span className="font-bold">
@@ -1052,6 +1080,8 @@ export default function Discounts() {
               /> */}
               </div>
             </div>
+  )
+            }
           </div>
         </div>
         <ModalPopup
@@ -1109,6 +1139,7 @@ export default function Discounts() {
               setModalIsOpen={setModalIsOpen}
               EmployeeID={EmployeeID}
               setEmployeeID={setEmployeeID}
+              updatedata={updatedata}
             />
           )}
         </ModalPopup>

@@ -83,7 +83,7 @@ const ForgotPassword = () => {
     EditUserSettings(id, dispatch);
   }, []);
   // const pass = sessionStorage.getItem("password");
-  const pass = localStorage.getItem("password");
+  const pass = sessionStorage.getItem("password");
   console.log(pass, "password");
 
   const handleSubmit = async (values) => {
@@ -119,7 +119,7 @@ const ForgotPassword = () => {
   };
   console.log(otpEnabled, "otpEnabled");
   return (
-    <div className="  h-full w-[38vw]  py-[2vw] flex flex-col mx-auto items-center justify-center">
+    <div className="  h-full py-[2vw] flex justify-center ">
       <Formik
         initialValues={{
           email_id: getUserSettingsEdit.email_id,
@@ -145,7 +145,7 @@ const ForgotPassword = () => {
             <div className="gap-y-[1.5vw] flex-col flex pt-[1vw]">
               {otpEnabled ? (
                 <>
-                  <div className="col-span-1">
+                  <div className="relative col-span-1">
                     <InputOTP
                       name="otp"
                       style={{
@@ -173,7 +173,7 @@ const ForgotPassword = () => {
                     <ErrorMessage
                       name="otp"
                       component="div"
-                      className="text-red-500 text-[0.8vw]"
+                      className="text-red-500 text-[0.8vw]  absolute bottom-[-1.2vw]"
                     />
                   </div>
                   <button
@@ -183,14 +183,14 @@ const ForgotPassword = () => {
                   >
                     Resend OTP
                   </button>
-                  <div className="col-span-1">
-                    <div className="relative flex items-center">
+                  <div className="col-span-1 relative">
+                    <div className=" flex items-center">
                       <Field
                         type={showPassword ? "text" : "password"}
                         name="newPassword"
                         placeholder="Enter New Password"
                         autoFocus={false}
-                        className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                        className="placeholder-[#1F487C] border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                       />
                       <div
                         className="absolute right-[1vw] cursor-pointer"
@@ -207,17 +207,17 @@ const ForgotPassword = () => {
                     <ErrorMessage
                       name="newPassword"
                       component="div"
-                      className="text-red-500 text-[0.8vw]"
+                      className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]"
                     />
                   </div>
-                  <div className="col-span-1">
-                    <div className="relative flex items-center">
+                  <div className="col-span-1 relative ">
+                    <div className=" flex items-center">
                       <Field
                         type={showConfirmPassword ? "text" : "password"}
                         name="confirm"
                         placeholder="Enter Confirm Password"
                         autoFocus={false}
-                        className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                        className="placeholder-[#1F487C] border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                       />
                       <div
                         className="absolute right-[1vw] cursor-pointer"
@@ -234,26 +234,23 @@ const ForgotPassword = () => {
                     <ErrorMessage
                       name="confirm"
                       component="div"
-                      className="text-red-500 text-[0.8vw]"
+                      className="text-red-500 text-[0.8vw]  absolute bottom-[-1.2vw]"
                     />
                   </div>
-                  <div className="flex justify-between ">
+                  <div className="flex justify-between items-center ">
                     <div
-                      className=" text-[#1F487C] cursor-pointer mt-[.8vw]"
-                      onClick={() => setOtpEnabled(false)}
+                      // className=" text-[#1F487C] cursor-pointer "
+                      // onClick={() => setOtpEnabled(false)}
                     >
-                      <span className="border-[.3vw] border-[#1F487C] rounded-md text-[#1F487C]   py-[.7vw] px-[2vw]">
+                      <button className=" py-[0.7vw] px-[2vw] rounded-md shadow-sm text-[1.2vw] font-medium text-white bg-[#1F487C]"
+                        onClick={() => setOtpEnabled(false)}>
                         Back
-                      </span>
+                      </button>
                     </div>
                     <div className="">
                       <button
-                        // onClick={() => {
-                        //   handleSubmit();
-                        // }}
                         type="submit"
-                        //disabled={isSubmitting}
-                        className="   py-[.8vw] px-[2vw] border border-transparent rounded-md shadow-sm text-[1.2vw] font-medium text-white bg-[#1F487C]"
+                        className=" py-[0.7vw] px-[2vw] rounded-md shadow-sm text-[1.2vw] font-medium text-white bg-[#1F487C]"
                       >
                         Submit
                       </button>
@@ -262,32 +259,34 @@ const ForgotPassword = () => {
                 </>
               ) : (
                 <>
-                  <div className="col-span-1">
+                  <div className="col-span-1 ">
                     <label className="text-[#1F487C] text-[1.1vw] ">
                       Email ID
                       <span className="text-[1vw] text-red-600 pl-[0.2vw]">
                         *
                       </span>
                     </label>
-                    <Field
-                      type="text"
-                      name="email_id"
-                      placeholder="Enter Email Address"
-                      // value={getUserSettingsEdit.email_id}
-                      readOnly
-                      className="border-r-[0.3vw] cursor-not-allowed mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
-                    />
-                    <ErrorMessage
-                      name="email_id"
-                      component="div"
-                      className="text-red-500 text-[0.8vw]"
-                    />
+                    <div className="relative">
+                      <Field
+                        type="text"
+                        name="email_id"
+                        placeholder="Enter Email Address"
+                        // value={getUserSettingsEdit.email_id}
+                        readOnly
+                        className="placeholder-[#1F487C] border-r-[0.3vw] cursor-not-allowed mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[25vw] rounded-[0.5vw] outline-none px-[1vw]"
+                      />
+                      <ErrorMessage
+                        name="email_id"
+                        component="div"
+                        className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]"
+                      />
+                    </div>
                   </div>
                   <div className="flex justify-center">
                     <button
                       type="submit"
                       onClick={() => handleSendOTP}
-                      className="w-full flex justify-center py-2 px-2 border border-transparent rounded-md shadow-sm text-[1vw] font-medium text-white bg-[#1F487C]"
+                      className="w-[12.5vw] flex justify-center py-2 px-2 border border-transparent rounded-md shadow-sm text-[1vw] font-medium text-white bg-[#1F487C]"
                     >
                       Send OTP
                     </button>

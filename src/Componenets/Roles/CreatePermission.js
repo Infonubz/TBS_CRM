@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Formik, Field, Form, ErrorMessage } from "formik";
-import { Checkbox } from "antd";
+import { ConfigProvider, Select } from "antd";
+import { IoMdArrowDropdown } from "react-icons/io";
 import * as Yup from "yup";
-import axios from "axios";
 import { toast } from "react-toastify";
-import { MultiSelect } from "react-multi-select-component";
 import { LiaSave } from "react-icons/lia";
 import "../../App.css";
 import { GET_PERMISSIONS } from "../../Store/Type";
@@ -12,9 +11,13 @@ import {
   GetPermissionById,
   GetPermissionData,
   SubmitPermissionData,
+  SubmitOPPermissionData
 } from "../../Api/Role&Responsibilites/ActivePermission";
-import { useDispatch, useSelector } from "react-redux";
-import { capitalizeFirstLetter } from "../Common/Captilization";
+import {
+  GetUserRoles,
+  GetPermissions,
+} from "../../Api/Role&Responsibilites/ActiveRoles";
+import { useDispatch } from "react-redux";
 
 export default function CreatePermission({
   setIsPermissionModalOpen,
@@ -22,6 +25,8 @@ export default function CreatePermission({
   SetPermissionUpdate,
   SetPermissionData,
   permissionData,
+  filter,
+  setPermission
 }) {
   const validationSchema = Yup.object().shape({
     role_type: Yup.string()
@@ -40,20 +45,36 @@ export default function CreatePermission({
   const [viewMode, setViewMode] = useState("Product Owner");
   //const [viewMode, setViewMode] = useState("Operator");
   const [user, setUser] = useState("");
-  const [showModulePermissions, setShowModulePermissions] = useState(true); // State to control visibility
-
-  const getroleName = useSelector((state) => state.crm.role_name_list);
-  const dispatch = useDispatch();
+  // const [rolesData, setRoleData] = useState();
+  const [showModulePermissions, setShowModulePermissions] = useState(true);
+  const [userlist, setUserlist] = useState({
+    user: "",
+  });
+  const [rolesPermisionData, setRolesPermissionData] = useState();
+  //const getroleName = useSelector((state) => state.crm.role_name_list);
+  const dispatch = useDispatch(); 
+  const type_id = sessionStorage.getItem("type_id");
 
   const modulePermissionsData = [
-    { module_id: 1, module_name: "User Management" },
-    { module_id: 2, module_name: "Request Management" },
-    { module_id: 3, module_name: "Offers & Deals" },
-    { module_id: 4, module_name: "Advertisement" },
-    { module_id: 5, module_name: "Promotions" },
-    { module_id: 6, module_name: "Roles" },
-    { module_id: 7, module_name: "Report" },
-    { module_id: 8, module_name: "Subscription" },
+    { module_id: 1, module_name: "Partner - (UM)" },
+    { module_id: 2, module_name: "Client - (UM)" },
+    { module_id: 3, module_name: "Employee - (UM)" },
+    { module_id: 4, module_name: "Offers & Deals" },
+    { module_id: 5, module_name: "Advertisement" },
+    { module_id: 6, module_name: "Promotions" },
+    { module_id: 7, module_name: "Roles" },
+  ];
+
+  const modulePermissionOptions = modulePermissionsData.map((module) => ({
+    label: module.module_name,
+    value: module.module_name,
+  }));
+
+  const crudPermissionOptions = [
+    { label: "View", value: "view" },
+    { label: "Create", value: "create" },
+    { label: "Update", value: "update" },
+    { label: "Delete", value: "delete" },
   ];
 
   const permissionIdMap = {
@@ -67,22 +88,49 @@ export default function CreatePermission({
     Subscription: 8,
   };
 
+
+  const fetchRolesPermission = async (roleId) => {
+    try {
+      const data = await GetPermissions(roleId, dispatch);
+      setRolesPermissionData(data);
+      setRoleId(roleId); 
+      console.log(data, "rolesPermission");
+    } catch (error) {
+      console.log(error, "Error fetching Roles permission data.");
+    }
+  };
+
   const handleSubmit = async (values) => {
+    console.log(permissionupdate, "permissionupdate");
     try {
       const modulePermissions = values.module_permissions.map((permission) => ({
         module_id: permissionIdMap[permission.module_name],
         module_name: permission.module_name,
       }));
-
-      const data = await SubmitPermissionData(
-        { ...values, module_permissions: modulePermissions },
-        permissionupdate,
-        dispatch,
-        role_type_id
-      );
+      if(type_id === "PRO101"){
+        const data = await SubmitPermissionData(
+          { ...values, module_permissions: modulePermissions },
+          permissionupdate,
+          dispatch,
+          filter,
+          rolesPermisionData
+        );
+        toast.success(data?.message);
+      }
+      else{
+        const data = await SubmitOPPermissionData(
+          { ...values, module_permissions: modulePermissions },
+          permissionupdate,
+          dispatch,
+          filter,
+          role_type_id,
+          user,
+          rolesPermisionData
+        );
+        toast.success(data?.message);
+      }
+      setPermission(true);
       setIsPermissionModalOpen(false);
-      toast.success(data?.message);
-      GetPermissionData(dispatch);
     } catch (error) {
       console.error("Error uploading data", error);
     }
@@ -96,7 +144,10 @@ export default function CreatePermission({
         SetPermissionData,
         role_type_id
       );
-
+      console.log(data, "role data");
+      setUser(data?.user);
+      fetchRolesPermission(data?.role_id);
+      SetPermissionData(data);
       if (data && data.crud_permissions && data.module_permissions) {
         SetPermissionData(data);
         setSelectedCrudPermissions(
@@ -105,7 +156,10 @@ export default function CreatePermission({
             value: permission,
           }))
         );
-
+        setUserlist((prevState) => ({
+          ...prevState,
+          user: data.user,
+        }));
         const mappedModulePermissions = data.module_permissions.map(
           (permission) => ({
             module_id: permissionIdMap[permission.module_name],
@@ -114,15 +168,12 @@ export default function CreatePermission({
         );
 
         setSelectedModulePermissions(mappedModulePermissions);
-
-        // Check if user is Operator and hide module permissions
+        setRoleId(data?.role_id);
         if (data.user !== "employee") {
           setShowModulePermissions(true);
         } else {
           setShowModulePermissions(true);
         }
-
-        setShowModulePermissions(true); // Show module permissions by default
       } else {
         console.error(
           "Error: Data returned from GetPermissionById is invalid or missing properties"
@@ -133,42 +184,24 @@ export default function CreatePermission({
     }
   };
 
-  useEffect(() => {
-    if (permissionupdate != null) {
-      fetchGetPermission();
-    }
-  }, [permissionupdate, SetPermissionUpdate, SetPermissionData]);
-
-  const crudPermissionOptions = [
-    { label: "View", value: "view" },
-    { label: "Create", value: "create" },
-    { label: "Update", value: "update" },
-    { label: "Delete", value: "delete" },
-  ];
-
-  const modulePermissionOptions = modulePermissionsData.map((module) => ({
-    label: module.module_name,
-    value: module.module_name,
-  }));
-  const apiUrl = process.env.REACT_APP_API_URL;
-
   const fetchRoleTypes = async (selectedUser) => {
     console.log(selectedUser, "selectedUser");
     try {
       const userToFetch =
-        selectedUser == "Employee" ? "EMP101" : "OP101" || selectedUser;
-      const response = await axios.post(`${apiUrl}/permissions/userRoles`, {
-        user_id: userToFetch,
-      });
-      setRoleNames(response.data);
+        selectedUser === "Employee" ? "EMP101" : "OP101" || selectedUser;
 
-      if (viewMode === "Product Owner" && selectedUser === "Operator") {
+      const response = await GetUserRoles(userToFetch, dispatch);
+      setRoleNames(response);
+
+      console.log(response, "response role");
+
+      if (type_id === "PRO101" && selectedUser === "Operator") {
         setShowModulePermissions(false);
       } else {
         setShowModulePermissions(true);
       }
 
-      if (viewMode === "Operator") {
+      if (type_id === "OP101") {
         setShowModulePermissions(true);
       }
     } catch (error) {
@@ -177,15 +210,40 @@ export default function CreatePermission({
   };
 
   useEffect(() => {
-    fetchRoleTypes();
-  }, []);
+    if (type_id === "PRO101" && rolesPermisionData?.crud_permission_id != null) {
+      SetPermissionUpdate(rolesPermisionData?.crud_permission_id);
+    }
+  }, [rolesPermisionData, SetPermissionUpdate, type_id]);
+
+  useEffect(() => {
+    const selectedUser =
+      filter === "OP" && type_id === "PRO101"
+        ? "Operator"
+        : filter === "PO" && type_id === "PRO101"
+        ? "Employee"
+        : type_id === "OP101"
+        ? "Operator"
+        : "";
+    fetchRoleTypes(selectedUser);
+    setUser(selectedUser);
+
+    sessionStorage.setItem("user", selectedUser);
+  }, [filter, type_id]);
+
+  useEffect(() => {
+    if (permissionupdate != null) {
+      fetchGetPermission();
+    }
+  }, [permissionupdate, SetPermissionUpdate, SetPermissionData]);
+
 
   return (
     <Formik
       initialValues={{
-        user: permissionData?.user || "",
+        //user: permissionData?.user || user,
         role_type: permissionData?.role_type || "",
-        crud_permissions: selectedCrudPermissions || [],
+        crud_permissions:
+          permissionData?.crud_permissions || selectedCrudPermissions,
         module_permissions: selectedModulePermissions || [],
       }}
       onSubmit={(values, { setSubmitting }) => {
@@ -203,11 +261,11 @@ export default function CreatePermission({
       {({ handleSubmit, values, setFieldValue, handleChange }) => (
         <Form onSubmit={handleSubmit}>
           <div className="flex justify-between mr-[3vw]">
-            <div className="text-[1.2vw] text-[#1F4B7F] pt-[0.4vw] font-semibold">
-              CREATE NEW PERMISSION
+            <div className="text-[1.1vw] text-[#1F4B7F] pt-[0.4vw] font-bold">
+            { (type_id === "PRO101" && permissionData?.crud_permissions) || (type_id === "OP101" && permissionupdate) ? "UPDATE PERMISSION" : "CREATE NEW PERMISSION"}  
             </div>
             <button
-              className="flex bg-[#1F4B7F] mt-[0.3vw] px-[0.6vw] gap-[0.5vw] py-[0.3vw] rounded-[0.6vw] items-center justify-center"
+              className="flex bg-[#1F4B7F] mt-[0.3vw] px-[0.6vw] gap-[0.5vw] py-[0.3vw] rounded-[0.75vw] items-center justify-center"
               type="submit"
             >
               <span>
@@ -217,7 +275,7 @@ export default function CreatePermission({
             </button>
           </div>
           <div className="grid grid-cols-2 gap-[1vw] pt-[2vw]">
-            {viewMode !== "Operator" && (
+            {/* {viewMode !== "Operator" && (
               <div>
                 <label
                   htmlFor="user"
@@ -227,54 +285,158 @@ export default function CreatePermission({
                 </label>
 
                 {permissionupdate != null ? (
-                  <Field
-                    as="select"
-                    id="user"
-                    name="user"
-                    value={capitalizeFirstLetter(values.user)}
-                    disabled={permissionupdate ? true : false}
-                    onChange={(e) => {
-                      handleChange(e);
-                      const selectedUser = e.target.value;
-                      setUser(e.target.value);
-                      localStorage.setItem("user", selectedUser);
-                      fetchRoleTypes(selectedUser); // Pass selectedUser to fetchRoleTypes
+                  // <Field
+                  //   as="select"
+                  //   id="user"
+                  //   name="user"
+                  //   value={capitalizeFirstLetter(values.user)}
+                  //   disabled={permissionupdate ? true : false}
+                  //   onChange={(e) => {
+                  //     handleChange(e);
+                  //     const selectedUser = e.target.value;
+                  //     setUser(e.target.value);
+                  //     sessionStorage.setItem("user", selectedUser);
+                  //     fetchRoleTypes(selectedUser); // Pass selectedUser to fetchRoleTypes
+                  //   }}
+                  //   className="cursor-not-allowed border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C]
+                  //        text-[#1F487C] text-[1.2vw] h-[2.75vw] w-[100%] rounded-[0.9vw] outline-none px-[1vw]"
+                  // >
+                  //   
+                  //   <option label=" Operator Employee" value="Operator">
+                  //     Operator Employee
+                  //   </option>
+                  //   <option label="Product Owner Employee" value="Employee">
+                  //     Product Owner Employee
+                  //   </option>
+                  // </Field>
+
+                  <ConfigProvider
+                    theme={{
+                      components: {
+                        Select: {
+                          optionActiveBg: "#aebed1",
+                          optionSelectedColor: "#FFF",
+                          optionSelectedBg: "#aebed1",
+                          optionHeight: "2",
+                        },
+                      },
                     }}
-                    className="cursor-not-allowed border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C]
-                         text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                   >
-                    <option label="Select User" value="" />
-                    <option label="Operator" value="Operator">
-                      Operator
-                    </option>
-                    <option label="Employee" value="Employee">
-                      Employee
-                    </option>
-                  </Field>
+                    <Select
+                      placeholder="Select User"
+                      value={capitalizeFirstLetter(values.user) || ""}
+                      disabled={permissionupdate ? true : false}
+                      className="custom-select bg-white outline-none w-full mt-[0.5vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl 
+                  border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
+                      onChange={(value) => {
+                        setFieldValue("user", value);
+                        setFieldValue("role_type", "");
+                        setUser(value);
+                        sessionStorage.setItem("user", value);
+                        fetchRoleTypes(value);
+                      }}
+                      suffixIcon={
+                        <span style={{ fontSize: "1vw", color: "#1f487c" }}>
+                          <IoMdArrowDropdown size="2vw" />
+                        </span>
+                      }
+                      options={[
+                        {
+                          value: "",
+                          label: (
+                            <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                              Select User
+                            </div>
+                          ),
+                          disabled: true,
+                        },
+                        {
+                          value: "Operator",
+                          label: (
+                            <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                              Operator Employee
+                            </div>
+                          ),
+                        },
+                        {
+                          value: "Employee",
+                          label: (
+                            <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                              Product Owner Employee
+                            </div>
+                          ),
+                        },
+                      ]}
+                    />
+                  </ConfigProvider>
                 ) : (
-                  <Field
-                    as="select"
-                    id="user"
-                    name="user"
-                    value={capitalizeFirstLetter(values.user)}
-                    onChange={(e) => {
-                      handleChange(e);
-                      const selectedUser = e.target.value;
-                      setUser(e.target.value);
-                      localStorage.setItem("user", selectedUser);
-                      fetchRoleTypes(e.target.value); // Pass selectedUser to fetchRoleTypes
+                  <ConfigProvider
+                    theme={{
+                      components: {
+                        Select: {
+                          optionActiveBg: "#aebed1",
+                          optionSelectedColor: "#FFF",
+                          optionSelectedBg: "#aebed1",
+                          optionHeight: "2",
+                        },
+                      },
                     }}
-                    className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C]
-                   text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                   >
-                    <option label="Select User" value="" />
-                    <option label="Operator" value="Operator">
-                      Operator
-                    </option>
-                    <option label="Employee" value="Employee">
-                      Employee
-                    </option>
-                  </Field>
+                    <Select
+                      placeholder="Select User"
+                      value={
+                        filter === "OP" && type_id === "PRO101"
+                          ? "Operator"
+                          : filter === "PO" && type_id === "PRO101"
+                          ? "Employee"
+                          : type_id === "OP101"
+                          ? "Operator"
+                          : values.user 
+                      }
+                      disabled={type_id} 
+                      className="custom-select bg-white outline-none w-full mt-[0.5vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl 
+             border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
+                      // onChange={(value) => {
+                      //   setFieldValue("user", value); 
+                      //   setFieldValue("role_type", ""); 
+                      //   setUser(value); 
+                      //   sessionStorage.setItem("user", value); 
+                      //   fetchRoleTypes(value); 
+                      // }}
+                      suffixIcon={
+                        <span style={{ fontSize: "1vw", color: "#1f487c" }}>
+                          <IoMdArrowDropdown size="2vw" />
+                        </span>
+                      }
+                      options={[
+                        {
+                          value: "",
+                          label: (
+                            <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                              Select User
+                            </div>
+                          ),
+                          disabled: true,
+                        },
+                        {
+                          value: "Operator",
+                          label: (
+                            <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                              Operator Employee
+                            </div>
+                          ),
+                        },
+                        {
+                          value: "Employee",
+                          label: (
+                            <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                              Product Owner Employee
+                            </div>
+                          ),
+                        },
+                      ]}
+                    />
+                  </ConfigProvider>
                 )}
 
                 <ErrorMessage
@@ -283,7 +445,7 @@ export default function CreatePermission({
                   className="text-red-500 text-[0.8vw]"
                 />
               </div>
-            )}
+            )} */}
             <div>
               <label
                 htmlFor="role_type"
@@ -302,7 +464,7 @@ export default function CreatePermission({
                       (role) => role.role_type === e.target.value
                     );
                     setRoleId(selectedRole?.role_id || "");
-                    localStorage.setItem("role_type", e.target.value);
+                    sessionStorage.setItem("role_type", e.target.value);
                   }}
                   className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                 >
@@ -314,7 +476,8 @@ export default function CreatePermission({
                   ))}
                 </Field> */}
 
-              {permissionupdate != null ? (
+            {(type_id === "OP101" && permissionupdate != null) || 
+              (type_id === "PRO101" && permissionData?.crud_permissions)  ? (
                 <Field
                   as="input"
                   id="role_type"
@@ -322,35 +485,63 @@ export default function CreatePermission({
                   type="text"
                   disabled={permissionupdate ? true : false}
                   className="cursor-not-allowed border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C]
-                   text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                   text-[#1F487C] text-[1.2vw] h-[2.90vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                 />
               ) : (
-                <Field
-                  as="select"
-                  id="role_type"
-                  name="role_type"
-                  value={values?.role_type}
-                  onChange={(e) => {
-                    handleChange(e);
-                    const selectedRole = roleNames?.find(
-                      (role) => role?.role_type === e.target.value
-                    );
-                    setRoleId(selectedRole?.role_id || "");
-                    localStorage.setItem("role_type", e.target.value);
+                <ConfigProvider
+                  theme={{
+                    components: {
+                      Select: {
+                        optionActiveBg: "#aebed1",
+                        optionSelectedColor: "#FFF",
+                        optionSelectedBg: "#aebed1",
+                        optionHeight: "2",
+                      },
+                    },
                   }}
-                  className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                 >
-                  <option value="">Select Role</option>
-                  {roleNames?.length > 0 &&
-                    roleNames?.map((roleName) => (
-                      <option
-                        key={roleName?.role_id}
-                        value={roleName?.role_type}
-                      >
-                        {roleName?.role_type}
-                      </option>
-                    ))}
-                </Field>
+                  <Select
+                    placeholder="Select Role"
+                    className="custom-select bg-white outline-none w-full mt-[0.5vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw]
+                    border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
+                    value={values.role_type}
+                    onChange={(value) => {
+                      setFieldValue("role_type", value);
+                      const selectedRole = roleNames?.find(
+                        (role) => role.role_type === value
+                      );
+                      fetchRolesPermission(selectedRole?.role_id);
+                      sessionStorage.setItem("role_type", value);
+                      console.log(selectedRole?.role_id, "Role Type");
+                    }}
+                    suffixIcon={
+                      <span style={{ fontSize: "1vw", color: "#1f487c" }}>
+                        <IoMdArrowDropdown size="2vw" />
+                      </span>
+                    }
+                    options={[
+                      {
+                        value: "",
+                        label: (
+                          <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                            Select Role
+                          </div>
+                        ),
+                        disabled: true,
+                      },
+                      ...(Array.isArray(roleNames) ? roleNames : []).map(
+                        (roleName) => ({
+                          value: roleName.role_type,
+                          label: (
+                            <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                              {roleName.role_type}
+                            </div>
+                          ),
+                        })
+                      ),
+                    ]}
+                  />
+                </ConfigProvider>
               )}
 
               <ErrorMessage
@@ -359,15 +550,116 @@ export default function CreatePermission({
                 className="text-red-500 text-[0.8vw]"
               />
             </div>
-            {viewMode !== "Operator" && (
-              <div>
-                <label
-                  htmlFor="crud_permission"
-                  className="text-[#1F4B7F] text-[1.1vw] font-semibold"
-                >
-                  Permission
+
+            <div>
+              <div className="flex items-center gap-[0.2vw]">
+                <label className="text-[#1F4B7F] text-[1.1vw] font-semibold">
+                  Description
                 </label>
+              </div>
+              <Field
+                as="textarea"
+                placeholder="Description"
+                disabled 
+                value={rolesPermisionData?.description}
+                rows="3"
+                cols="50"
+                className="cursor-not-allowed border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C]
+                   text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw] py-[0.3vw]"
+              />
+            </div>
+          </div>
+
+          {viewMode !== "Operator" && (
+            <div className=" pt-[1vw]">
+              <label
+                htmlFor="crud_permission"
+                className="text-[#1F4B7F] text-[1.1vw] font-semibold"
+              >
+                Permission
+              </label>
+              {type_id === "PRO101" ? (
                 <Field name="crud_permissions">
+                  {({ field, form }) => (
+                    <div className="rmsc mt-[0.5vw] ml-[0.5vw]">
+                      <div className="grid grid-cols-4 gap-[0.5vw]">
+                        {crudPermissionOptions.map((option) => (
+                          <div key={option.value} className="flex items-center">
+                            <input
+                              type="checkbox"
+                              id={option.value}
+                              name="crud_permissions"
+                              value={option.value}
+                              disabled={type_id === "OP101"}
+                              className="checkbox-custom transform scale-150 mr-[0.5vw] cursor-pointer"
+                              checked={field.value?.includes(option.value)}
+                              onChange={(e) => {
+                                const selectedValues = field.value
+                                  ? [...field.value]
+                                  : [];
+                                if (e.target.checked) {
+                                  selectedValues.push(option.value);
+                                } else {
+                                  const index = selectedValues.indexOf(
+                                    option.value
+                                  );
+                                  if (index > -1) {
+                                    selectedValues.splice(index, 1);
+                                  }
+                                }
+                                form.setFieldValue(
+                                  "crud_permissions",
+                                  selectedValues
+                                );
+                              }}
+                            />
+                            <label
+                              htmlFor={option.value}
+                              className="text-[0.90vw] text-[#1F4B7F]"
+                            >
+                              {option.label}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </Field>
+              ) : (
+                <>
+                  <div className="text-[1.1vw] font-medium px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                    {Array.isArray(rolesPermisionData?.crud_permissions) &&
+                    rolesPermisionData.crud_permissions.length > 0 ? (
+                      <div className="flex flex-wrap gap-[1vw]">
+                        {rolesPermisionData.crud_permissions.map(
+                          (permission, index) => (
+                            <span key={index}>
+                              {index + 1}. {permission}
+                              {index <
+                                rolesPermisionData.crud_permissions.length - 1}
+                            </span>
+                          )
+                        )}
+                      </div>
+                    ) : (
+                      //   <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                      //   {Array.isArray(rolesPermisionData?.crud_permissions) &&
+                      //     rolesPermisionData.crud_permissions.map((permission, index) => (
+                      //      <div className="grid grid-cols-4" key={index}>
+                      //         {index + 1}. {permission}
+                      //       </div>
+                      //     ))}
+                      // </div>
+
+                      <div className="text-[1vw] text-[#FF0000] flex text-center justify-center font-medium">
+                        No permissions.
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {/* <Field name="crud_permissions">
                   {({ field, form }) => (
                     <MultiSelect
                       options={crudPermissionOptions}
@@ -384,18 +676,16 @@ export default function CreatePermission({
                       labelledBy="Select"
                     />
                   )}
-                </Field>
-                <ErrorMessage
-                  name="crud_permissions"
-                  component="div"
-                  className="text-red-500 text-[0.8vw]"
-                />
-              </div>
-            )}
-          </div>
-
-          {showModulePermissions !== false && (
-            <div className="mt-[1vw]">
+                </Field> */}
+              <ErrorMessage
+                name="crud_permissions"
+                component="div"
+                className="text-red-500 text-[0.8vw]"
+              />
+            </div>
+          )}
+          {showModulePermissions !== false && filter !== "OP" && (
+            <div className="mt-[1.75vw]">
               <label
                 htmlFor="module_permissions"
                 className="text-[#1F4B7F] text-[1.1vw] font-semibold"
@@ -404,24 +694,46 @@ export default function CreatePermission({
               </label>
               <Field name="module_permissions">
                 {({ field, form }) => (
-                  <Checkbox.Group
-                    options={modulePermissionOptions}
-                    value={values.module_permissions.map(
-                      (item) => item.module_name
-                    )}
-                    className="grid grid-cols-2 pt-[1vw] gap-3 custom-checkbox"
-                    onChange={(checkedValues) => {
-                      const updatedPermissions = checkedValues.map(
-                        (moduleName) => ({
-                          module_id: permissionIdMap[moduleName],
-                          module_name: moduleName,
-                        })
-                      );
-                      setFieldValue("module_permissions", updatedPermissions);
-                    }}
-                  />
+                  <div className="grid grid-cols-4 ml-[0.5vw] pt-[0.5vw] gap-3">
+                    {modulePermissionOptions.map((option) => (
+                      <div key={option.value} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id={option.value}
+                          name="module_permissions"
+                          value={option.value}
+                          checked={field.value.some(
+                            (item) => item.module_name === option.value
+                          )}
+                          onChange={(e) => {
+                            const selectedValues = [...field.value];
+                            if (e.target.checked) {
+                              selectedValues.push({
+                                module_id: permissionIdMap[option.value],
+                                module_name: option.value,
+                              });
+                            } else {
+                              const index = selectedValues.findIndex(
+                                (item) => item.module_name === option.value
+                              );
+                              if (index > -1) selectedValues.splice(index, 1);
+                            }
+                            setFieldValue("module_permissions", selectedValues);
+                          }}
+                          className="mr-[0.5vw] transform scale-150 cursor-pointer"
+                        />
+                        <label
+                          htmlFor={option.value}
+                          className="text-[0.90vw] text-[#1F4B7F]"
+                        >
+                          {option.label}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </Field>
+
               <ErrorMessage
                 name="module_permissions"
                 component="div"

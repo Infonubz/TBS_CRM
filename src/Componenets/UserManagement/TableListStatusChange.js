@@ -8,7 +8,7 @@ import image from "../../asserts/direction.png";
 const TableListStatusChange = ({ statusId, userId, setStatusModal }) => {
   const dispatch = useDispatch();
   const handleClick = async () => {
-    userStatusActivate("inactive", userId, dispatch);
+    userStatusActivate(statusId, userId, dispatch);
     GetRequestManagementData(dispatch);
     console.log("call 1");
     setStatusModal(false);
@@ -22,10 +22,10 @@ const TableListStatusChange = ({ statusId, userId, setStatusModal }) => {
         </div>
         <div className="flex justify-around mt-[1vw]">
           <button
-            className=" text-[0.9vw] text-white  space-x-[0.7vw] px-[0.8vw] w-[8vw] h-[2vw] bg-[#FF1100] rounded-[0.5vw]"
+            className={`text-[0.9vw] text-white  space-x-[0.7vw] px-[0.8vw] w-[8vw] h-[2vw] ${statusId === 2 ? "bg-[#FF1100]":"bg-[#38ac2c]"} rounded-[0.5vw]`}
             onClick={handleClick}
           >
-            Inactive
+           {statusId === 2 ? "Inactive" : "Active"}
           </button>
           {/* <button
             className=" text-[0.9vw] text-white  space-x-[0.7vw] px-[0.8vw] w-[8vw] h-[2vw] bg-[#FF6B00] rounded-[0.5vw]"
@@ -33,10 +33,10 @@ const TableListStatusChange = ({ statusId, userId, setStatusModal }) => {
             Inactive
           </button> */}
         </div>
-        <div className="text-red-500 text-[1.2vw] text-center pt-[.5vw]">
+        {/* <div className="text-red-500 text-[1.2vw] text-center pt-[.5vw]">
           You can't make this <span className="text-green-600"> Active </span>
           again
-        </div>
+        </div> */}
       </div>
     </div>
   );

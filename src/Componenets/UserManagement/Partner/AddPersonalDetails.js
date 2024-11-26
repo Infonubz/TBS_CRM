@@ -1,4 +1,4 @@
-import { Progress, Upload } from "antd";
+import { ConfigProvider, Progress, Select, Upload } from "antd";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { FaCloudUploadAlt } from "react-icons/fa";
@@ -15,6 +15,8 @@ import {
   submitPersonalData,
 } from "../../../Api/UserManagement/Partner";
 import { FaUpload } from "react-icons/fa";
+import { IoMdArrowDropdown } from "react-icons/io";
+// import { color } from "html2canvas/dist/types/css/types/color";
 
 const validationSchema = Yup.object().shape({
   phone: Yup.string()
@@ -29,15 +31,33 @@ const validationSchema = Yup.object().shape({
     )
     .required("Email is required"),
   alt_phone: Yup.string()
-    .matches(/^[0-9]+$/, "Alternative Phone number must be a number")
-    .min(10, "Alternative Phone number must be at least 10 digits")
-    .max(10, "Alternative Phone number maximum 10 digits only")
+    .matches(/^[0-9]+$/, "Phone number must be a number")
+    .min(10, "Phone number must be at least 10 digits")
+    .max(10, "Phone number maximum 10 digits only")
     .required("Alternative Phone Number is required"),
   firstname: Yup.string().required("Company Name is required"),
   lastname: Yup.string().required("Owner Name is required"),
   // blood: Yup.string().required("Company Name is required"),
   gender: Yup.string().required("Please select an Gender"), // Validation schema for select field
-  dob: Yup.date().required("Date of Birth is required").nullable(),
+  // dob: Yup.date().required("Date of Birth is required").nullable(),
+  dob: Yup.date()
+    .required("Date of Birth is required")
+    .nullable()
+    .max(new Date(), "Date of Birth cannot be in the future") // Dob cannot be in the future
+    .test(
+      "age",
+      "You must be at least 15 years old",
+      (value) => {
+        if (!value) return true; // Skip validation if the value is empty (handled by required)
+        const today = new Date();
+        const age = today.getFullYear() - value.getFullYear();
+        const monthDiff = today.getMonth() - value.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < value.getDate())) {
+          return age > 15; // Ensure the person is at least 15 years old
+        }
+        return age >= 15; // Check age
+      }
+    ),
   occupation: Yup.string().required("please select the occupation")
   // profile_img: Yup.mixed()
   //   .required("File is empty")
@@ -92,19 +112,20 @@ export default function AddPersonalDetails({
     if (PartnerID && enable == false) {
       setCurrentpage(2);
     } else {
-      console.log("vadhfkjdfhkjdfhkjf",values);
-      
+      console.log("vadhfkjdfhkjdfhkjf", values);
+
       try {
         const data = await submitPartnerPersonalData(
           values,
           PartnerID,
           enable,
           dispatch,
-          fileList
+          fileList,
+          setPartnerID
         );
         // setModalIsOpen(false);
         console.log(data, "111111");
-        toast.success(data?.message);
+        toast.success(data?.message || "partner details updated successfully");
         setCurrentpage(2);
         GetPartnerProfile(PartnerID, dispatch)
         GetPartnerData(dispatch);
@@ -122,7 +143,7 @@ export default function AddPersonalDetails({
       gender: values.gender,
       date_of_birth: values.dob,
       profile_img: values.profile_img,
-      occupation : values.occupation
+      occupation: values.occupation
     })
     setEnableUpload(true);
   };
@@ -170,20 +191,21 @@ export default function AddPersonalDetails({
   return (
 
     <div>
-      <div className="border-l-[0.1vw] h-[28vw] overflow-y-scroll px-[2vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f]">
+      <div className="border-l-[0.1vw] h-[28vw]  px-[2vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f] mt-[1.5vw]">
         <div className="h-[4vw] w-full flex items-center justify-between ">
           <label className="text-[1.5vw] font-semibold text-[#1f4b7f] ">
             Personal Details
           </label>
-          {PartnerID || addressback ? (
+          {updatedata || addressback ? (
             <button
               className={`${enable
                 ? "bg-[#1f4b7f] text-white"
                 : "text-[#1f4b7f] bg-white border-[#1f4b7f]"
                 } rounded-full font-semibold w-[10vw] h-[2vw] flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] text-[1.1vw] `}
-              onClick={() =>{
-               setEnable(!enable)
-                setEnableUpload(false)}
+              onClick={() => {
+                setEnable(!enable)
+                setEnableUpload(false)
+              }
               }
             >
               Enable to Edit
@@ -206,7 +228,7 @@ export default function AddPersonalDetails({
               dob: patpersonalData?.date_of_birth ? dayjs(patpersonalData.date_of_birth).format("YYYY-MM-DD")
                 : "",
               gender: patpersonalData?.gender || "",
-              occupation:patpersonalData?.occupation || ""
+              occupation: patpersonalData?.occupation || ""
               // blood: patpersonalData || "",
               // profile_img: patpersonalData?.profile_img || "",
             }}
@@ -230,7 +252,8 @@ export default function AddPersonalDetails({
               touched
             }) => (
               <Form onSubmit={handleSubmit}>
-                <div className="gap-y-[1.5vw] flex-col flex">
+                <div className="gap-y-[1.5vw] flex-col  flex">
+                  <div className="overflow-y-scroll gap-y-[1.5vw] flex-col  flex h-[18vw] pb-[1vw]">
                   <div className="grid grid-cols-2 w-full gap-x-[2vw]">
                     <div className="col-span-1 relative">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
@@ -245,13 +268,13 @@ export default function AddPersonalDetails({
                         placeholder="Enter First Name"
                         value={values.firstname}
                         disabled={
-                          PartnerID || addressback
+                          updatedata || addressback
                             ? enable
                               ? false
                               : true
                             : false
                         }
-                        className={`${PartnerID || addressback
+                        className={`${updatedata || addressback
                           ? enable == false
                             ? " cursor-not-allowed"
                             : ""
@@ -277,13 +300,13 @@ export default function AddPersonalDetails({
                         placeholder="Enter Last Name"
                         value={values.lastname}
                         disabled={
-                          PartnerID || addressback
+                          updatedata || addressback
                             ? enable
                               ? false
                               : true
                             : false
                         }
-                        className={`${PartnerID || addressback
+                        className={`${updatedata || addressback
                           ? enable == false
                             ? " cursor-not-allowed"
                             : ""
@@ -312,13 +335,13 @@ export default function AddPersonalDetails({
                           placeholder="Enter Number"
                           value={values.phone}
                           disabled={
-                            PartnerID || addressback
+                            updatedata || addressback
                               ? enable
                                 ? false
                                 : true
                               : false
                           }
-                          className={`${PartnerID || addressback
+                          className={`${updatedata || addressback
                             ? enable == false
                               ? " cursor-not-allowed"
                               : ""
@@ -348,13 +371,13 @@ export default function AddPersonalDetails({
                         placeholder="Enter Email Address"
                         value={values.emailid}
                         disabled={
-                          PartnerID || addressback
+                          updatedata || addressback
                             ? enable
                               ? false
                               : true
                             : false
                         }
-                        className={`${PartnerID || addressback
+                        className={`${updatedata || addressback
                           ? enable == false
                             ? " cursor-not-allowed"
                             : ""
@@ -382,13 +405,13 @@ export default function AddPersonalDetails({
                         placeholder="Enter Alternate Number"
                         value={values.alt_phone}
                         disabled={
-                          PartnerID || addressback
+                          updatedata || addressback
                             ? enable
                               ? false
                               : true
                             : false
                         }
-                        className={`${PartnerID || addressback
+                        className={`${updatedata || addressback
                           ? enable == false
                             ? " cursor-not-allowed"
                             : ""
@@ -401,7 +424,7 @@ export default function AddPersonalDetails({
                         className="text-red-500 text-[0.8vw] absolute bottom-[-1.3vw] left-[.3vw]"
                       />
                     </div>
-               
+
                     <div className="col-span-1 relative">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         Gender
@@ -409,22 +432,22 @@ export default function AddPersonalDetails({
                           *
                         </span>
                       </label>
-                      <Field
+                      {/* <Field
                         as="select"
                         name="gender"
                         value={values.gender}
                         onChange={(e) => {
                           handleChange(e);
-                          localStorage.setItem("status", e.target.value);
+                          sessionStorage.setItem("status", e.target.value);
                         }}
                         disabled={
-                          PartnerID || addressback
+                          updatedata || addressback
                             ? enable
                               ? false
                               : true
                             : false
                         }
-                        className={`${PartnerID || addressback
+                        className={`${updatedata || addressback
                           ? enable == false
                             ? " cursor-not-allowed"
                             : ""
@@ -435,7 +458,84 @@ export default function AddPersonalDetails({
                         <option label="Male" value="Male" className="" />
                         <option label="Female" value="Female" className="" />
                         <option label="Other" value="Other" className="" />
-                      </Field>
+                      </Field> */}
+                      <ConfigProvider
+                        theme={{
+                          components: {
+                            Select: {
+                              optionActiveBg: '#aebed1',
+                              optionSelectedColor: '#FFF',
+                              optionSelectedBg: '#aebed1',
+                              optionHeight: '2',
+                            },
+                          },
+                        }}
+                      >
+                        <Select
+                          // showSearch
+                          value={values.gender}
+                          onChange={(value) => {
+                            handleChange({ target: { name: 'gender', value } });
+                            sessionStorage.setItem('status', value);
+                          }}
+                          disabled={
+                            updatedata || addressback
+                              ? enable
+                                ? false
+                                : true
+                              : false
+                          }
+                          name="gender"
+                          className={`${updatedata || addressback
+                            ? enable == false
+                              ? " cursor-not-allowed"
+                              : ""
+                            : ""
+                            } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          // className="custom-select bg-white outline-none w-full mt-[0.5vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
+                          placeholder="Select Gender"
+                          optionFilterProp="label"
+                          suffixIcon={<span style={{ fontSize: '1vw', color: '#1f487c' }}>
+                            <IoMdArrowDropdown size="2vw" />
+                          </span>}
+                          style={{ padding: 4 }}
+                          options={[
+                            {
+                              value: '',
+                              label: (
+                                <div className="text-[1vw]  px-[0.2vw] pb-[0.1vw] text-gray-400">
+                                  Select Gender
+                                </div>
+                              ),
+                              disabled: true,
+                            },
+                            {
+                              value: 'Male',
+                              label: (
+                                <div className="text-[1vw] font-normal  px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  Male
+                                </div>
+                              ),
+                            },
+                            {
+                              value: 'Female',
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  Female
+                                </div>
+                              ),
+                            },
+                            {
+                              value: 'Other',
+                              label: (
+                                <div className="text-[1vw]  px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  Other
+                                </div>
+                              ),
+                            },
+                          ]}
+                        />
+                      </ConfigProvider>
                       <ErrorMessage
                         name="gender"
                         component="div"
@@ -444,7 +544,7 @@ export default function AddPersonalDetails({
                     </div>
                   </div>
                   <div className="grid grid-cols-2 w-full gap-x-[2vw]">
-                  <div className="col-span-1 relative">
+                    <div className="col-span-1 relative">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         Date of Birth
                         <span className="text-[1vw] text-red-600 pl-[0.2vw]">
@@ -456,18 +556,19 @@ export default function AddPersonalDetails({
                         name="dob"
                         placeholder="Select Date of Birth"
                         value={values.dob}
+                        // style={{color:"red"}}
                         onChange={(e) => {
                           handleChange(e);
-                          localStorage.setItem("dob", e.target.value);
+                          sessionStorage.setItem("dob", e.target.value);
                         }}
                         disabled={
-                          PartnerID || addressback
+                          updatedata || addressback
                             ? enable
                               ? false
                               : true
                             : false
                         }
-                        className={`${PartnerID || addressback
+                        className={`${updatedata || addressback
                           ? enable == false
                             ? " cursor-not-allowed"
                             : ""
@@ -480,14 +581,14 @@ export default function AddPersonalDetails({
                         className="text-red-500 text-[0.8vw] absolute bottom-[-1.3vw] left-[.3vw]"
                       />
                     </div>
-                    <div className="col-span-1 relative">
+                    <div className="col-span-1 relative umselect">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         Occupation
                         <span className="text-[1vw] text-red-600 pl-[0.2vw]">
                           *
                         </span>
                       </label>
-                      <Field
+                      {/* <Field
                         as="select"
                         name="occupation"
                         value={values.occupation}
@@ -495,13 +596,13 @@ export default function AddPersonalDetails({
                           handleChange(e);
                         }}
                         disabled={
-                          PartnerID || addressback
+                          updatedata || addressback
                             ? enable
                               ? false
                               : true
                             : false
                         }
-                        className={`${PartnerID || addressback
+                        className={`${updatedata || addressback
                           ? enable == false
                             ? " cursor-not-allowed"
                             : ""
@@ -513,7 +614,94 @@ export default function AddPersonalDetails({
                         <option label="Entrepreneur" value="entrepreneur" className="" />
                         <option label="Labourer" value="labourer" className="" />
                         <option label="Retired" value="retired" className="" />
-                      </Field>
+                      </Field> */}
+                        <ConfigProvider
+                        theme={{
+                          components: {
+                            Select: {
+                              optionActiveBg: '#aebed1',
+                              optionSelectedColor: '#FFF',
+                              optionSelectedBg: '#aebed1',
+                              optionHeight: '2',
+                            },
+                          },
+                        }}
+                      >
+                        <Select
+                          showSearch
+                          value={values.occupation}
+                          onChange={(value) => {
+                            handleChange({ target: { name: 'occupation', value } });
+                          }}
+                          disabled={
+                            updatedata || addressback
+                              ? enable
+                                ? false
+                                : true
+                              : false
+                          }
+                          name="occupation"
+                          className={`${updatedata || addressback
+                            ? enable == false
+                              ? " cursor-not-allowed"
+                              : ""
+                            : ""
+                            } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          // className="custom-select bg-white outline-none w-full mt-[0.5vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
+                          placeholder="Select Gender"
+                          filterOption={(input, option) => 
+                            option?.value?.toLowerCase()?.includes(input.toLowerCase()) // Make it case-insensitive
+                          }
+                          optionFilterProp="value"
+                          suffixIcon={<span style={{ fontSize: '1vw', color: '#1f487c' }}>
+                            <IoMdArrowDropdown size="2vw" />
+                          </span>}
+                          style={{ padding: 4 }}
+                          options={[
+                            {
+                              value: '',
+                              label: (
+                                <div className="text-[1vw]  px-[0.2vw] pb-[0.1vw] text-gray-400">
+                                  Select Occupation
+                                </div>
+                              ),
+                              disabled: true,
+                            },
+                            {
+                              value: 'student',
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  Student
+                                </div>
+                              ),
+                            },
+                            {
+                              value: 'entrepreneur',
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  Entrepreneur
+                                </div>
+                              ),
+                            },
+                            {
+                              value: 'labourer',
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  Labourer
+                                </div>
+                              ),
+                            },
+                            {
+                              value: 'retired',
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  Retired
+                                </div>
+                              ),
+                            },
+                          ]}
+                        />
+                      </ConfigProvider>
                       <ErrorMessage
                         name="occupation"
                         component="div"
@@ -541,15 +729,16 @@ export default function AddPersonalDetails({
                       />
                     </div> */}
 
-              
+
+                  </div>
                   </div>
 
-                  <div className="flex items-center justify-between py-[1vw] relative">
-               
+                  <div className="flex items-center justify-between  relative">
+
                     <div>
-                    {updatedata
-                      ? " "
-                      : profileImage === false && (
+                      {updatedata
+                        ? " "
+                        : profileImage === false && (
                           <div className="text-red-700 text-[.7vw] top-[-.3vw] absolute">
                             * Profile Image is required
                           </div>
@@ -570,7 +759,7 @@ export default function AddPersonalDetails({
                         type="submit"
                       // onClick={() => setCurrentpage(2)}
                       >
-                        {PartnerID || addressback ? enable
+                        {updatedata || addressback ? enable
                           ? "Update & Continue"
                           : "Continue"
                           : "Continue"}

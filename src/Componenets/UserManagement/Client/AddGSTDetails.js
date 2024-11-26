@@ -102,7 +102,7 @@ export default function AddGSTDetails({
 
   return (
     <div>
-      <div className="border-l-[0.1vw] relative px-[2vw] h-[28vw] ree border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f]">
+      <div className="border-l-[0.1vw] relative px-[2vw] h-[28vw] ree border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] mt-[1.5vw] rounded-[1vw] border-[#1f4b7f]">
         <div className="h-[4vw] w-full flex items-center justify-between ">
           <label className="text-[1.5vw] font-semibold text-[#1f4b7f] ">
             GST Details
@@ -262,7 +262,8 @@ export default function AddGSTDetails({
                         </div>
                         <div className="grid grid-cols-2 mt-[1vw]">
                           <div className="font-semibold">Upload Documents:</div>
-                          <div>{superadmingstdata?.upload_gst}</div>
+                          {/* <div>{superadmingstdata?.upload_gst}</div> */}
+                          <span className="h-[8vw] w-[9vw] flex items center"><img src={`http://192.168.90.47:4000/${superadmingstdata?.upload_gst}`} alt="Gst Document"/></span>
                         </div>
                       </div>
                     ) : (

@@ -10,8 +10,7 @@ const api = axios.create({
 
 const apiUrl = process.env.REACT_APP_API_URL;
 
-const user = localStorage.getItem("USER_ID");
-
+const user = sessionStorage.getItem("USER_ID");
 export const GetEmployeeData = async (dispatch) => {
   const endpoint = user?.startsWith("tbs-pro")
     ? `${apiUrl}/pro-All-emp-details`
@@ -84,9 +83,13 @@ export const submitPersonalData = async (
   personalvalues,
   enable,
   EmployeeID,
-  dispatch
+  dispatch,
+  fileList,
+  setEmployeeID
 ) => {
-  const dynamicId = user?.startsWith("tbs-pro") ? "owner_id" : "tbs_operator_id";
+  const dynamicId = user?.startsWith("tbs-pro")
+    ? "owner_id"
+    : "tbs_operator_id";
   // const payload = {
   //   emp_first_name: personalvalues.firstname,
   //   emp_last_name: personalvalues.lastname,
@@ -111,10 +114,13 @@ export const submitPersonalData = async (
   formData.append("date_of_birth", personalvalues.dob);
   formData.append("gender", personalvalues.gender);
   formData.append("blood_group", personalvalues.blood);
-  formData.append("role_type", personalvalues.role);
-  formData.append("role_type_id", personalvalues.role_id);
-  formData.append("profile_img", personalvalues.profile_img);
-  formData.append("owner_id", localStorage.getItem("USER_ID"));
+  // formData.append("role_type", personalvalues.role);
+  // formData.append("role_type_id", personalvalues.role_id);
+  // formData.append("profile_img", personalvalues.profile_img);
+  if (fileList[0]?.originFileObj) {
+    formData.append("profile_img", fileList[0].originFileObj);
+  }
+  formData.append("owner_id", sessionStorage.getItem("USER_ID"));
 
   // Now `formData` is ready to be used
 
@@ -141,11 +147,11 @@ export const submitPersonalData = async (
       headers: {
         // "Content-Type": "application/json",
         "Content-Type": "multipart/form-data",
-
       },
     });
     GetEmployeeData(dispatch);
     sessionStorage.setItem("EMP_ID", response?.data?.id);
+    setEmployeeID(response?.data?.id ? response?.data?.id:EmployeeID)
     console.log(response, "responseresponse");
     return response.data;
   } catch (error) {
@@ -155,21 +161,36 @@ export const submitPersonalData = async (
 };
 
 export const submitEmployeeAddressData = async (
-  addressvalues,
   EmployeeID,
+  values,
+  currentValues,
   dispatch
 ) => {
+  // const payload = {
+  //   temp_add: addressvalues.temp_address,
+  //   temp_country: addressvalues.temp_country,
+  //   temp_state: addressvalues.temp_state,
+  //   temp_city: addressvalues.temp_city,
+  //   temp_zip_code: addressvalues.temp_postal,
+  //   perm_add: addressvalues.per_address,
+  //   perm_country: addressvalues.per_country,
+  //   perm_state: addressvalues.per_state,
+  //   perm_city: addressvalues.per_city,
+  //   perm_zip_code: addressvalues.per_postal,
+  // };
   const payload = {
-    temp_add: addressvalues.temp_address,
-    temp_country: addressvalues.temp_country,
-    temp_state: addressvalues.temp_state,
-    temp_city: addressvalues.temp_city,
-    temp_zip_code: addressvalues.temp_postal,
-    perm_add: addressvalues.per_address,
-    perm_country: addressvalues.per_country,
-    perm_state: addressvalues.per_state,
-    perm_city: addressvalues.per_city,
-    perm_zip_code: addressvalues.per_postal,
+    temp_add: currentValues.address,
+    temp_country: currentValues.country,
+    temp_state: currentValues.state,
+    temp_city: currentValues.city,
+    temp_zip_code: currentValues.postalcode,
+    temp_region: currentValues.region,
+    perm_add: values.per_address,
+    perm_country: values.per_country,
+    perm_state: values.per_state,
+    perm_city: values.per_city,
+    perm_zip_code: values.per_postal,
+    perm_region: values.per_region,
   };
 
   // const url = updatedata
@@ -179,10 +200,12 @@ export const submitEmployeeAddressData = async (
   // const method = updatedata ? "put" : "post";
 
   const url = user.startsWith("tbs-pro")
-    ? `${apiUrl}/pro-emp-registered-address/${EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
-    }`
-    : `${apiUrl}/emp-registered-address/${EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
-    }`;
+    ? `${apiUrl}/pro-emp-registered-address/${
+        EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
+      }`
+    : `${apiUrl}/emp-registered-address/${
+        EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
+      }`;
 
   // const url = `${apiUrl}/pro-emp-registered-address/${
   //   EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
@@ -211,16 +234,20 @@ export const submitEmployeeAddressData = async (
 export const submitEmployeeProffesionalData = async (
   values,
   EmployeeID,
+  currentRoleId,
+  setCurrentRoleId,
   dispatch
 ) => {
   const payload = {
     joining_date: values.join_date,
     designation: values.designation,
+    role_type: values.role,
     branch: values.branch,
-    official_email_id: values.emailid,
-    years_of_experience: values.experiance,
     department: values.department,
     reporting_manager: values.report_manager,
+    qualification: values.qualification,
+    language: values.language,
+    role_type_id: currentRoleId,
   };
 
   // const url = `${apiUrl}/pro-emp-professional-details/${
@@ -228,10 +255,12 @@ export const submitEmployeeProffesionalData = async (
   // }`;
 
   const url = user.startsWith("tbs-pro")
-    ? `${apiUrl}/pro-emp-professional-details/${EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
-    }`
-    : `${apiUrl}/emp-professional-details/${EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
-    }`;
+    ? `${apiUrl}/pro-emp-professional-details/${
+        EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
+      }`
+    : `${apiUrl}/emp-professional-details/${
+        EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
+      }`;
 
   const method = "post";
 
@@ -251,6 +280,9 @@ export const submitEmployeeProffesionalData = async (
     handleError(error);
     return null;
   }
+  finally{
+    setCurrentRoleId("")
+  }
 };
 
 export const SubmitEmpDocumentsData = async (
@@ -259,19 +291,46 @@ export const SubmitEmpDocumentsData = async (
   dispatch
 ) => {
   const formData = new FormData();
-  formData.append("aadhar_card_doc", documentsdata.aadhar_doc);
-  formData.append("pan_card_doc", documentsdata.pan_doc);
-  formData.append("work_experience_certificate", documentsdata.work_exp_doc);
-  formData.append("educational_certificate", documentsdata.edu_cer_doc);
-  formData.append("other_documents", documentsdata.other_doc);
   formData.append("aadhar_card_number", documentsdata.aadhar_number);
   formData.append("pan_card_number", documentsdata.pan_number);
+  // documentsdata.aadhar_doc? formData.append("aadhar_card_front_doc", documentsdata.aadhar_doc):''
+  // documentsdata.aadhar_bk_doc ? formData.append("aadhar_card_back_doc", documentsdata.aadhar_bk_doc):""
+  // documentsdata.pan_doc ? formData.append("pan_card_front_doc", documentsdata.pan_doc):""
+  // documentsdata.pan_bk_doc ? formData.append("pan_card_back_doc", documentsdata.pan_bk_doc):""
+  // documentsdata.offerletter ? formData.append("offer_letter_doc", documentsdata.offerletter):""
+  // documentsdata.qualification ? formData.append("qualification_doc", documentsdata.qualification):""
+  if (documentsdata.aadhar_doc) {
+    formData.append("aadhar_card_front_doc", documentsdata.aadhar_doc);
+  }
 
-  const url = user.startsWith("tbs-pro")
-    ? `${apiUrl}/pro-emp-professional-documents/${EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
-    }`
-    : `${apiUrl}/emp-professional-documents/${EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
-    }`;
+  if (documentsdata.aadhar_bk_doc) {
+    formData.append("aadhar_card_back_doc", documentsdata.aadhar_bk_doc);
+  }
+
+  if (documentsdata.pan_doc) {
+    formData.append("pan_card_front_doc", documentsdata.pan_doc);
+  }
+
+  if (documentsdata.pan_bk_doc) {
+    formData.append("pan_card_back_doc", documentsdata.pan_bk_doc);
+  }
+
+  if (documentsdata.offerletter) {
+    formData.append("offer_letter_doc", documentsdata.offerletter);
+  }
+
+  if (documentsdata.qualification) {
+    formData.append("qualification_doc", documentsdata.qualification);
+  }
+  // formData.append("other_documents", documentsdata.other_doc);
+
+  const url = user?.startsWith("tbs-pro")
+    ? `${apiUrl}/pro-emp-professional-documents/${
+        EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
+      }`
+    : `${apiUrl}/emp-professional-documents/${
+        EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
+      }`;
 
   // const url = `${apiUrl}/pro-emp-professional-documents/${
   //   EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
@@ -303,10 +362,12 @@ export const GetEmpAddressById = async (
   setEmpAddressData
 ) => {
   const endpoint = user.startsWith("tbs-pro")
-    ? `${apiUrl}/pro-emp-registered-address/${EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
-    }`
-    : `${apiUrl}/emp-registered-address/${EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
-    }`;
+    ? `${apiUrl}/pro-emp-registered-address/${
+        EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
+      }`
+    : `${apiUrl}/emp-registered-address/${
+        EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
+      }`;
 
   try {
     const response = await api.get(endpoint);
@@ -347,18 +408,21 @@ export const GetEmpPersonalById = async (
   setEmpPersonalData
 ) => {
   const endpoint = user?.startsWith("tbs-pro")
-    ? `${apiUrl}/pro-emp-personal-details/${EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
-    }`
-    : `${apiUrl}/emp-personal-details/${EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID")
-    }`;
+    ? `${apiUrl}/pro-emp-personal-details/${
+        EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID") ? sessionStorage.getItem("EMP_ID") :sessionStorage.getItem('Employee_Id')
+      }`
+    : `${apiUrl}/emp-personal-details/${
+        EmployeeID ? EmployeeID : sessionStorage.getItem("EMP_ID") ? sessionStorage.getItem("EMP_ID") :sessionStorage.getItem('Employee_Id')
+      }`;
 
   try {
     const response = await api.get(endpoint);
     console.log(response, "responseresponse");
     // SetUpdateData(null);
     setEmpPersonalData("");
-    console.log(response,"ressssssssss");
-    
+    console.log(response, "ressssssssss");
+    sessionStorage.setItem('Employee_Id', EmployeeID)
+
     // sessionStorage.setItem('EmployeeProfileImg', response.data[0].profile_img)
     return response?.data;
   } catch (error) {
@@ -372,8 +436,11 @@ export const GetEmpDocumentById = async (
   setEmployeeID,
   setEmpDocumentlData
 ) => {
+  
   const endpoint = user.startsWith("tbs-pro")
-    ? `${apiUrl}/pro-emp-professional-documents/${EmployeeID}`
+    ? 
+    `${apiUrl}/pro-emp-professional-documents/${EmployeeID}`
+    // `${apiUrl}/pro-emp-documents-only/${EmployeeID}`
     : `${apiUrl}/emp-documents-only/${EmployeeID}`;
 
   try {
@@ -391,6 +458,19 @@ export const GetEmpDocumentById = async (
 export const GetProductOwnerEmployee = async () => {
   try {
     const response = await api.get(`${apiUrl}/role`);
+    // GetEmployeeData(dispatch);
+    console.log(response, "responseresponse");
+    return response.data;
+  } catch (error) {
+    handleError(error);
+    return null;
+  }
+};
+
+export const GetEmployeeRoles = async () => {
+  const selectuser = user.startsWith("tbs-pro") ? 2 : 1
+  try {
+    const response = await api.get(`${apiUrl}/roles/${selectuser}`);
     // GetEmployeeData(dispatch);
     console.log(response, "responseresponse");
     return response.data;
@@ -451,7 +531,6 @@ export const OwnerEmployeeProfile = async (image, EmployeeID) => {
   const updateurl = user.startsWith("tbs-pro")
     ? `${apiUrl}/pro-emp-profileImg/${EmployeeID}`
     : `${apiUrl}/emp-profileImg/${EmployeeID}`;
-
 
   const method = "put";
   try {

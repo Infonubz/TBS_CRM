@@ -9,17 +9,17 @@ import {
 } from "../../../Api/RequestManagement/RequestManagement";
 import { toast } from "react-toastify";
 
-export default function ReqAdsStatusUpdate({ adId, setViewStatus }) {
+export default function ReqAdsStatusUpdate({ adId, setViewStatus,showtable }) {
   const dispatch = useDispatch();
 
   const handlechange = async (valueid, valuedata) => {
     try {
-      const data = await ReqAdsStatusChange(valueid, valuedata, adId, dispatch);
+      const data = await ReqAdsStatusChange(valueid, valuedata, adId, dispatch,showtable);
       console.log(valueid, valuedata, adId, "currentidcurrentid");
       console.log(data, "datadatadatadata");
       toast.success(data);
       setViewStatus(false);
-      GetRequestAdsData(dispatch);
+      // GetRequestAdsData(dispatch);
       console.log(data);
     } catch (error) {
       console.error("Error uploading data", error);
@@ -45,7 +45,7 @@ export default function ReqAdsStatusUpdate({ adId, setViewStatus }) {
         </button>
         <button
           className="items-center text-[0.9vw] text-white  space-x-[0.7vw] px-[0.8vw] w-[8vw] h-[2vw] bg-[#FF1100] rounded-[0.5vw]"
-          onClick={() => handlechange(5, "Rejected")}
+          onClick={() => handlechange(4, "Rejected")}
         >
           Rejected
         </button>

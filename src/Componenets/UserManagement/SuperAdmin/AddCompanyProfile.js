@@ -12,6 +12,7 @@ import {
 } from "../../../Api/UserManagement/SuperAdmin";
 import axios from "axios";
 import { useDispatch } from "react-redux";
+import umbuslogo from "../../../asserts/umbuslogo.png"
 import { FaUpload } from "react-icons/fa";
 import ImageCropper from "./ImageCropper";
 
@@ -43,22 +44,28 @@ const validationSchema = Yup.object().shape({
     //   /^[a-zA-Z]+[0-9]+$/,
     //   "Company name must contain letters and numbers only"
     // )
-    .min(3, "Company name must be at least 3 characters long")
-    .max(30, "Company name must be at most 30 characters long")
-    .matches(/^[^!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+$/, 'Special characters are not allowed')
+    .min(3, "At least 3 characters long")
+    .max(30, "Maximum 30 characters only")
+    .matches(
+      /^[^!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+$/,
+      "Special characters are not allowed"
+    )
     .required("Company Name is required"),
   ownername: Yup.string()
     .required("Owner Name is required")
-    .matches(/^[^!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+$/, 'Special characters are not allowed'),
+    .matches(
+      /^[^!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+$/,
+      "Special characters are not allowed"
+    ),
   password: Yup.string(),
   aadhar: Yup.string()
     .matches(/^[0-9]{12}$/, "Aadhar number must be exactly 12 digits")
     .required("Aadhar Number is required")
-    .max(12,"Aadhar number must be exactly 12 digits"),
+    .max(12, "Aadhar number must be exactly 12 digits"),
   pan: Yup.string()
     .matches(
       /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
-      "PAN number must be in the format: ABCDE1234F"
+      "PAN number format must be: ABCDE1234F"
     )
     .required("Pan Number is required"),
   // profileimg: Yup.mixed()
@@ -105,13 +112,13 @@ export default function AddSuperAdmin({
   profileImage,
   setProfileImage,
   updatedata,
-  setEnableUpload
+  setEnableUpload,
 }) {
   const dispatch = useDispatch();
 
   const handleSubmit = async (values) => {
     console.log(values, "hiiiiiiiiii");
-    if (operatorID && enable == false) {
+    if (operatorID && enable == false && addressback == true || updatedata && enable == false  ) {
       setCurrentpage(2);
     } else {
       try {
@@ -120,17 +127,17 @@ export default function AddSuperAdmin({
           operatorID,
           enable,
           dispatch,
-          fileList
+          fileList,
+          setOperatorID
         );
         toast.success(data?.message);
         setCurrentpage(2);
         setOperator_Id(data?.id);
-        GetOperatorProfile(operatorID, dispatch)
+        GetOperatorProfile(operatorID, dispatch);
         console.log("Current page set to 2");
       } catch (error) {
         console.error("Error uploading data", error);
       }
-  
     }
     setsuperadmincompanydata({
       company_name: values.companyname,
@@ -141,8 +148,9 @@ export default function AddSuperAdmin({
       alternate_emailid: values.emailid,
       aadharcard_number: values.aadhar,
       pancard_number: values.pan,
-      profileimg: values.profileimg
+      profileimg: values.profileimg,
     });
+    setEnableUpload(false)
   };
 
   const handleBlur = async (e, setFieldError) => {
@@ -172,17 +180,15 @@ export default function AddSuperAdmin({
     alternate_emailid: "",
     aadharcard_number: "",
     pancard_number: "",
-    profileimg: ""
+    profileimg: "",
   });
-
 
   const { Dragger } = Upload;
   // const [profileImage, setProfileImage] = useState("");
-  console.log(profileImage, 'super_admin_company_data')
+  console.log(profileImage, "super_admin_company_data");
 
   const [previewUrl, setPreviewUrl] = useState("");
-  const [draggerImage, setDraggerImage] = useState(false)
-
+  const [draggerImage, setDraggerImage] = useState(false);
 
   const [enable, setEnable] = useState(false);
   const fetchGetUser = async () => {
@@ -211,17 +217,17 @@ export default function AddSuperAdmin({
     addressback,
   ]);
 
-
   const handleImageCrop = (croppedImage) => {
-    setsuperadmincompanydata(prevState => ({
+    setsuperadmincompanydata((prevState) => ({
       ...prevState,
-      profileimg: croppedImage
+      profileimg: croppedImage,
     }));
   };
 
   return (
     <div>
-      <div className="border-l-[0.1vw] px-[2vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f]">
+      <div className="border-l-[0.1vw] px-[2vw] border-t-[0.1vw] mt-[1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f] relative">
+        <div className="w-[5vw] h-[5vw] bg-white shadow-lg rounded-full absolute left-[16.6vw] top-[-2.5vw] flex justify-center items-center"><img className="" src={umbuslogo} alt="buslogo"/></div>
         <div className="h-[4vw] w-full flex items-center justify-between ">
           <label className="text-[1.5vw] font-semibold text-[#1f4b7f] ">
             Company Profile
@@ -231,13 +237,14 @@ export default function AddSuperAdmin({
           </button> */}
           {operatorID || addressback ? (
             <button
-              className={`${enable
-                ? "bg-[#1f4b7f] text-white"
-                : "text-[#1f4b7f] bg-white border-[#1f4b7f]"
-                } rounded-full font-semibold w-[10vw] h-[2vw] flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] text-[1.1vw] `}
-              onClick={() =>{ 
-                setEnable(!enable)
-                setEnableUpload(false)
+              className={`${
+                enable
+                  ? "bg-[#1f4b7f] text-white"
+                  : "text-[#1f4b7f] bg-white border-[#1f4b7f]"
+              } rounded-full font-semibold w-[10vw] h-[2vw] flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] text-[1.1vw] `}
+              onClick={() => {
+                setEnable(!enable);
+                setEnableUpload(false);
               }}
             >
               Enable to Edit
@@ -268,13 +275,11 @@ export default function AddSuperAdmin({
             }}
             validationSchema={validationSchema}
             onSubmit={(values) => {
-              console.log([superadmincompanydata]?.length,"lelelelelel");
-              
-              if(profileImage === true || updatedata ){
+              console.log([superadmincompanydata]?.length, "lelelelelel");
+
+              if (profileImage === true || updatedata) {
                 handleSubmit(values);
               }
-        
-
             }}
             enableReinitialize
           >
@@ -288,12 +293,12 @@ export default function AddSuperAdmin({
               setFieldError,
               errors,
               touched,
-              resetForm
+              resetForm,
             }) => (
               <Form onSubmit={handleSubmit}>
                 <div className="gap-y-[1.5vw] flex-col flex">
                   <div className="grid grid-cols-2 w-full gap-x-[2vw]">
-                    <div className="col-span-1">
+                    <div className="col-span-1 relative">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         Company Name
                         <span className="text-[1vw] text-red-600 pl-[0.2vw]">
@@ -312,20 +317,21 @@ export default function AddSuperAdmin({
                               : true
                             : false
                         }
-                        className={`${operatorID || addressback
-                          ? enable == false
-                            ? " cursor-not-allowed"
+                        className={`${
+                          operatorID || addressback
+                            ? enable == false
+                              ? " cursor-not-allowed"
+                              : ""
                             : ""
-                          : ""
-                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                        } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                       />
                       <ErrorMessage
                         name="companyname"
                         component="div"
-                        className="text-red-500 text-[0.8vw]"
+                        className="text-red-500 text-[0.8vw] absolute left-[.2vw] bottom-[-1.2vw]"
                       />
                     </div>
-                    <div className="col-span-1">
+                    <div className="col-span-1 relative">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         Owner Name
                         <span className="text-[1vw] text-red-600 pl-[0.2vw]">
@@ -344,22 +350,23 @@ export default function AddSuperAdmin({
                               : true
                             : false
                         }
-                        className={`${operatorID || addressback
-                          ? enable == false
-                            ? " cursor-not-allowed"
+                        className={`${
+                          operatorID || addressback
+                            ? enable == false
+                              ? " cursor-not-allowed"
+                              : ""
                             : ""
-                          : ""
-                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                        } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                       />
                       <ErrorMessage
                         name="ownername"
                         component="div"
-                        className="text-red-500 text-[0.8vw]"
+                        className="text-red-500 text-[0.8vw] absolute left-[.2vw] bottom-[-1.2vw]"
                       />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 w-full gap-x-[2vw]">
-                    <div className="col-span-1 ">
+                    <div className="col-span-1 relative">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         Phone
                         <span className="text-[1vw] text-red-600 pl-[0.2vw]">
@@ -381,12 +388,13 @@ export default function AddSuperAdmin({
                                 : true
                               : false
                           }
-                          className={`${operatorID || addressback
-                            ? enable == false
-                              ? " cursor-not-allowed"
+                          className={`${
+                            operatorID || addressback
+                              ? enable == false
+                                ? " cursor-not-allowed"
+                                : ""
                               : ""
-                            : ""
-                            } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                         />
                         {/* <button className="absolute right-[0.5vw] text-[1vw] text-white w-[5vw] bg-[#1F4B7F] rounded-full h-[1.7vw]">
                           Verify
@@ -395,10 +403,10 @@ export default function AddSuperAdmin({
                       <ErrorMessage
                         name="phone"
                         component="div"
-                        className="text-red-500 text-[0.8vw]"
+                        className="text-red-500 text-[0.8vw] absolute left-[.2vw] bottom-[-1.2vw]"
                       />
                     </div>
-                    <div className="col-span-1">
+                    <div className="col-span-1 relative">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         Email ID
                         <span className="text-[1vw] text-red-600 pl-[0.2vw]">
@@ -417,17 +425,18 @@ export default function AddSuperAdmin({
                               : true
                             : false
                         }
-                        className={`${operatorID || addressback
-                          ? enable == false
-                            ? " cursor-not-allowed"
+                        className={`${
+                          operatorID || addressback
+                            ? enable == false
+                              ? " cursor-not-allowed"
+                              : ""
                             : ""
-                          : ""
-                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                        } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                       />
                       <ErrorMessage
                         name="emailid"
                         component="div"
-                        className="text-red-500 text-[0.8vw]"
+                        className="text-red-500 text-[0.8vw] absolute left-[.2vw] bottom-[-1.2vw]"
                       />
                     </div>
                   </div>
@@ -474,7 +483,7 @@ export default function AddSuperAdmin({
                     </div>
                   </div> */}
                   <div className="grid grid-cols-2 w-full gap-x-[2vw] relative mb-[.7vw]">
-                    <div className="col-span-1">
+                    <div className="col-span-1 relative">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         Aadhar Card Number
                         <span className="text-[1vw] text-red-600 pl-[0.2vw]">
@@ -494,12 +503,13 @@ export default function AddSuperAdmin({
                                 : true
                               : false
                           }
-                          className={`${operatorID || addressback
-                            ? enable == false
-                              ? " cursor-not-allowed"
+                          className={`${
+                            operatorID || addressback
+                              ? enable == false
+                                ? " cursor-not-allowed"
+                                : ""
                               : ""
-                            : ""
-                            } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                         />
 
                         {/* <div className=" absolute right-[1vw]">
@@ -509,10 +519,10 @@ export default function AddSuperAdmin({
                       <ErrorMessage
                         name="aadhar"
                         component="div"
-                        className="text-red-500 text-[0.8vw]"
+                        className="text-red-500 text-[0.8vw] absolute left-[.2vw] bottom-[-1.2vw]"
                       />
                     </div>
-                    <div className="col-span-1">
+                    <div className="col-span-1 relative">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         Pan Card Number
                         <span className="text-[1vw] text-red-600 pl-[0.2vw]">
@@ -532,12 +542,13 @@ export default function AddSuperAdmin({
                                 : true
                               : false
                           }
-                          className={`${operatorID || addressback
-                            ? enable == false
-                              ? " cursor-not-allowed"
+                          className={`${
+                            operatorID || addressback
+                              ? enable == false
+                                ? " cursor-not-allowed"
+                                : ""
                               : ""
-                            : ""
-                            } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                         />
 
                         {/* <div className=" absolute right-[1vw]">
@@ -548,23 +559,20 @@ export default function AddSuperAdmin({
                       <ErrorMessage
                         name="pan"
                         component="div"
-                        className="text-red-500 text-[0.8vw]"
+                        className="text-red-500 text-[0.8vw] absolute left-[.2vw] bottom-[-1.2vw]"
                       />
                     </div>
 
-
-
-                    {
-                    updatedata ?  " " : (
-                    profileImage === false && <div className="text-red-700 text-[.7vw] absolute  bottom-[-3vw]">
-                     * Profile Image is required
-                    </div>)}
-
+                    {updatedata
+                      ? " "
+                      : profileImage === false && (
+                          <div className="text-red-700 text-[.7vw] absolute  bottom-[-2.5vw]">
+                            * Profile Image is required
+                          </div>
+                        )}
                   </div>
-                 
 
-              
-                  <div className="flex items-center justify-between py-[1vw]">
+                  <div className="flex items-center justify-between pb-[1vw]">
                     <div>
                       <h1 className="text-[#1F4B7F] text-[0.7vw] font-semibold">
                         *You must fill in all fields to be able to continue
@@ -577,7 +585,7 @@ export default function AddSuperAdmin({
                       <button
                         className="bg-[#1F487C] font-semibold rounded-full w-[11vw] h-[2vw] text-[1vw] text-white"
                         type="submit"
-                      // onClick={() => setCurrentpage(2)}
+                        // onClick={() => setCurrentpage(2)}
                       >
                         {operatorID || addressback
                           ? enable

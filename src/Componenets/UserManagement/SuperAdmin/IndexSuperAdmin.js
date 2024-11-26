@@ -9,6 +9,7 @@ import AddRegisterAddress from "./AddRegisterAddress";
 import AddBusinessDetails from "./AddBusinessDetails";
 import AddGSTDetails from "./AddGSTDetails";
 import AddDocuments from "./AddDocuments";
+import pencilshape from '../../../asserts/pencilicon.png'
 import {
   GetOperatorProfile,
   GetSuperAdminById,
@@ -42,20 +43,20 @@ export default function SuperAdminIndex({
   const [previewTitle, setPreviewTitle] = useState("");
   const [fileList, setFileList] = useState([]);
   const [operator_id, setOperator_Id] = useState(null);
-  const [profileImage,setProfileImage] = useState(false)
-  const [enableUpload,setEnableUpload] = useState(false)
+  const [profileImage, setProfileImage] = useState(false)
+  const [enableUpload, setEnableUpload] = useState(false)
 
-  console.log("fileListfileLisfileListt",fileList);
-  
+  console.log("fileListfileLisfileListt", operatorID, updatedata);
 
-useEffect(()=>{
-  if(updatedata){
-    setEnableUpload(true)
-  }
-  else{
-    setEnableUpload(false)
-  }
-},[])
+
+  useEffect(() => {
+    if (updatedata) {
+      setEnableUpload(true)
+    }
+    else {
+      setEnableUpload(false)
+    }
+  }, [])
 
 
   const handlePreview = async (file) => {
@@ -76,13 +77,13 @@ useEffect(()=>{
   const dispatch = useDispatch();
 
   const handleChange = async ({ fileList: newFileList }) => {
-    console.log(newFileList[0]?.originFileObj,"helldjfhdjkfhdkjf",newFileList?.length, "ereffgdfqe");
+    console.log(newFileList[0]?.originFileObj, "helldjfhdjkfhdkjf", newFileList?.length, "ereffgdfqe");
     setFileList(newFileList);
-    if(newFileList?.length > 0){
+    if (newFileList?.length > 0) {
 
       setProfileImage(true)
     }
-    else{
+    else {
       setProfileImage(false)
     }
     // SubmitProfileData(newFileList[0], dispatch);
@@ -91,7 +92,7 @@ useEffect(()=>{
     //   const data = await OperatorProfile(newFileList[0]);
     //   // setSuperAdminData(data);
     //   console.log(data);
-      
+
     // } catch (error) {
     //   console.error("Error fetching additional user data", error);
     // }
@@ -178,8 +179,8 @@ useEffect(()=>{
     "locationlocationlocation"
   );
 
-  console.log(profileImage,"imagkjhdfkjdhfk");
-  
+  console.log(profileImage, "imagkjhdfkjdhfk");
+
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -231,7 +232,7 @@ useEffect(()=>{
                 <div className="border-b-[0.1vw] border-[#1f4b7f] w-[15vw]"></div>
               </div>
 
-              <div className="flex items-center flex-col">
+              <div className="flex items-center flex-col relative">
                 {/* <Upload
                   action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
                   listType="picture-card"
@@ -248,30 +249,40 @@ useEffect(()=>{
                   {fileList.length >= 1 ? null : uploadButton}
                 </Upload> */}
 
-<div className="relative">
-  <ImgCrop showGrid rotationSlider showReset onImageCrop={(file) => {
-      
-    }}>
-    <Upload
-      action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-      listType="picture-card"
-      fileList={fileList}
-      onChange={handleChange}
-      onPreview={handlePreview}
-      disabled={enableUpload}
-    >
-      {fileList?.length < 1 && "+ Upload"}
-    </Upload>
-  </ImgCrop>
+                <div className="relative">
+                  <ImgCrop showGrid rotationSlider showReset onImageCrop={(file) => {
 
-  {fileList.length === 0 && selectedFile && (  // Check if there are no files in the fileList and selectedFile is set
-    <img
-      src={`http://192.168.90.47:4000${selectedFile}`}
-      alt="Photo"
-      className="w-[5vw] h-[5vw] object-cover rounded-[0.2vw] top-[.7vw] left-[.7vw] absolute opacity-25 z-[1] pointer-events-none"
-    />
-  )}
-</div>
+                  }}>
+                    <Upload
+                      action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                      listType="picture-card"
+                      fileList={fileList}
+                      onChange={handleChange}
+                      onPreview={handlePreview}
+                      disabled={enableUpload}
+                    >
+                      {fileList?.length < 1 && "+ Upload"}
+
+
+                    </Upload>
+                  </ImgCrop>
+
+                  {fileList.length === 0 && selectedFile && (  // Check if there are no files in the fileList and selectedFile is set
+                    <img
+                      src={`http://192.168.90.47:4000${selectedFile}`}
+                      alt="Profile"
+                      className="w-[5vw] h-[5vw] object-cover rounded-[0.2vw] top-[.7vw] left-[.7vw] absolute opacity-25 z-[1] pointer-events-none"
+                    />
+                  )}
+                  
+                </div>
+                {updatedata
+                      ? " "
+                      : profileImage === false && (
+                          <span className="text-red-700 text-[.7vw] absolute bottom-[-1.2vw]">
+                            * Profile Image is required
+                          </span>
+                        )}
 
 
                 {/* {operatorProfileImage === 'null' || operatorProfileImage === null ? (
@@ -303,11 +314,25 @@ useEffect(()=>{
                 </Modal>
               </div>
 
-              <div className="flex gap-[3vw] pt-[2vw] px-[7.5vw]">
+              <div className="flex gap-[3vw] pt-[2vw] px-[7.5vw] relative">
                 <div className="">
                   <div className="bg-[#D9D9D9] rounded-t-full rounded-b-full w-[0.7vw] h-[14vw] relative">
                     <div
-                      className={`absolute rounded-t-full rounded-b-full w-[0.7vw] h-[2vw] bg-[#1f4b7f] ${currentpage == 1
+                      className={`absolute  h-[1.5vw] w-[3.4vw] ${currentpage == 1
+                        ? "top-[.2vw]"
+                        : currentpage == 2
+                          ? "top-[3.4vw]"
+                          : currentpage == 3
+                            ? "top-[6.5vw]"
+                            : currentpage == 4
+                              ? "top-[9.5vw]"
+                              : "bottom-[-.3vw]"
+                        }`}
+                    >
+                      <img src={pencilshape} alt='icon' className="h-[1.2vw] w-[3.4vw]" />
+                    </div>
+                    {/* <img src={pencilshape} alt='icon' 
+                      className={`absolute h-[3vw] w-[5vw] ${currentpage == 1
                         ? "top-0"
                         : currentpage == 2
                           ? "top-[3vw]"
@@ -317,7 +342,7 @@ useEffect(()=>{
                               ? "top-[9vw]"
                               : "bottom-0"
                         }`}
-                    ></div>
+                    /> */}
                   </div>
                 </div>
                 <div className="flex">
@@ -350,6 +375,7 @@ useEffect(()=>{
                   SPA_ID={SPA_ID}
                   superadmindata={superadmindata}
                   operatorID={operatorID}
+                  setOperatorID={setOperatorID}
                   setAddressBack={setAddressBack}
                   addressback={addressback}
                   operator_id={operator_id}
@@ -372,6 +398,7 @@ useEffect(()=>{
                   addressback={addressback}
                   setBusinessBack={setBusinessBack}
                   businessback={businessback}
+                  updatedata={updatedata}
                 />
               ) : currentpage == 3 ? (
                 <AddBusinessDetails
@@ -384,6 +411,7 @@ useEffect(()=>{
                   businessback={businessback}
                   documentback={documentback}
                   setDocumentBack={setDocumentBack}
+                  updatedata={updatedata}
                 />
               ) : currentpage == 4 ? (
                 <AddDocuments
@@ -398,6 +426,7 @@ useEffect(()=>{
                   setBusinessBack={setBusinessBack}
                   gstback={gstback}
                   setGstback={setGstback}
+                  updatedata={updatedata}
                 />
               ) : (
                 currentpage == 5 && (
@@ -412,6 +441,7 @@ useEffect(()=>{
                     gstback={gstback}
                     operator_id={operator_id}
                     setGstback={setGstback}
+                    updatedata={updatedata}
                   />
                 )
               )}

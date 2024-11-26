@@ -1,0 +1,91 @@
+.carousel {
+  position: relative;
+  width: 40vw; /* Adjust width as needed */
+  margin: 0 auto;
+  text-align: center;
+}
+
+.carousel-track-container {
+  overflow: hidden;
+  width: 100%;
+}
+
+.carousel-track {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.5s ease-in-out;
+}
+
+.carousel-slide {
+  display: flex; /* This ensures that the image is horizontally centered */
+  justify-content: center; /* Horizontally center the image */
+  align-items: center; /* Vertically center the image */
+  opacity: 0.5;
+  transform-origin: center;
+  transition: transform 0.5s ease, opacity 0.5s ease;
+  height: 15vw; /* You can adjust this value to match your image height */
+  position: relative; /* Ensure it's positioned correctly within the carousel */
+}
+
+.small-slide {
+  width: 5vw;
+  opacity: 0.3;
+  transform: scale(0.6);
+  height: 12vw;
+}
+
+.medium-slide {
+  width: 8vw;
+  opacity: 0.7;
+  transform: scale(0.8);
+  height: 15vw;
+}
+
+.large-slide {
+  width: 25vw;
+  opacity: 1;
+  transform: scale(1);
+}
+
+.hidden-slide {
+  display: none;
+}
+
+.carousel-slide img {
+  width: 100%; /* Make sure it fills the available space */
+  max-width: 100%; /* Prevent it from growing beyond its container */
+  height: 12.5vw; /* Set the desired height */
+  object-fit: fill; /* Ensures the image maintains aspect ratio without distortion */
+  border-radius: 1vw;
+}
+
+.carousel-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: transparent;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.prev {
+  left: -3vw;
+}
+
+.next {
+  right: -3vw;
+}
+
+.carousel-caption {
+  margin-top: 10px;
+  font-weight: bold;
+  color: #4a4a4a;
+}
+.small-slide,
+.medium-slide,
+.large-slide {
+  margin: 0; /* Ensure no margin between the slides */
+}

@@ -6,6 +6,7 @@ import * as Yup from "yup";
 import AddGST from "./AddGST";
 import ModalPopup from "../../Common/Modal/Modal";
 import { toast } from "react-toastify";
+import umbuslogo from "../../../asserts/umbuslogo.png"
 import {
   GetSuperAdminData,
   GetSuperAdminGSTById,
@@ -74,6 +75,7 @@ export default function AddGSTDetails({
   };
 
   const fetchGetUser = async () => {
+    console.log("admindatadadghdfkg");
     try {
       const data = await GetSuperAdminGSTById(
         operatorID,
@@ -81,13 +83,15 @@ export default function AddGSTDetails({
         setSuperAdminGSTData
       );
       setSuperAdminGSTData(data);
+      console.log(superadmingstdata,"admindatadadghdfkg");
+      
     } catch (error) {
       console.error("Error fetching additional user data", error);
     }
   };
 
   useEffect(() => {
-    if (operatorID != null) {
+    if (operatorID != null || clientID) {
       console.log(superadmingstdata, "superadmingstdata");
       fetchGetUser();
     }
@@ -102,7 +106,9 @@ export default function AddGSTDetails({
 
   return (
     <div>
-      <div className="border-l-[0.1vw] relative px-[2vw] h-[28vw] ree border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f]">
+      <div className="border-l-[0.1vw] relative px-[2vw] h-[28vw] ree border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f] mt-[1vw]">
+      <div className="w-[5vw] h-[5vw] bg-white shadow-lg rounded-full absolute left-[16.6vw] top-[-2.5vw] flex justify-center items-center"><img className="" src={umbuslogo} alt="buslogo"/></div>
+
         <div className="h-[4vw] w-full flex items-center justify-between ">
           <label className="text-[1.5vw] font-semibold text-[#1f4b7f] ">
             GST Details
@@ -261,8 +267,8 @@ export default function AddGSTDetails({
                           <div>{superadmingstdata?.head_office}</div>
                         </div>
                         <div className="grid grid-cols-2 mt-[1vw]">
-                          <div className="font-semibold">Upload Documents:</div>
-                          <div>{superadmingstdata?.upload_gst}</div>
+                          <div className="font-semibold">Uploaded Document:</div>
+                          <span className="h-[8vw] w-[9vw] flex items center"><img src={`http://192.168.90.47:4000${superadmingstdata?.upload_gst}`} alt="Gst Image"/></span>
                         </div>
                       </div>
                     ) : (
@@ -300,7 +306,7 @@ export default function AddGSTDetails({
                       <button
                         className="border-[#1F487C] w-[5vw] font-semibold text-[1vw] h-[2vw] rounded-full border-r-[0.2vw]  border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw]"
                         onClick={() => {
-                          setCurrentpage(2);
+                          setCurrentpage(4);
                           setGstback(true);
                         }}
                       >
@@ -338,6 +344,8 @@ export default function AddGSTDetails({
           setClientID={setClientID}
           setmodalIsOpen1={setmodalIsOpen1}
           modalIsOpen1={modalIsOpen1}
+          superadmingstdata={superadmingstdata}
+          setSuperAdminGSTData={setSuperAdminGSTData}
         />
       </ModalPopup>
     </div>

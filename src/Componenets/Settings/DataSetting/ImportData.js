@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Upload, Select, message } from "antd";
+import { Upload, Select, message, ConfigProvider } from "antd";
 import { MdCloudDownload } from "react-icons/md";
 import { BsFilePdf } from "react-icons/bs";
 import { MdOutlineImage } from "react-icons/md";
 import { AiOutlineFileExcel } from "react-icons/ai";
 import { VscPlayCircle } from "react-icons/vsc";
-import image from "../../../asserts/Image.png";
+import image from "../../../asserts/Image.png"
 import "./index.css";
 import * as Yup from "yup";
 import axios from "axios";
@@ -18,6 +18,7 @@ import {
   GetImportData,
   SubmitImportData,
 } from "../../../Api/Settings/DataSettings/ImportData";
+import { IoMdArrowDropdown } from "react-icons/io";
 
 const validationSchema = Yup.object().shape({
   upload_files: Yup.mixed()
@@ -74,20 +75,100 @@ const Import_Data = () => {
     },
   };
 
+  // const handleSubmit = async (values) => {
+  //   console.log(values, "valuesvalues");
+  //   try {
+  //     const data = await SubmitImportData(values, dispatch);
+  //     toast.success(data?.message);
+  //     console.log(data);
+  //     // setFileName("");
+  //     // setFormValues("");
+  //     // setFormValues({ field_id: "", select_fields: "", upload_files: null });
+  //     GetImportData(dispatch);
+  //   } catch (error) {
+  //     console.error("Error uploading data", error);
+  //   }
+  // };
+
   const handleSubmit = async (values) => {
-    console.log(values, "valuesvalues");
+
+    let field_id = '';
+    switch (values.select_fields) {
+      case "User Management - Operator":
+        field_id = 1;
+        break;
+      case "User Management - Partner":
+        field_id = 2;
+        break;
+      case "User Management - Employee":
+        field_id = 3;
+        break;
+      case "User Management - Client":
+        field_id = 4;
+        break;
+      case "Offers & deals":
+        field_id = 5;
+        break;
+      case "advertisement":
+        field_id = 6;
+        break;
+      default:
+        field_id = 7;
+    }
+    values.field_id = field_id;
+    console.log(field_id, "valuesvalues");
+
     try {
-      const data = await SubmitImportData(values, dispatch);
+      const data = await SubmitImportData(values, field_id, dispatch);
       toast.success(data?.message);
       console.log(data);
+
       setFileName("");
       setFormValues("");
       setFormValues({ field_id: "", select_fields: "", upload_files: null });
+
       GetImportData(dispatch);
     } catch (error) {
       console.error("Error uploading data", error);
     }
   };
+
+
+  const options = [
+    {
+      value: '',
+      label: 'Select Field',
+      disabled: true
+    },
+    {
+      value: 'User Management - Operator',
+      label: 'User Management - Operator',
+    },
+    {
+      value: 'User Management - Partner',
+      label: 'User Management - Partner',
+    },
+    {
+      value: 'User Management - Employee',
+      label: 'User Management - Employee',
+    },
+    {
+      value: 'User Management - Client',
+      label: 'User Management - Client',
+    },
+    {
+      value: 'Promotion',
+      label: 'Promotions',
+    },
+    {
+      value: 'Offers & deals',
+      label: 'Offers & Deals',
+    },
+    {
+      value: 'advertisement',
+      label: 'Advertisement',
+    },
+  ];
 
   return (
     <div>
@@ -118,7 +199,7 @@ const Import_Data = () => {
                     FILES
                   </p>
                 </div> */}
-                <div className="Flex pt-[0.9vw] drag">
+                <div className="Flex pt-[0.9vw] drag relative">
                   <Field name="upload_files">
                     {({ field }) => (
                       <>
@@ -188,7 +269,7 @@ const Import_Data = () => {
                     )}
                   </Field>
                   {errors.upload_files && touched.upload_files && (
-                    <div className="text-red-500 text-[0.8vw]">
+                    <div className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]">
                       {errors.upload_files}
                     </div>
                   )}
@@ -198,7 +279,7 @@ const Import_Data = () => {
                 <label className="text-[#1F487C] text-[1.2vw] font-medium">
                   Select Module
                 </label>
-                <Field
+                {/* <Field
                   as="select"
                   id="select_fields"
                   name="select_fields"
@@ -206,14 +287,23 @@ const Import_Data = () => {
                   onChange={(e) => {
                     handleChange(e);
                     //setupdatedata(e.target.value);
-                    localStorage.setItem("select_fields", e.target.value);
+                    sessionStorage.setItem("select_fields", e.target.value);
                   }}
                   className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C]
                   text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none"
                 >
                   <option label="Select fields" value="" className="" />
-                  <option label="User Management" value="User management">
-                    User Management
+                  <option label="  User Management - Operator" value="  User Management - Operator">
+                    User Management - Operator
+                  </option>
+                  <option label=" User Management - Partner" value=" User Management - Partner">
+                    User Management - Partner
+                  </option>
+                  <option label=" User Management - Employee" value=" User Management - Employee">
+                    User Management - Employee
+                  </option>
+                  <option label=" User Management - Client" value=" User Management - Client  ">
+                    User Management - Client
                   </option>
                   <option label="Promotions" value="Promotion">
                     Promotions
@@ -224,12 +314,45 @@ const Import_Data = () => {
                   <option label="Advertisement" value="advertisement">
                     Advertisement
                   </option>
-                </Field>
-                {errors.select_fields && touched.select_fields && (
-                  <div className="text-red-500 text-[0.8vw]">
-                    {errors.select_fields}
-                  </div>
-                )}
+                </Field> */}
+                <div className="relative">
+                  <ConfigProvider
+                    theme={{
+                      components: {
+                        Select: {
+                          padding: '1vw',
+                          fontSize: '1vw',
+                          colorText: '#1F487C'
+                        },
+                      },
+                    }}
+                  >
+                    <Select
+                      id="select_fields"
+                      name="select_fields"
+                      value={values.select_fields}
+                      onChange={(value) => {
+                        handleChange({ target: { name: 'select_fields', value } });
+                        sessionStorage.setItem("select_fields", value);
+                      }}
+                      suffixIcon={<span style={{ fontSize: '1vw', color: '#1f487c' }}><IoMdArrowDropdown size="2vw" /></span>}
+                      // className=" border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none"
+                      className="data-select  mt-[0.5vw]  placeholder-blue border-[#1F487C] text-[#1F487C] border-b-[0.2vw] rounded-b-[0.7vw] text-[1.2vw] h-[2.7vw] w-[100%] outline-none"
+                      options={options}
+                      dropdownStyle={{
+                        paddingTop: '1wv',
+                        height: '12.5vw',
+                        overflow: "auto",
+                        fontSize: '1vw'
+                      }}
+                    />
+                  </ConfigProvider>
+                  {errors.select_fields && touched.select_fields && (
+                    <div className="text-red-500 text-[0.8vw] absolute bottom-[-1.5vw]">
+                      {errors.select_fields}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
             <div className="flex justify-end pr-[2vw]">

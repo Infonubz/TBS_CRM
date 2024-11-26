@@ -22,13 +22,13 @@ export const GetTbsInfo = async (dispatch) => {
   }
 };
 
-export const SubmitAboutUs = async (values) => {
-  console.log(values, "about_us_file_data");
+export const SubmitAboutUs = async (values, li_id) => {
+  console.log(li_id, "about_us_file_data");
   const formData = new FormData();
   formData.append("about_us_file", values);
 
-  const url = `${apiUrl}/tbsInfo`;
-  const method = "post";
+  const url = li_id ? `${apiUrl}/tbsInfo-About/49` : `${apiUrl}/tbsInfo`;
+  const method = li_id ? 'put' : "post";
 
   try {
     const response = await api({
@@ -51,7 +51,7 @@ export const SubmitPrivacyPolicy = async (values) => {
   const formData = new FormData();
   formData.append("privacy_policy_file", values);
 
-  const url = `${apiUrl}/tbsInfo-Privacy/3`;
+  const url = `${apiUrl}/tbsInfo-Privacy/49`;
   const method = "put";
 
   try {
@@ -75,7 +75,7 @@ export const SubmitTermsConditions = async (values) => {
   const formData = new FormData();
   formData.append("terms_conditions_file", values);
 
-  const url = `${apiUrl}/tbsInfo-Terms/3`;
+  const url = `${apiUrl}/tbsInfo-Terms/49`;
   const method = "put";
 
   try {
@@ -99,7 +99,7 @@ export const SubmitUserAgreement = async (values) => {
   const formData = new FormData();
   formData.append("user_agreement_file", values);
 
-  const url = `${apiUrl}/tbsInfo-User/3`;
+  const url = `${apiUrl}/tbsInfo-User/49`;
   const method = "put";
 
   try {

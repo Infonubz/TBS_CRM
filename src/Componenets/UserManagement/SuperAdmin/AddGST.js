@@ -1,4 +1,4 @@
-import { Progress, Upload } from "antd";
+import { ConfigProvider, Modal, Progress, Select, Upload } from "antd";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { FaCloudUploadAlt } from "react-icons/fa";
@@ -9,6 +9,7 @@ import {
   SubmitGSTData,
 } from "../../../Api/UserManagement/SuperAdmin";
 import { useDispatch } from "react-redux";
+import { IoMdArrowDropdown } from "react-icons/io";
 const FILE_SIZE = 1024 * 1024 * 5; // 5MB
 const SUPPORTED_FORMATS = [
   "application/pdf",
@@ -17,22 +18,41 @@ const SUPPORTED_FORMATS = [
   "image/png",
 ];
 const validationSchema = Yup.object().shape({
-  gst: Yup.string().required("GSTIN is required"),
-  state_code: Yup.string().required("State Code is required"),
+  gst: Yup.string()
+  .matches(
+    /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[0-9]{1}[A-Z]{1}[0-9]{1}$/,
+    "Format should be 22AAAAA0000A1Z5."
+  )
+  .required("GST Number is required"),
+  // state_code: Yup.string().required("State Code is required"),
   state: Yup.string().required("State is required"),
-  head_office: Yup.string().required("Head Offcie is required"),
+  // head_office: Yup.string().required("Head Offcie is required"),
+  state_code: Yup.string()
+  .matches(/^\d+$/, "State Code must be a number")  // Ensures only numbers
+  .required("State Code is required")
+  .max(2,"State code must be valid 2 digit number"),
+
+// state: Yup.string()
+//   .matches(/^[A-Za-z]+$/, "State must contain only alphabets")  // Ensures only alphabets
+//   .required("State is required"),
+
+head_office: Yup.string()
+  .matches(/^[A-Za-z]+$/, "Head Office must contain only alphabets")  // Ensures only alphabets
+  .required("Head Office is required")
+  .max(40,"maximum 40 characters only"),
   gst_file: Yup.mixed()
     .required("GST Document is required")
-    .test(
-      "fileSize",
-      "File too large",
-      (value) => value && value.size <= FILE_SIZE
-    )
-    .test(
-      "fileFormat",
-      "Unsupported Format",
-      (value) => value && SUPPORTED_FORMATS.includes(value.type)
-    ),
+    // .test(
+    //   "fileSize",
+    //   "File too large",
+    //   (value) => value && value.size <= FILE_SIZE
+    // )
+    // .test(
+    //   "fileFormat",
+    //   "Unsupported Format",
+    //   (value) => value && SUPPORTED_FORMATS.includes(value.type)
+    // )
+    ,
   ctc: Yup.string().required("GST is required"),
 });
 
@@ -45,6 +65,10 @@ export default function AddGST({
   setModalIsOpen,
   setmodalIsOpen1,
   modalIsOpen1,
+  clientID,
+  superadmingstdata,
+  setSuperAdminGSTData
+
 }) {
   const props = {
     name: "file",
@@ -68,8 +92,12 @@ export default function AddGST({
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
-  const [superadmingstdata, setSuperAdminGSTData] = useState("");
+  const [inputPreview, setInputPreview] = useState()
+  // const [superadmingstdata, setSuperAdminGSTData] = useState("");
   const updateId = operatorID ? operatorID : operator_id;
+
+  console.log(superadmingstdata,"dhdhdhdhdhdh");
+  
 
 
   const handlePreview = (file) => {
@@ -85,7 +113,7 @@ export default function AddGST({
   const handleSubmit = async (values) => {
     console.log("Subm65656", values);
     try {
-      const data = await SubmitGSTData(values, updateId, setSuperAdminGSTData, dispatch);
+      const data = await SubmitGSTData(values, updateId, setSuperAdminGSTData,superadmingstdata , dispatch);
       toast.success(data?.message);
       // setOperatorID(null);
       setmodalIsOpen1(false);
@@ -102,33 +130,71 @@ export default function AddGST({
   useEffect(() => {
     console.log("modalIsOpen1 state changed:", modalIsOpen1);
     console.log(updateId, "clientID111");
+    setInputPreview(superadmingstdata?.upload_gst)
   }, [modalIsOpen1]);
 console.log(operatorID,"operatorIDoperatorID");
 
-  const fetchGetUser = async () => {
-    try {
-      const data = await GetSuperAdminGSTById(
-        operatorID,
-        setOperatorID,
-        setSuperAdminGSTData
-      );
-      setSuperAdminGSTData(data);
-    } catch (error) {
-      console.error("Error fetching additional user data", error);
-    }
-  };
+const handleFileChange = (event) => {
+  const file = event?.currentTarget?.files[0];
 
-  useEffect(() => {
-    if (operatorID != null) {
-      fetchGetUser();
+  // Check if the file is selected and it's a valid file
+  if (file) {
+    // Validate if the selected file is an actual file object
+    if (file instanceof File) {
+      setInputPreview(URL.createObjectURL(file));
+    } else {
+      console.error("Selected item is not a valid file.");
     }
-  }, [operatorID, setOperatorID, setSuperAdminGSTData]);
+  } else {
+    console.error("No file selected.");
+  }
+};
+
+
+const [isModalOpen, setIsModalOpen] = useState(false);
+const [modalImage, setModalImage] = useState(null);
+
+const openModal = (event) => {
+  // Get the image source (src) using `getElementById`
+  const imageSrc = event.target.getAttribute('src');
+  
+  // Set the modal image source
+  setModalImage(imageSrc);
+  
+  // Open the modal
+  setIsModalOpen(true);
+};
+const closeModal = () => {
+  setIsModalOpen(false);
+};
+
+
+
+  // const fetchGetUser = async () => {
+  //   try {
+  //     const data = await GetSuperAdminGSTById(
+  //       operatorID,
+  //       setOperatorID,
+  //       setSuperAdminGSTData
+  //     );
+  //     setSuperAdminGSTData(data);
+  //   } catch (error) {
+  //     console.error("Error fetching additional user data", error);
+  //   }
+  // };
+console.log(clientID,"ididididdhgfsudfgusfgb");
+
+  // useEffect(() => {
+  //   if (operatorID != null || clientID ) {
+  //     fetchGetUser();
+  //   }
+  // }, [operatorID, setOperatorID, setSuperAdminGSTData]);
 
   console.log(superadmingstdata, "superadmingstdata4444");
 
   return (
     <div>
-      <div className="">
+      <div className="umselect">
         <div className="h-[4vw] w-full flex items-center justify-between ">
           <label className="text-[1.5vw] font-semibold text-[#1f4b7f] ">
             Add GST
@@ -148,7 +214,7 @@ console.log(operatorID,"operatorIDoperatorID");
               state: superadmingstdata?.state_name || "",
               head_office: superadmingstdata?.head_office || "",
               gst_file: superadmingstdata?.upload_gst || null,
-              ctc: superadmingstdata?.aggregate_turnover_exceeded || "",
+              ctc: superadmingstdata?.aggregate_turnover_exceeded == true ? 1 : 0 || "",
             }}
             validationSchema={validationSchema}
             onSubmit={(values) => {
@@ -170,7 +236,7 @@ console.log(operatorID,"operatorIDoperatorID");
               <Form onSubmit={handleSubmit}>
                 <div className="gap-y-[1.5vw] flex-col flex">
                   <div className="grid grid-cols-2 w-full gap-x-[2vw]">
-                    <div className="col-span-1">
+                    <div className="col-span-1 relative">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         GSTIN
                         <span className="text-[1vw] text-red-600 pl-[0.2vw]">
@@ -187,12 +253,12 @@ console.log(operatorID,"operatorIDoperatorID");
                       <ErrorMessage
                         name="gst"
                         component="div"
-                        className="text-red-500 text-[0.8vw]"
+                        className="text-red-500 text-[0.8vw] absolute left-[.2vw] bottom-[-1.2vw]"
                       />
                     </div>
-                    <div className="col-span-1">
+                    <div className="col-span-1 relative">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
-                        State code number
+                       Gst State code
                         <span className="text-[1vw] text-red-600 pl-[0.2vw]">
                           *
                         </span>
@@ -207,19 +273,19 @@ console.log(operatorID,"operatorIDoperatorID");
                       <ErrorMessage
                         name="state_code"
                         component="div"
-                        className="text-red-500 text-[0.8vw]"
+                        className="text-red-500 text-[0.8vw] absolute left-[.2vw] bottom-[-1.2vw]"
                       />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 w-full gap-x-[2vw]">
-                    <div className="col-span-1 ">
+                    <div className="col-span-1 relative">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         State
                         <span className="text-[1vw] text-red-600 pl-[0.2vw]">
                           *
                         </span>
                       </label>
-                      <Field
+                      {/* <Field
                         as="select"
                         name="state"
                         id="state"
@@ -231,15 +297,98 @@ console.log(operatorID,"operatorIDoperatorID");
                         <option label="Kerala" value="Kerala" />
                         <option label="Karnataka" value="Karnataka" />
                         <option label="Andhra" value="Andhra" />
-                      </Field>
+                      </Field> */}
+                          <ConfigProvider
+                        theme={{
+                          components: {
+                            Select: {
+                              optionActiveBg: '#aebed1',
+                              optionSelectedColor: '#FFF',
+                              optionSelectedBg: '#aebed1',
+                              optionHeight: '2',
+                            },
+                          },
+                        }}
+                      >
+                        <Select
+                          showSearch
+                          value={values.state}
+                          onChange={(value) => {
+                            handleChange({ target: { name: 'state', value } })
+                          }}
+                          name="state"
+                          className={`custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          // className="custom-select bg-white outline-none w-full mt-[0.5vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
+                          placeholder="Select state"
+                          optionFilterProp="value" 
+                          // filterSort={(optionA, optionB) =>
+                          //   (optionA?.label ?? '')?.toLowerCase()?.localeCompare((optionB?.label ?? '')?.toLowerCase())
+                          // }
+                          // // optionFilterProp="children" 
+                          suffixIcon={<span style={{ fontSize: '1vw', color: '#1f487c' }}>
+                            <IoMdArrowDropdown size="2vw" />
+                          </span>}
+                          style={{ padding: 4 }}
+                          options={[
+                            {
+                              value: '',
+                              label: (
+                                <div className="text-[1vw] px-[0.2vw] pb-[0.1vw] text-gray-400">
+                                  Select State
+                                </div>
+                              ),
+                              disabled: true,
+                            },
+                            {
+                              value: 'Tamilnadu',
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  Tamilnadu
+                                </div>
+                              ),
+                            },
+                            {
+                              value: 'Kerala',
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  Kerala
+                                </div>
+                              ),
+                            },
+                            {
+                              value: 'Karnataka',
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  Karnataka
+                                </div>
+                              ),
+                            },
+                            {
+                              value: 'Andhra',
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  Andhra
+                                </div>
+                              ),
+                            },
+                          ]}
+                          // options={[
+                          //   { value: '', label: 'Select State', disabled: true },
+                          //   { value: 'Tamilnadu', label: 'Tamilnadu' },
+                          //   { value: 'Kerala', label: 'Kerala' },
+                          //   { value: 'Karnataka', label: 'Karnataka' },
+                          //   { value: 'Andhra', label: 'Andhra' },
+                          // ]}             
+                        />
+                      </ConfigProvider>
 
                       <ErrorMessage
-                        name="State"
+                        name="state"
                         component="div"
-                        className="text-red-500 text-[0.8vw]"
+                        className="text-red-500 text-[0.8vw] absolute left-[.2vw] bottom-[-1.2vw]"
                       />
                     </div>
-                    <div className="col-span-1">
+                    <div className="col-span-1 relative">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         Head Office
                         <span className="text-[1vw] text-red-600 pl-[0.2vw]">
@@ -256,7 +405,7 @@ console.log(operatorID,"operatorIDoperatorID");
                       <ErrorMessage
                         name="head_office"
                         component="div"
-                        className="text-red-500 text-[0.8vw]"
+                        className="text-red-500 text-[0.8vw] absolute left-[.2vw] bottom-[-1.2vw]"
                       />
                     </div>
                   </div>
@@ -304,7 +453,7 @@ console.log(operatorID,"operatorIDoperatorID");
                   </div> */}
                   <div className="grid grid-cols-2 w-full gap-x-[2vw]">
                     <div className="col-span-2 flex flex-col w-full ">
-                      <div className="col-span-1">
+                      <div className="col-span-1 relative">
                         <label className="text-[#1F4B7F] text-[1.1vw]">
                           Upload GST File
                           <span className="text-[1vw] text-red-600 pl-[0.2vw]">
@@ -336,38 +485,64 @@ console.log(operatorID,"operatorIDoperatorID");
                             onChange={(event) => {
                               const file = event.currentTarget.files[0];
                               setFieldValue("gst_file", file);
-                              handlePreview(file); // If you want to preview the selected file
+                              // handlePreview(file); // If you want to preview the selected file
+                              handleFileChange(event)
                             }}
                           />
+                          <div className="relative">
                           <button
-                            className="border-r-[0.3vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none"
+                            className="border-r-[0.3vw]  flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none"
                             onClick={(event) => {
                               event.preventDefault();
-                              document.getElementById("gst_file").click();
+                              document.getElementById("gst_file").click(); 
                             }}
                           >
                             <span className="opacity-50">Upload GST Image</span>
-                            <FaCloudUploadAlt
+                            {/* <FaCloudUploadAlt
                               color="#1F487C"
                               size={"2vw"}
                               className="absolute right-[1vw]"
-                            />
+                            /> */}
+                       
                           </button>
-                          {values.gst_file && (
+                          {inputPreview  ? (
+                          inputPreview?.startsWith("blob") ? (
+                            <img
+                            src={inputPreview}
+                            className="h-[2.5vw] w-[2.5vw] absolute cursor-zoom-in top-[.15vw] right-[.3vw]"
+                            alt="Gst Image"
+                            onClick={openModal} 
+                          />
+                          ) : (
+                            <img
+                            src={`http://192.168.90.47:4000${inputPreview}`}
+                            className="h-[2.5vw] w-[2.5vw] absolute cursor-zoom-in top-[.15vw]  right-[.3vw]"
+                            alt="Gst Image"
+                            onClick={openModal} 
+                          />
+                          )
+                        ) : (
+                          <FaCloudUploadAlt
+                            color="#1F487C"
+                            size="2vw"
+                            className="absolute right-[1vw] top-[.4vw] pointer-events-none"
+                          />
+                        )}
+                        </div>
+                          {/* {values.gst_file && (
                             <div
                               onClick={() => setPreviewOpen(true)}
-                              className="cursor-pointer underline-offset-1 underline text-[#1F4B7F] text-[0.7vw]"
+                              className="cursor-pointer underline-offset-1 underline text-[#1F4B7F] text-[0.7vw] absolute left-[.2vw] bottom-[-1.2vw]"
                             >
                               {values.gst_file.name
                                 ? values.gst_file.name
                                 : values.gst_file}
                             </div>
-                          )}
+                          )} */}
                           <ErrorMessage
                             name="gst_file"
                             component="div"
-                            style={{ color: "red" }}
-                            className="text-[0.8vw]"
+                            className="text-[0.8vw] text-red-500 absolute left-[.2vw] bottom-[-1.2vw]"
                           />
                         </div>
                       </div>
@@ -411,6 +586,7 @@ console.log(operatorID,"operatorIDoperatorID");
                             type="radio"
                             name="ctc"
                             value="1"
+                            checked={values.ctc == "1"}
                             className=" border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C]"
                           />
                           <label className="text-[#1F4B7F] text-[0.8vw] pl-[1vw]">
@@ -424,9 +600,9 @@ console.log(operatorID,"operatorIDoperatorID");
                         ) : null} */}
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 w-full gap-x-[2vw]">
+                    <div className="grid grid-cols-2 w-full gap-x-[2vw] relative">
                       <div className="col-span-2">
-                        <Field type="radio" name="ctc" value="0" />
+                        <Field type="radio" name="ctc" value="0" checked={values.ctc == "0"} />
                         <label className="text-[#1F4B7F] text-[0.8vw] pl-[1vw]">
                           My Aggregate Turnover (PAN India Total Turnover) has
                           not Exceeded 20 lakhs
@@ -434,7 +610,7 @@ console.log(operatorID,"operatorIDoperatorID");
                         <ErrorMessage
                           name="ctc"
                           component="div"
-                          className="text-red-500 text-[0.8vw]"
+                          className="text-red-600 text-[0.8vw] absolute left-[.2vw] bottom-[-1.2vw]"
                         />
                       </div>
                     </div>
@@ -461,6 +637,25 @@ console.log(operatorID,"operatorIDoperatorID");
           </Formik>
         </div>
       </div>
+      <Modal
+        visible={isModalOpen}
+        onCancel={closeModal}
+        footer={null}
+        centered
+        // width="35vw"
+        bodyStyle={{ padding: 0 }}
+        destroyOnClose={true} // Ensures modal is destroyed on close
+      >
+        {/* Display the image in the modal */}
+        {modalImage && (
+          <img
+            src={modalImage}
+            alt="Aadhar Preview"
+            style={{ width: "100%" }}
+            className=""
+          />
+        )}
+      </Modal>
     </div>
   );
 }

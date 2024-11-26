@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { HiOutlineDocumentPlus } from "react-icons/hi2";
 import ModalPopup from "../Common/Modal/Modal";
-import CreatePermission from "./CreatePermission";
-import axios from "axios";
+// import CreatePermission from "./CreatePermission";
+// import axios from "axios";
 import { MdDelete, MdModeEdit } from "react-icons/md";
 import DeleteList from "../Offers/DeleteList";
 import dayjs from "dayjs";
@@ -11,7 +11,9 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import { FiEdit } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import { GetPermissionData } from "../../Api/Role&Responsibilites/ActivePermission";
-import { Table, Pagination, Tooltip } from "antd";
+import { Table, 
+  // Pagination, 
+  Tooltip } from "antd";
 import { capitalizeFirstLetter } from "../Common/Captilization";
 import ReactPaginate from "react-js-pagination";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -27,20 +29,32 @@ export default function Permission({
   permissionid,
   SetPermissionUpdate,
   permissionupdate,
+  SetFilter,
+  filter,
+  setPermission
 }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(3);
-  const [rolePage, setRolePage] = useState(1);
+  //const [rolePage, setRolePage] = useState(1);
   const [deletemodalIsOpen, setDeleteModalIsOpen] = useState(false);
   const [deleteid, setdelete] = useState();
   const getpermissionlist = useSelector((state) => state.crm.permission_list);
   const [viewMode, setViewMode] = useState("Product Owner");
   const apiUrl = process.env.REACT_APP_API_URL;
-
+  const [activePage, setActivePage] = useState(1);
+  const itemsPerPage = 3; // Number of items to display per page
   const dispatch = useDispatch();
-  useEffect(() => {
-    GetPermissionData(dispatch);
-  }, []);
+  const userId = sessionStorage.getItem("USER_ID");
+  const type_id = sessionStorage.getItem("type_id");
+  const permissionData = async(filter) =>{
+    try{
+     const data = await GetPermissionData(filter, dispatch);
+     console.log(data, "permission data");
+    }
+    catch(error){
+      console.error(error, "Error fetching data");
+    }
+    }
 
   const paginatedData =
     getpermissionlist?.length > 0 &&
@@ -57,6 +71,7 @@ export default function Permission({
   // };
 
   const closeDeleteModal = () => {
+    setPermission(true);
     setDeleteModalIsOpen(false);
   };
 
@@ -76,7 +91,7 @@ export default function Permission({
       render: (row) => {
         return (
           <span className="flex">
-            <h1 className="text-[1vw]">{capitalizeFirstLetter(row?.user)}</h1>
+            <h1 className="text-[1vw]">{capitalizeFirstLetter(row?.user ==="Operator"? "Operator Employee" : "Product Owner Employee")}</h1>
           </span>
         );
       },
@@ -196,16 +211,23 @@ export default function Permission({
       render: (row) => {
         const handleDelete = () => {
           setDeleteModalIsOpen(true);
-          console.log("DeleteID", row?.permission_id);
-          setdelete(row.permission_id);
+          if(type_id === "PRO101"){
+            setdelete(row.crud_permission_id);
+          }
+       else{
+        setdelete(row.permission_id);
+       }
         };
         return (
           <span className="action-icons flex gap-2">
             <MdModeEdit
               className="h-[1.8vw] w-[1.8vw] cursor-pointer"
               onClick={() => {
-                SetPermissionUpdate(row.role_id);
-                console.log(row.role_id, "permissionid permissionid");
+                if(type_id === "PRO101"){
+                  SetPermissionUpdate(row.crud_permission_id);
+                }else{
+                  SetPermissionUpdate(row.permission_id);
+                }
                 setIsPermissionModalOpen(true);
               }}
               color="#1F4B7F"
@@ -225,12 +247,9 @@ export default function Permission({
     },
   ];
 
-  const [activePage, setActivePage] = useState(1);
-  const itemsPerPage = 3; // Number of items to display per page
-
   // Calculate pagination slice based on activePage
   const indexOfLastItem = activePage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage; 
   const currentItems =
     getpermissionlist?.length > 0 &&
     getpermissionlist?.slice(indexOfFirstItem, indexOfLastItem);
@@ -239,6 +258,12 @@ export default function Permission({
   const handlePageChange = (pageNumber) => {
     setActivePage(pageNumber);
   };
+
+  useEffect(() => {
+    permissionData(filter);
+  }, [filter]);
+
+
   return (
     <>
       <div>
@@ -251,6 +276,7 @@ export default function Permission({
             index % 2 === 1 ? "bg-white" : "bg-[#1F487C]/[10%]"
           }
         />
+        {getpermissionlist?.length > 3 ? (
         <div className="w-full h-[8vh] px-[1vw] flex justify-between items-center">
           <div className="text-[#1f4b7f]  flex text-[1.1vw] gap-[0.5vw]">
             <span>Showing</span>
@@ -299,6 +325,7 @@ export default function Permission({
               /> */}
           </div>
         </div>
+        ) : ""}
         <ModalPopup
           show={deletemodalIsOpen}
           onClose={closeDeleteModal}
@@ -309,8 +336,10 @@ export default function Permission({
           <DeleteList
             setDeleteModalIsOpen={setDeleteModalIsOpen}
             title={"want to delete this user permission"}
-            api={`${apiUrl}/permissions/${deleteid}`}
-            module={"roles"}
+            api={`${apiUrl}/permissions/${userId}/${deleteid}`}
+            module={"permissions"}
+            filter = {filter}
+            setPermission={setPermission}
           />
         </ModalPopup>
       </div>

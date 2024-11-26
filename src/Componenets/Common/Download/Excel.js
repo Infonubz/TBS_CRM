@@ -5,6 +5,7 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { MdOutlineFileDownload } from "react-icons/md";
 import { CiExport } from "react-icons/ci";
+import { RiDownload2Fill } from "react-icons/ri";
 
 const ExportButton = ({ dataArray }) => {
   const exportToExcel = () => {
@@ -29,12 +30,12 @@ const ExportButton = ({ dataArray }) => {
 
   return (
     <button
-      className="bg-[#1F4B7F] flex px-[1vw] text-white justify-center h-[5vh] gap-[0.5vw] items-center rounded-[0.5vw]"
+      className="bg-[#1F4B7F] flex px-[0.75vw] text-white justify-center h-[5vh] gap-[0.5vw] items-center rounded-[0.5vw]"
       // bg-[#1F4B7F] flex px-[1vw]  justify-center h-[5vh] gap-[0.5vw] items-center rounded-[0.5vw]
       onClick={exportToExcel}
     >
       <span>
-        <CiExport size={"1vw"} color="white" />
+        <RiDownload2Fill size={"1.2vw"} color="white" />
       </span>
       <span className="text-white  text-[1.1vw]">Export</span>
     </button>

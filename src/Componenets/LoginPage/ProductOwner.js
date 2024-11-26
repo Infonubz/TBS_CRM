@@ -4,8 +4,11 @@ import product_owner from "../../asserts/product_owner1.png";
 import logo from "../../asserts/crmlogo.png";
 import ProductOwner from "../Login/ProductOwner";
 import ProductOwnerForgotPassword from "../ForgotPassword/ProductOwner";
+
 export default function ProductOwnerLoginPage({ setAuthtoken }) {
+
   const [forgotpassword, setForgotPassword] = useState(false);
+
   return (
     <div>
       <div
@@ -19,11 +22,11 @@ export default function ProductOwnerLoginPage({ setAuthtoken }) {
         }}
       >
         <div className="absolute right-[1.5vw] top-0">
-          <img src={logo} className="h-[6vw] w-[13vw]" />
+          <img src={logo} alt="logo" className="h-[6vw] w-[13vw]" />
         </div>
         <div className="w-[90%] h-[80%] relative rounded-tr-[2vw] rounded-br-[2vw] mt-[6%]">
           <div
-            className="h-full w-full  border-[0.1vw] border-[#1F487C] rounded-tr-[2vw] rounded-br-[2vw]"
+            className="h-full w-full border-[0.1vw] border-[#1F487C] rounded-tr-[2vw] rounded-br-[2vw]"
             style={{
               backgroundImage: `url(${product_owner})`,
               backgroundSize: "cover",
@@ -33,7 +36,7 @@ export default function ProductOwnerLoginPage({ setAuthtoken }) {
             }}
           >
             
-            {forgotpassword == false ? (
+            {forgotpassword === false ? (
               <ProductOwner
                 setAuthtoken={setAuthtoken}
                 setForgotPassword={setForgotPassword}

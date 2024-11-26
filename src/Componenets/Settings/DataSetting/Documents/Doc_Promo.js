@@ -27,32 +27,35 @@ export default function Promo() {
 
   const columns = [
     {
-      title: <span className="text-[1vw]">Name</span>,
+      title: <span className="text-[1.25vw] font-bold text-[#1F487C] flex items-center justify-center">Name</span>,
       sorter: (a, b) => a.name.length - b.name.length,
       render: (row) => (
-        <div className="flex items-center">
+        <div className="flex items-center justify-center">
           <p className="text-[1vw]">{row?.promo_name}</p>
         </div>
       ),
+      width: "20vw"
     },
     {
-      title: <span className="text-[1vw]">Modified</span>,
+      title: <span className="text-[1.25vw] font-bold text-[#1F487C] flex items-center justify-center">Modified</span>,
       sorter: (a, b) => (a.updated_date ? new Date(a.updated_date) - new Date(b.updated_date) : 0),
       render: (row) => (
-        <div className="flex items-center">
+        <div className="flex items-center justify-center">
           <p className="text-[1vw]">
             {row?.updated_date ? `${dayjs(row.updated_date).format("DD MMM, YY")}` : ''}
           </p>
         </div>
       ),
+      width: "15vw"
     },
     {
-      title: <span className="text-[1vw]">Size</span>,
+      title: <span className="text-[1.25vw] font-bold text-[#1F487C] flex items-center justify-center">Size</span>,
       render: (row) => (
-        <div className="flex items-center">
-          <p className="text-[1vw]">{row?.promo_img_details?.background_image?.size}</p>
+        <div className="flex items-center justify-center">
+          <p className="text-[1vw]">{(row?.promo_img_details?.background_image?.size / 1024).toFixed(2)} KB</p>
         </div>
       ),
+      width: "15vw"
     },
   ];
 
@@ -65,6 +68,7 @@ export default function Promo() {
             dataSource={get_recent_promos}
             pagination={false}
             className="customize-table"
+            scroll={{ y: '25vw' }}
             onRow={(record) => ({
               onClick: () => handleOnClick(record),
             })}
@@ -78,7 +82,7 @@ export default function Promo() {
             {selectItems ? (
               <img
                 src={`http://192.168.90.47:4000${selectItems?.background_image
-                }`}
+                  }`}
                 alt="Promo"
                 className="w-full h-full object-fill"
                 style={{ borderRadius: "1.4vw" }}
@@ -98,14 +102,16 @@ export default function Promo() {
                   size="2vw"
                   onClick={handleDownload}
                 /> */}
-                 <Image_Video 
-                fileUrl={fileUrl} 
-                filename={filename}
-                selectItems ={selectItems} />
+                <Image_Video
+                  fileUrl={fileUrl}
+                  filename={filename}
+                  selectItems={selectItems} />
               </div>
             </div>
             <div className="text-[1vw] text-[#818181]">
-              Size: {selectItems?.promo_img_details?.promo_image?.size}
+              {selectItems ?
+                <p> Size: {(selectItems?.promo_img_details?.promo_image?.size / 10242).toFixed(2)} KB</p>
+                : <p>Size:{""}</p>}
             </div>
           </div>
         </div>

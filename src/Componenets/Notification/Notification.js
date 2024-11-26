@@ -32,9 +32,9 @@ export default function Notification() {
 
   useEffect(() => {
     // setUserId(sessionStorage.getItem("USER_ID"));
-    setUserId(localStorage.getItem("USER_ID"));
+    setUserId(sessionStorage.getItem("USER_ID"));
     // setTypeId(sessionStorage.getItem("type_id"));
-    setTypeId(localStorage.getItem("type_id"));
+    setTypeId(sessionStorage.getItem("type_id"));
 
     GetNotificationData(dispatch);
   }, []);

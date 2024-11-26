@@ -11,7 +11,9 @@ const AddressIndex = ({
   setAddressBack,
   setCurrentpage,
   addressback,
-  setPartnerID
+  setPartnerID,
+  documentback,
+  updatedata
 }) => {
   const [selected, setSelected] = useState(1);
   const [toggle,setToggle] = useState(false)
@@ -78,9 +80,12 @@ const AddressIndex = ({
     }
   }, [PartnerID, setPartnerID, setEmpAddressData, proffesionaback]);
 
+  console.log(updatedata,"helloidid");
+  
+
   return (
     <div>
-      <div className="border-l-[0.1vw] h-[28vw] overflow-y-scroll px-[2vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f]">
+      <div className="border-l-[0.1vw] px-[2vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] mt-[1.5vw] rounded-[1vw] border-[#1f4b7f]">
         <div className="h-[3vw] w-full flex items-center justify-between ">
           <label className="text-[1.5vw] font-semibold text-[#1f4b7f] ">
             Registered Address
@@ -99,7 +104,7 @@ const AddressIndex = ({
           ) : (
             ""
           )} */}
-           {PartnerID || proffesionaback ? (
+           {updatedata || documentback ? (
             <button
               className={`${
                 enable
@@ -157,7 +162,8 @@ const AddressIndex = ({
         </div>
              <Checkbox className={`${selected === 1 ? "":"hidden"} text-[#1F4B7F] font-semibold text-[.9vw] mt-[.5vw]`}
           onChange={() => setCheckBox(!checkBox)}
-          disabled={PartnerID || proffesionaback ? (enable ? false : true) : false}
+          disabled={PartnerID || proffesionaback || updatedata ? (PartnerID &&  enable == false && updatedata == "" ? false : enable ? false : true) : false}
+          // disabled={PartnerID || proffesionaback || updatedata ? true : false}
           // onChange={(e) => {
           //   if (e.target.checked) {
           //     setFieldValue("temp_address", values.temp_address);
@@ -196,6 +202,8 @@ const AddressIndex = ({
             enable={enable}
             proffesionaback={proffesionaback}
             PartnerID={PartnerID}
+            updatedata={updatedata}
+            documentback={documentback}
           />
         ) : (
           <PerAddress
@@ -208,7 +216,8 @@ const AddressIndex = ({
             enable={enable}
             proffesionaback={proffesionaback}
             PartnerID={PartnerID}
-          
+            updatedata={updatedata}  
+            documentback={documentback}
           />
         )}
       </div>

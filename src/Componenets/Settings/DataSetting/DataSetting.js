@@ -11,21 +11,31 @@ import "../../../App.css";
 import Export_Data from "./ExportData";
 import Import_Data from "./ImportData";
 import Documents from "./Documents/Documents";
+import CustomTemplate from "./CustomTemplate/CustomTemplate";
 
 export default function DataSettingList() {
 
-  const [active, setActive] = useState("0");
+  // const [active, setActive] = useState("0");
+
+  // const handleCollapseChange = (key) => {
+  //   if (active !== key) {
+  //     setActive(key);
+  //   }
+  // };
+  // console.log(active, 'active_KEY');
+
+  const [active, setActive] = useState("");
 
   const handleCollapseChange = (key) => {
-    if (active !== key) {
-      setActive(key);
-    }
+    setActive((prev) => (prev === key ? "" : key));
   };
+
   console.log(active, 'active_KEY');
+
 
   return (
     <div className="">
-      <Collapse
+      {/* <Collapse
         activeKey={active}
         onChange={() => handleCollapseChange("1")}
         className="bg-[#1F487C] rounded-2xl border border-[#1F487C]  shadow-[0_9px_9px_rgba(0,0,0,0.45)]shadow-xl"
@@ -122,7 +132,7 @@ export default function DataSettingList() {
             children: <Export_Data />,
           },
         ]}
-      />
+      /> */}
       {/* <Collapse
                 className="bg-[#1F487C] rounded-2xl border border-[#1F487C] mt-[1vw] shadow-[0_9px_9px_rgba(0,0,0,0.45)] shadow-xl"
                 size="large"
@@ -147,7 +157,7 @@ export default function DataSettingList() {
       <Collapse
         activeKey={active}
         onChange={() => handleCollapseChange("3")}
-        className="bg-[#1F487C] rounded-2xl border border-[#1F487C] mt-[1vw] shadow-[0_9px_9px_rgba(0,0,0,0.45)]shadow-xl"
+        className="bg-[#1F487C] rounded-2xl border border-[#1F487C] shadow-[0_9px_9px_rgba(0,0,0,0.45)]shadow-xl"
         size="large"
         expandIcon={({ isActive }) =>
           isActive ? (
@@ -193,6 +203,57 @@ export default function DataSettingList() {
           },
         ]}
       />
+
+<Collapse
+        activeKey={active}
+        onChange={() => handleCollapseChange("4")}
+        className="bg-[#1F487C] rounded-2xl border border-[#1F487C] mt-[1vw] shadow-[0_9px_9px_rgba(0,0,0,0.45)]shadow-xl"
+        size="large"
+        expandIcon={({ isActive }) =>
+          isActive ? (
+            <IoIosArrowUp
+              className="mt-[0.5vw]"
+              style={{ color: "#FFFFFF", height: "2vw", width: "1.8vw" }}
+            />
+          ) : (
+            <RiArrowRightSLine
+              className="mt-[1.5vw]"
+              style={{ color: "#FFFFFF", height: "2vw", width: "1.8vw" }}
+            />
+          )
+        }
+        expandIconPosition="end"
+        items={[
+          {
+            key: "4",
+            label: (
+              <div className="flex items-center h-[5vh]">
+                <div className="col-span-2 pt-[0.3vw]">
+                  <span className="">
+                    <HiOutlineDocumentDuplicate
+                      style={{
+                        color: "#FFFFFF",
+                        height: "2.3vw",
+                        width: "2.3vw",
+                      }}
+                    />
+                  </span>
+                </div>
+                <div className="col-span-2 pl-[1vw]">
+                  <span className="text-[#FFFFFF] font-medium text-[1.1vw]">
+                    Custom Templates
+                  </span>
+                  <p className="text-[#FFFFFF] text-[0.8vw]">
+                    Manage Templates
+                  </p>
+                </div>
+              </div>
+            ),
+            children: <CustomTemplate />,
+          },
+        ]}
+      />
+
       {/* <Collapse
                 className="bg-[#1F487C] rounded-2xl border border-[#1F487C] mt-[1vw] shadow-[0_9px_9px_rgba(0,0,0,0.45)] shadow-xl"
                 size="large"

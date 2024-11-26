@@ -11,10 +11,10 @@ const api = axios.create({
 
 const apiUrl = process.env.REACT_APP_API_URL;
 
+const dynamicId = sessionStorage.getItem("type_id");
 // const dynamicId = sessionStorage.getItem("type_id");
-const dynamicId = localStorage.getItem("type_id");
+const operatorid = sessionStorage.getItem("USER_ID");
 // const operatorid = sessionStorage.getItem("USER_ID");
-const operatorid = localStorage.getItem("USER_ID");
 
 export const GetNotificationData = async (dispatch) => {
   console.log("FUNCTION CALL");

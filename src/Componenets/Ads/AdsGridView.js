@@ -11,6 +11,8 @@ import ReactPlayer from "react-player";
 import ModalPopup from '../Common/Modal/Modal';
 import Ad_Advertisement from './Add_Advertisement';
 import DeleteList from '../Offers/DeleteList';
+import { MdDateRange, MdMail } from 'react-icons/md';
+import { FaPhoneAlt } from 'react-icons/fa';
 
 const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPage, updatedata, SetUpdateData, deleteData, SetDeleteData, mbleItemsPerPage, mble_activePage, openPopovers, setOpenPopovers, isModalOpen, setIsModalOpen, adsdata, setAdsData }) => {
 
@@ -89,7 +91,7 @@ const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPag
                     </div>
                     <div className='col-span-2 text-[1vw] text-[#1F487C] grid grid-items-4 gap-[0.75vw] pt-[0.75vw]'>
                       <p className='font-bold text-[1.2vw]'>{item?.client_details}</p>
-                      <p>{item?.phone}</p>
+                      <p className='flex items-center gap-[.5vw]'><FaPhoneAlt size={"0.8vw"} color="#1F4B7F" />{item?.phone}</p>
                       <p className="text-[1vw] text-[#1F4B7F] font-medium">
                         {item?.web_url?.length > 20 ? (
                           <Tooltip
@@ -112,7 +114,22 @@ const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPag
                           </div>
                         )}
                       </p>
-                      <p>{item.emailid}</p>
+                      <p>{item.emailid?.length > 20 ?
+                      ( <Tooltip
+                        placement="bottom"
+                        title={item?.emailid}
+                        className="cursor-pointer"
+                        color="#1F487C"
+                      >
+                        <div className="text-[1vw] text-[#1F4B7C] flex items-center gap-[.5vw]">
+                        <MdMail size={"1vw"} color="#1F4B7F" /> <span>{`${item?.emailid?.slice(0, 20)}...`}</span>
+                        </div>
+                      </Tooltip>):
+                      (
+                        <div className="text-[1vw] text-[#1F4B7F] flex items-center gap-[.5vw]">
+                         <MdMail size={"1vw"} color="#1F4B7F" /> <span>{item?.emailid?.slice(0, 20)}</span>
+                        </div>)
+                      }</p>
                     </div>
 
                     <div className='col-span-2 text-[1vw] text-[#1F487C] '>
@@ -152,22 +169,25 @@ const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPag
                                 {item?.ad_description?.slice(0, 20)}
                               </div>)}
                           </p>
+                          <span className='flex items-center gap-[.5vw] text-[.9vw] font-semibold'>
+                          <MdDateRange size={"1vw"} color="#1F4B7F" />
                           <p>
                             {`${dayjs(item?.start_date).format("DD MMM, YY")}`} -{" "}
                             {`${dayjs(item?.end_date).format("DD MMM, YY")}`}
                           </p>
+                          </span>
                           <div className=''>
                             <button
-                              className={`${item?.status_id == 3
+                              className={`${item.ads_status_id == 2
                                 ? "bg-[#34AE2A]"
-                                : item?.status_id == 1
+                                : item.ads_status_id == 4
                                   ? "bg-[#FD3434]"
-                                  : item?.status_id == 2
+                                  : item.ads_status_id == 1
                                     ? "bg-[#FF9900]"
-                                    : "bg-[#FF9900]"
-                                } rounded-t-xl text-[1vw] font-semibold text-white w-[10.5vw] py-[0.15vw] `}
+                                    : item.ads_status_id == 3 ? "bg-[#2A99FF]" : "bg-[#646262]"
+                              } rounded-t-xl text-[1vw] font-semibold text-white w-[10.5vw] py-[0.15vw] `}
                             >
-                              {capitalizeFirstLetter(item?.status)}
+                              {capitalizeFirstLetter(item?.ads_status)}
                             </button>
                           </div>
                         </div>
@@ -267,7 +287,7 @@ const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPag
                     </div>
                     <div className='col-span-2 text-[1vw] text-[#1F487C] grid grid-items-4 gap-[0.75vw] pt-[0.75vw]'>
                       <p className='font-bold text-[1.2vw]'>{item?.client_details}</p>
-                      <p>{item?.phone}</p>
+                      <p className='flex items-center gap-[.5vw]'><FaPhoneAlt size={"0.8vw"} color="#1F4B7F" />{item?.phone}</p>
                       <p className="text-[1vw] text-[#1F4B7F] font-medium">
                         {item?.web_url?.length > 20 ? (
                           <Tooltip
@@ -290,7 +310,22 @@ const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPag
                           </div>
                         )}
                       </p>
-                      <p>{item.emailid}</p>
+                      <p>{item.emailid?.length > 20 ?
+                      ( <Tooltip
+                        placement="bottom"
+                        title={item?.emailid}
+                        className="cursor-pointer"
+                        color="#1F487C"
+                      >
+                        <div className="text-[1vw] text-[#1F4B7C] flex items-center gap-[.5vw]">
+                        <MdMail size={"1vw"} color="#1F4B7F" /> <span>{`${item?.emailid?.slice(0, 20)}...`}</span>
+                        </div>
+                      </Tooltip>):
+                      (
+                        <div className="text-[1vw] text-[#1F4B7F] flex items-center gap-[.5vw]">
+                         <MdMail size={"1vw"} color="#1F4B7F" /> <span>{item?.emailid?.slice(0, 20)}</span>
+                        </div>)
+                      }</p>
                     </div>
 
                     <div className='col-span-2 text-[1vw] text-[#1F487C] '>
@@ -330,22 +365,25 @@ const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPag
                                 {item?.mobad_description?.slice(0, 20)}
                               </div>)}
                           </p>
+                          <span className='flex items-center gap-[.5vw] text-[.9vw] font-semibold'>
+                          <MdDateRange size={"1vw"} color="#1F4B7F" />
                           <p>
                             {`${dayjs(item?.start_date).format("DD MMM, YY")}`} -{" "}
                             {`${dayjs(item?.end_date).format("DD MMM, YY")}`}
                           </p>
+                          </span>
                           <div className=''>
                             <button
-                              className={`${item.status_id == 3
+                              className={`${item.ads_status_id == 2
                                 ? "bg-[#34AE2A]"
-                                : item?.status_id == 1
+                                : item.ads_status_id == 4
                                   ? "bg-[#FD3434]"
-                                  : item?.status_id == 2
+                                  : item.ads_status_id == 1
                                     ? "bg-[#FF9900]"
-                                    : "bg-[#FF9900]"
-                                } rounded-t-xl text-[1vw] font-semibold text-white w-[10.5vw] py-[0.15vw] `}
+                                    : item.ads_status_id == 3 ? "bg-[#2A99FF]" : "bg-[#646262]"
+                              } rounded-t-xl text-[1vw] font-semibold text-white w-[10.5vw] py-[0.15vw] `}
                             >
-                              {capitalizeFirstLetter(item?.status)}
+                              {capitalizeFirstLetter(item?.ads_status)}
                             </button>
                           </div>
                         </div>

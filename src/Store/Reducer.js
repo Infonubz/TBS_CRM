@@ -46,6 +46,11 @@ import {
   BIN_DATA,
   TBS_INFO,
   REFER_EARN,
+  REDEEM_OFFER,
+  OPERATOR_DATA,
+  PROMO_BG_IMAGE,
+  GET_REQ_PARTNER,
+  GET_ROLES_PERMISSION,
 } from "./Type";
 
 const initialState = {
@@ -87,7 +92,11 @@ const initialState = {
   operator_byid: {},
   bin_data: [],
   tbs_info: {},
-  refer_earn:[]
+  refer_earn: [],
+  operator_data: [],
+  promo_bg: "",
+  get_req_partner: [],
+  get_roles_permission:[]
 };
 
 export const crmreducer = (state = initialState, action) => {
@@ -362,6 +371,36 @@ export const crmreducer = (state = initialState, action) => {
       return {
         ...state,
         refer_earn: payload,
+      };
+    case REDEEM_OFFER:
+      console.log(payload, "REDEEM_OFFER");
+      return {
+        ...state,
+        redeem_offer: payload,
+      };
+    case OPERATOR_DATA:
+      console.log(payload, "OPERATOR_DATA");
+      return {
+        ...state,
+        operator_data: payload,
+      };
+    case PROMO_BG_IMAGE:
+      console.log(payload, "payload988585858");
+
+      return {
+        ...state,
+        promo_bg: payload,
+      };
+    case GET_REQ_PARTNER:
+      return {
+        ...state,
+        get_req_partner: payload,
+      };
+    case GET_ROLES_PERMISSION:
+      console.log(payload, "GET_ROLES_PERMISSION");
+      return {
+        ...state,
+        get_roles_permission: payload,
       };
     default:
       return state;

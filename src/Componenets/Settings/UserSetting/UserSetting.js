@@ -13,21 +13,30 @@ import ForgotPassword from "./ForgotPassword";
 
 export default function UserSettingList() {
 
-  const [active, setActive] = useState("0");
+  // const [active, setActive] = useState("0");
+
+  // const handleCollapseChange = (key) => {
+  //   if (active !== key) {
+  //     setActive(key);
+  //   }
+  // };
+  // console.log(active, 'active_KEY');
+
+  const [active, setActive] = useState("");
 
   const handleCollapseChange = (key) => {
-    if (active !== key) {
-      setActive(key);
-    }
+    setActive((prev) => (prev === key ? "" : key)); 
   };
+
   console.log(active, 'active_KEY');
+
 
   return (
     <div>
       <Collapse
         activeKey={active}
         onChange={() => handleCollapseChange("1")}
-        className="bg-[#1F487C] rounded-2xl border border-[#1F487C]  shadow-[0_9px_9px_rgba(0,0,0,0.45)] shadow-xl"
+        className="bg-[#1F487C] rounded-2xl border border-[#1F487C] "
         size="large"
         expandIcon={({ isActive }) =>
           isActive ? (

@@ -982,6 +982,7 @@ export default function Advertisement() {
   const [toggleDelete, settoggleDelete] = useState(false);
   const [deleteData, SetDeleteData] = useState();
   const [tabType, setTabType] = useState("Web");
+  const [showPagenation,setShowPagenation]= useState(false)
   const apiUrl = process.env.REACT_APP_API_URL;
   const getadlist = useSelector((state) => state.crm.ad_list);
   const getMobileadlist = useSelector((state) => state.crm.mobile_adsList);
@@ -1054,6 +1055,19 @@ export default function Advertisement() {
     GetAdsData(dispatch);
     GetMobileAds(dispatch);
   }, []);
+
+  useEffect(()=>{
+    setShowPagenation(false)
+    if(tabType === "Web"){
+      getadlist?.length > 3 &&
+      setShowPagenation(true)
+    }
+    else if(tabType === "Mobile"){
+      getMobileadlist?.length > 3 &&
+      setShowPagenation(true)
+
+    }
+  })
 
   // const webColumns = [
   //   // {
@@ -1537,7 +1551,7 @@ export default function Advertisement() {
         <div className="px-[5vw] h-[92vh] relative w-full ">
           <div className="h-[12vh] w-full flex flex-col">
             <h1 className="text-[#1F4B7F] pt-[0.5vw] text-[1.5vw] font-bold">
-              UPLOAD ADS
+             <span> UPLOAD ADS  </span><span className="text-[1vw]">-</span><span className="text-[1vw] pl-[.5vw]">{`(${tabType})`}</span>
             </h1>
 
             <div className="pb-[0.5vw] flex h-full items-center justify-between">
@@ -1722,6 +1736,7 @@ export default function Advertisement() {
               className="custom-table"
             /> */}
           </div>
+          {showPagenation === true  &&
           <div className="w-full h-[8vh] flex justify-between items-center">
             <div className="text-[#1f4b7f] flex text-[1.1vw] gap-[0.5vw]">
               <span>Showing</span>
@@ -1812,7 +1827,7 @@ export default function Advertisement() {
                 />
               )}
             </div>
-          </div>
+          </div> }
         </div>
       </div>
       <ModalPopup

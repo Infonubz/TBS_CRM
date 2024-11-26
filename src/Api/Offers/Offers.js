@@ -7,6 +7,9 @@ import { GetPartnerData } from "../UserManagement/Partner";
 import { GetAdsData } from "../Ads/Ads";
 import { GetPromotionData } from "../Promotion/Promotion";
 import { GetClientData } from "../UserManagement/Client";
+import { GetRedeemOffersData } from "./RedeemOffers";
+import { GetRolesData } from "../Role&Responsibilites/ActiveRoles";
+import { GetPermissionCount, GetPermissionData } from "../Role&Responsibilites/ActivePermission";
 const api = axios.create({
   headers: {
     "Content-Type": "application/json",
@@ -25,28 +28,39 @@ export const GetOffersData = async (dispatch) => {
     // return null;
   }
 };
-export const Deleteall = async (api, dispatch, module) => {
+export const Deleteall = async (api, dispatch, module, filter, setPermission) => {
   try {
     const response = await axios.delete(api);
-    console.log(module == "offer", "responsedata5555");
+    console.log(module === "offer", "responsedata5555");
     toast.success(response.data);
-    if (module == "operator") {
+    if (module === "operator") {
       GetOperatorData(dispatch);
       toast.success(response?.data?.message);
       console.log(response.data, "response.dataresponse.data");
-    } else if (module == "employee") {
+    } else if (module === "employee") {
       GetEmployeeData(dispatch);
-    } else if (module == "partner") {
+    } else if (module === "partner") {
       GetPartnerData(dispatch);
-    } else if (module == "offer") {
+    } else if (module === "offer") {
       GetOffersData(dispatch);
-    } else if (module == "ads") {
+    } else if (module === "ads") {
       GetAdsData(dispatch);
-    } else if (module == "promotion") {
+    } else if (module === "promotion") {
       GetPromotionData(dispatch);
-    } else if (module == "client") {
+    } else if (module === "client") {
       GetClientData(dispatch);
-    } else {
+    } else if (module === "redeemoffer") {
+      GetRedeemOffersData(dispatch);
+    }
+    else if (module === "roles") {
+      GetRolesData(filter, dispatch);
+    }
+    else if(module === "permissions"){
+      setPermission(true);
+      GetPermissionData(filter, dispatch);
+      GetPermissionCount(filter, dispatch);
+    }
+    else {
       console.log("testt");
     }
     return response.data;
@@ -129,9 +143,10 @@ export const SubmitOffersData = async (
   promotionvalues,
   updatedata,
   dispatch,
-  offerlist
+  offerlist,
+  useage
 ) => {
-  console.log(promotionvalues.file, "promotionvalues.file");
+  console.log(promotionvalues, "promotionvalues.file");
   const formData = new FormData();
   formData.append(
     "offer_name",
@@ -147,21 +162,19 @@ export const SubmitOffersData = async (
     promotionvalues.expiry_date ? promotionvalues.expiry_date : new Date()
   );
   formData.append(
+    "offer_value",
+    promotionvalues.value ? promotionvalues.value : null
+  );
+  formData.append(
     "usage",
-    promotionvalues.usage ? promotionvalues.usage : null
+    // promotionvalues.usage ? promotionvalues.usage : null
+    useage ? useage : null
   );
   formData.append(
     "status",
     promotionvalues.status ? promotionvalues.status : null
   );
-  // formData.append(
-  //   "status_id",
-  //   promotionvalues.status == "Draft"
-  //     ? 1
-  //     : promotionvalues.status == "Paused"
-  //     ? 2
-  //     : 3
-  // ); // Assuming this is a fixed value
+
 
   formData.append(
     "status_id",
@@ -219,7 +232,7 @@ export const SubmitOffersData = async (
   );
   formData.append("theme", offerlist?.offer_bgImgae);
   // formData.append("tbs_user_id", sessionStorage.getItem("USER_ID"));
-  formData.append("tbs_user_id", localStorage.getItem("USER_ID"));
+  formData.append("tbs_user_id", sessionStorage.getItem("USER_ID"));
 
   // formData.append("image_size", promotionvalues.file_size);
   // formData.append("image_type", promotionvalues.file_type);

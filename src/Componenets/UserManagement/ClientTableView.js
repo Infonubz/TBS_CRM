@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Grid, Space, Table } from "antd";
+import { Button, Grid, Space, Table, Tooltip } from "antd";
 import { render } from "@testing-library/react";
 import { MdModeEditOutline, MdPadding } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
@@ -41,6 +41,7 @@ const ClientTableView = ({
   const get_operator_list = useSelector((state) => state.crm.operator_list);
   const [viewmodal, setViewModal] = useState(false);
   const [statusclientid, setStatusClientId] = useState(null);
+  const [userName,setUserName] = useState("")
 
   const columns = [
     {
@@ -61,13 +62,26 @@ const ClientTableView = ({
                 ? `http://192.168.90.47:4000${row?.company_logo}`
                 : UserProfile
                 } `}
-              alt="Photo"
+                 alt="Profile"
               className="w-[2.15vw] h-[2.15vw] object-cover rounded-[0.2vw]"
             />
           </div>
         );
       },
       width: "6vw",
+    },
+    {
+      title: <div className="flex items-center justify-center font-bold text-[1.2vw]">Client Id</div>,
+      key: "id",
+      ellipsis: true,
+      width: "9vw",
+      render: (text, row) => {
+        return (
+          <div className="flex items-center justify-center">
+            <p className="text-[1.1vw] text-[#1F4B7F]">{row.tbs_client_id}</p>
+          </div>
+        );
+      },
     },
     {
       title: <div className="flex items-center justify-center  font-bold text-[1.2vw]">Client Name</div>, // dataIndex: "name",
@@ -80,10 +94,18 @@ const ClientTableView = ({
       width: "12vw",
       sortOrder: sortedInfo.columnKey === "name" && sortedInfo.order,
       render: (row) => (
-        <div className="flex items-center">
-          <p className="text-[1.1vw]">{`${row?.owner_name}`}</p>
+        <div className="flex items-center text-[1.1vw] text-[#1F4B7F] justify-center">
+          {
+            row?.owner_name?.length > 15 ? (
+              <Tooltip title={capitalizeFirstLetter(row?.owner_name)}>
+                <span>{`${capitalizeFirstLetter(row?.owner_name).slice(0, 15)}...`}</span>
+              </Tooltip>
+            ) : (
+              <span>{capitalizeFirstLetter(row?.owner_name)}</span>
+            )
+          }
         </div>
-      ),
+      )
     },
 
     {
@@ -100,13 +122,13 @@ const ClientTableView = ({
       render: (text, row) => {
         return (
           <div className="flex items-center justify-center">
-            <p className="text-[1.1vw]">{row.phone}</p>
+            <p className="text-[1.1vw] text-[#1F4B7F]">{row.phone}</p>
           </div>
         );
       },
     },
     {
-      title: <div className="flex  font-bold text-[1.2vw]">Email</div>,
+      title: <div className="flex  font-bold text-[1.2vw] justify-center">Email</div>,
       // dataIndex: "email",
       key: "email",
       sorter: (a, b) => a.emailid?.length - b.emailid?.length,
@@ -115,9 +137,27 @@ const ClientTableView = ({
       width: "15vw",
       render: (row) => {
         return (
-          <div className="flex items-center justify-center">
-            <p className="text-[1.1vw]">{row.emailid}</p>
-          </div>
+          // <div className="flex items-center justify-center">
+          //   <p className="text-[1.1vw] text-[#1F4B7F]">{row.emailid}</p>
+          // </div>
+          <div flex items-center justify-center>
+          {row?.emailid?.length > 20 ? (
+            <Tooltip
+              placement="top"
+              title={row?.emailid}
+              className="cursor-pointer"
+            >
+              <div className="text-[1.1vw] text-center text-[#1f4b7f]">
+                {" "}
+                {`${row?.emailid?.slice(0, 20)}...`}
+              </div>
+            </Tooltip>
+          ) : (
+            <div className="text-[1.1vw] text-center text-[#1f4b7f]">
+              {row?.emailid?.slice(0, 20)}
+            </div>
+          )}
+        </div>
         );
       },
     },
@@ -132,7 +172,7 @@ const ClientTableView = ({
       render: (row) => {
         return (
           <div className="flex items-center justify-center">
-            <p className="text-[1.1vw]">
+            <p className="text-[1.1vw] text-[#1F4B7F]">
               {dayjs(row.created_date).format("DD MMM, YY")}
             </p>
           </div>
@@ -213,6 +253,7 @@ const ClientTableView = ({
                 onClick={() => {
                   setDeleteModalIsOpen(true);
                   setClientID(row?.tbs_client_id);
+                  setUserName(row.owner_name)
                 }}
               />
 
@@ -273,7 +314,7 @@ const ClientTableView = ({
       >
         <DeleteList
           setDeleteModalIsOpen={setDeleteModalIsOpen}
-          title={"Want to delete this Client"}
+          title={`Want to delete this Client ${capitalizeFirstLetter(userName)}`}
           api={`${apiUrl}/client-details/${clientID}`}
           module={"client"}
         />

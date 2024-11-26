@@ -20,22 +20,24 @@ import Support from "./Componenets/Support/Support";
 import Offers from "./Componenets/Offers/Offers";
 import Subscription from "./Componenets/Subscription/Subscription";
 import Notification from "./Componenets/Notification/Notification";
-import ProductOwner from "./Componenets/Login/ProductOwner";
-import Employee from "./Componenets/Login/Employee";
-import Operator from "./Componenets/Login/Operator";
-import Partner from "./Componenets/Login/Partner";
+// import ProductOwner from "./Componenets/Login/ProductOwner";
+// import Employee from "./Componenets/Login/Employee";
+// import Operator from "./Componenets/Login/Operator";
+// import Partner from "./Componenets/Login/Partner";
 import ProductOwnerLoginPage from "./Componenets/LoginPage/ProductOwner";
 import OperatorLoginPage from "./Componenets/LoginPage/Operator";
 import OwnerEmployeeLoginPage from "./Componenets/LoginPage/OwnerEmployee";
+import PartnerLoginPage from "./Componenets/LoginPage/Partner";
+import OperatorEmployeeLoginPage from "./Componenets/LoginPage/OperatorEmployee";
 
 function App() {
   // const [authtoken, setAuthtoken] = useState(sessionStorage.getItem("token"));
-  const [authtoken, setAuthtoken] = useState(localStorage.getItem("token"));
+  const [authtoken, setAuthtoken] = useState(sessionStorage.getItem("token"));
 
 
   useEffect(() => {
     // const token = sessionStorage.getItem("token");
-    const token = localStorage.getItem("token")
+    const token = sessionStorage.getItem("token")
     if (token) {
       setAuthtoken(token);
     }
@@ -73,9 +75,10 @@ console.log(authtoken,"authtoken852");
       ) : (
         <Routes>
           <Route path="/" element={<ProductOwnerLoginPage setAuthtoken={setAuthtoken} />} />
-          <Route path="/employee" element={<OwnerEmployeeLoginPage />} />
+          <Route path="/poemployee" element={<OwnerEmployeeLoginPage setAuthtoken={setAuthtoken} />} />
+          <Route path="/opemployee" element={<OperatorEmployeeLoginPage setAuthtoken={setAuthtoken} />} />
           <Route path="/operator" element={<OperatorLoginPage />} />
-          <Route path="/partner" element={<Partner />} />
+          <Route path="/partner" element={<PartnerLoginPage setAuthtoken={setAuthtoken} />} />
         </Routes>
       )}
     </Router>

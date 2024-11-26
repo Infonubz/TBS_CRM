@@ -15,15 +15,23 @@ import ReferEarn from "./ReferEarn";
 import { act, useState } from "react";
 const Index = () => {
 
-  const [active, setActive] = useState("0");
+  // const [active, setActive] = useState("0");
+
+  // const handleCollapseChange = (key) => {
+  //   if (active !== key) {
+  //     setActive(key);
+  //   }
+  // };
+  // console.log(active, 'active_KEY');
+
+
+  const [active, setActive] = useState("");
 
   const handleCollapseChange = (key) => {
-    if (active !== key) {
-      setActive(key);
-    }
+    setActive((prev) => (prev === key ? "" : key));
   };
-  console.log(active, 'active_KEY');
 
+  console.log(active, 'active_KEY');
 
   return (
     <div>
@@ -223,7 +231,7 @@ const Index = () => {
           },
         ]}
       />
-      <Collapse
+      {/* <Collapse
         className="bg-[#1F487C] rounded-2xl border border-[#1F487C] mt-[1vw] shadow-[0_9px_9px_rgba(0,0,0,0.45)] shadow-xl"
         size="large"
         activeKey={active}
@@ -272,8 +280,8 @@ const Index = () => {
             children: <AboutUs />,
           },
         ]}
-      />
-      <Collapse
+      /> */}
+      {/* <Collapse
         className="bg-[#1F487C] rounded-2xl border border-[#1F487C] mt-[1vw] shadow-[0_9px_9px_rgba(0,0,0,0.45)] shadow-xl"
         size="large"
         activeKey={active}
@@ -312,9 +320,6 @@ const Index = () => {
                   <span className="text-[#FFFFFF] font-medium text-[1.1vw]">
                     Refer and Earn
                   </span>
-                  {/* <p className="text-[#FFFFFF] text-[0.8vw]">
-                    Manage your about us, Privacy Policy, Terms & Condition, User Agreement
-                  </p> */}
                 </div>
               </div>
             ),
@@ -322,7 +327,7 @@ const Index = () => {
             // children: <AboutUs />,
           },
         ]}
-      />
+      /> */}
     </div>
   );
 };

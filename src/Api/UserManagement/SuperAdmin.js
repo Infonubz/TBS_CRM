@@ -83,7 +83,8 @@ export const SubmitCompanyData = async (
   operatorID,
   enable,
   dispatch,
-  fileList
+  fileList,
+  setOperatorID
 ) => {
 
   const formData = new FormData();
@@ -96,10 +97,12 @@ export const SubmitCompanyData = async (
   formData.append('alternate_emailid', companyvalue.emailid);
   formData.append('aadharcard_number', companyvalue.aadhar);
   formData.append('pancard_number', companyvalue.pan);
-  formData.append('user_status', 'draft');
-  formData.append('req_status', 'pending');
+  if(enable === false){
+  formData.append('user_status', 'Draft');
+  formData.append('req_status', 'Draft');
   formData.append('user_status_id', 0);
   formData.append('req_status_id', 0);
+}
   formData.append('profileimg', fileList[0]?.originFileObj)
 
 
@@ -137,6 +140,7 @@ export const SubmitCompanyData = async (
     sessionStorage.setItem("SPA_ID", response?.data?.id);
     GetOperatorData(dispatch);
     GetOperatorProfile(sessionStorage.getItem("SPA_ID") === null || sessionStorage.getItem("SPA_ID") === 'null' || sessionStorage.getItem("SPA_ID") === undefined || sessionStorage.getItem("SPA_ID") === 'undefined' ? operatorID : sessionStorage.getItem("SPA_ID"), dispatch)
+    setOperatorID(response?.data?.id ? response?.data?.id : operatorID)
     console.log(response?.data?.id, "respnse_submit_company_details");
 
     return response.data;
@@ -203,7 +207,7 @@ export const SubmitBusinessData = async (
     msme_type: businessvalues.msme,
     msme_number: businessvalues.msme_number,
     type_of_service: businessvalues.service,
-    currency_code: businessvalues.country_code,
+    currency_code: businessvalues.currency_code,
   };
 
   // const url = updatedata
@@ -245,7 +249,9 @@ export const SubmitDocumentsData = async (
   formData.append("aadar_back_doc", documentsdata.aadhar_back);
   formData.append("pancard_front_doc", documentsdata.pan_front);
   formData.append("pancard_back_doc", documentsdata.pan_back);
-  formData.append("msme_doc", documentsdata.msme_doc);
+  formData.append("msme_docs", documentsdata.msme_docs);
+  console.log(documentsdata.msme_doc,"memedocuments");
+  
 
   const url = `${apiUrl}/operator_details/${operatorID ? operatorID : sessionStorage.getItem("SPA_ID")
     }`;
@@ -306,14 +312,14 @@ export const GetSuperAdminGSTById = async (
   setSuperAdminGSTData
 ) => {
   console.log(operatorID, "ahsgxdahsjksaxbj");
-  const getid = sessionStorage.getItem("SPA_ID");
+  const getid = sessionStorage.getItem("OPERATE_ID")?sessionStorage.getItem("OPERATE_ID"):sessionStorage.getItem("SPA_ID");
   try {
     const response = await api.get(
-      `${apiUrl}/get-GST/${operatorID}`
+      `${apiUrl}/get-GST/${getid}`
     );
     console.log(response, "responseresponse");
     // SetUpdateData(null);
-    setSuperAdminGSTData("");
+    setSuperAdminGSTData(response?.data[0]);
     return response?.data[0];
   } catch (error) {
     handleError(error);
@@ -322,7 +328,7 @@ export const GetSuperAdminGSTById = async (
 };
 
 
-export const SubmitGSTData = async (documentsdata, operatorID, setSuperAdminGSTData, dispatch) => {
+export const SubmitGSTData = async (documentsdata, operatorID, setSuperAdminGSTData,superadmingstdata, dispatch) => {
   console.log(documentsdata, "documentsdata");
   const formData = new FormData();
   formData.append(
@@ -330,16 +336,23 @@ export const SubmitGSTData = async (documentsdata, operatorID, setSuperAdminGSTD
     documentsdata.ctc == "1" || 1 ? "true" : "false"
   );
   formData.append("state_name", documentsdata.state);
-  formData.append("state_code_number", 30);
+  formData.append("state_code_number", documentsdata.state_code);
   formData.append("gstin", documentsdata.gst);
   formData.append("head_office", documentsdata.head_office);
   formData.append("upload_gst", documentsdata.gst_file);
   formData.append("has_gstin", "true");
 
-  const url = operatorID
-    ? `${apiUrl}/operator_details/${operatorID}`
-    : `${apiUrl}/operator_details/${sessionStorage.getItem('OPERATE_ID')}`;
-  const method = operatorID ? "put" : "post";
+if(superadmingstdata?.user_status_id == 0) {
+  formData.append("user_status","Posted")
+  formData.append("user_status_id",1)
+  formData.append("req_status","Pending")
+  formData.append("req_status_id",1)
+}
+
+  const url = sessionStorage.getItem('OPERATE_ID')
+  ? `${apiUrl}/operator_details/${sessionStorage.getItem('OPERATE_ID')}`
+    : `${apiUrl}/operator_details/${sessionStorage.getItem('SPA_ID')}`;
+  const method = sessionStorage.getItem('OPERATE_ID') ? "put" : "post";
   // const url = `${apiUrl}/operator_details/${operatorID}`;
   // const method = "post";
   try {
@@ -352,7 +365,7 @@ export const SubmitGSTData = async (documentsdata, operatorID, setSuperAdminGSTD
       },
     });
     // GetSuperAdminData(dispatch);
-    GetSuperAdminGSTById(operatorID, null, setSuperAdminGSTData);
+    GetSuperAdminGSTById(sessionStorage.getItem('OPERATE_ID'), null, setSuperAdminGSTData);
     setSuperAdminGSTData("");
     GetOperatorData(dispatch)
     console.log(response, "responseresponse");
@@ -509,6 +522,28 @@ export const GetOperatorProfile = async (operatorID, dispatch) => {
     return null;
   }
 };
+
+export const GetCurrencyList = async ()=>{
+  try{
+    const response = await axios.get(`${apiUrl}/currency-code`)
+    console.log((response.data,"currency"));
+    return response.data
+    
+  }
+  catch(err){
+    handleError(err)
+  }
+}
+
+export const GetBusinessList = async () =>{
+  try{
+    const response = await axios.get(`${apiUrl}/bussiness-categories`)
+    return response.data
+  }
+  catch(err){
+    handleError(err)
+  }
+}
 
 export const OperatorProfile = async (image, operatorID) => {
   console.log(image, "image987465222");
