@@ -1,7 +1,7 @@
-import { render } from "@testing-library/react";
+//import { render } from "@testing-library/react";
 import { Table, Pagination, Tooltip } from "antd";
 import React, { useState } from "react";
-import { IoMdEye } from "react-icons/io";
+//import { IoMdEye } from "react-icons/io";
 import { MdDelete, MdEdit } from "react-icons/md";
 import "../../App.css";
 import dayjs from "dayjs";
@@ -28,9 +28,11 @@ export default function ReqPromotion({
 
   const [promotionId, setPromotionId] = useState(null);
   const [viewmodal, setViewPromoModal] = useState(false);
-  const [viewid, setViewID] = useState(null);
+  //const [viewid, setViewID] = useState(null);
   const [promoId, setPromoId] = useState("");
-  console.log(promoId, "prooooooooooid");
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
+  const apiUrl = process.env.REACT_APP_API_URL;
+
   const columns = [
     {
       title: (
@@ -349,7 +351,7 @@ export default function ReqPromotion({
         <DeleteList
           setDeleteModalIsOpen={setDeleteModalIsOpen}
           title={"Want to delete this Promotion"}
-          api={`http://192.168.90.47:4000/api/promo/${promotionId}`}
+          api={`${apiUrl}/promo/${promotionId}`}
           module={"promotion"}
         />
       </ModalPopup>
@@ -362,7 +364,7 @@ export default function ReqPromotion({
       >
         {
           <img
-            api={`http://192.168.90.47:4000/${promotionId}`}
+            api={`${apiImgUrl}/${promotionId}`}
             className="rounded-[0.5vw]"
           />
         }

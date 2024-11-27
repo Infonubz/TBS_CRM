@@ -23,6 +23,7 @@ export default function RedeemGridView({
   setOfferView,
   offerview
 }) {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
 
   const [promotionid, setPromoId] = useState(null);
   const [hoverid, setHoverId] = useState("");
@@ -149,7 +150,7 @@ export default function RedeemGridView({
               <img
                 src={
                   item?.offer_img != null
-                    ? `http://192.168.90.47:4000${item.offer_img}`
+                    ? `${apiImgUrl}${item.offer_img}`
                     : userimg
                 }
                 className="h-[5vw] w-[5vw] rounded-[0.5vw]"
@@ -191,7 +192,7 @@ export default function RedeemGridView({
         closeicon={false}
       >
         <img
-          src={`http://192.168.90.47:4000${offerimage}`}
+          src={`${apiImgUrl}${offerimage}`}
           className="w-full h-full"
         />
       </ModalPopup>

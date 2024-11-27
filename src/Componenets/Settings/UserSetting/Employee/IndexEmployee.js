@@ -9,6 +9,10 @@ import { IoTriangleSharp } from "react-icons/io5";
 
 const IndexEmployee = ({ }) => {
 
+    const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
+    const apiurl = process.env.REACT_APP_API_URL;
+
+
     const [switchTab, setSwitchTab] = useState('PersonalDetails')
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState("");
@@ -30,16 +34,16 @@ const IndexEmployee = ({ }) => {
             reader.onerror = (error) => reject(error);
         });
 
-   
+
     const handleChange = async ({ fileList: newFileList }) => {
-     
+
         newFileList = Array.isArray(newFileList) ? newFileList : [];
 
-        console.log('newFileList:', newFileList);  
+        console.log('newFileList:', newFileList);
 
         setFileList(newFileList);
 
-        
+
         if (newFileList.length > 0) {
             setProfileImage(true);
         } else {
@@ -48,7 +52,7 @@ const IndexEmployee = ({ }) => {
     };
     const handlePreview = async (file) => {
         if (!file.url && !file.preview) {
-          
+
             file.preview = await getBase64(file.originFileObj);
         }
         setPreviewImage(file.url || file.preview);
@@ -93,7 +97,7 @@ const IndexEmployee = ({ }) => {
                                 }}>
                                     <Upload
                                         action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                                        listType="picture-circle"
+                                        listType="picture-card"
                                         fileList={fileList}
                                         onChange={handleChange}
                                         onPreview={handlePreview}
@@ -107,9 +111,9 @@ const IndexEmployee = ({ }) => {
 
                                 {fileList.length === 0 && selectedFile && (
                                     <img
-                                        src={`http://192.168.90.47:4000${selectedFile}`}
+                                        src={`${apiImgUrl}${selectedFile}`}
                                         alt="Photo"
-                                        className="w-[6.1vw] h-[6.1vw] object-cover rounded-full top-[0.1vw] left-[0.15vw] absolute opacity-25 z-[1] pointer-events-none"
+                                        className="w-[6.1vw] h-[6.1vw] object-cover top-[0.1vw] left-[0.15vw] absolute opacity-25 z-[1] pointer-events-none"
                                     />
                                 )}
                             </div>

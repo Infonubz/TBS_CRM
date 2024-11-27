@@ -20,6 +20,8 @@ export default function RedeemListView({
   setOfferView,
   offerview
 }) {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
+
   const [promotionid, setPromoId] = useState(null);
   const apiUrl = process.env.REACT_APP_API_URL;
   const columns = [
@@ -247,7 +249,7 @@ export default function RedeemListView({
         closeicon={false}
       >
         <img
-          src={`http://192.168.90.47:4000${offerimage}`}
+          src={`${apiImgUrl}${offerimage}`}
           className="w-full h-full"
         />
       </ModalPopup>

@@ -38,7 +38,7 @@ const Index = () => {
       <Collapse
         activeKey={active}
         onChange={() => handleCollapseChange("1")}
-        className="bg-[#1F487C] rounded-2xl border border-[#1F487C]  "
+        className="bg-[#1F487C] rounded-2xl border border-[#1F487C] shadow-[0_9px_9px_rgba(0,0,0,0.45)] shadow-xl"
         size="large"
         expandIcon={({ isActive }) =>
           isActive ? (

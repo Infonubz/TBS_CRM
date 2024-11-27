@@ -190,7 +190,7 @@ const ForgotPassword = () => {
                         name="newPassword"
                         placeholder="Enter New Password"
                         autoFocus={false}
-                        className="placeholder-[#1F487C] border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                        className="placeholder-[#1F487C] border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-xl outline-none px-[1vw]"
                       />
                       <div
                         className="absolute right-[1vw] cursor-pointer"
@@ -217,7 +217,7 @@ const ForgotPassword = () => {
                         name="confirm"
                         placeholder="Enter Confirm Password"
                         autoFocus={false}
-                        className="placeholder-[#1F487C] border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                        className="placeholder-[#1F487C] border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-xl outline-none px-[1vw]"
                       />
                       <div
                         className="absolute right-[1vw] cursor-pointer"
@@ -273,7 +273,7 @@ const ForgotPassword = () => {
                         placeholder="Enter Email Address"
                         // value={getUserSettingsEdit.email_id}
                         readOnly
-                        className="placeholder-[#1F487C] border-r-[0.3vw] cursor-not-allowed mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[25vw] rounded-[0.5vw] outline-none px-[1vw]"
+                        className="placeholder-[#1F487C] border-r-[0.3vw] cursor-not-allowed mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[25vw] rounded-xl outline-none px-[1vw]"
                       />
                       <ErrorMessage
                         name="email_id"
@@ -301,3 +301,174 @@ const ForgotPassword = () => {
   );
 };
 export default ForgotPassword;
+
+
+// import React, { useState, useEffect } from "react";
+// import { useDispatch, useSelector } from "react-redux";
+// import { Formik, Field, Form, ErrorMessage } from "formik";
+// import * as Yup from "yup";
+// import { FaEye, FaEyeSlash } from "react-icons/fa";
+// import { ResetPassword } from "../../../Api/ForgotPassword/ForgotPassword";
+
+
+
+// const ForgotPassword = () => {
+//   const [showPassword, setShowPassword] = useState(false);
+//   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+//   const getUserSettingsEdit = useSelector(
+//     (state) => state.crm.user_settings_edit
+//   );
+
+//   const validationSchema = Yup.object().shape({
+//     currentPassword: Yup.string()
+//       .required("Current password is required")
+//       .test("match", "Current password is incorrect", (value, context) => {
+//         return value === getUserSettingsEdit.password;
+//       }),
+//     newPassword: Yup.string()
+//       .min(8, "New password must be at least 8 characters")
+//       .required("New password is required"),
+//     confirmNewPassword: Yup.string()
+//       .oneOf([Yup.ref("newPassword"), null], "Passwords must match")
+//       .required("Please confirm your new password"),
+//   });
+//   const dispatch = useDispatch();
+
+//   useEffect(() => {
+//     const id = sessionStorage.getItem("USER_ID");
+//   }, []);
+
+//   const handleSubmit = async (values) => {
+//     try {
+//       const response = await ResetPassword(values);
+//       console.log("Password updated successfully");
+//       sessionStorage.setItem("password", values.newPassword);
+//     } catch (error) {
+//       console.error("Error updating password", error);
+//     }
+//   };
+
+//   const togglePasswordVisibility = () => {
+//     setShowPassword(!showPassword);
+//   };
+
+//   const toggleConfirmPassword = () => {
+//     setShowConfirmPassword(!showConfirmPassword);
+//   };
+
+//   return (
+//     <div className=" py-[2vw] px-[10vw]">
+//       <Formik
+//         initialValues={{
+//           currentPassword: "",
+//           newPassword: "",
+//           confirmNewPassword: "",
+//         }}
+//         validationSchema={validationSchema}
+//         onSubmit={(values, { setSubmitting }) => {
+//           handleSubmit(values);
+//         }}
+//       >
+//         {({ isSubmitting }) => (
+//           <Form>
+//             <div className="grid grid-cols-2 gap-x-[7.5vw] gap-y-[1vw]">
+           
+//               <div className="col-span-1 relative">
+//                 <label className="text-[#1F487C] text-[1.1vw]">
+//                   Current Password
+//                   <span className="text-[1vw] text-red-600 pl-[0.2vw]">*</span>
+//                 </label>
+//                 <div className="relative">
+//                   <Field
+//                     type="password"
+//                     name="currentPassword"
+//                     placeholder="Enter Current Password"
+//                     className="placeholder-[#1F487C] border-r-[0.2vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-xl outline-none px-[1vw]"
+//                   />
+//                   <ErrorMessage
+//                     name="currentPassword"
+//                     component="div"
+//                     className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]"
+//                   />
+//                 </div>
+//               </div>
+            
+//               <div className="col-span-1">
+//                 <label className="text-[#1F487C] text-[1.1vw]">
+//                   New Password
+//                   <span className="text-[1vw] text-red-600 pl-[0.2vw]">*</span>
+//                 </label>
+//                 <div className="relative">
+//                   <Field
+//                     type={showPassword ? "text" : "password"}
+//                     name="newPassword"
+//                     placeholder="Enter New Password"
+//                     className="placeholder-[#1F487C] border-r-[0.2vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-xl outline-none px-[1vw]"
+//                   />
+//                   <div
+//                     className="absolute right-[1vw] cursor-pointer top-[1.25vw]"
+//                     onClick={togglePasswordVisibility}
+//                   >
+//                     {showPassword ? (
+//                       <FaEye className="text-[1.5vw] text-[#1F487C]" />
+//                     ) : (
+//                       <FaEyeSlash className="text-[1.5vw] text-[#1F487C]" />
+//                     )}
+//                   </div>
+//                   <ErrorMessage
+//                     name="newPassword"
+//                     component="div"
+//                     className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]"
+//                   />
+//                 </div>
+//               </div>
+        
+//               <div className="col-span-1">
+//                 <label className="text-[#1F487C] text-[1.1vw]">
+//                   Confirm New Password
+//                   <span className="text-[1vw] text-red-600 pl-[0.2vw]">*</span>
+//                 </label>
+//                 <div className="relative">
+//                   <Field
+//                     type={showConfirmPassword ? "text" : "password"}
+//                     name="confirmNewPassword"
+//                     placeholder="Confirm New Password"
+//                     className="placeholder-[#1F487C] border-r-[0.2vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-xl outline-none px-[1vw]"
+//                   />
+//                   <div
+//                     className="absolute right-[1vw] top-[1.25vw] cursor-pointer"
+//                     onClick={toggleConfirmPassword}
+//                   >
+//                     {showConfirmPassword ? (
+//                       <FaEye className="text-[1.5vw] text-[#1F487C]" />
+//                     ) : (
+//                       <FaEyeSlash className="text-[1.5vw] text-[#1F487C]" />
+//                     )}
+//                   </div>
+//                   <ErrorMessage
+//                     name="confirmNewPassword"
+//                     component="div"
+//                     className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]"
+//                   />
+//                 </div>
+//               </div>
+  
+//             </div>
+//             <div className="flex justify-center pt-[1vw]">
+//               <button
+//                 type="submit"
+//                 disabled={isSubmitting}
+//                 className="w-[12.5vw] flex justify-center py-2 px-2 border border-transparent rounded-xl shadow-sm text-[1vw] font-medium text-white bg-[#1F487C]"
+//               >
+//                 Update
+//               </button>
+//             </div>
+//           </Form>
+//         )}
+//       </Formik>
+//     </div>
+//   );
+// };
+
+// export default ForgotPassword;

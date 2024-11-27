@@ -9,8 +9,9 @@ import BinRestore from "./BinRestore";
 import BinDelete from "./BinDelete";
 
 export default function Advertisement({ currentItems, selectedTab ,activePage, itemsPerPage }) {
-  const [viewModal, setViewModalIsOpen] = useState(false);
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
 
+  const [viewModal, setViewModalIsOpen] = useState(false);
   const [imgUrl, setImgUrl] = useState({
     type: "",
     url: "",
@@ -173,7 +174,7 @@ export default function Advertisement({ currentItems, selectedTab ,activePage, i
       >
         {imgUrl.type && imgUrl.type.startsWith("image/") ? (
           <img
-            src={`http://192.168.90.47:4000${imgUrl.url}`}
+            src={`${apiImgUrl}${imgUrl.url}`}
             alt="Ad"
             className="p-[0.4] w-full h-full"
             style={{
@@ -192,7 +193,7 @@ export default function Advertisement({ currentItems, selectedTab ,activePage, i
               borderRadius: "1.2vw",
             }}
           >
-            <source src={`http://192.168.90.47:4000${imgUrl.url}`} />
+            <source src={`${apiImgUrl}${imgUrl.url}`} />
           </video>
         )}
       </ModalPopup>

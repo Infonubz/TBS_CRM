@@ -86,10 +86,11 @@ const FinanceDetails = ({ companyData, setCompanyData }) => {
           handleSubmit,
           values,
           handleChange,
+          dirty
         }) => (
           <Form onSubmit={handleSubmit}>
             <div>
-              <div className="grid grid-cols-2 gap-x-[20vw] mr-[15vw] gap-y-[3vw] pr-[6vw] px-[6vw] pt-[2vw]">
+            <div className="grid grid-cols-2 gap-x-[20vw] mr-[15vw] gap-y-[3vw] pr-[6vw] px-[6vw] pt-[2vw]">
                 <div className="grid grid-cols-2 ">
                   <span className=" flex items-center">
                     <label
@@ -238,10 +239,16 @@ const FinanceDetails = ({ companyData, setCompanyData }) => {
                   </span>
                 </div>
               </div>
-              <div className="flex justify-end pr-[1vw] pt-[2vw] pb-[2vw]">
+              <div className="flex justify-center items-center py-[1vw]">
                 <button
-                  className="w-[10vw] h-[2.5vw] text-[1.3vw] bg-[#1F487C] text-white rounded-md"
+                  className="w-1/6 h-[2.5vw] text-[1.3vw] bg-[#1F487C] text-white rounded-md"
                   type="submit"
+                  disabled={isSubmitting || !dirty || !isValid}
+                  style={{
+                    backgroundColor: isSubmitting || !dirty || !isValid ? '#d3d3d3' : '#1F487C',
+                    color: isSubmitting || !dirty || !isValid ? '#9e9e9e' : '#fff',
+                    cursor: isSubmitting || !dirty || !isValid ? 'not-allowed' : 'pointer',
+                  }}
                 >
                   Save
                 </button>

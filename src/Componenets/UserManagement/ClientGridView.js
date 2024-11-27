@@ -24,6 +24,9 @@ export default function ClientGridView({
   SetUpdateData,
   updatedata,
 }) {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
+  const apiUrl = process.env.REACT_APP_API_URL;
+  
   const [hoverid, setHoverId] = useState("");
   const [changeColor, setChangeColor] = useState();
   const [openPopovers, setOpenPopovers] = useState({});
@@ -54,7 +57,7 @@ export default function ClientGridView({
     setDeleteModalIsOpen(false);
   };
 
-  const apiUrl = process.env.REACT_APP_API_URL;
+  
 
   return (
     <>
@@ -78,7 +81,7 @@ export default function ClientGridView({
                 <div className="flex justify-center pl-[4vw] pt-[1vw]">
                   <img
                     src={`${item?.company_logo
-                      ? `http://192.168.90.47:4000${item?.company_logo}`
+                      ? `${apiImgUrl}${item?.company_logo}`
                       : userimg
                       } `}
                       alt="Profile"

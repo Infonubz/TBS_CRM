@@ -32,6 +32,8 @@ const PartnerTableList = ({
   get_partner_list,
   updatedata
 }) => {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
+  const apiUrl = process.env.REACT_APP_API_URL;
   const [sortedInfo, setSortedInfo] = useState({});
   const [viewmodal, setViewModal] = useState(false);
   const [userName,setUserName] = useState()
@@ -60,13 +62,13 @@ const PartnerTableList = ({
       align: "center",
       render: (row) => {
         console.log(row, "rowrowrow");
-        const image = `http://192.168.90.47:4000${row?.profile_img}`;
+        const image = `${apiImgUrl}${row?.profile_img}`;
         console.log(image, "imageimage");
         return (
           <div className="flex justify-center items-center">
             <img
               src={`${row?.profile_img
-                ? `http://192.168.90.47:4000${row?.profile_img}`
+                ? `${apiImgUrl}${row?.profile_img}`
                 : UserProfile
                 } `}
                  alt="Profile"
@@ -298,7 +300,7 @@ const PartnerTableList = ({
   const closeDeleteModal = () => {
     setDeleteModalIsOpen(false);
   };
-  const apiUrl = process.env.REACT_APP_API_URL;
+
 
   console.log(currentData, "wefwefewfcew");
   return (

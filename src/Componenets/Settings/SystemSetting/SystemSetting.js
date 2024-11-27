@@ -16,11 +16,12 @@ import CustomTemplate from "./CustomTemplate";
 import CompanySettings from "./CompanySettings";
 import FinanceDetails from "./FinanceDetails";
 import AboutUs from "./AboutUs";
-import CompanDetails from "./CompanyDetails/CompanDetails";
+// import CompanDetails from "./CompanyDetails/CompanDetails";
 import { useDispatch, useSelector } from "react-redux";
 import { GetOperatorData } from "../../../Api/Settings/SystemSettings/CompanyDetails";
 
 export default function SystemSettingList() {
+
   const [companyData, setCompanyData] = useState();
   const [userid, setUserid] = useState();
   const [selectedFile, setSelectedFile] = useState(null);
@@ -171,9 +172,9 @@ export default function SystemSettingList() {
               ),
               children: (
                 <div>
-                  <CompanDetails
+                  {/* <CompanDetails
                     operatorData={operatorData}
-                    selectedFile={selectedFile} />
+                    selectedFile={selectedFile} /> */}
                 </div>
               ),
             },
@@ -231,10 +232,11 @@ export default function SystemSettingList() {
         ]}
       />
       <Collapse
+
+        className={`bg-[#1F487C] rounded-2xl border border-[#1F487C] mt-[1vw] shadow-[0_9px_9px_rgba(0,0,0,0.45)] shadow-xl`}
+        size="large"
         activeKey={active}
         onChange={() => handleCollapseChange("3")}
-        className="bg-[#1F487C] rounded-2xl border border-[#1F487C] shadow-xl mt-[1vw]"
-        size="large"
         expandIcon={({ isActive }) =>
           isActive ? (
             <IoIosArrowUp
@@ -253,29 +255,26 @@ export default function SystemSettingList() {
           {
             key: "3",
             label: (
-              <div className="flex items-center ">
-                <div className="col-span-2">
+              <div className="flex items-center h-[5vh]">
+                <div className="col-span-2 pt-[0.3vw]">
                   <span className="">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="2.3vw" height="2.3vw" viewBox="0 0 24 24"><path fill="#FFF" d="m6 16.5l-3 2.94V11h3m5 3.66l-1.57-1.34L8 14.64V7h3m5 6l-3 3V3h3m2.81 9.81L17 11h5v5l-1.79-1.79L13 21.36l-3.47-3.02L5.75 22H3l6.47-6.34L13 18.64" /></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="2.3vw" height="2.3vw" viewBox="0 0 24 24"><path fill="#FFF" d="m6 16.5l-3 2.94V11h3m5 3.66l-1.57-1.34L8 14.64V7h3m5 6l-3 3V3h3m2.81 9.81L17 11h5v5l-1.79-1.79L13 21.36l-3.47-3.02L5.75 22H3l6.47-6.34L13 18.64" /></svg>
+
                   </span>
                 </div>
-                <div className="col-span-2 pl-[0.6vw]">
+                <div className="col-span-2 pl-[1vw]">
                   <span className="text-[#FFFFFF] font-medium text-[1.1vw]">
-                    Finance Details
+                  Finance Details
                   </span>
                   <p className="text-[#FFFFFF] text-[0.8vw]">
-                    Manage your company name, currency and financial year end
+                  Manage your company name, currency and financial year end
                   </p>
                 </div>
               </div>
             ),
-            children: (
-              <div>
-                <FinanceDetails
-                  companyData={companyData}
-                  setCompanyData={setCompanyData} />
-              </div>
-            ),
+            children: <FinanceDetails
+              companyData={companyData}
+              setCompanyData={setCompanyData} />,
           },
         ]}
       />

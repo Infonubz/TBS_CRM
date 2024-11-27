@@ -20,6 +20,7 @@ export default function ListView({
   setOfferView,
   offerview
 }) {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const [promotionid, setPromoId] = useState(null);
   const apiUrl = process.env.REACT_APP_API_URL;
   const columns = [
@@ -93,21 +94,44 @@ export default function ListView({
         );
       },
     },
+    // {
+    //   title: <h1 className="text-[1.2vw] font-semibold  flex items-center justify-center">Offer Value</h1>,
+    //   width: "12vw",
+    //   sorter: (a, b) => a.offer_value.localeCompare(b.offer_value),
+    //   onHeaderCell: () => ({
+    //     style: { transform: 'none', transition: 'none' },
+    //   }),
+    //   render: (row) => {
+    //     return (
+    //       <div className="flex items-center justify-center">
+    //         <p className="text-[1vw] text-[#1F487C]">₹ {row.offer_value}</p>
+    //       </div>
+    //     );
+    //   },
+    // },
     {
-      title: <h1 className="text-[1.2vw] font-semibold  flex items-center justify-center">Offer Value</h1>,
+      title: <h1 className="text-[1.2vw] font-semibold flex items-center justify-center">Offer Value</h1>,
       width: "12vw",
-      sorter: (a, b) => a.offer_value.localeCompare(b.offer_value),
+      sorter: (a, b) => {
+        
+        if (typeof a?.offer_value === 'number' && typeof b?.offer_value === 'number') {
+          return a?.offer_value - b?.offer_value; 
+        }
+        const valueA = String(a?.offer_value || '');  
+        const valueB = String(b?.offer_value || '');  
+        return valueA.localeCompare(valueB);
+      },
       onHeaderCell: () => ({
         style: { transform: 'none', transition: 'none' },
       }),
       render: (row) => {
         return (
           <div className="flex items-center justify-center">
-            <p className="text-[1vw] text-[#1F487C]">₹ {row.offer_value}</p>
+            <p className="text-[1vw] text-[#1F487C]">₹ {row?.offer_value}</p>
           </div>
         );
       },
-    },
+    },    
     {
       title: <h1 className="text-[1.2vw] font-semibold  flex items-center justify-center">Category</h1>,
       sorter: (a, b) => a.occupation.localeCompare(b.occupation),
@@ -261,7 +285,7 @@ export default function ListView({
         closeicon={false}
       >
         <img
-          src={`http://192.168.90.47:4000${offerimage}`}
+          src={`${apiImgUrl}${offerimage}`}
           className="w-full h-full"
         />
       </ModalPopup>

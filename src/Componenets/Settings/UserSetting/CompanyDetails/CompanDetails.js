@@ -4,11 +4,17 @@ import AddressDetails from './AddressDetails'
 import CompanyProfile from './CompanyProfile'
 import BusinessDetails from './BusinessDetails'
 import { useDispatch, useSelector } from 'react-redux'
-import { GetOperatorData } from '../../../../Api/Settings/SystemSettings/CompanyDetails'
+import { GetOperatorData, SubmitCompanyData } from '../../../../Api/Settings/SystemSettings/CompanyDetails'
 import ImgCrop from "antd-img-crop";
 import { Upload } from "antd";
 
 const CompanDetails = ({ operatorData, selectedFile }) => {
+
+
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
+  const apiurl = process.env.REACT_APP_API_URL;
+
+  console.log(apiImgUrl,selectedFile,'selectZ_file')
 
   const [switchTab, setSwitchTab] = useState('companyProfile')
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -18,7 +24,7 @@ const CompanDetails = ({ operatorData, selectedFile }) => {
   const [profileImage, setProfileImage] = useState(false)
   const [enableUpload, setEnableUpload] = useState(false)
 
-  console.log(fileList, 'testing_subjectF')
+  console.log(selectedFile, 'testing_subjectF')
 
   const getBase64 = (file) =>
     new Promise((resolve, reject) => {
@@ -34,27 +40,52 @@ const CompanDetails = ({ operatorData, selectedFile }) => {
     inputRef.current.click(); // Programmatically trigger file input
   };
 
+  // const handleChange = async ({ fileList: newFileList }) => {
+  //   console.log(newFileList[0]?.originFileObj, "helldjfhdjkfhdkjf", newFileList?.length, "ereffgdfqe");
+  //   setFileList(newFileList);
+  //   if (newFileList?.length > 0) {
+  //     setProfileImage(true)
+  //   }
+  //   else {
+  //     setProfileImage(false)
+  //   }
+  //   // SubmitProfileData(newFileList[0], dispatch);
+
+  //   // try {
+  //   //   const data = await OperatorProfile(newFileList[0]);
+  //   //   // setSuperAdminData(data);
+  //   //   console.log(data);
+
+  //   // } catch (error) {
+  //   //   console.error("Error fetching additional user data", error);
+  //   // }
+  // };
+
+  const dispatch = useDispatch()
   const handleChange = async ({ fileList: newFileList }) => {
     console.log(newFileList[0]?.originFileObj, "helldjfhdjkfhdkjf", newFileList?.length, "ereffgdfqe");
-    setFileList(newFileList);
+
+    setFileList(newFileList); // Update the file list state
+
     if (newFileList?.length > 0) {
+      setProfileImage(true); // Set profile image state if there is a file
 
-      setProfileImage(true)
+      // Call SubmitCompanyData with dispatch and the new file list
+      try {
+        const response = await SubmitCompanyData(dispatch, newFileList);
+        if (response) {
+          console.log("Company data submitted successfully", response);
+        } else {
+          console.error("Failed to submit company data.");
+        }
+      } catch (error) {
+        console.error("Error during company data submission", error);
+      }
+    } else {
+      setProfileImage(false); // Set profile image state to false if no file is uploaded
     }
-    else {
-      setProfileImage(false)
-    }
-    // SubmitProfileData(newFileList[0], dispatch);
-
-    // try {
-    //   const data = await OperatorProfile(newFileList[0]);
-    //   // setSuperAdminData(data);
-    //   console.log(data);
-
-    // } catch (error) {
-    //   console.error("Error fetching additional user data", error);
-    // }
   };
+
 
   const handlePreview = async (file) => {
     if (!file.url && !file.preview) {
@@ -97,12 +128,12 @@ const CompanDetails = ({ operatorData, selectedFile }) => {
           <div className='col-span-3 flex flex-col items-center justify-center'>
             <div className=''>
               <div className="relative">
-                <ImgCrop showGrid rotationSlider showReset onImageCrop={(file) => {
 
-                }}>
+                <ImgCrop showGrid rotationSlider showReset onImageCrop={(file) => { }}>
                   <Upload
+                    className="custom-upload"
                     action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                    listType="picture-circle"
+                    listType="picture-card"
                     fileList={fileList}
                     onChange={handleChange}
                     onPreview={handlePreview}
@@ -119,7 +150,6 @@ const CompanDetails = ({ operatorData, selectedFile }) => {
                     onClick={handleButtonClick}
                     className="w-[6.1vw] h-[6.1vw] rounded-full bg-white text-white py-2 px-4 border-[0.1vw] border-[#1F487C]"
                   >
-                 
                   </button>
                   <input
                     ref={inputRef}
@@ -130,12 +160,11 @@ const CompanDetails = ({ operatorData, selectedFile }) => {
                   />
                 </div> */}
 
-                {fileList.length === 0 && selectedFile && (  // Check if there are no files in the fileList and selectedFile is set
+                {fileList.length === 0 && selectedFile && (
                   <img
-                    src={`http://192.168.90.47:4000${selectedFile}`}
+                    src={`${apiImgUrl}${selectedFile}`}
                     alt="Photo"
-                    className="w-[6.1vw] h-[6.1vw] object-cover rounded-full top-[0.1vw] left-[0.15vw] absolute opacity-25 z-[1] pointer-events-none"
-
+                    className="w-[8vw] h-[8vw] object-cover rounded-[0.1vw] top-[0.1vw]  absolute rounded-[0.5vw] opacity-25 z-[1] pointer-events-none"
                   />
                 )}
               </div>

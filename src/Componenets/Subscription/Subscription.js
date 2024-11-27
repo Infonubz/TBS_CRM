@@ -28,6 +28,7 @@ import { IoIosArrowDropdownCircle } from "react-icons/io";
 import { IoIosArrowDropupCircle } from "react-icons/io";
 
 export default function Subscription({ }) {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const [expandedRowKey, setExpandedRowKey] = useState(null);
   const [showHalfMap, setShowHalfMap] = useState({}); // State to track which user's product key to show/hide
   const [eyeIcon, setEyeIcon] = useState(false);
@@ -135,7 +136,7 @@ export default function Subscription({ }) {
         return (
           <div className="flex justify-center text-[#1F4B7F] text-[1vw] py-[0.5vw]">
             <img
-              src={`http://192.168.90.47:4000${row?.profile_img}`}
+              src={`${apiImgUrl}${row?.profile_img}`}
               alt=""
               className="w-[2vw] h-[2vw] border-[0.1vw] border-slate-200 rounded-full"
             />
@@ -301,7 +302,7 @@ export default function Subscription({ }) {
         <div className="grid grid-cols-5 items-center py-[1vw]">
           <div className="col-span-1 flex flex-col gap-[1vw] justify-center items-center border-r-[0.1vw] border-[#1F487C] w-full h-full">
             <img
-              src={`http://192.168.90.47:4000${item?.profileimg}`}
+              src={`${apiImgUrl}${item?.profileimg}`}
               alt=""
               className="w-[6vw] h-[6vw] border-[0.1vw] border-slate-200 rounded-full"
             />
@@ -407,7 +408,7 @@ export default function Subscription({ }) {
         backgroundPosition: "center",
       }}
     >
-      <div className="px-[5vw] w-full h-[90vw]">
+      <div className="px-[2.5vw] w-full h-[90vw]">
         <div className="flex justify-between items-center ">
           <h1 className="text-[#1F4B7F] pt-[0.5vw] text-[1.5vw] font-bold">
             SUBSCRIPTION

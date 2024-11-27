@@ -114,6 +114,7 @@ export default function AddSuperAdmin({
   updatedata,
   setEnableUpload,
 }) {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const dispatch = useDispatch();
 
   const handleSubmit = async (values) => {
@@ -158,7 +159,7 @@ export default function AddSuperAdmin({
 
     try {
       const response = await axios.post(
-        "http://192.168.90.47:4000/operator_validation",
+        `${apiImgUrl}/operator_validation`,
         { phone: value }
       );
       console.log(response.data.Phone, "ggggg");

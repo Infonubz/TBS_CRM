@@ -137,6 +137,7 @@ export default function AddDocuments({
   PartnerID,
   setModalIsOpen
 }) {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
@@ -496,7 +497,7 @@ export default function AddDocuments({
                           />
                           ) : (
                             <img
-                            src={`http://192.168.90.47:4000${inputPreview.aadharfr}`}
+                            src={`${apiImgUrl}${inputPreview.aadharfr}`}
                             className="h-[2.5vw] w-[2.5vw] absolute  top-[.15vw] cursor-zoom-in right-[.3vw]"
                             alt="Aadhar Front"
                             onClick={openModal} 
@@ -598,7 +599,7 @@ export default function AddDocuments({
                           />
                           ) : (
                             <img
-                            src={`http://192.168.90.47:4000${inputPreview.aadharbk}`}
+                            src={`${apiImgUrl}${inputPreview.aadharbk}`}
                             className="h-[2.5vw] w-[2.5vw] absolute  top-[.15vw] cursor-zoom-in right-[.3vw]"
                             alt="Aadhar Front"
                             onClick={openModal} 
@@ -696,7 +697,7 @@ export default function AddDocuments({
                           />
                           ) : (
                             <img
-                            src={`http://192.168.90.47:4000${inputPreview.panfr}`}
+                            src={`${apiImgUrl}${inputPreview.panfr}`}
                             className="h-[2.5vw] w-[2.5vw] absolute  top-[.15vw] cursor-zoom-in right-[.3vw]"
                             alt="pan doc"
                             onClick={openModal} 
@@ -794,7 +795,7 @@ export default function AddDocuments({
                           />
                           ) : (
                             <img
-                            src={`http://192.168.90.47:4000${inputPreview.panbk}`}
+                            src={`${apiImgUrl}${inputPreview.panbk}`}
                             className="h-[2.5vw] w-[2.5vw] absolute  top-[.15vw] cursor-zoom-in right-[.3vw]"
                             alt="pan doc"
                             onClick={openModal} 

@@ -59,7 +59,9 @@ export default function Status_Update_Modal({ currentid, setIsSaveModal, setIsVe
   console.log(currentid, "currentidcurrentid");
   return (
     <>
-      <div className="flex flex-col items-center justify-center">
+    {
+      isActivate === false ? (
+        <div className="flex flex-col items-center justify-center">
         <p className="text-[1.5vw] text-[]">Update the status of Operator</p>
         <img src={image} className="h-[6vw] w-[6vw] mt-[1vw]"></img>
         <div className="mt-[1vw] w-[100%] relative">
@@ -126,7 +128,23 @@ export default function Status_Update_Modal({ currentid, setIsSaveModal, setIsVe
           </button>
         </div>
       </div>
-
+      )
+      :
+      (
+        <Activate_Modal
+        isActivate={setIsActivate}
+        currentid={currentid}
+        setIsSaveModal={setIsSaveModal}
+        verifyData={verifyData}
+        setVerifyData={setVerifyData}
+        setRequestData={setRequestData}
+        requestData={requestData}
+      />
+      )
+    }
+    
+    
+{/* 
       <ModalPopup
         className="border border-[#1f487c] border-b-8 border-r-8 border-b-[#1f487c] border-r-[#1f487c] rounded-md"
         show={isActivate}
@@ -134,8 +152,8 @@ export default function Status_Update_Modal({ currentid, setIsSaveModal, setIsVe
         onClose={closeModal}
         height="300px"
         width="600px"
-      >
-        <Activate_Modal
+      > */}
+        {/* <Activate_Modal
           isActivate={setIsActivate}
           currentid={currentid}
           setIsSaveModal={setIsSaveModal}
@@ -143,8 +161,8 @@ export default function Status_Update_Modal({ currentid, setIsSaveModal, setIsVe
           setVerifyData={setVerifyData}
           setRequestData={setRequestData}
           requestData={requestData}
-        />
-      </ModalPopup>
+        /> */}
+      {/* </ModalPopup> */}
     </>
   );
 }

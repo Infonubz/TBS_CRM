@@ -19,6 +19,8 @@ export default function PartnerGridView({
   setModalIsOpen,
   SetUpdateData,
 }) {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
+  const apiUrl = process.env.REACT_APP_API_URL;
   const [hoverid, setHoverId] = useState("");
   const [changeColor, setChangeColor] = useState();
   const [partnerdeletemodalIsOpen, setPartnerDeleteModalIsOpen] =
@@ -29,7 +31,7 @@ export default function PartnerGridView({
   const closeDeleteModal = () => {
     setPartnerDeleteModalIsOpen(false);
   };
-  const apiUrl = process.env.REACT_APP_API_URL;
+
 
   const togglePopover = (tbs_partner_id) => {
     setOpenPopovers((prevState) => ({
@@ -77,7 +79,7 @@ export default function PartnerGridView({
                   <img
                     src={`${
                       item?.profile_img
-                        ? `http://192.168.90.47:4000${item?.profile_img}`
+                        ? `${apiImgUrl}${item?.profile_img}`
                         : userimg
                     } `}
                     alt="Profile"

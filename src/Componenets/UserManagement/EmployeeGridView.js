@@ -22,12 +22,14 @@ export default function EmployeeGridView({
   setDeleteEmpModalIsOpen,
   deleteEmpmodalIsOpen,
 }) {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
+  const apiUrl = process.env.REACT_APP_API_URL;
   const [hoverid, setHoverId] = useState("");
   const [changeColor, setChangeColor] = useState();
   const [openPopovers, setOpenPopovers] = useState({});
   const [userName,setUserName] = useState("")
 
-  const apiUrl = process.env.REACT_APP_API_URL;
+
 
   const user = sessionStorage.getItem("USER_ID");
 
@@ -88,7 +90,7 @@ export default function EmployeeGridView({
                   <img
                     src={`${
                       item?.profile_img
-                        ? `http://192.168.90.47:4000${item?.profile_img}`
+                        ? `${apiImgUrl}${item?.profile_img}`
                         : userimg
                     } `}
                       alt="Profile"

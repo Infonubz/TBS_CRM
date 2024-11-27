@@ -28,6 +28,8 @@ export default function GridList({
   setDeleteOpModalIsOpen,
   deleteOpmodalIsOpen,
 }) {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
+  const apiUrl = process.env.REACT_APP_API_URL;
   const [hoverid, setHoverId] = useState("");
   const [changeColor, setChangeColor] = useState();
   const [openPopovers, setOpenPopovers] = useState({});
@@ -58,7 +60,7 @@ export default function GridList({
     setDeleteOpModalIsOpen(false);
   };
 
-  const apiUrl = process.env.REACT_APP_API_URL;
+  
 
   return (
     <>
@@ -92,7 +94,7 @@ export default function GridList({
                     //     : `http://192.168.90.47:4000${item?.profile_img}`
                     // } `}
                     src={`${item?.profileimg
-                        ? `http://192.168.90.47:4000${item?.profileimg}`
+                        ? `${apiImgUrl}${item?.profileimg}`
                         : userimg
                       } `}
                       alt="Profile"

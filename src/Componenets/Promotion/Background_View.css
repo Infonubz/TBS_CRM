@@ -8,6 +8,8 @@
 .carousel-track-container {
   overflow: hidden;
   width: 100%;
+  position: relative;
+
 }
 
 .carousel-track {
@@ -24,8 +26,9 @@
   opacity: 0.5;
   transform-origin: center;
   transition: transform 0.5s ease, opacity 0.5s ease;
-  height: 15vw; /* You can adjust this value to match your image height */
+  height: 12.5vw; /* You can adjust this value to match your image height */
   position: relative; /* Ensure it's positioned correctly within the carousel */
+  border-radius: 1vw;
 }
 
 .small-slide {
@@ -46,8 +49,20 @@
   width: 25vw;
   opacity: 1;
   transform: scale(1);
-}
+  /* background-color: blueviolet; */
+  position: relative;
 
+}
+.logo {
+  position: absolute;
+  top: 0;
+  left: 2;
+  height: 12.5vw;
+  width: 6vw;
+  background-color: azure;
+  z-index: 2; /* Ensure it stays above */
+
+}
 .hidden-slide {
   display: none;
 }
@@ -89,3 +104,6 @@
 .large-slide {
   margin: 0; /* Ensure no margin between the slides */
 }
+/* .large-slide {
+  border: 2px solid #1F4B7F; 
+} */

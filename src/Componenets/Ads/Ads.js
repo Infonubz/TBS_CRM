@@ -1548,7 +1548,7 @@ export default function Advertisement() {
           backgroundPosition: "center",
         }}
       >
-        <div className="px-[5vw] h-[92vh] relative w-full ">
+        <div className="px-[2.5vw] h-[92vh] relative w-full ">
           <div className="h-[12vh] w-full flex flex-col">
             <h1 className="text-[#1F4B7F] pt-[0.5vw] text-[1.5vw] font-bold">
              <span> UPLOAD ADS  </span><span className="text-[1vw]">-</span><span className="text-[1vw] pl-[.5vw]">{`(${tabType})`}</span>

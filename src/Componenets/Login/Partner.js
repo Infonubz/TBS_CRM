@@ -42,6 +42,7 @@ export default function Partner({setForgotPassword}) {
     const validationResult = validateInput(values.emailid_phone);
     try {
       const data = await PartnerLogin(values, validationResult);
+      toast.warning(data?.message);
         if (data?.token !== undefined) {
           console.log(data, "data2");
           navigate("/dashboard");

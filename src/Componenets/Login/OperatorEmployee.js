@@ -41,6 +41,7 @@ export default function OperatorEmployee({ setAuthtoken }) {
     const validationResult = validateInput(values.emailid_phone);
     try {
       const data = await OpEmpLogin(values, validationResult);
+      toast.warning(data?.message);
         if (data?.token !== undefined) {
           console.log(data, "data2");
           navigate("/dashboard");

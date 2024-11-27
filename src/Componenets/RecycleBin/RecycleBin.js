@@ -100,7 +100,7 @@ export default function RecycleBin() {
       }}
     >
       <>
-        <div className="left-[5%] right-[5%] px-[5vw]">
+        <div className=" px-[2.5vw]">
           <div className="flex">
             <h1 className="text-[#1F4B7F] text-[1.8vw] font-bold flex items-center justify-center">
              <span className="pr-[.3vw]">RecycleBin</span> <span className="text-[1vw]">-</span><span className="text-[1vw] pl-[.5vw]">{selectedTitle}</span>
@@ -389,7 +389,7 @@ export default function RecycleBin() {
         </div>
 
         { getBin?.length > 0  && (
-          <div className="w-full h-[8vh] flex justify-between items-center px-[5vw]">
+          <div className="w-full h-[8vh] flex justify-between items-center px-[2.5vw]">
             <div className="text-[#1f4b7f] flex text-[1.1vw] gap-[0.5vw]">
               <span>Showing</span>
               <span className="font-bold">

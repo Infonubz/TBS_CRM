@@ -1,7 +1,9 @@
 import React, { useEffect } from "react";
 import Backdrop from "../../asserts/CRMbg.png";
-import { Collapse, Table, 
-  // Tag,  Pagination 
+import {
+  Collapse,
+  Table,
+  // Tag,  Pagination
 } from "antd";
 import { HiOutlineDocumentPlus } from "react-icons/hi2";
 import { IoIosArrowUp, IoIosArrowDown, IoMdAdd } from "react-icons/io";
@@ -46,14 +48,14 @@ import { IoSearch } from "react-icons/io5";
 const { Panel } = Collapse;
 
 export default function Roles() {
- // const [roleData, SetRoleData] = useState([]);
+  // const [roleData, SetRoleData] = useState([]);
   const [rolesid, SetRolesId] = useState(null);
   const [updatedata, SetUpdateData] = useState(null);
   // const [currentPage, setCurrentPage] = useState(1);
   // const [pageSize, setPageSize] = useState(3);
   const [roledata, setRoleData] = useState("");
   const getrolelist = useSelector((state) => state.crm.role_list);
- // const getRoleCount = useSelector((state) => state.crm.roles_count);
+  // const getRoleCount = useSelector((state) => state.crm.roles_count);
   const getOpEmpCount = useSelector((state) => state.crm.op_emp_count);
   // const getProEmpCount = useSelector((state) => state.crm.pro_emp_count);
   // const getPermissionCount = useSelector((state) => state.crm.permission_count);
@@ -86,6 +88,18 @@ export default function Roles() {
   // const showModal = () => {
   //   setIsModalOpen(true);
   // };
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const storedCrudPermissions = sessionStorage.getItem("crud_permission");
+  const crudPermissions = storedCrudPermissions
+    ? storedCrudPermissions.split(",")
+    : [];
+
+  const showCreateIcon = crudPermissions.includes("create");
+  const showEditIcon = crudPermissions.includes("update");
+  const showDeleteIcon = crudPermissions.includes("delete");
+  const showViewIcon = crudPermissions.includes("view");
+
+  const type = typeid === "PRO101" || typeid === "OP101";
 
   const closeModal = () => {
     setPermission(true);
@@ -147,27 +161,27 @@ export default function Roles() {
   });
 
   const roleColumns = [
+    // {
+    //   title: <span className="text-[1.1vw] font-bold pl-[2vw]">ID</span>,
+    //   key: "role_id",
+    //   //  dataIndex: "id",
+    //   render: (row) => {
+    //     return (
+    //       <span className="flex">
+    //         <h1 className="text-[1vw] pl-[2vw]">{row?.role_id}</h1>
+    //       </span>
+    //     );
+    //   },
+    // },
     {
-      title: <span className="text-[1.1vw] font-bold pl-[2vw]">ID</span>,
-      key: "role_id",
-      //  dataIndex: "id",
-      render: (row) => {
-        return (
-          <span className="flex">
-            <h1 className="text-[1vw] pl-[2vw]">{row?.role_id}</h1>
-          </span>
-        );
-      },
-    },
-    {
-      title: <span className="text-[1.1vw] font-bold">User</span>,
+      title: <span className="text-[1.1vw] font-bold pl-[2vw]">User</span>,
       key: "role",
       render: (row) => {
         console.log(row, "741852963");
 
         return (
           <span className="flex">
-            <p className="text-[1vw]">
+            <p className="text-[1vw] pl-[2vw]">
               {row?.user_id === "OP101"
                 ? "Operator Employee"
                 : "Product Owner Employee"}
@@ -175,17 +189,15 @@ export default function Roles() {
           </span>
         );
       },
-      className: typeid === "OP101" ? "hidden" : "",
-      // Conditionally set `className` to hide/show based on `viewMode`
-      // className: viewMode === "Operator" ? "hidden" : "",
+      className: typeid === "OP101" || typeid === "OPEMP101" ? "hidden" : "",
     },
     {
-      title: <span className="text-[1.1vw] font-bold">Role Type</span>,
+      title: <span className="text-[1.1vw] font-bold pl-[2vw]">Role Type</span>,
       key: "role",
       render: (row) => {
         return (
           <span className="flex">
-            <p className="text-[1vw]">{row?.role_type}</p>
+            <p className="text-[1vw] pl-[2vw]">{row?.role_type}</p>
           </span>
         );
       },
@@ -269,8 +281,7 @@ export default function Roles() {
           </span>
         );
       },
-      // Conditionally set `className` to hide/show based on `viewMode`
-      className: typeid === "OP101" ? "hidden" : "",
+      className: typeid === "OP101" || typeid === "OPEMP101" ? "hidden" : "",
     },
   ];
 
@@ -285,7 +296,6 @@ export default function Roles() {
     setPermissionCount(data);
     console.log(data, "Permission count fetched!");
   };
-
 
   const permissions = [
     {
@@ -337,8 +347,8 @@ export default function Roles() {
     }
   }, [typeid, filter, dispatch]);
 
-  useEffect(() =>{
-    if (permission){
+  useEffect(() => {
+    if (permission) {
       permissionCountList();
       setPermission(false);
     }
@@ -346,7 +356,7 @@ export default function Roles() {
 
   useEffect(() => {
     if (typeid === "OP101") {
-      setRoleCount(getOpEmpCount); 
+      setRoleCount(getOpEmpCount);
     }
   }, [getOpEmpCount, typeid]);
 
@@ -354,7 +364,7 @@ export default function Roles() {
     roleCountList();
     GetRolesData(filter, dispatch);
     permissionCountList();
-  }, [filter, dispatch]); 
+  }, [filter, dispatch]);
 
   useEffect(() => {
     if (filter === "PO") {
@@ -375,7 +385,7 @@ export default function Roles() {
           backgroundPosition: "center",
         }}
       >
-        <div className="h-[92vw] w-full left-[5%] right-[5%] px-[5vw]">
+        <div className="h-[100vw] w-full  px-[2.5vw]">
           <p className="text-[#1F487C] text-[1.4vw] font-bold pt-[0.5vw]">
             {" "}
             ROLES AND RESPONSIBILITES{" "}
@@ -384,10 +394,10 @@ export default function Roles() {
             className={` ${
               typeid === "PRO101"
                 ? "grid grid-cols-3"
-                : "w-[90vw] h-[15vw] flex justify-between"
+                : "w-[100vw] h-[15vw] flex justify-between"
             } w-full justify-between`}
           >
-            <div className="h-[15vw] w-[30vw] rounded-[1vw] bg-white border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.3vw] border-[#1F487C]">
+            <div className="h-[15vw] w-full rounded-[1vw] bg-white border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.3vw] border-[#1F487C]">
               <p className="text-white h-[3vw] rounded-tr-[0.8vw] rounded-tl-[0.8vw] bg-[#1F487C] font-medium text-[1.3vw] pt-[0.3vw] pb-[0.1vw]">
                 <div className="flex ml-[0.5vw] justify-between items-center">
                   {/* <div
@@ -516,9 +526,9 @@ export default function Roles() {
                             </span>
                             <span className="">
                               <p className="text-[1.1vw] pl-[0.2vw] font-medium text-[#1F487C]">
-                              {typeid === "PRO101" 
-                                ? capitalizeFirstLetter(role?.role) 
-                           : capitalizeFirstLetter(role?.role_type)}
+                                {typeid === "PRO101"
+                                  ? capitalizeFirstLetter(role?.role)
+                                  : capitalizeFirstLetter(role?.role_type)}
                               </p>
                             </span>
                           </div>
@@ -551,7 +561,7 @@ export default function Roles() {
               </div>
             </div>
 
-            {typeid === "PRO101" && (
+            {(typeid === "PRO101" || typeid === "PROEMP101") && (
               <div className="flex ml-[4.5vw] h-[2vw] w-[20vw] gap-x-[2.5vw] text-[1.3vw]">
                 <div
                   className={` cursor-pointer ${
@@ -593,12 +603,13 @@ export default function Roles() {
                 </div>
               </div>
             )}
-            <div className="h-[15vw] w-[30vw] overflow-hidden rounded-[1vw] bg-white border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.3vw] border-[#1F487C]">
+            <div className="h-[15vw] w-full overflow-hidden rounded-[1vw] bg-white border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.3vw] border-[#1F487C]">
               <p className="text-white h-[3vw] rounded-tr-[0.8vw] rounded-tl-[0.8vw] bg-[#1F487C] font-medium text-[1.3vw] pt-[0.6vw] pb-[0.6vw] pl-[1.6vw]">
                 Permissions
               </p>
               <div>
-                {Array.isArray(permissions) && permissions.length > 0 && (
+                {Array.isArray(permissions) &&
+                  permissions.length > 0 &&
                   permissions.map(
                     (permission, index) =>
                       permission.userCount !== undefined && (
@@ -628,15 +639,14 @@ export default function Roles() {
                           </div>
                         </div>
                       )
-                  )
+                  )}
+                {permissionCount?.message && (
+                  <div className="flex justify-center pt-[2vw] items-center w-[30vw]">
+                    <p className="text-center text-[1vw] text-[#1F487C] mt-[2vw]">
+                      {permissionCount?.message}
+                    </p>
+                  </div>
                 )}
-              {permissionCount?.message && 
-                <div className="flex justify-center pt-[2vw] items-center w-[30vw]">
-                <p className="text-center text-[1vw] text-[#1F487C] mt-[2vw]">
-                  {permissionCount?.message}
-                </p>
-              </div>
-              }
               </div>
             </div>
           </div>
@@ -683,7 +693,7 @@ export default function Roles() {
                       </span>
                     </div>
                     <div>
-                      {typeid !== "OP101" && (
+                      {(typeid === "PRO101" || typeid === "PROEMP101") && (
                         <div
                           className="flex items-center"
                           onClick={() => setIsModalOpen(true)}
@@ -786,7 +796,7 @@ export default function Roles() {
                     <DeleteList
                       setDeleteModalIsOpen={setDeleteModalIsOpen}
                       title={"Want to delete this User Role"}
-                      api={`http://192.168.90.47:4000/api/role/${rolesid}`}
+                      api={`${apiUrl}/role/${rolesid}`}
                       module={"roles"}
                       filter={filter}
                     />
@@ -840,19 +850,24 @@ export default function Roles() {
                         ACTIVE PERMISSIONS
                       </span>
                     </div>
-                    <div
-                      className="flex items-center"
-                      onClick={() => {
-                        setIsPermissionModalOpen(true);
-                        SetPermissionData();
-                        SetPermissionUpdate(null);
-                      }}
-                    >
-                      <HiOutlineDocumentPlus className="text-[#FFFFFF] h-[3.4vh] w-[3.4vh] mr-[1vh]" />
-                      <span className="text-[#FFFFFF] font-medium text-[2vh]">
-                        Create New Permission
-                      </span>
-                    </div>
+                    {
+  (typeid === "PRO101" || typeid === "OP101" || (typeid === "PROEMP101" && showCreateIcon)) && (
+    <div
+      className="flex items-center"
+      onClick={() => {
+        setIsPermissionModalOpen(true);
+        SetPermissionData();
+        SetPermissionUpdate(null);
+      }}
+    >
+      <HiOutlineDocumentPlus className="text-[#FFFFFF] h-[3.4vh] w-[3.4vh] mr-[1vh]" />
+      <span className="text-[#FFFFFF] font-medium text-[2vh]">
+        Create New Permission
+      </span>
+    </div>
+  )
+}
+
                   </div>
                   // <div className="flex justify-between">
                   //   <span className="text-[#FFFFFF] font-medium items-center pt-[0.4vw] text-[1.2vw] pl-[1vw]">
@@ -882,7 +897,7 @@ export default function Roles() {
                   SetPermissionId={SetPermissionId}
                   filter={filter}
                   SetFilter={SetFilter}
-                  setPermission = {setPermission}
+                  setPermission={setPermission}
                 />
               </Panel>
             </Collapse>
@@ -899,14 +914,14 @@ export default function Roles() {
       >
         <CreatePermission
           permissionupdate={permissionupdate}
-          SetPermissionUpdate = {SetPermissionUpdate}
+          SetPermissionUpdate={SetPermissionUpdate}
           setIsPermissionModalOpen={setIsPermissionModalOpen}
           SetPermissionData={SetPermissionData}
           permissionData={permissionData}
           permissionid={permissionid}
           filter={filter}
-          setPermission = {setPermission}
-          permission = {permission}
+          setPermission={setPermission}
+          permission={permission}
         />
       </ModalPopup>
       <ModalPopup

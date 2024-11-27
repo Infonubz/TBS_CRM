@@ -17,7 +17,7 @@ export default function Partner({  data,tabfilter }) {
   const [requestData, setRequestData] = useState("");
   const [statusFromEdit, SetStatusFromEdit] = useState(false);
   const [comments,setComments]= useState("")
-
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
 
   
   const closeModal = () => {
@@ -38,14 +38,14 @@ export default function Partner({  data,tabfilter }) {
       // key: "photo",
       align: "center",
       render: (row) => {
-        const image = `http://192.168.90.47:4000${row?.profile_img}`;
+        const image = `${apiImgUrl}${row?.profile_img}`;
         console.log(row?.profileimg, "imageimage");
         return (
           <div className="flex justify-center items-center">
             <img
               src={`${
                 row?.profile_img
-                  ? `http://192.168.90.47:4000${row?.profile_img}`
+                  ? `${apiImgUrl}${row?.profile_img}`
                   : UserProfile
               } `}
               alt="Photo"

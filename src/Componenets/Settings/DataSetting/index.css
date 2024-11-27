@@ -226,10 +226,3 @@
 .custom-option .icon {
   margin-left: 0.5vw;
 }
-
-.umselect{
-  .custom-select .ant-select-selection-search-input {
-    color: #1f4b7f !important;
-    font-size: 1vw;
-  }
-}

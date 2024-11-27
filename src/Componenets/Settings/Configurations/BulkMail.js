@@ -65,16 +65,31 @@ const BulkMail = () => {
     GetFromMail(setFromMail);
   }, []);
 
+  // const handleSelectAll = (event) => {
+  //   const { checked } = event.target;
+  //   setSelectAll(checked);
+  //   setOperatorChecked(
+  //     optionEmail.reduce((acc, { emailid }) => {
+  //       acc[emailid] = checked;
+  //       return acc;
+  //     }, {})
+  //   );
+  // };
+
   const handleSelectAll = (event) => {
     const { checked } = event.target;
     setSelectAll(checked);
-    setOperatorChecked(
-      optionEmail.reduce((acc, { emailid }) => {
-        acc[emailid] = checked;
-        return acc;
-      }, {})
-    );
+  
+    const newOperatorChecked = Array.isArray(optionEmail)
+      ? optionEmail.reduce((acc, { emailid }) => {
+          acc[emailid] = checked;
+          return acc;
+        }, {})
+      : {};  // Return an empty object if optionEmail is not an array
+  
+    setOperatorChecked(newOperatorChecked);
   };
+  
 
   const printSelectedValues = (setFieldValue) => {
     const selectedEmails = Object.keys(operatorChecked).filter(
@@ -122,9 +137,11 @@ const BulkMail = () => {
     }
   };
 
-  const filteredOptions = optionEmail.filter((email) =>
-    email.emailid.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredOptions = Array.isArray(optionEmail) 
+  ? optionEmail.filter((email) =>
+      email?.emailid?.toLowerCase()?.includes(searchTerm?.toLowerCase())
+    ) 
+  : []; 
 
   console.log(optionEmail, 'option_Email')
 
@@ -202,7 +219,7 @@ const BulkMail = () => {
           <form onSubmit={handleSubmit} className="">
             <div className="flex flex-col px-[3vw] pt-[2vw]">
 
-              <div className="">
+              <div className="relative">
                 <Field
                   type="text"
                   name="from_mail"
@@ -214,11 +231,11 @@ const BulkMail = () => {
                 <ErrorMessage
                   name="from_mail"
                   component="div"
-                  className="text-red-500 text-sm"
+                  className="text-red-500 text-sm absolute bottom-[-1.2vw]"
                 />
               </div>
 
-              <div className="mt-[1vw]">
+              <div className="mt-[1vw] relative">
                 <Field
                   type="text"
                   name="to_mail"
@@ -232,7 +249,7 @@ const BulkMail = () => {
                 <ErrorMessage
                   name="to_mail"
                   component="div"
-                  className="text-red-500 text-sm"
+                  className="text-red-500 text-[0.8vw] absolute bottom-[-1.3vw]"
                 />
               </div>
 
@@ -318,7 +335,7 @@ const BulkMail = () => {
                   </div>
                 </Modal>
               </div>
-              <div className="mt-[1vw]">
+              <div className="mt-[1vw] relative">
                 <Field
                   type="text"
                   name="subject"
@@ -328,7 +345,7 @@ const BulkMail = () => {
                 <ErrorMessage
                   name="subject"
                   component="div"
-                  className="text-red-500 text-sm"
+                  className="text-red-500 text-[0.8vw] absolute bottom-[-1.3vw]"
                 />
               </div>
             </div>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { IoIosArrowUp } from "react-icons/io";
 import { RiArrowRightSLine } from "react-icons/ri";
 import { FiAlertCircle } from "react-icons/fi";
@@ -10,6 +10,8 @@ import { Collapse } from "antd";
 import "../../../App.css";
 import EditProfile from "./EditProfile";
 import ForgotPassword from "./ForgotPassword";
+import { GetOperatorData } from "../../../Api/Settings/SystemSettings/CompanyDetails";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function UserSettingList() {
 
@@ -22,21 +24,53 @@ export default function UserSettingList() {
   // };
   // console.log(active, 'active_KEY');
 
+  const [companyData, setCompanyData] = useState();
+  const [userid, setUserid] = useState();
+  const [selectedFile, setSelectedFile] = useState(null);
+
+
+  const typeId = sessionStorage.getItem("type_id");
+  const userID = sessionStorage.getItem("USER_ID")
+
+
+  const operatorData = useSelector((state) => state?.crm?.operator_data[0])
+  console.log(operatorData, 'operator_data')
+
+  const dispatch = useDispatch()
+
+  const fetchData = async () => {
+    if (typeId === 'OP101') {
+      try {
+        const data = await GetOperatorData(dispatch)
+        const profile = data[0].profileimg
+        setSelectedFile(profile)
+        console.log(profile, 'op_profile')
+      } catch (error) {
+
+      }
+    }
+  }
+
+  useEffect(() => {
+    fetchData()
+  }, [dispatch]);
+
   const [active, setActive] = useState("");
 
   const handleCollapseChange = (key) => {
-    setActive((prev) => (prev === key ? "" : key)); 
+    setActive((prev) => (prev === key ? "" : key));
   };
 
   console.log(active, 'active_KEY');
 
+  
 
   return (
     <div>
       <Collapse
         activeKey={active}
         onChange={() => handleCollapseChange("1")}
-        className="bg-[#1F487C] rounded-2xl border border-[#1F487C] "
+        className="bg-[#1F487C] rounded-2xl border border-[#1F487C] shadow-[0_9px_9px_rgba(0,0,0,0.45)] shadow-xl"
         size="large"
         expandIcon={({ isActive }) =>
           isActive ? (

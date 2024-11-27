@@ -21,6 +21,9 @@ export default function Activate_Modal({
   const [isActivateModal, setIsActivateModal] = useState(false);
   const dispatch = useDispatch();
 
+  console.log(requestData,currentid,verifyData,"datatatatatatat");
+  
+
   const handlechange = async (valuedata) => {
     console.log(valuedata, currentid, "currentidcurrentid");
     try {
@@ -69,7 +72,7 @@ export default function Activate_Modal({
               <div className="col-span-5">
                 <label className="text-[#6C717B]">Operator Id</label>
                 <p className="font-bold pt-[0.3vw]">
-                  {requestData?.operator_id}
+                  {requestData?.tbs_operator_id}
                 </p>
               </div>
               <div className="col-span-4">
@@ -122,7 +125,8 @@ export default function Activate_Modal({
                     className="text-[0.8vw] text-white "
                     onClick={() => {
                       handlechange("Active");
-                      setIsActivateModal(true);
+                      // setIsActivateModal(true);
+                      setIsSaveModal(false)
                     }}
                   >
                     Activate

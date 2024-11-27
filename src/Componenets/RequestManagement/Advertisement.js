@@ -16,7 +16,7 @@ import { GetAdsById } from "../../Api/Ads/Ads";
 import ReactPlayer from "react-player";
 import ViewAd from "./Advertisement/ViewAd";
 
-export default function ReqAdvertisement({ currentData, showtable }) {
+export default function ReqAdvertisement({ currentData, showtable, adfilter }) {
   const [eyeModalIsOpen, setEyeModalIsOpen] = useState(false);
   const [viewstatus, setViewStatus] = useState(false);
   const [viewmodal, setViewAdModal] = useState(false);
@@ -24,6 +24,7 @@ export default function ReqAdvertisement({ currentData, showtable }) {
   const [adsDtata, setAdsData] = useState("");
   const [advertisementId, setAdvertisementId] = useState(null);
   const [updatedata, SetUpdateData] = useState(null);
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   console.log(updatedata, "upppppddddddddaaaaaaaaattt");
   const UpdateStatus = (tbs_ad_id) => {
@@ -348,7 +349,7 @@ export default function ReqAdvertisement({ currentData, showtable }) {
         <DeleteList
           setDeleteModalIsOpen={setDeleteModalIsOpen}
           title={"Want to delete this Promotion"}
-          api={`http://192.168.90.47:4000/api/ads/${advertisementId}`}
+          api={`${apiUrl}/ads/${advertisementId}`}
           module={"requestmanagement"}
         />
       </ModalPopup>
@@ -376,6 +377,7 @@ export default function ReqAdvertisement({ currentData, showtable }) {
           adId={advertisementId}
           setViewStatus={setViewStatus}
           showtable={showtable}
+          adfilter={adfilter}
         />
       </ModalPopup>
     </>

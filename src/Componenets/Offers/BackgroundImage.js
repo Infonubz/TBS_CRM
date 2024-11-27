@@ -116,6 +116,7 @@ const BackgroundView = ({
   draggerImage,
   offerType
 }) => {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
 
   // const [startIndex, setStartIndex] = useState(0);
   const [rotateAngle, setRotateAngle] = useState(0);
@@ -706,7 +707,7 @@ const BackgroundView = ({
                   <img
                     // src={previewUrl}
                     // src={currentofferdata.file}
-                    src={`http://192.168.90.47:4000${offerdata.offer_img}`}
+                    src={`${apiImgUrl}${offerdata.offer_img}`}
                     className="w-[8.2vw] h-[15vw] bg-white object-cover opacity-50 rounded-tl-[1vw] rounded-bl-[1vw] rounded-tr-[2.2vw] rounded-br-[1.5vw]"
                   />
                 ) : (
@@ -720,13 +721,13 @@ const BackgroundView = ({
               {updatedata && draggerImage === false ? (
                 <img
                   // src={previewUrl}
-                  src={`http://192.168.90.47:4000${offerdata.offer_img}`}
+                  src={`${apiImgUrl}${offerdata.offer_img}`}
                   className="absolute top-[4.5vw] bg-white left-[0.5vw] w-[5.5vw] h-[5.5vw] rounded-[50%]"
                 />
               ) : (
                 <img
                   src={previewUrl}
-                  // src={`http://192.168.90.47:4000${offerdata.offer_img}`}
+                  // src={`${apiImgUrl}${offerdata.offer_img}`}
                   className="absolute top-[4.5vw] bg-white left-[0.5vw] w-[5.5vw] h-[5.5vw] rounded-[50%]"
                 />
               )}
@@ -856,12 +857,12 @@ const BackgroundView = ({
                       <div className=" flex absolute top-0 w-full h-full ">
                         <div className="  w-[7.2vw] bg-white rounded-lg ">
                           <img
-                            src={`http://192.168.90.47:4000${offerdata.offer_img}`}
+                            src={`${apiImgUrl}${offerdata.offer_img}`}
                             className="w-[4vw] h-[1vw] opacity-30  " />
                         </div>
                         <div className="w-[10vw] h-[10vw] rounded-full absolute top-1 z-20 ">
                           <img
-                            src={`http://192.168.90.47:4000${offerdata.offer_img}`}
+                            src={`${apiImgUrl}${offerdata.offer_img}`}
                             className="w-[6vw]" />
                         </div>
                         <div>

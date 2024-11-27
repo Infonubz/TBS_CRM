@@ -41,7 +41,7 @@ export default function OwnerEmployee({ setAuthtoken }) {
     const validationResult = validateInput(values.emailid_phone);
     try {
       const data = await ProEmpLogin(values, validationResult);
-      //toast.success(data?.message);
+      toast.warning(data?.message);
         if (data?.token !== undefined) {
           console.log(data, "data2");
           navigate("/dashboard");

@@ -75,6 +75,10 @@ const validationSchema = Yup.object().shape({
 
 const Documents = () => {
 
+
+    const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
+    const apiurl = process.env.REACT_APP_API_URL;
+
     const [partnerDocument, setPartnerDocument] = useState()
 
     console.log(partnerDocument, 'partner_document')
@@ -472,7 +476,7 @@ const Documents = () => {
                 <img
                     alt="example"
                     style={{ width: "100%" }}
-                    src={`http://192.168.90.47:4000${previewImage}`}
+                    src={`${apiImgUrl}${previewImage}`}
                 />
             </Modal>
         </div>

@@ -265,6 +265,12 @@ const Documents = () => {
 
   console.log(documents, 'documents_documentes')
 
+
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
+  const apiurl = process.env.REACT_APP_API_URL;
+
+  console.log(apiImgUrl, 'apiimageurl')
+
   const user = sessionStorage.getItem("USER_ID");
 
   const fetchDocuments = async () => {
@@ -410,24 +416,24 @@ const Documents = () => {
 
     if (dropDown == 'operator') {
       images = [
-        `http://192.168.90.47:4000${selectItems?.aadar_front_doc}`,
-        `http://192.168.90.47:4000${selectItems?.aadar_back_doc}`,
-        `http://192.168.90.47:4000${selectItems?.pancard_front_doc}`,
-        `http://192.168.90.47:4000${selectItems?.pancard_back_doc}`,
+        `${apiImgUrl}${selectItems?.aadar_front_doc}`,
+        `${apiImgUrl}${selectItems?.aadar_back_doc}`,
+        `${apiImgUrl}${selectItems?.pancard_front_doc}`,
+        `${apiImgUrl}${selectItems?.pancard_back_doc}`,
       ];
     } else if (dropDown == 'partner') {
       images = [
-        `http://192.168.90.47:4000${selectItems?.aadhar_card_front}`,
-        `http://192.168.90.47:4000${selectItems?.aadhar_card_back}`,
-        `http://192.168.90.47:4000${selectItems?.pan_card_front}`,
-        `http://192.168.90.47:4000${selectItems?.pan_card_back}`,
+        `${apiImgUrl}${selectItems?.aadhar_card_front}`,
+        `${apiImgUrl}${selectItems?.aadhar_card_back}`,
+        `${apiImgUrl}${selectItems?.pan_card_front}`,
+        `${apiImgUrl}${selectItems?.pan_card_back}`,
       ];
     } else if (dropDown == 'employee') {
       images = [
-        `http://192.168.90.47:4000${selectItems?.aadhar_card_front_doc}`,
-        `http://192.168.90.47:4000${selectItems?.aadhar_card_back_doc}`,
-        `http://192.168.90.47:4000${selectItems?.pan_card_front_doc}`,
-        `http://192.168.90.47:4000${selectItems?.pan_card_back_doc}`,
+        `${apiImgUrl}${selectItems?.aadhar_card_front_doc}`,
+        `${apiImgUrl}${selectItems?.aadhar_card_back_doc}`,
+        `${apiImgUrl}${selectItems?.pan_card_front_doc}`,
+        `${apiImgUrl}${selectItems?.pan_card_back_doc}`,
 
       ];
     }
@@ -464,7 +470,7 @@ const Documents = () => {
       //sorter: (a, b) => a.name.length - b.name.length,
       render: (row) => (
         <div className="flex items-center font-normal justify-center">
-          <p className="text-[0.9vw]">{row?.tbs_operator_id ? row?.tbs_operator_id : row?.tbs_partner_id ? row?.tbs_partner_id : row?.tbs_pro_emp_id ? row?.tbs_pro_emp_id : row?.image_size ? (row?.image_size / 1024).toFixed(2) + ' KB' : row?.promo_img_details ? (row?.promo_img_details?.background_image?.size / 1024).toFixed(2) + ' KB' : row?.mobad_file_size ? (row?.mobad_file_size / 1024).toFixed(2) + ' KB' : (row?.ad_file_size / 1024).toFixed(2) + ' KB'}</p>
+          <p className="text-[0.9vw]">{row?.tbs_operator_id ? row?.tbs_operator_id : row?.tbs_partner_id ? row?.tbs_partner_id : row?.tbs_pro_emp_id ? row?.tbs_pro_emp_id : row?.tbs_op_emp_id ? row?.tbs_op_emp_id : row?.image_size ? (row?.image_size / 1024).toFixed(2) + ' KB' : row?.promo_img_details ? (row?.promo_img_details?.background_image?.size / 1024).toFixed(2) + ' KB' : row?.mobad_file_size ? (row?.mobad_file_size / 1024).toFixed(2) + ' KB' : (row?.ad_file_size / 1024).toFixed(2) + ' KB'}</p>
         </div>
       ),
       width: '10vw'
@@ -511,15 +517,15 @@ const Documents = () => {
 
 
   const videoUrl = selectItems?.ad_video
-    ? `http://192.168.90.47:4000${selectItems?.ad_video}`
+    ? `${apiImgUrl}${selectItems?.ad_video}`
     : selectItems?.mobad_vdo
-      ? `http://192.168.90.47:4000${selectItems?.mobad_vdo}`
+      ? `${apiImgUrl}${selectItems?.mobad_vdo}`
       : selectItems?.offer_img
-        ? `http://192.168.90.47:4000${selectItems?.offer_img}`
+        ? `${apiImgUrl}${selectItems?.offer_img}`
         : selectItems?.background_image
-          ? `http://192.168.90.47:4000${selectItems?.background_image}`
+          ? `${apiImgUrl}${selectItems?.background_image}`
           : selectItems?.promo_img_details?.promo_image
-            ? `http://192.168.90.47:4000${selectItems?.promo_img_details?.promo_image}`
+            ? `${apiImgUrl}${selectItems?.promo_img_details?.promo_image}`
             : null;
 
   const fileUrl = videoUrl;
@@ -538,7 +544,7 @@ const Documents = () => {
   return (
     <>
       <div className='p-[1vw] '>
-        <div className='rounded-xl border-[#1F487C] border-[0.1vw] border-b-[0.2vw]' >
+        <div className='rounded-xl border-[#1F487C] border-[0.1vw] border-b-[0.1vw]' >
 
           {/* -------------------------------------------SearchTab------------------------------------- */}
 
@@ -555,7 +561,7 @@ const Documents = () => {
               </div>
             </div>
             <div className='flex items-center gap-[1.5vw]'>
-              <span className='text-white text-[1vw]'>Sort: </span>
+              <span className='text-white text-[1vw]'>Sort : </span>
               <span className='text-white text-[1vw]'>Module Name</span>
               <span className='text-white text-[1vw]'>File Size </span>
               <span className='text-white text-[1vw]'>Date Added</span>
@@ -758,9 +764,10 @@ const Documents = () => {
               </div>
             </div>
           </div>
+        </div>
 
-          {/* ------------------------------------------RecentDocuments--------------------------------- */}
-
+        {/* ------------------------------------------RecentDocuments--------------------------------- */}
+        <div className='pt-[0.5vw]'>
           <div className='px-[1vw] grid grid-cols-2'>
             <div className='font-bold text-[1.25vw] text-[#1F487C] '>
               Recent Documents
@@ -796,31 +803,31 @@ const Documents = () => {
                           <>
                             {selectItems?.aadhar_card_doc !== null && (
                               <img
-                                src={`http://192.168.90.47:4000${selectItems?.aadhar_card_front_doc}`}
+                                src={`${apiImgUrl}${selectItems?.aadhar_card_front_doc}`}
                                 className="h-[10vw]"
                               />
                             )}
                             {selectItems?.pan_card_doc !== null && (
                               <img
-                                src={`http://192.168.90.47:4000${selectItems?.aadhar_card_back_doc}`}
+                                src={`${apiImgUrl}${selectItems?.aadhar_card_back_doc}`}
                                 className="h-[10vw]"
                               />
                             )}
                             {selectItems?.offer_letter_doc !== null && (
                               <img
-                                src={`http://192.168.90.47:4000${selectItems?.pan_card_front_doc}`}
+                                src={`${apiImgUrl}${selectItems?.pan_card_front_doc}`}
                                 className="h-[10vw]"
                               />
                             )}
                             {selectItems?.qualification_doc !== null && (
                               <img
-                                src={`http://192.168.90.47:4000${selectItems?.pan_card_back_doc}`}
+                                src={`${apiImgUrl}${selectItems?.pan_card_back_doc}`}
                                 className="h-[10vw]"
                               />
                             )}
                           </>
                         ) : (
-                          <p>No content available</p>
+                          <p>No data</p>
                         )
                       }
                     </div>
@@ -843,31 +850,31 @@ const Documents = () => {
                             <>
                               {selectItems?.aadhar_card_front !== null && (
                                 <img
-                                  src={`http://192.168.90.47:4000${selectItems?.aadhar_card_front}`}
+                                  src={`${apiImgUrl}${selectItems?.aadhar_card_front}`}
                                   className="h-[10vw]"
                                 />
                               )}
                               {selectItems?.aadhar_card_back !== null && (
                                 <img
-                                  src={`http://192.168.90.47:4000${selectItems?.aadhar_card_back}`}
+                                  src={`${apiImgUrl}${selectItems?.aadhar_card_back}`}
                                   className="h-[10vw]"
                                 />
                               )}
                               {selectItems?.pan_card_front !== null && (
                                 <img
-                                  src={`http://192.168.90.47:4000${selectItems?.pan_card_front}`}
+                                  src={`${apiImgUrl}${selectItems?.pan_card_front}`}
                                   className="h-[10vw]"
                                 />
                               )}
                               {selectItems?.pan_card_back !== null && (
                                 <img
-                                  src={`http://192.168.90.47:4000${selectItems?.pan_card_back}`}
+                                  src={`${apiImgUrl}${selectItems?.pan_card_back}`}
                                   className="h-[10vw]"
                                 />
                               )}
                             </>
                           ) : (
-                            <p>No content available</p>
+                            <p>No data</p>
                           )
                         }
 
@@ -891,28 +898,28 @@ const Documents = () => {
                               <>
                                 {selectItems?.aadar_front_doc && (
                                   <img
-                                    src={`http://192.168.90.47:4000${selectItems?.aadar_front_doc}`}
+                                    src={`${apiImgUrl}${selectItems?.aadar_front_doc}`}
                                     className="h-[10vw]"
                                     alt="Aadhar Front"
                                   />
                                 )}
                                 {selectItems?.aadar_back_doc && (
                                   <img
-                                    src={`http://192.168.90.47:4000${selectItems?.aadar_back_doc}`}
+                                    src={`${apiImgUrl}${selectItems?.aadar_back_doc}`}
                                     className="h-[10vw]"
                                     alt="Aadhar Back"
                                   />
                                 )}
                                 {selectItems?.pancard_front_doc && (
                                   <img
-                                    src={`http://192.168.90.47:4000${selectItems?.pancard_front_doc}`}
+                                    src={`${apiImgUrl}${selectItems?.pancard_front_doc}`}
                                     className="h-[10vw]"
                                     alt="Pan Card Front"
                                   />
                                 )}
                                 {selectItems?.pancard_back_doc && (
                                   <img
-                                    src={`http://192.168.90.47:4000${selectItems?.pancard_back_doc}`}
+                                    src={`${apiImgUrl}${selectItems?.pancard_back_doc}`}
                                     className="h-[10vw]"
                                     alt="Pan Card Back"
                                   />
@@ -920,7 +927,7 @@ const Documents = () => {
 
                               </>
                             ) : (
-                              <p>No content available</p>
+                              <p>No data</p>
                             )
                           }
 
@@ -938,7 +945,7 @@ const Documents = () => {
                           {selectItems ? (
                             selectItems?.ad_file_type?.startsWith("image/") || selectItems?.offer_img || selectItems?.background_image ? (
                               <img
-                                src={`http://192.168.90.47:4000${selectItems?.ad_video || selectItems?.offer_img || selectItems?.background_image}`}
+                                src={`${apiImgUrl}${selectItems?.ad_video || selectItems?.offer_img || selectItems?.background_image}`}
                                 alt="Ad/Offer/Background"
                                 className="w-full h-full object-cover"
                                 style={{ borderRadius: "1.4vw" }}
@@ -952,7 +959,7 @@ const Documents = () => {
                                 className="w-full h-full object-cover"
                                 style={{ borderRadius: "1.2vw" }}
                               >
-                                <source src={`http://192.168.90.47:4000${selectItems?.ad_video || selectItems?.mobad_vdo}`} type={selectItems?.ad_file_type} />
+                                <source src={`${apiImgUrl}${selectItems?.ad_video || selectItems?.mobad_vdo}`} type={selectItems?.ad_file_type} />
                                 Your browser does not support the video tag.
                               </video>
                             ) : (

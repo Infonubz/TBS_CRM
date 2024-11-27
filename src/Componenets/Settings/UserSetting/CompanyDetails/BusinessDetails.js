@@ -26,7 +26,8 @@ const validationSchema = Yup.object().shape({
 });
 
 const BusinessDetails = ({ operatorData }) => {
-
+ 
+    console.log(operatorData, 'operator_data_businessDetails')
     const dispatch = useDispatch()
     const handleSubmit = async (values) => {
         try {

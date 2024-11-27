@@ -107,7 +107,7 @@ export default function CreatePermission({
         module_id: permissionIdMap[permission.module_name],
         module_name: permission.module_name,
       }));
-      if(type_id === "PRO101"){
+      if(type_id === "PRO101" || type_id === "PROEMP101"){
         const data = await SubmitPermissionData(
           { ...values, module_permissions: modulePermissions },
           permissionupdate,
@@ -476,73 +476,71 @@ export default function CreatePermission({
                   ))}
                 </Field> */}
 
-            {(type_id === "OP101" && permissionupdate != null) || 
-              (type_id === "PRO101" && permissionData?.crud_permissions)  ? (
-                <Field
-                  as="input"
-                  id="role_type"
-                  name="role_type"
-                  type="text"
-                  disabled={permissionupdate ? true : false}
-                  className="cursor-not-allowed border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C]
-                   text-[#1F487C] text-[1.2vw] h-[2.90vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
-                />
-              ) : (
-                <ConfigProvider
-                  theme={{
-                    components: {
-                      Select: {
-                        optionActiveBg: "#aebed1",
-                        optionSelectedColor: "#FFF",
-                        optionSelectedBg: "#aebed1",
-                        optionHeight: "2",
-                      },
-                    },
-                  }}
-                >
-                  <Select
-                    placeholder="Select Role"
-                    className="custom-select bg-white outline-none w-full mt-[0.5vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw]
-                    border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
-                    value={values.role_type}
-                    onChange={(value) => {
-                      setFieldValue("role_type", value);
-                      const selectedRole = roleNames?.find(
-                        (role) => role.role_type === value
-                      );
-                      fetchRolesPermission(selectedRole?.role_id);
-                      sessionStorage.setItem("role_type", value);
-                      console.log(selectedRole?.role_id, "Role Type");
-                    }}
-                    suffixIcon={
-                      <span style={{ fontSize: "1vw", color: "#1f487c" }}>
-                        <IoMdArrowDropdown size="2vw" />
-                      </span>
-                    }
-                    options={[
-                      {
-                        value: "",
-                        label: (
-                          <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                            Select Role
-                          </div>
-                        ),
-                        disabled: true,
-                      },
-                      ...(Array.isArray(roleNames) ? roleNames : []).map(
-                        (roleName) => ({
-                          value: roleName.role_type,
-                          label: (
-                            <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                              {roleName.role_type}
-                            </div>
-                          ),
-                        })
-                      ),
-                    ]}
-                  />
-                </ConfigProvider>
-              )}
+{((type_id === "OP101" || type_id === "OPEMP101") && permissionupdate != null) ||
+(type_id === "PRO101" || type_id === "PROEMP101") && permissionData?.crud_permissions ? (
+  <Field
+    as="input"
+    id="role_type"
+    name="role_type"
+    type="text"
+    disabled={!!permissionupdate} // Explicitly convert to boolean
+    className="cursor-not-allowed border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C]
+    text-[#1F487C] text-[1.2vw] h-[2.90vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+  />
+) : (
+  <ConfigProvider
+    theme={{
+      components: {
+        Select: {
+          optionActiveBg: "#aebed1",
+          optionSelectedColor: "#FFF",
+          optionSelectedBg: "#aebed1",
+          optionHeight: "2",
+        },
+      },
+    }}
+  >
+    <Select
+      placeholder="Select Role"
+      className="custom-select bg-white outline-none w-full mt-[0.5vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw]
+      border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
+      value={values.role_type}
+      onChange={(value) => {
+        setFieldValue("role_type", value);
+        const selectedRole = roleNames?.find(
+          (role) => role.role_type === value
+        );
+        fetchRolesPermission(selectedRole?.role_id);
+        sessionStorage.setItem("role_type", value);
+        console.log(selectedRole?.role_id, "Role Type");
+      }}
+      suffixIcon={
+        <span style={{ fontSize: "1vw", color: "#1f487c" }}>
+          <IoMdArrowDropdown size="2vw" />
+        </span>
+      }
+      options={[
+        {
+          value: "",
+          label: (
+            <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+              Select Role
+            </div>
+          ),
+          disabled: true,
+        },
+        ...(Array.isArray(roleNames) ? roleNames : []).map((roleName) => ({
+          value: roleName.role_type,
+          label: (
+            <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+              {roleName.role_type}
+            </div>
+          ),
+        })),
+      ]}
+    />
+  </ConfigProvider>
+)}
 
               <ErrorMessage
                 name="role_type"

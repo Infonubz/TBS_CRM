@@ -42,7 +42,7 @@ const validationSchema = Yup.object().shape({
 
 const CompanyProfile = ({ fileList }) => {
 
-
+    console.log(fileList, 'image_fileList')
     const operatorData = useSelector((state) => state?.crm?.operator_data[0])
     console.log(operatorData, 'operator_data')
 
@@ -55,7 +55,7 @@ const CompanyProfile = ({ fileList }) => {
     const handleSubmit = async (values) => {
         console.log(values, "hiiiiiiiiii");
         try {
-            const data = await SubmitCompanyData(values, dispatch, fileList);
+            const data = await SubmitCompanyData(dispatch, fileList, values);
             GetOperatorData(dispatch)
             toast.success(data?.message);
             console.log("Current page set to 2");
@@ -269,7 +269,7 @@ const CompanyProfile = ({ fileList }) => {
                         <div className='flex items-center justify-center pt-[2vw] pb-[0.5vw]'>
                             <button
                                 type="submit"
-                                className=" text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[12vw]"
+                                className="text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[12vw]"
                                 disabled={isSubmitting || !dirty || !isValid}
                                 style={{
                                     backgroundColor: isSubmitting || !dirty || !isValid ? '#d3d3d3' : '#1F487C',
@@ -277,8 +277,9 @@ const CompanyProfile = ({ fileList }) => {
                                     cursor: isSubmitting || !dirty || !isValid ? 'not-allowed' : 'pointer',
                                 }}
                             >
-                                Save
+                                Submit
                             </button>
+
                         </div>
                     </Form>
                 )}

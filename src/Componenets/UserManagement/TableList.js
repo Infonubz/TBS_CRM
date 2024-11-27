@@ -34,6 +34,8 @@ const TableList = ({
   update,
   setUpdate,
 }) => {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
+  const apiUrl = process.env.REACT_APP_API_URL;
   const [sortedInfo, setSortedInfo] = useState({});
   const [statusModal, setStatusModal] = useState(false);
   const [statusId, setStatusId] = useState();
@@ -66,14 +68,14 @@ const TableList = ({
       // key: "photo",
       align: "center",
       render: (row) => {
-        const image = `http://192.168.90.47:4000${row?.profileimg}`;
+        const image = `${apiImgUrl}${row?.profileimg}`;
         console.log(row?.profileimg, "imageimage");
         return (
           <div className="flex justify-center items-center">
             <img
               src={`${
                 row?.profileimg
-                  ? `http://192.168.90.47:4000${row?.profileimg}`
+                  ? `${apiImgUrl}${row?.profileimg}`
                   : UserProfile
               } `}
               alt="Profile"
@@ -347,7 +349,7 @@ const TableList = ({
   const closeDeleteModal = () => {
     setDeleteOpModalIsOpen(false);
   };
-  const apiUrl = process.env.REACT_APP_API_URL;
+
 
   console.log(currentData, "operatorIDoperatorID");
   return (

@@ -175,7 +175,7 @@ export default function AddPromoIndex({
           promo_value: promodata ? promodata.promo_value : "",
           promo_code: promodata ? promodata.promo_code : "",
         }}
-        validationSchema={validationSchema}
+        // validationSchema={validationSchema}
         context={{ isEdit: true }}
         onSubmit={(values) => handleSubmit(values)}
         //   enableReinitialize

@@ -153,6 +153,7 @@ const Ad_Advertisement = ({
   // clientdetail,
   // setClientDetail,
 }) => {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const { RangePicker } = DatePicker;
   const { Dragger } = Upload;
   const [advalues, setAdValues] = useState();
@@ -969,11 +970,11 @@ text-[#1F487C] text-[0.8vw] h-[2.7vw] w-[100%] rounded-[0.75vw] outline-none px-
                             style={{
                               backgroundImage: `url(${tabType == "Web" && adsdata
                                   ? adsdata.ad_video
-                                    ? `http://192.168.90.47:4000${adsdata.ad_video}`
-                                    : `http://192.168.90.47:4000${fileName.ad_video}`
+                                    ? `${apiImgUrl}${adsdata.ad_video}`
+                                    : `${apiImgUrl}${fileName.ad_video}`
                                   : adsdata.mobad_vdo
-                                    ? `http://192.168.90.47:4000${adsdata.mobad_vdo}`
-                                    : `http://192.168.90.47:4000${fileName.mobad_vdo}`
+                                    ? `${apiImgUrl}${adsdata.mobad_vdo}`
+                                    : `${apiImgUrl}${fileName.mobad_vdo}`
                                 })`,
                               backgroundSize: "cover",
                               backgroundPosition: "center",

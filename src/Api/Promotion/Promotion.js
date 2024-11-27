@@ -105,7 +105,7 @@ export const GetOperatorName = async (dispatch) => {
   try {
     // const response = await axios.get(`${apiUrl}/promo-operatorDetails`);
     const response = await axios.get(
-      `http://192.168.90.47:4000/api/request-management-status/2`
+      `${apiUrl}/request-management-status/2`
     );
     dispatch({ type: GET_OPERATOR_NAME, payload: response.data });
     console.log(response?.data, "operator Name");

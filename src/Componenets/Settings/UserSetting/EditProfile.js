@@ -9,6 +9,9 @@ import { EditUserSettings, UpdateEditUserSettings } from "../../../Api/Settings/
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import IndexEmployee from "./Employee/IndexEmployee";
 import IndexPartner from "./Partner/IndexPartner";
+import CompanDetails from './CompanyDetails/CompanDetails';
+import { GetOperatorData } from "../../../Api/Settings/SystemSettings/CompanyDetails";
+
 
 const EditProfile = () => {
 
@@ -92,13 +95,44 @@ const EditProfile = () => {
     setShowPassword(!showPassword);
   };
 
+
+  const [companyData, setCompanyData] = useState();
+  const [userid, setUserid] = useState();
+  const [selectedFile, setSelectedFile] = useState(null);
+
+
+
+
+  const operatorData = useSelector((state) => state?.crm?.operator_data[0])
+  console.log(operatorData, 'operator_data')
+
+
+  const fetchData = async () => {
+    if (typeId === 'OP101') {
+      try {
+        const data = await GetOperatorData(dispatch)
+        const profile = data[0].profileimg
+        setSelectedFile(profile)
+        console.log(profile, 'op_profile')
+      } catch (error) {
+
+      }
+    }
+  }
+
+  useEffect(() => {
+    fetchData()
+  }, [dispatch]);
+
   return (
     <>
 
       {typeId === 'PROEMP101' ? <IndexEmployee />
         : typeId === 'EMP101' ? <IndexEmployee /> :
           typeId === 'PAT101' ? <IndexPartner />
-            :
+            : typeId === 'OP101' ?< CompanDetails operatorData={operatorData}
+            selectedFile={selectedFile}
+            /> :
             < div >
               <Formik
                 initialValues={{

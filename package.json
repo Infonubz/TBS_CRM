@@ -17,6 +17,7 @@
     "country-list": "^2.3.0",
     "dayjs": "^1.11.11",
     "dom-to-image": "^2.6.0",
+    "dotenv": "^16.4.5",
     "file-saver": "^2.0.5",
     "formik": "^2.4.6",
     "fortawesome": "^0.0.1-security",

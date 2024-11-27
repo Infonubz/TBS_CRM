@@ -256,7 +256,7 @@
 //               {(updatedata && draggerImage === false) ?
 //                 <img
 //                   // src={previewUrl}
-//                   src={`http://192.168.90.47:4000${promodata.promo_image}`}
+//                   src={`${apiImgUrl}${promodata.promo_image}`}
 //                   className="w-[8.2vw] h-[13vw] bg-white object-cover opacity-50 rounded-tl-[1vw] rounded-bl-[1vw] rounded-tr-[2.2vw] rounded-br-[1.5vw]"
 //                 />
 //                 :
@@ -273,7 +273,7 @@
 //                 <img
 //                   // src={previewUrl}
 //                   // src={currentofferdata.file}
-//                   src={`http://192.168.90.47:4000${promodata.promo_image}`}
+//                   src={`${apiImgUrl}${promodata.promo_image}`}
 //                   className="w-[6.5vw] h-[13vw] bg-white object-cover opacity-50 rounded-tl-[1vw] rounded-bl-[1vw] rounded-tr-[2.2vw] rounded-br-[1.5vw]"
 //                 />
 //               ) : (
@@ -285,13 +285,13 @@
 //             </div>
 //             {updatedata && draggerImage === false ? (
 //               <img
-//                 src={`http://192.168.90.47:4000${promodata.promo_image}`}
+//                 src={`${apiImgUrl}${promodata.promo_image}`}
 //                 className="absolute top-[4.5vw] bg-white left-[7.2vw] w-[4.5vw] h-[4.5vw] rounded-[50%]"
 //               />
 //             ) : (
 //               <img
 //                 src={previewUrl}
-//                 // src={`http://192.168.90.47:4000${promodata.promo_image}`}
+//                 // src={`${apiImgUrl}${promodata.promo_image}`}
 //                 className="absolute top-[4.5vw] bg-white left-[7.1vw] w-[4.5vw] h-[4.5vw] rounded-[50%]"
 //               />
 //             )}
@@ -369,8 +369,8 @@
 //                 // style={{
 //                 //   backgroundImage: `url(${
 //                 //     adsdata.ad_video
-//                 //       ? `http://192.168.90.47:4000${adsdata.ad_video}`
-//                 //       : `http://192.168.90.47:4000${fileName.ad_video}`
+//                 //       ? `${apiImgUrl}${adsdata.ad_video}`
+//                 //       : `${apiImgUrl}${fileName.ad_video}`
 //                 //   })`,
 //                 //   backgroundSize: "cover",
 //                 //   backgroundPosition: "center",
@@ -570,8 +570,9 @@ const Background_View = ({
   setImageData,
   setSample,
   sample,
-  setBgPromo
+  setBgPromo,
 }) => {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [fileName, setFileName] = useState("");
   const [fileList, setFileList] = useState([]);
@@ -747,19 +748,21 @@ const Background_View = ({
         <div className="absolute top-1/2 left-[10.2vw] -translate-y-1/2">
           {updatedata && !draggerImage ? (
             <img
-              src={`http://192.168.90.47:4000${promodata.promo_image}`}
-              className="w-[6vw] h-[12.5vw] bg-white object-cover opacity-50 rounded-tl-[1vw] rounded-bl-[1vw] rounded-tr-[2.2vw] rounded-br-[1.5vw]"
+              src={`${apiImgUrl}${promodata.promo_image}`}
+              // className="logo"
+              className="w-[6vw] h-[12.5vw] z-2 bg-white object-cover opacity-50 rounded-tl-[1vw] rounded-bl-[1vw] rounded-tr-[2.2vw] rounded-br-[1.5vw]"
             />
           ) : (
             <img
               src={tempUrl}
-              className="w-[6vw] h-[12.5vw] bg-white object-cover opacity-50 blur-[0.05vw] rounded-tl-[1vw] rounded-bl-[1vw] rounded-tr-[2.2vw] rounded-br-[1.5vw]"
+              // className="logo"
+              className="w-[6vw] h-[12.5vw] z-2 bg-white object-cover opacity-50 blur-[0.05vw] rounded-tl-[1vw] rounded-bl-[1vw] rounded-tr-[2.2vw] rounded-br-[1.5vw]"
             />
           )}
         </div>
         {updatedata && !draggerImage ? (
           <img
-            src={`http://192.168.90.47:4000${promodata.promo_image}`}
+            src={`${apiImgUrl}${promodata.promo_image}`}
             className="absolute top-1/2 left-[11vw] -translate-y-1/2 w-[4.5vw] h-[4.5vw] bg-white rounded-full"
           />
         ) : (
@@ -806,27 +809,12 @@ const Background_View = ({
   console.log(promolist?.usage, "promolistpromolist");
   console.log(SaveFun, "SaveFun");
 
-  // const saveAsImage = async () => {
-  //   if (componentRef.current) {
-  //     try {
-  //       const dataUrl = await toPng(componentRef.current, { backgroundColor: "#ffffff" });
-  //       setImageData(dataUrl); // Save the image data URL to state
-  //       console.log(dataUrl,"Image saved in state!");
-  //       sessionStorage.setItem("promo_bg",dataUrl)
-  //     } catch (error) {
-  //       console.error("Error generating image:", error);
-  //     }
-  //   }
-  // };
   const saveAsImage = async () => {
     if (componentRef.current) {
       try {
-        // Generate the image data URL
         const dataUrl = await toPng(componentRef.current, {
           backgroundColor: "#ffffff",
         });
-
-        // Convert the data URL to a Blob
         const response = await fetch(dataUrl);
         const blob = await response.blob();
 
@@ -837,29 +825,152 @@ const Background_View = ({
           lastModified: Date.now(),
         });
 
-        // Save the File object in state
-        setImageData(fileObject);
+        setImageData(dataUrl); // Save the image data URL to state
+        console.log(dataUrl, "Image saved in state!");
+        sessionStorage.setItem("promo_bg", dataUrl);
         dispatch({
           type: PROMO_BG_IMAGE,
           payload: fileObject,
         });
-        console.log(fileObject.name, "fileObject7965413");
-        sessionStorage.setItem("promo_bg_name", fileObject.name);
-        // sessionStorage.setItem("promo_bg", JSON.stringify(fileObject));
-        sessionStorage.setItem("promo_bg", fileObject);
-
-        setPromolist({
-          ...promolist,
-          background_image: "hello",
-        });
-        setBgPromo(fileObject)
-        setSample("test");
-        console.log("File saved in state:", fileObject);
       } catch (error) {
-        console.error("Error generating file:", error);
+        console.error("Error generating image:", error);
       }
     }
   };
+
+  // const saveAsImage = async () => {
+  //   if (componentRef.current) {
+  //     try {
+  //       // Generate the image data URL
+  //       const dataUrl = await toPng(componentRef.current, {
+  //         backgroundColor: "#ffffff",
+  //       });
+
+  //       // Convert the data URL to a Blob
+  //       const response = await fetch(dataUrl);
+  //       const blob = await response.blob();
+
+  //       // Create a File object
+  //       const fileName = "pencilicon.png"; // You can customize the file name
+  //       const fileObject = new File([blob], fileName, {
+  //         type: "image/png",
+  //         lastModified: Date.now(),
+  //       });
+
+  //       // Save the File object in state
+  //       setImageData(fileObject);
+  //       dispatch({
+  //         type: PROMO_BG_IMAGE,
+  //         payload: fileObject,
+  //       });
+  //       console.log(fileObject.name, "fileObject7965413");
+  //       sessionStorage.setItem("promo_bg_name", fileObject.name);
+  //       // sessionStorage.setItem("promo_bg", JSON.stringify(fileObject));
+  //       sessionStorage.setItem("promo_bg", fileObject);
+
+  //       setPromolist({
+  //         ...promolist,
+  //         background_image: "hello",
+  //       });
+  //       setBgPromo(fileObject)
+  //       setSample("test");
+  //       console.log("File saved in state:", fileObject);
+  //     } catch (error) {
+  //       console.error("Error generating file:", error);
+  //     }
+  //   }
+  // };
+
+  //new
+
+  // const saveAsImage = async () => {
+  //   // Find the current large slide element
+  //   const largeSlideElement = document.querySelector(".carousel-slide.large-slide");
+
+  //   if (!largeSlideElement) {
+  //     console.error("No large slide found!");
+  //     return;
+  //   }
+
+  //   try {
+  //     // Use html2canvas to capture the slide
+  //     const canvas = await html2canvas(largeSlideElement, {
+  //       scale: 2, // Increase resolution
+  //       useCORS: true, // Enable cross-origin resource sharing
+  //       backgroundColor: "#ffffff", // Optional: Set background color
+  //     });
+
+  //     // Convert canvas to Data URL
+  //     const dataUrl = canvas.toDataURL("image/png");
+
+  //     // Convert the data URL to a Blob
+  //     const response = await fetch(dataUrl);
+  //     const blob = await response.blob();
+
+  //     // Create a File object
+  //     const fileName = "promotion-image.png"; // Customize file name
+  //     const fileObject = new File([blob], fileName, {
+  //       type: "image/png",
+  //       lastModified: Date.now(),
+  //     });
+
+  //     // Save the File object in state (if required for further use)
+  //     setImageData(fileObject);
+  //     dispatch({
+  //       type: PROMO_BG_IMAGE,
+  //       payload: fileObject,
+  //     });
+
+  //     // Trigger download
+  //     const link = document.createElement("a");
+  //     link.href = dataUrl;
+  //     link.download = fileName;
+  //     document.body.appendChild(link);
+  //     link.click();
+  //     document.body.removeChild(link); // Clean up
+
+  //     console.log("Image saved and downloaded successfully!");
+  //   } catch (error) {
+  //     console.error("Error saving large slide as image:", error);
+  //   }
+  // };
+
+  // const saveAsImage = async () => {
+  //   if (componentRef.current) {
+  //     try {
+  //       // Generate the image data URL
+  //       const dataUrl = await toPng(componentRef.current, {
+  //         backgroundColor: "#ffffff", // Optional: Set background color
+  //       });
+  //       // Convert the data URL to a Blob
+  //       const response = await fetch(dataUrl);
+  //       const blob = await response.blob();
+
+  //       // Create a File object
+  //       const fileName = "pencilicon.png"; // You can customize the file name
+  //       const fileObject = new File([blob], fileName, {
+  //         type: "image/png",
+  //         lastModified: Date.now(),
+  //       });
+  //       console.log(fileObject, "fileObject777");
+  //       dispatch({
+  //         type: PROMO_BG_IMAGE,
+  //         payload: fileObject,
+  //       });
+  //       // Save the image data URL to state
+  //       setImageData(dataUrl);
+
+  //       // Log for debugging
+  //       console.log("Image saved in state:", dataUrl);
+
+  //       // Optionally, save it to sessionStorage or another storage
+  //       sessionStorage.setItem("promo_bg", dataUrl);
+  //     } catch (error) {
+  //       console.error("Error generating image:", error);
+  //     }
+  //   }
+  // };
+
   useEffect(() => {
     if (SaveFun) {
       saveAsImage();
@@ -868,7 +979,7 @@ const Background_View = ({
   // console.log(imageData, "imageFileimageFile");
   // const storedFileData = sessionStorage.getItem("promo_bg");
   // console.log(storedFileData,"storedFileData");
-  
+
   // if (storedFileData) {
   //   const { name, lastModified, type, size } = JSON.parse(storedFileData);
 

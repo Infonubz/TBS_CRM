@@ -9,12 +9,12 @@ import {
 } from "../../../Api/RequestManagement/RequestManagement";
 import { toast } from "react-toastify";
 
-export default function ReqAdsStatusUpdate({ adId, setViewStatus,showtable }) {
+export default function ReqAdsStatusUpdate({ adId, setViewStatus,showtable,adfilter }) {
   const dispatch = useDispatch();
 
   const handlechange = async (valueid, valuedata) => {
     try {
-      const data = await ReqAdsStatusChange(valueid, valuedata, adId, dispatch,showtable);
+      const data = await ReqAdsStatusChange(valueid, valuedata, adId, dispatch,showtable,adfilter);
       console.log(valueid, valuedata, adId, "currentidcurrentid");
       console.log(data, "datadatadatadata");
       toast.success(data);

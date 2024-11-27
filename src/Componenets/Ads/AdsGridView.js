@@ -17,7 +17,7 @@ import { FaPhoneAlt } from 'react-icons/fa';
 const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPage, updatedata, SetUpdateData, deleteData, SetDeleteData, mbleItemsPerPage, mble_activePage, openPopovers, setOpenPopovers, isModalOpen, setIsModalOpen, adsdata, setAdsData }) => {
 
   const apiUrl = process.env.REACT_APP_API_URL;
-
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const togglePopover = (adId) => {
     setOpenPopovers((prevState) => ({
       ...prevState,
@@ -245,7 +245,7 @@ const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPag
                         <div className="w-full h-[9.5vw] overflow-hidden ">
                           {item?.ad_file_type && item?.ad_file_type.startsWith("image/") ? (
                             <img
-                              src={`http://192.168.90.47:4000${item?.ad_video}`}
+                              src={`${apiImgUrl}${item?.ad_video}`}
                               alt="Ad"
                               className="w-full h-full object-cover"
                               style={{
@@ -263,7 +263,7 @@ const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPag
                                 style={{
                                   objectFit: "cover",
                                 }}
-                                url={`http://192.168.90.47:4000${item?.ad_video}`}
+                                url={`${apiImgUrl}${item?.ad_video}`}
                                 className="react-player"
                               />
                             </div>
@@ -441,7 +441,7 @@ const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPag
                         <div className="w-full h-[9.5vw] overflow-hidden ">
                           {item?.mobad_file_type && item?.mobad_file_type.startsWith("image/") ? (
                             <img
-                              src={`http://192.168.90.47:4000${item?.mobad_vdo}`}
+                              src={`${apiImgUrl}${item?.mobad_vdo}`}
                               alt="Ad"
                               className="w-full h-full object-cover"
                               style={{
@@ -459,7 +459,7 @@ const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPag
                                 style={{
                                   objectFit: "cover",
                                 }}
-                                url={`http://192.168.90.47:4000${item?.mobad_vdo}`}
+                                url={`${apiImgUrl}${item?.mobad_vdo}`}
                                 className="react-player"
                               />
                             </div>

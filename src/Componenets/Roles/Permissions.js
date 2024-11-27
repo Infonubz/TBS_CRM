@@ -46,6 +46,21 @@ export default function Permission({
   const dispatch = useDispatch();
   const userId = sessionStorage.getItem("USER_ID");
   const type_id = sessionStorage.getItem("type_id");
+
+
+  const storedCrudPermissions = sessionStorage.getItem("crud_permission");
+  const crudPermissions = storedCrudPermissions
+    ? storedCrudPermissions.split(",")
+    : [];
+
+  const showCreateIcon = crudPermissions.includes("create");
+  const showEditIcon = crudPermissions.includes("update");
+  const showDeleteIcon = crudPermissions.includes("delete");
+  const showViewIcon = crudPermissions.includes("view");
+
+  const type =  type_id === "PRO101" || type_id === "OP101";
+
+
   const permissionData = async(filter) =>{
     try{
      const data = await GetPermissionData(filter, dispatch);
@@ -76,22 +91,22 @@ export default function Permission({
   };
 
   const permissionColumns = [
+    // {
+    //   title: <span className="text-[1.1vw] font-bold pl-[2vw]">ID</span>,
+    //   render: (row) => {
+    //     return (
+    //       <span className="flex">
+    //         <h1 className="pl-[2vw] text-[1vw]">{row?.permission_id}</h1>
+    //       </span>
+    //     );
+    //   },
+    // },
     {
-      title: <span className="text-[1.1vw] font-bold pl-[2vw]">ID</span>,
+      title: <span className="text-[1.1vw] font-bold pl-[2vw]">User</span>,
       render: (row) => {
         return (
           <span className="flex">
-            <h1 className="pl-[2vw] text-[1vw]">{row?.permission_id}</h1>
-          </span>
-        );
-      },
-    },
-    {
-      title: <span className="text-[1.1vw] font-bold">User</span>,
-      render: (row) => {
-        return (
-          <span className="flex">
-            <h1 className="text-[1vw]">{capitalizeFirstLetter(row?.user ==="Operator"? "Operator Employee" : "Product Owner Employee")}</h1>
+            <h1 className="text-[1vw] pl-[2vw]">{capitalizeFirstLetter(row?.user ==="operator" || row?.user ==="Operator" ? "Operator Employee" : "Product Owner Employee")}</h1>
           </span>
         );
       },
@@ -148,16 +163,17 @@ export default function Permission({
         );
       },
     },
-    // Module Permission column
     {
       title: <span className="text-[1.1vw] font-bold">Module Permission</span>,
       render: (row) => {
-        const modulePermissions = row?.module_permissions || [];
+        const modulePermissions = Array.isArray(row?.module_permissions)
+          ? row.module_permissions
+          : []; // Ensure it's an array
         const moduleNames = modulePermissions.map(
           (permission) => permission.module_name
         );
         const moduleName = moduleNames.join(", ");
-
+    
         return (
           <div className="flex items-center">
             {moduleName.length > 20 ? (
@@ -167,10 +183,7 @@ export default function Permission({
                 className="cursor-pointer"
                 color="#1F487C"
               >
-                <h1 className="text-[1.1vw]">{`${moduleName.slice(
-                  0,
-                  20
-                )}...`}</h1>
+                <h1 className="text-[1.1vw]">{`${moduleName.slice(0, 20)}...`}</h1>
               </Tooltip>
             ) : (
               <h1 className="text-[1.1vw]">{moduleName}</h1>
@@ -179,6 +192,7 @@ export default function Permission({
         );
       },
     },
+    
     // Created column
     {
       title: <span className="text-[1.1vw] font-bold">Created</span>,
@@ -220,6 +234,7 @@ export default function Permission({
         };
         return (
           <span className="action-icons flex gap-2">
+           {(showEditIcon || type) && (
             <MdModeEdit
               className="h-[1.8vw] w-[1.8vw] cursor-pointer"
               onClick={() => {
@@ -232,11 +247,14 @@ export default function Permission({
               }}
               color="#1F4B7F"
             />
+            )}
+            {(showDeleteIcon || type) && (
             <MdDelete
               className="h-[1.8vw] w-[1.8vw] cursor-pointer"
               onClick={handleDelete}
               color="#1F4B7F"
             />
+      )}
             <i
               className="pi pi-ellipsis-v text-[#1F4B7F] pt-[0.2vw]"
               style={{ fontSize: "1.25rem" }}

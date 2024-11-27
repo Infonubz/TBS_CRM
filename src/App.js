@@ -29,6 +29,8 @@ import OperatorLoginPage from "./Componenets/LoginPage/Operator";
 import OwnerEmployeeLoginPage from "./Componenets/LoginPage/OwnerEmployee";
 import PartnerLoginPage from "./Componenets/LoginPage/Partner";
 import OperatorEmployeeLoginPage from "./Componenets/LoginPage/OperatorEmployee";
+// import dotenv from 'dotenv';
+// dotenv.config();
 
 function App() {
   // const [authtoken, setAuthtoken] = useState(sessionStorage.getItem("token"));

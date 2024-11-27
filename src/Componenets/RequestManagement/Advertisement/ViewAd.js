@@ -4,6 +4,8 @@ import { GetAdsById } from "../../../Api/Ads/Ads";
 import ReactPlayer from "react-player";
 
 const ViewAd = ({updatedata,showtable}) =>{
+    const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
+
     const [adsData,setAdsData] = useState()
     console.log(updatedata,"ponceads");
 
@@ -31,7 +33,7 @@ const ViewAd = ({updatedata,showtable}) =>{
                             showtable == 4 ?
                         (adsData?.ad_file_type || adsData?.ad_file_type.startsWith("image/")) ? (
                         <img
-                            src={`http://192.168.90.47:4000${adsData?.ad_video}`}
+                            src={`${apiImgUrl}${adsData?.ad_video}`}
                             alt="Ad"
                             className="w-full h-full object-cover"
                             style={{
@@ -49,7 +51,7 @@ const ViewAd = ({updatedata,showtable}) =>{
                             style={{
                                 objectFit: "cover",
                             }}
-                            url={`http://192.168.90.47:4000${adsData?.ad_video}`}
+                            url={`${apiImgUrl}${adsData?.ad_video}`}
                             className="react-player"
                             />
                         </div>
@@ -57,7 +59,7 @@ const ViewAd = ({updatedata,showtable}) =>{
                         :
                         (adsData?.mobad_file_type || adsData?.mobad_file_type.startsWith("image/")) ? (
                             <img
-                                src={`http://192.168.90.47:4000${adsData?.mobad_vdo}`}
+                                src={`${apiImgUrl}${adsData?.mobad_vdo}`}
                                 alt="Ad"
                                 className="w-full h-full object-cover"
                                 style={{
@@ -75,7 +77,7 @@ const ViewAd = ({updatedata,showtable}) =>{
                                 style={{
                                     objectFit: "cover",
                                 }}
-                                url={`http://192.168.90.47:4000${adsData?.mobad_vdo}`}
+                                url={`${apiImgUrl}${adsData?.mobad_vdo}`}
                                 className="react-player"
                                 />
                             </div>

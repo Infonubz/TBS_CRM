@@ -110,10 +110,10 @@ export default function Sidebar() {
   }, [getnotificationlist]);
 
   return (
-    <div className="fixed w-full ">
-      <div className="relative">
+    <div className="fixed w-full px-[2.5vw]">
+      <div className="relative ">
         {/* rounded-t-full */}
-        <div className="absolute h-[8vh] bottom-0 left-[2.5%] right-[2.5%] px-[5vw] flex items-center rounded-t-full  bg-[#1F4B7F] w-[96%]">
+        <div className="absolute h-[8vh] bottom-0  pl-[2.5vw]  flex items-center rounded-t-full  bg-[#1F4B7F] w-full">
           {/* <div className="absolute h-[5vw] bottom-0 left-0 right-0 px-[5vw] flex items-center  bg-[#1F4B7F] w-[100%]"> */}
           <div className=" flex items-center justify-between w-full">
             <div className="flex items-center gap-[2vw]">

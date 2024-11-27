@@ -85,6 +85,7 @@ export default function AddPromotion({
   handleChange,
   setFieldValue,
 }) {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const { Dragger } = Upload;
   const [fileName, setFileName] = useState("");
   const dispatch = useDispatch();
@@ -825,7 +826,7 @@ text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1v
                       backgroundImage: `url(${
                         sessionStorage.getItem("upload")
                           ? sessionStorage.getItem("promotion_logo")
-                          : `http://192.168.90.47:4000${promodata.promo_image}`
+                          : `${apiImgUrl}${promodata.promo_image}`
                       })`,
                       backgroundSize: "cover",
                       backgroundPosition: "center",

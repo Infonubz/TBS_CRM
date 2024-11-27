@@ -22,6 +22,7 @@ import { toast } from "react-toastify";
 import { RiUser3Fill } from "react-icons/ri";
 import ImgCrop from "antd-img-crop";
 
+
 const getBase64 = (file) =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -37,6 +38,7 @@ export default function ClientIndex({
   setModalIsOpen,
   updatedata,
 }) {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const [currentpage, setCurrentpage] = useState(1);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
@@ -53,6 +55,8 @@ export default function ClientIndex({
   const location = useLocation();
   const [selectedFile, setSelectedFile] = useState(null);
   const [SPA_ID, SetSPAID] = useState(null);
+
+  const imgUrl = process.env.REACT_SERVER_IMAGE_URL
   //const [superadmindata, setSuperAdminData] = useState("");
   const [clientdata, setClientData] = useState("");
 
@@ -161,6 +165,7 @@ export default function ClientIndex({
   //     setFileList(selectedFile)
   //   }
   // },[selectedFile])
+console.log(process.env.REACT_SERVER_IMAGE_URL,"urlrurlrurlrurlrurlrurl");
 
   return (
     <div>
@@ -258,9 +263,9 @@ export default function ClientIndex({
                   {fileList.length === 0 &&
                     selectedFile && ( // Check if there are no files in the fileList and selectedFile is set
                       <img
-                        src={`http://192.168.90.47:4000${selectedFile}`}
+                        src={`${apiImgUrl}${selectedFile}`}
                         alt="Profile"
-                        className="w-[5vw] h-[5vw] object-cover rounded-[0.2vw] top-[.7vw] left-[.7vw] absolute opacity-25 z-[1] pointer-events-none"
+                        className="w-[5.9vw] h-[5.9vw] object-cover rounded-[0.2vw] top-[0vw] left-[0vw] absolute opacity-25 z-[1] pointer-events-none"
                       />
                     )}
                 </div>

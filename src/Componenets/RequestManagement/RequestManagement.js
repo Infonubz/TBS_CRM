@@ -466,12 +466,13 @@ const partnerIndexOfFirtsItem = partnerIndexOfLastItem - partnerItemsPerPage
           dispatch,
           moment(values[0].$d).format("YYYY-MM-DD"),
           moment(values[1].$d).format("YYYY-MM-DD"),
-          showtable
+          showtable,
+          adfilter
         );
         // functioncall()
       } catch (err) {
         console.log(err, "iam the error");
-        GetRequestAdsData(dispatch, 5, showtable);
+        GetRequestAdsData(dispatch, adfilter, showtable);
       }
     } else if (showtable == 5) {
       try {
@@ -497,12 +498,13 @@ const partnerIndexOfFirtsItem = partnerIndexOfLastItem - partnerItemsPerPage
           dispatch,
           moment(values[0].$d).format("YYYY-MM-DD"),
           moment(values[1].$d).format("YYYY-MM-DD"),
-          showtable
+          showtable,
+          adfilter
         );
         // functioncall()
       } catch (err) {
         console.log(err, "iam the error");
-        GetRequestAdsData(dispatch, 5, showtable);
+        GetRequestAdsData(dispatch, adfilter, showtable);
       }
     }
 
@@ -526,13 +528,13 @@ const partnerIndexOfFirtsItem = partnerIndexOfLastItem - partnerItemsPerPage
       SearchRequestPromotion(e.target.value, dispatch);
     } else if (showtable == 4) {
       console.log(e.target.value, "search e value");
-      SearchReqAdvertisement(e.target.value, dispatch, showtable);
+      SearchReqAdvertisement(e.target.value, dispatch, showtable,adfilter);
     } else if (showtable == 5) {
       ReqManOffersSearch(e.target.value, dispatch);
       console.log(e.target.value, "evalues");
     } else {
       console.log(e.target.value, "search e value");
-      SearchReqAdvertisement(e.target.value, dispatch, showtable);
+      SearchReqAdvertisement(e.target.value, dispatch, showtable,adfilter);
     }
   };
   // ######################################################################
@@ -581,6 +583,14 @@ const partnerIndexOfFirtsItem = partnerIndexOfLastItem - partnerItemsPerPage
     }
   }, [showtable, setShowTable, showpaginate, setShowPaginate]);
 
+  useEffect(()=>{
+    SetFilter("all")
+    setPartnerFilter("all")
+    SetAdFilter("all")
+    SetOfferFilter("All")
+    SetPromoFilter("All")
+  },[showtable])
+
   return (
     <>
       <div
@@ -591,7 +601,7 @@ const partnerIndexOfFirtsItem = partnerIndexOfLastItem - partnerItemsPerPage
           backgroundPosition: "center",
         }}
       >
-        <div className="px-[5vw] h-[92vh] w-full ">
+        <div className="px-[2.5vw] h-[92vh] w-full ">
           <div className="h-[12vh] w-full flex flex-col ">
             <div className="flex items-center pt-[0.5vw]">
               <h1 className="text-[#1F4B7F]  text-[1.5vw] font-bold">
@@ -843,7 +853,7 @@ const partnerIndexOfFirtsItem = partnerIndexOfLastItem - partnerItemsPerPage
                         </p>
                       </div>
                     </div>
-                  ) : showtable == 4 ? (
+                  ) : showtable == 4 || 6 ? (
                     <div className="flex gap-x-[2.5vw] text-[1.3vw]">
                       <div
                         className={` cursor-pointer ${adfilter == "all"
@@ -881,7 +891,7 @@ const partnerIndexOfFirtsItem = partnerIndexOfLastItem - partnerItemsPerPage
                         }}
                       >
                         <p className="text-[1.3vw] text-[#1f487c] text-center">
-                          Verified
+                          Approved
                         </p>
                       </div>
                       <div
@@ -1160,6 +1170,7 @@ const partnerIndexOfFirtsItem = partnerIndexOfLastItem - partnerItemsPerPage
                 currentData={adscurrentItems}
                 columns={columns}
                 showtable={showtable}
+                adfilter={adfilter}
               />
             ) : showtable == 5 ? (
               <ReqOffers currentData={offerCurrentItems} columns={columns} />
@@ -1168,6 +1179,7 @@ const partnerIndexOfFirtsItem = partnerIndexOfLastItem - partnerItemsPerPage
                 currentData={adscurrentItems}
                 columns={columns}
                 showtable={showtable}
+                adfilter={adfilter}
               />
             ) : (
               ""

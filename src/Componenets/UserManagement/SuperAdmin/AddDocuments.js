@@ -88,6 +88,8 @@ export default function AddDocuments({
   setDocumentBack,
   updatedata
 }) {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
+ 
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
@@ -99,6 +101,8 @@ export default function AddDocuments({
     panbk: null,
     msme: null,
   });
+
+
 
   const handleFileChange = (event, key) => {
     const file = event?.currentTarget?.files[0];
@@ -371,7 +375,7 @@ export default function AddDocuments({
                           />
                           ) : (
                             <img
-                            src={`http://192.168.90.47:4000${inputPreview.aadharfr}`}
+                            src={`${apiImgUrl}${inputPreview.aadharfr}`}
                             className="h-[2.5vw] w-[2.5vw] absolute  top-[.2vw] cursor-zoom-in right-[.3vw]"
                             alt="Aadhar Front"
                             onClick={openModal} 
@@ -581,7 +585,7 @@ export default function AddDocuments({
                           />
                           ) : (
                             <img
-                            src={`http://192.168.90.47:4000${inputPreview.aadharbk}`}
+                            src={`${apiImgUrl}${inputPreview.aadharbk}`}
                             className="h-[2.5vw] w-[2.5vw] absolute  top-[.2vw] cursor-zoom-in right-[.3vw]"
                             alt="Aadhar Back"
                             onClick={openModal} 
@@ -711,7 +715,7 @@ export default function AddDocuments({
                           />
                           ) : (
                             <img
-                            src={`http://192.168.90.47:4000${inputPreview.panfr}`}
+                            src={`${apiImgUrl}${inputPreview.panfr}`}
                             className="h-[2.5vw] w-[2.5vw] absolute  top-[.2vw] cursor-zoom-in right-[.3vw]"
                             alt="Pan Front"
                             onClick={openModal} 
@@ -838,7 +842,7 @@ export default function AddDocuments({
                           />
                           ) : (
                             <img
-                            src={`http://192.168.90.47:4000${inputPreview.panbk}`}
+                            src={`${apiImgUrl}${inputPreview.panbk}`}
                             className="h-[2.5vw] w-[2.5vw] absolute  top-[.2vw] cursor-zoom-in right-[.3vw]"
                             alt="Pan Back"
                             onClick={openModal} 
@@ -967,7 +971,7 @@ export default function AddDocuments({
                           />
                           ) : (
                             <img
-                            src={`http://192.168.90.47:4000${inputPreview.msme}`}
+                            src={`${apiImgUrl}${inputPreview.msme}`}
                             className="h-[2.5vw] w-[2.5vw] absolute  top-[.2vw] cursor-zoom-in right-[.3vw]"
                             alt="msme"
                             onClick={openModal} 

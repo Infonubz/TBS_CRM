@@ -32,6 +32,8 @@ const ClientTableView = ({
   setDeleteModalIsOpen,
   deletemodalIsOpen,
 }) => {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
+  const apiUrl = process.env.REACT_APP_API_URL;
   const [sortedInfo, setSortedInfo] = useState({});
   const handleChange = (pagination, filters, sorter) => {
     console.log("Various parameters", pagination, filters, sorter);
@@ -53,13 +55,13 @@ const ClientTableView = ({
       align: "center",
       render: (row) => {
         console.log(row, "rowrowrow");
-        const image = `http://192.168.90.47:4000${row?.company_logo}`;
+        const image = `${apiImgUrl}${row?.company_logo}`;
         console.log(image, "imageimage");
         return (
           <div className="flex justify-center items-center">
             <img
               src={`${row?.company_logo
-                ? `http://192.168.90.47:4000${row?.company_logo}`
+                ? `${apiImgUrl}${row?.company_logo}`
                 : UserProfile
                 } `}
                  alt="Profile"
@@ -288,7 +290,7 @@ const ClientTableView = ({
     setDeleteModalIsOpen(false);
   };
 
-  const apiUrl = process.env.REACT_APP_API_URL;
+
 
   const closeModal = () => {
     setViewModal(false);

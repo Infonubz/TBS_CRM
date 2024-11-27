@@ -40,6 +40,7 @@ export default function AddGSTDetails({
   setModalIsOpen,
   setGstback,
 }) {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const [modalIsOpen1, setmodalIsOpen1] = useState(false);
   const [superadmingstdata, setSuperAdminGSTData] = useState("");
 
@@ -263,7 +264,7 @@ export default function AddGSTDetails({
                         <div className="grid grid-cols-2 mt-[1vw]">
                           <div className="font-semibold">Upload Documents:</div>
                           {/* <div>{superadmingstdata?.upload_gst}</div> */}
-                          <span className="h-[8vw] w-[9vw] flex items center"><img src={`http://192.168.90.47:4000/${superadmingstdata?.upload_gst}`} alt="Gst Document"/></span>
+                          <span className="h-[8vw] w-[9vw] flex items center"><img src={`${apiImgUrl}/${superadmingstdata?.upload_gst}`} alt="Gst Document"/></span>
                         </div>
                       </div>
                     ) : (

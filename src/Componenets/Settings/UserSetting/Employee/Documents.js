@@ -94,6 +94,11 @@ const validationSchema = Yup.object().shape({
 
 const Documents = () => {
 
+
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
+  const apiurl = process.env.REACT_APP_API_URL;
+
+
   const [empDocument, setEmpDocument] = useState()
 
   console.log(empDocument, 'emp_Document')
@@ -600,6 +605,12 @@ const Documents = () => {
               <div className='flex items-center justify-center pt-[2vw] pb-[0.5vw]'>
                 <button
                   type="submit"
+                  // disabled={isSubmitting || !dirty || !isValid}
+                  // style={{
+                  //   backgroundColor: isSubmitting || !dirty || !isValid ? '#d3d3d3' : '#1F487C',
+                  //   color: isSubmitting || !dirty || !isValid ? '#9e9e9e' : '#fff',
+                  //   cursor: isSubmitting || !dirty || !isValid ? 'not-allowed' : 'pointer',
+                  // }}
                   disabled={isSubmitting || !dirty || !isValid}
                   style={{
                     backgroundColor: isSubmitting || !dirty || !isValid ? '#d3d3d3' : '#1F487C',
@@ -612,6 +623,7 @@ const Documents = () => {
                 </button>
               </div>
             </div>
+            {console.log(dirty, 'dirty_dirty')}
           </Form>
         )}
       </Formik>
@@ -625,7 +637,7 @@ const Documents = () => {
         <img
           alt="example"
           style={{ width: "100%" }}
-          src={`http://192.168.90.47:4000${previewImage}`}
+          src={`${apiImgUrl}${previewImage}`}
         />
       </Modal>
     </div>

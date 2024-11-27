@@ -102,16 +102,15 @@ export const ProEmpLogin = async (personalvalues, validationResult) => {
     const crudPermissions = response?.data?.crud_permissions;
     if (response.data) {
       sessionStorage.setItem("USER_ID", response.data.id);
+      sessionStorage.setItem("PRO_ID", response.data.ownerId);
+      sessionStorage.setItem("USER_ID", response.data.id);
       sessionStorage.setItem("token", response.data.token);
       sessionStorage.setItem("user_name", response.data.user_name);
       sessionStorage.setItem("type_id", response.data.type_id);
       sessionStorage.setItem("type_name", response.data.type_name);
+      sessionStorage.setItem("crud_permission",crudPermissions);
       sessionStorage.setItem(
-        "crud_permissions",
-        JSON.stringify(crudPermissions)
-      );
-      sessionStorage.setItem(
-        "module_permissions",
+        "module_permission",
         JSON.stringify(modulePermissions)
       );
       return response.data;
@@ -161,15 +160,13 @@ export const OpEmpLogin = async (personalvalues, validationResult) => {
     const crudPermissions = response?.data?.crud_permissions;
     if (response.data) {
       sessionStorage.setItem("USER_ID", response.data.id);
+      sessionStorage.setItem("OP_ID", response.data.operatorId);
       sessionStorage.setItem("token", response.data.token);
       sessionStorage.setItem("user_name", response.data.user_name);
       sessionStorage.setItem("type_id", response.data.type_id);
       sessionStorage.setItem("type_name", response.data.type_name);
       sessionStorage.setItem("crud_permission", crudPermissions);
-      sessionStorage.setItem(
-        "module_permission",
-        JSON.stringify(modulePermissions)
-      );
+      sessionStorage.setItem("module_permission", JSON.stringify(modulePermissions));
       return response.data;
     } else {
       throw new Error("Invalid response from server");
@@ -302,10 +299,10 @@ export const PartnerLogin = async (values, validationResult) => {
       return response?.data;
     }
   } catch (error) {
-    if (error.response.data.error) {
+    if (error.response && error.response.data && error.response.data.error) {
       toast.warning(error.response.data.error);
     } else {
-      console.log(error.response, "An error occurred. Please try again.");
+      toast.error("An error occurred. Please try again.");
     }
     return null;
   }

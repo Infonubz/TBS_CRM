@@ -34,6 +34,7 @@ const AdsListView = ({
   setAdsData,
 }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
 
   const togglePopover = (adId) => {
     setOpenPopovers((prevState) => ({
@@ -352,7 +353,7 @@ const AdsListView = ({
           <div className="w-full h-[10vw] overflow-hidden px-[1vw] py-[0.5vw]">
             {row.ad_file_type && row.ad_file_type.startsWith("image/") ? (
               <img
-                src={`http://192.168.90.47:4000${row.ad_video}`}
+                src={`${apiImgUrl}${row.ad_video}`}
                 alt="Ad"
                 className="w-full h-full object-cover"
                 style={{
@@ -370,7 +371,7 @@ const AdsListView = ({
                   style={{
                     objectFit: "cover",
                   }}
-                  url={`http://192.168.90.47:4000${row.ad_video}`}
+                  url={`${apiImgUrl}${row.ad_video}`}
                   className="react-player"
                 />
               </div>
@@ -640,7 +641,7 @@ const AdsListView = ({
           <div className="w-full h-[10vw] overflow-hidden px-[1vw] py-[0.5vw]">
             {row.mobad_file_type && row.mobad_file_type.startsWith("image/") ? (
               <img
-                src={`http://192.168.90.47:4000${row.mobad_vdo}`}
+                src={`${apiImgUrl}${row.mobad_vdo}`}
                 alt="Ad"
                 className="w-full h-full object-cover"
                 style={{
@@ -658,7 +659,7 @@ const AdsListView = ({
                   style={{
                     objectFit: "cover",
                   }}
-                  url={`http://192.168.90.47:4000${row.ad_video}`}
+                  url={`${apiImgUrl}${row.ad_video}`}
                   className="react-player"
                 />
               </div>

@@ -34,6 +34,7 @@ export default function AddOffer({
   offerType,
   setOfferType
 }) {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
 
   const validationSchema = Yup.object().shape({
     // usage: Yup.string()
@@ -325,9 +326,16 @@ export default function AddOffer({
             <Form onSubmit={handleSubmit}>
               <div className="flex justify-between mr-[3vw]">
                 <div className="text-[1.4vw] text-[#1F4B7F] font-semibold">
-                  {updatedata
-                    ? "UPDATE OFFERS & DEALS"
-                    : "CREATE NEW OFFERS & DEALS"}
+                 {offerType === 'discount' ? 
+                   updatedata
+                    ? "UPDATE DISCOUNT OFFERS"
+                    : "CREATE NEW DISCOUNT OFFERS"
+                 :
+                 updatedata
+                  ? "UPDATE REDEEM OFFERS"
+                  : "CREATE NEW REDEEM OFFERS"
+                  }
+
                 </div>
                 <div className="flex gap-x-[1vw]">
                   {/* {offerlist?.offer_bgImgae && (
@@ -801,8 +809,8 @@ text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.75vw] outline-none px-[1vw
                                 backgroundImage: `url(${(offerdata.offer_img
                                   && draggerImage == false
                                 )
-                                  ? `http://192.168.90.47:4000${offerdata.offer_img}`
-                                  : `http://192.168.90.47:4000${offerdata.offer_img}`
+                                  ? `${apiImgUrl}${offerdata.offer_img}`
+                                  : `${apiImgUrl}${offerdata.offer_img}`
                                   })`,
                                 backgroundSize: "cover",
                                 backgroundPosition: "center",
@@ -846,7 +854,7 @@ text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.75vw] outline-none px-[1vw
                               style={{
                                 backgroundImage: `url(${
                                   previewUrl || offerdata.offer_img
-                                    ? `http://192.168.90.47:4000${offerdata.offer_img}`
+                                    ? `${apiImgUrl}${offerdata.offer_img}`
                                     : ""
                                 })`,
                                 backgroundSize: "cover",

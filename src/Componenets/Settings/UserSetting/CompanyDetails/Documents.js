@@ -75,6 +75,9 @@ const validationSchema = Yup.object().shape({
 const Documents = ({ operatorData }) => {
 
 
+    const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
+    const apiurl = process.env.REACT_APP_API_URL;
+
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState("");
     const [previewTitle, setPreviewTitle] = useState("");
@@ -151,7 +154,7 @@ const Documents = ({ operatorData }) => {
                 >
                     {({ isSubmitting, isValid, setFieldValue, values, handleChange, dirty }) => (
 
-                        
+
                         < Form >
                             <div className="grid grid-cols-2 gap-[1vw]">
                                 <div className="">
@@ -575,8 +578,8 @@ const Documents = ({ operatorData }) => {
                             {console.log(dirty, 'dirty_dirty')}
                         </Form>
                     )}
-            </Formik>
-        </div >
+                </Formik>
+            </div >
             <Modal
                 open={previewOpen}
                 title={previewTitle}
@@ -586,7 +589,7 @@ const Documents = ({ operatorData }) => {
                 <img
                     alt="example"
                     style={{ width: "100%" }}
-                    src={`http://192.168.90.47:4000${previewImage}`}
+                    src={`${apiImgUrl}${previewImage}`}
                 />
             </Modal>
         </>

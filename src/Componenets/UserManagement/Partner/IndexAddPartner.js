@@ -41,6 +41,7 @@ export default function AddParner({
   setModalIsOpen,
   updatedata
 }) {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const [currentpage, setCurrentpage] = useState(1);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
@@ -241,9 +242,9 @@ export default function AddParner({
                   {fileList.length === 0 &&
                     selectedFile && ( // Check if there are no files in the fileList and selectedFile is set
                       <img
-                        src={`http://192.168.90.47:4000${selectedFile}`}
+                        src={`${apiImgUrl}${selectedFile}`}
                         alt="Profile"
-                        className="w-[5vw] h-[5vw] object-cover rounded-[0.2vw] top-[.7vw] left-[.7vw] absolute opacity-25 z-[1] pointer-events-none"
+                        className="w-[5.9vw] h-[5.9vw] object-cover rounded-[0.2vw] top-[0vw] left-[0vw] absolute opacity-25 z-[1] pointer-events-none"
                       />
                     )}
       

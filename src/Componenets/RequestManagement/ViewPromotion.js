@@ -3,7 +3,8 @@ import { GetReqPromotionById } from "../../Api/RequestManagement/RequestManageme
 
 export default function ViewPromotion({ promoId }) {
   const [promodata, setPromoData] = useState("");
-  console.log(promoId, "idddddddsaasd");
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
+
   const fetchGetPromo = async () => {
     try {
       const data = await GetReqPromotionById(promoId);
@@ -16,7 +17,7 @@ export default function ViewPromotion({ promoId }) {
   useEffect(() => {
     fetchGetPromo();
   }, [promoId]);
-  console.log(promodata, "promodata");
+
   return (
     <div className="w-full h-full">
       {/* <div className="col-span-2 flex flex-col">
@@ -28,7 +29,7 @@ export default function ViewPromotion({ promoId }) {
         </span>
       </div> */}
       <img
-        src={`http://192.168.90.47:4000${promodata.background_image}`}
+        src={`${apiImgUrl}${promodata.background_image}`}
         className="w-full h-full object-contain"
       />
     </div>

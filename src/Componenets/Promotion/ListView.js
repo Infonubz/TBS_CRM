@@ -20,6 +20,8 @@ export default function ListView({
   activePage,
   itemsPerPage,
 }) {
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const [eyeModalIsOpen, setEyeModalIsOpen] = useState(false);
   const [promoImage, setPromoImage] = useState("");
   const closeModal = () => {
@@ -177,9 +179,11 @@ export default function ListView({
       render: (row) => {
         return (
           <div className="flex items-center justify-center">
-            <p className="text-[1.1vw] text-[#1F487C]">{`${dayjs(row?.start_date).format(
+            <p className="text-[1.1vw] text-[#1F487C]">{`${dayjs(
+              row?.start_date
+            ).format("MMM DD")} - ${dayjs(row?.expiry_date).format(
               "MMM DD"
-            )} - ${dayjs(row?.expiry_date).format("MMM DD")}`}</p>
+            )}`}</p>
           </div>
         );
       },
@@ -196,9 +200,11 @@ export default function ListView({
       render: (row) => {
         return (
           <div className="flex items-center justify-center">
-            <p className="text-[1.1vw] text-[#1F487C]">{`${dayjs(row?.start_date).format(
+            <p className="text-[1.1vw] text-[#1F487C]">{`${dayjs(
+              row?.start_date
+            ).format("MMM DD")} - ${dayjs(row?.expiry_date).format(
               "MMM DD"
-            )} - ${dayjs(row?.expiry_date).format("MMM DD")}`}</p>
+            )}`}</p>
           </div>
         );
       },
@@ -277,16 +283,16 @@ export default function ListView({
               }}
             />
             {/* {(row?.promo_status_id === 1 || row?.promo_status_id === 0) && ( */}
-              <MdEdit
-                size={"1.3vw"}
-                color="#1F4B7F"
-                className=" cursor-pointer"
-                onClick={() => {
-                  setPromotionId(row.promo_id);
-                  SetUpdateData(row.promo_id);
-                  setModalIsOpen(true);
-                }}
-              />
+            <MdEdit
+              size={"1.3vw"}
+              color="#1F4B7F"
+              className=" cursor-pointer"
+              onClick={() => {
+                setPromotionId(row.promo_id);
+                SetUpdateData(row.promo_id);
+                setModalIsOpen(true);
+              }}
+            />
             {/* // )} */}
             <MdDelete
               size={"1.3vw"}
@@ -325,7 +331,7 @@ export default function ListView({
         {
           <div className="flex justofy-center mt-[1vw]">
             <img
-              src={`http://192.168.90.47:4000${promoImage}`}
+              src={`${apiImgUrl}${promoImage}`}
               className="rounded-[0.5vw]"
             />
           </div>

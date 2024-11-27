@@ -19,6 +19,10 @@ import { FaDownload } from "react-icons/fa6";
 
 const CustomTemplate = () => {
 
+
+    const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
+    const apiurl = process.env.REACT_APP_API_URL;
+
     const [documents, setDocuments] = useState([]);
     const [error, setError] = useState(null);
     const [dropDown, setDropDown] = useState('employee')
@@ -53,7 +57,7 @@ const CustomTemplate = () => {
         if (!row) {
             setErrors("Please select a Module.");
         } else {
-            const fileUrl = `http://192.168.90.47:4000${row?.upload_files}`;
+            const fileUrl = `${apiImgUrl}${row?.upload_files}`;
             const a = document.createElement('a');
             a.href = fileUrl;
             a.download = '';
@@ -186,7 +190,7 @@ const CustomTemplate = () => {
     return (
         <>
             <div className='p-[1vw] '>
-                <div className='rounded-xl border-[#1F487C] border-[0.1vw] border-b-[0.2vw]' >
+                <div className='rounded-xl border-[#1F487C] border-[0.1vw] border-b-[0.1vw]' >
 
                     {/* -------------------------------------------SearchTab------------------------------------- */}
 
@@ -204,7 +208,7 @@ const CustomTemplate = () => {
                                 </div>
                             </div>
                             <div className='flex items-center gap-[1.5vw]'>
-                                <span className='text-white text-[1vw]'>Sort: </span>
+                                <span className='text-white text-[1vw]'>Sort : </span>
                                 <span className='text-white text-[1vw]'>Module Name</span>
                                 <span className='text-white text-[1vw]'>File Size </span>
                                 <span className='text-white text-[1vw]'>Date Added</span>
@@ -226,7 +230,7 @@ const CustomTemplate = () => {
                         {documents.map((items) => (
                             <div
                                 // onClick={() => toggleDropDown('employee')}
-                                className={`${dropDown === 'employee' ? 'shadow-[#1F487C] shadow-md ' : ''} w-[15vw] h-[10vw] border-[0.2vw] border-[#1F487C] bg-white  rounded-xl border-t-[0.5vw]`}>
+                                className="w-[15vw] h-[10vw] border-[0.2vw] border-[#1F487C] bg-white  rounded-xl border-t-[0.5vw]">
                                 <div className="pl-[1vw] pt-[0.5vw] grid grid-rows-3 gap-y-[1vw]">
                                     <div>
                                         <svg
@@ -250,9 +254,9 @@ const CustomTemplate = () => {
                             </div>
                         ))}
                     </div>
-
-                    {/* ------------------------------------------RecentDocuments--------------------------------- */}
-
+                </div>
+                {/* ------------------------------------------RecentDocuments--------------------------------- */}
+                <div>
                     <div className='px-[1vw]'>
                         <div className='font-bold text-[1.25vw] text-[#1F487C] '>
 

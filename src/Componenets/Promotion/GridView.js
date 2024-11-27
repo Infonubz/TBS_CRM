@@ -19,6 +19,7 @@ export default function GridView({
   setPromotionId,
   setDeleteModalIsOpen,
 }) {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const [eyeModalIsOpen, setEyeModalIsOpen] = useState(false);
   const [promoImage, setPromoImage] = useState("");
   const closeModal = () => {
@@ -70,7 +71,7 @@ export default function GridView({
               <img
                 src={
                   item.promo_image != null
-                    ? `http://192.168.90.47:4000${item.promo_image}`
+                    ? `${apiImgUrl}${item.promo_image}`
                     : userimg
                 }
                 className="h-[4.5vw] w-[4.5vw]  rounded-[0.5vw] flex items-center justify-center"
@@ -245,7 +246,7 @@ export default function GridView({
         {
           <div className="flex justofy-center mt-[1vw]">
             <img
-              src={`http://192.168.90.47:4000${promoImage}`}
+              src={`${apiImgUrl}${promoImage}`}
               className="rounded-[0.5vw]"
             />
           </div>

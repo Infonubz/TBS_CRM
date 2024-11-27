@@ -31,7 +31,7 @@ export default function Settings() {
           backgroundPosition: "center",
         }}
       >
-        <div className="px-[5vw] h-[92vh] relative  w-full ">
+        <div className="px-[2.5vw] h-[92vh] relative  w-full ">
           <div className="h-[12vh] w-full flex flex-col ">
             <h1 className="text-[#1F4B7F] pt-[0.5vw] text-[1.5vw] font-bold">
               SETTINGS

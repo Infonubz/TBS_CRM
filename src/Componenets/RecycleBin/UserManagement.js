@@ -9,6 +9,8 @@ import ModalPopup from "../Common/Modal/Modal";
 import BinDelete from "./BinDelete";
 
 export default function UserManagement({ currentItems, selectedTab, activePage, itemsPerPage }) {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
+
   const [tbsId, setTbsId] = useState();
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [restoreModalOpen, SetRestoreModalOpen] = useState(false);
@@ -43,7 +45,7 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
       ),
       align: "center",
       render: (row) => {
-        const image = `http://192.168.90.47:4000${selectedTab === 5
+        const image = `${apiImgUrl}${selectedTab === 5
             ? row?.deleted_data?.operator?.profileimg
             : selectedTab === 7
               ? row?.deleted_data?.clientCompanyDetails?.company_logo
@@ -59,7 +61,7 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
         return (
           <div className="flex  items-center">
             <img
-              src={`http://192.168.90.47:4000${selectedTab === 5
+              src={`${apiImgUrl}${selectedTab === 5
                   ? row?.deleted_data?.operator?.profileimg
                   : selectedTab === 7
                     ? row?.deleted_data?.clientCompanyDetails?.company_logo

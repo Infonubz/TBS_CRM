@@ -5,6 +5,8 @@ import { MdCloudDownload } from "react-icons/md";
 import { MdCloudUpload } from "react-icons/md";
 import { LiaUserEditSolid } from "react-icons/lia";
 import { HiOutlineDocumentDuplicate } from "react-icons/hi";
+import { LuLayoutTemplate } from "react-icons/lu";
+
 import { RiDeleteBin5Fill } from "react-icons/ri";
 import { Collapse } from "antd";
 import "../../../App.css";
@@ -157,7 +159,7 @@ export default function DataSettingList() {
       <Collapse
         activeKey={active}
         onChange={() => handleCollapseChange("3")}
-        className="bg-[#1F487C] rounded-2xl border border-[#1F487C] shadow-[0_9px_9px_rgba(0,0,0,0.45)]shadow-xl"
+        className="bg-[#1F487C] rounded-2xl border border-[#1F487C] shadow-[0_9px_9px_rgba(0,0,0,0.45)]shadow-xl shadow-[0_9px_9px_rgba(0,0,0,0.45)] shadow-xl"
         size="large"
         expandIcon={({ isActive }) =>
           isActive ? (
@@ -204,10 +206,10 @@ export default function DataSettingList() {
         ]}
       />
 
-<Collapse
+      <Collapse
         activeKey={active}
         onChange={() => handleCollapseChange("4")}
-        className="bg-[#1F487C] rounded-2xl border border-[#1F487C] mt-[1vw] shadow-[0_9px_9px_rgba(0,0,0,0.45)]shadow-xl"
+        className="bg-[#1F487C] rounded-2xl border border-[#1F487C] mt-[1vw] shadow-[0_9px_9px_rgba(0,0,0,0.45)] shadow-xl"
         size="large"
         expandIcon={({ isActive }) =>
           isActive ? (
@@ -230,7 +232,7 @@ export default function DataSettingList() {
               <div className="flex items-center h-[5vh]">
                 <div className="col-span-2 pt-[0.3vw]">
                   <span className="">
-                    <HiOutlineDocumentDuplicate
+                    <LuLayoutTemplate
                       style={{
                         color: "#FFFFFF",
                         height: "2.3vw",

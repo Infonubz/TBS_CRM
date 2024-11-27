@@ -38,8 +38,12 @@ import { saveAs } from "file-saver";
 import RedeemListView from "./RedeemOffer/RedeemListView";
 import RedeemGridView from "./RedeemOffer/RedeemGridView";
 import { GetRedeemOffersData, handleRedeemoffersearch, SubmitRedeemExcel } from "../../Api/Offers/RedeemOffers";
+import { Tooltip } from "antd";
+
 
 export default function Offers() {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
+
   const [view, setView] = useState("list");
   // const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -53,7 +57,7 @@ export default function Offers() {
   const [offerType, setOfferType] = useState('discount')
   const [offerimage, setOfferImage] = useState("");
   const [offerview, setOfferView] = useState(false);
-
+  const [offerFilter, setOfferFilter] = useState('all')
 
   console.log(offerdata, 'Offers_datas')
 
@@ -123,7 +127,7 @@ export default function Offers() {
   };
 
   // const Getofferdata = async () => {
-  //   const url = "http://192.168.90.47:4000/promo";
+  //   const url = "${apiImgUrl}/promo";
   //   try {
   //     const response = await axios.get(url);
   //     console.log(response, "responseresponse");
@@ -142,7 +146,7 @@ export default function Offers() {
   //   Getofferdata();
   // }, []);
   // const handleSearch = async (value) => {
-  //   const url = `http://192.168.90.47:4000/search`;
+  //   const url = `${apiImgUrl}/search`;
   //   const payload = { search: value };
   //   try {
   //     const response = await axios.post(url, payload);
@@ -293,12 +297,12 @@ export default function Offers() {
             backgroundPosition: "center",
           }}
         >
-          <div className="px-[5vw] h-[92vh] relative w-full ">
+          <div className="px-[2.5vw] h-[92vh] relative w-full ">
             <div className="h-[12vh]  w-full flex flex-col ">
               <h1 className="text-[#1F4B7F] pt-[0.5vw] text-[1.5vw] font-bold">
-                OFFERS & DEALS
+                OFFERS
               </h1>
-              <div className="pb-[0.5vw] flex h-full items-center gap-[1vw]">
+              <div className="pb-[0.5vw] flex h-full items-center gap-[1.25vw]">
                 {/* <div className="flex border-[#1F4B7F] h-[5vh] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw]">
                   <button
                     className={`${view == "list" ? "bg-[#1F4B7F]" : "bg-white"
@@ -344,6 +348,12 @@ export default function Offers() {
                   </button>
                 </div> */}
                 <div className="flex border-[#1F4B7F] h-[5vh] ">
+                <Tooltip
+                placement="top"
+                title='List'
+                className="cursor-pointer"
+                color="black"
+              >
                   <button
                     className={`${view === 'list' ? "bg-[#1F487C]" : "bg-[white]"} px-[0.75vw] rounded-l-xl border-[0.1vw] border-b-[0.2vw] border-r-0  border-[#1F487C]`}
                     style={{
@@ -352,6 +362,14 @@ export default function Offers() {
                     onClick={() => setView('list')}>
                     <IoMdMenu color={`${view === 'list' ? "white" : "#1F487C"}`} />
                   </button>
+                  </Tooltip>
+               
+                  <Tooltip
+                placement="top"
+                title='Grid'
+                className="cursor-pointer"
+                color="black"
+              >
                   <button
                     className={`${view === 'Grid' ? "bg-[#1F487C]" : "bg-[white]"} px-[0.75vw] rounded-r-xl border-[0.1vw] border-b-[0.2vw] border-r-[0.2vw] border-l-0  border-[#1F487C]`}
                     style={{
@@ -360,8 +378,9 @@ export default function Offers() {
                     onClick={() => setView('Grid')}>
                     <IoGrid color={`${view === 'Grid' ? "white" : "#1F487C"}`} />
                   </button>
+                  </Tooltip>
                 </div>
-                <div className="flex gap-[1vw]">
+                <div className="flex gap-[1.25vw]">
                   {/* <div className="relative flex items-center">
                     <input
                       type="text"
@@ -379,8 +398,8 @@ export default function Offers() {
                   <div className="relative flex items-center">
                     <input
                       type="text"
-                      className="bg-white placeholder-[#1f477c76] text-[#1F487C] outline-none pl-[3vw] w-[19vw] h-[5vh] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw]"
-                      placeholder="Search Offer & Deal"
+                      className="bg-white placeholder-[#1f477c76] text-[#1F487C] outline-none pl-[3vw] w-[13.85vw] h-[5vh] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw]"
+                      placeholder="Search Offer"
                       onChange={(e) => {
                         { offerType === 'discount' ? handleoffersearch(e, dispatch) : handleRedeemoffersearch(e, dispatch) }
                       }}
@@ -391,11 +410,103 @@ export default function Offers() {
                       color="#1F4B7F"
                     />
                   </div>
-                  <div className="relative flex items-center justify-between w-[21vw] text-[1.3vw]">
-                    <div className={`${offerType === 'redeem' ? 'font-semibold underline' : ' '} text-[#1F487C] cursor-pointer `}
-                      onClick={() => setOfferType('redeem')}>Redeem Offers</div>
-                    <div className={`${offerType === 'discount' ? 'font-semibold underline' : 'font-normal'} text-[#1F487C] cursor-pointer`}
-                      onClick={() => setOfferType('discount')}>Discount Offers</div>
+
+                  <div className="w-[34vw]">
+                    <div className="flex gap-x-[2.25vw] text-[1.2vw]">
+                      <div
+                        className={` cursor-pointer ${offerFilter == "all"
+                          ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                          : ""
+                          } `}
+                        onClick={() => {
+                          setOfferFilter("all");
+                        }}
+                      >
+                        <p className="text-[1.3vw] text-[#1f487c] text-center">
+                          All
+                        </p>
+                      </div>
+                      <div
+                        className={` cursor-pointer ${offerFilter == "pending"
+                          ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                          : ""
+                          } `}
+                        onClick={() => {
+                          setOfferFilter("pending");
+                        }}
+                      >
+                        <p className="text-[1.3vw] text-[#1f487c] text-center">
+                          Pending
+                        </p>
+                      </div>
+                      <div
+                        className={` cursor-pointer ${offerFilter == "approved"
+                          ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                          : ""
+                          } `}
+                        onClick={() => {
+                          setOfferFilter("approved");
+                        }}
+                      >
+                        <p className="text-[1.3vw] text-[#1f487c] text-center">
+                          Approved
+                        </p>
+                      </div>
+                      <div
+                        className={` cursor-pointer ${offerFilter == "hold"
+                          ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                          : ""
+                          } `}
+                        onClick={() => {
+                          setOfferFilter("hold");
+                        }}
+                      >
+                        <p className="text-[1.3vw] text-[#1f487c] text-center">
+                          Hold
+                        </p>
+                      </div>
+                      <div
+                        className={` cursor-pointer ${offerFilter == "rejected"
+                          ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                          : ""
+                          } `}
+                        onClick={() => {
+                          setOfferFilter("rejected");
+                        }}
+                      >
+                        <p className="text-[1.3vw] text-[#1f487c] text-center">
+                          Rejected
+                        </p>
+                      </div>
+                      <div
+                        className={` cursor-pointer ${offerFilter == "draft"
+                          ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                          : ""
+                          } `}
+                        onClick={() => {
+                          setOfferFilter("draft");
+                        }}
+                      >
+                        <p className="text-[1.3vw] text-[#1f487c] text-center">
+                          Draft
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="relative flex items-center  text-[1.1vw]">
+                    <div className={`${offerType === 'redeem' ? "bg-[#1F4B7F] text-white font-semibold " : "bg-white"
+                      }  px-[0.5vw]  gap-[0.5vw] items-center rounded-tl-xl rounded-bl-xl border-[0.1vw] border-b-[0.25vw] border-r-0 border-[#1F487C] cursor-pointer w-[6vw] h-[5vh] flex item-center justify-center`}
+                    style={{
+                      transition: "all 0.5s",
+                    }}
+                      onClick={() => setOfferType('redeem')}>Redeem</div>
+                    <div className={`${offerType === 'discount' ? "bg-[#1F4B7F] text-white font-semibold " : "bg-white"
+                      }  px-[0.5vw]  gap-[0.5vw] items-center rounded-r-xl border-[0.1vw] border-r-[0.25vw] border-b-[0.25vw] border-l-0 border-[#1F487C] cursor-pointer w-[6vw] h-[5vh] flex item-center justify-center` }
+                      style={{
+                        transition: "all 0.5s",
+                      }}
+                      onClick={() => setOfferType('discount')}>Discount</div>
                   </div>
                   <div>
                     <ConfigProvider
@@ -412,14 +523,14 @@ export default function Offers() {
                       }}>
                       <Select
                         showSearch
-                        className=" custom-select bg-white outline-none w-[15vw] h-[5vh] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw]"
+                        className=" custom-select bg-white outline-none w-[11vw] h-[5vh] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw]"
                         placeholder="Select Categories"
                         optionFilterProp="label"
                         onChange={handleOccupationChange}
                         suffixIcon={<span style={{ fontSize: '1vw', color: '#1f487c' }}><IoMdArrowDropdown size="2vw" /></span>}
                         defaultValue={{
                           value: '',
-                          label: <div className="text-[1vw] px-[0.2vw] pb-[0.1vw] text-[#1F487C] opacity-50">Select the Category</div>,
+                          label: <div className="text-[1vw] px-[0.2vw] pb-[0.1vw] text-[#1F487C] opacity-50">Select Category</div>,
                           // value: 0,
                           // // label: "All",
                           // label: <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw]">All</div>,
@@ -485,10 +596,17 @@ export default function Offers() {
                     </ConfigProvider>
                   </div>
                 </div>
-                <div className="flex items-center gap-x-[1vw] h-full ">
-                  <div className="flex items-center gap-[1vw]">
+                <div className="flex items-center gap-x-[0.75vw] h-full ">
+                  <div className="flex items-center gap-[0.75vw]">
+                    
+                  <Tooltip
+                placement="top"
+                title='Export'
+                className="cursor-pointer"
+                color="black"
+              >
                     <button
-                      className="bg-[#1F4B7F] flex px-[1vw] h-[5vh] justify-center gap-[0.5vw] items-center rounded-xl"
+                      className="bg-[#1F4B7F] flex px-[0.5vw] h-[5vh] justify-center gap-[0.5vw] items-center rounded-xl"
                       onClick={handleExport}
                     >
                       < TbUpload
@@ -496,8 +614,9 @@ export default function Offers() {
                         size={"1.5vw"}
                         className=""
                       />
-                      <span className="text-white text-[1.1vw]">Export</span>
+                      {/* <span className="text-white text-[1.1vw]">Export</span> */}
                     </button>
+                    </Tooltip>
                     <input
                       id="xlsxFile"
                       name="xlsxFile"
@@ -513,22 +632,30 @@ export default function Offers() {
                       }}
                     />
                     <button
-                      className="bg-[#1F4B7F] flex px-[1vw] h-[5vh] justify-center gap-[0.5vw] items-center rounded-xl"
+                      className="bg-[#1F4B7F] flex px-[0.5vw] h-[5vh] justify-center gap-[0.5vw] items-center rounded-xl"
                       onClick={() =>
                         document.getElementById("xlsxFile").click()
                       }
                     >
-                      < GoDownload
+                      <Tooltip
+                placement="top"
+                title='Import'
+                className="cursor-pointer"
+                color="black"
+              >
+               < GoDownload
                         color="white"
                         size={"1.5vw"}
                         className=""
                       />
-                      <span className="text-white text-[1.1vw]">Import</span>
+              </Tooltip>
+                     
+                      {/* <span className="text-white text-[1.1vw]">Import</span> */}
                     </button>
 
                   </div>
                   <button
-                    className="bg-[#1F4B7F] flex pl-[0.25vw] pr-[1vw] w-[9vw] h-[5vh] justify-between gap-[0.25vw] items-center rounded-xl"
+                    className="bg-[#1F4B7F] flex px-[0.75vw]  h-[5vh] gap-[0.25vw] items-center rounded-xl"
                     onClick={() => {
                       setModalIsOpen(true);
                       SetUpdateData(null);
@@ -536,10 +663,10 @@ export default function Offers() {
                     }}
                   >
                     <span>
-                      <IoAdd size={"2vw"} color="white" />
+                      <IoAdd size={"1.8vw"} color="white" />
                     </span>
-                    <span className="text-white  text-[1.1vw]">
-                      Add Offer
+                    <span className="text-white  text-[1vw]">
+                      Add
                     </span>
                   </button>
                 </div>
@@ -680,6 +807,7 @@ export default function Offers() {
           className=""
         >
           <AddOffer
+       
             setModalIsOpen={setModalIsOpen}
             updatedata={updatedata}
             SetUpdateData={SetUpdateData}

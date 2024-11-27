@@ -1,21 +1,22 @@
-import { render } from '@testing-library/react'
+//import { render } from '@testing-library/react'
 import React, { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import ModalPopup from "../Common/Modal/Modal";
 // import DeleteList from "./DeleteList";
 import { Table, Pagination, Tooltip } from "antd";
-import { IoMdEye } from "react-icons/io";
+//import { IoMdEye } from "react-icons/io";
 import { MdDelete, MdEdit } from "react-icons/md";
 import DeleteList from '../Offers/DeleteList';
 import { useDispatch, useSelector } from 'react-redux';
 // import { GetAllReqManOffers } from '../../Api/RequestManagement/RequestManagementOffers';
 import { GetAllReqManOffers, ReqPromoStatusChange } from '../../Api/RequestManagement/RequestManagement';
-import ReqPromoStatusUpdate from './ReqPromoStatusUpdate';
+//import ReqPromoStatusUpdate from './ReqPromoStatusUpdate';
 import ReqOffersStatusUpdate from './ReqOffersStatusUpdate';
 import { FaEye } from 'react-icons/fa';
 
 export default function ReqOffers({ currentData }) {
 
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const [promotionid, setPromoId] = useState(null);
   const apiUrl = process.env.REACT_APP_API_URL;
   const [offerview, setOfferView] = useState(false);
@@ -29,7 +30,7 @@ export default function ReqOffers({ currentData }) {
   }
   const [updateData, SetUpdateData] = useState()
   const [statusupdateModal, setStatusupdateModal] = useState(false)
-  const [updateStatus, setUpdateStatus] = useState()
+  //const [updateStatus, setUpdateStatus] = useState()
 
   // const currentData = useSelector((state)=>state.crm.req_man_offers);
   const dispatch = useDispatch()
@@ -269,7 +270,7 @@ export default function ReqOffers({ currentData }) {
         closeicon={false}
       >
         <img
-          src={`http://192.168.90.47:4000${offerimage}`}
+          src={`${apiImgUrl}${offerimage}`}
           className="w-full h-full"
         />
       </ModalPopup>

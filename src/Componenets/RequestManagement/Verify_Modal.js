@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 // import image1 from "../../asserts/aadhar.jpg";
-import { Radio, Spin } from "antd";
+//import { Radio, Spin } from "antd";
 import { IoMdDownload } from "react-icons/io";
-import { TfiSave } from "react-icons/tfi";
+//import { TfiSave } from "react-icons/tfi";
 import "../../App.css";
 import ModalPopup from "../Common/Modal/Modal";
-import Success_Modal from "./Success_Modal";
-import axios from "axios";
+//import Success_Modal from "./Success_Modal";
+//import axios from "axios";
 import Status_Update_Modal from "./Status_Update_Modal";
 import { capitalizeFirstLetter } from "../Common/Captilization";
-import Zoom from "react-medium-image-zoom";
+//import Zoom from "react-medium-image-zoom";
 import "react-medium-image-zoom/dist/styles.css";
 import { useDispatch, useSelector } from "react-redux";
 import no_image_available from "../../asserts/No_image_available.jpg";
-import { REQUEST_MANAGEMENT_DATA } from "../../Store/Type";
+//import { REQUEST_MANAGEMENT_DATA } from "../../Store/Type";
 import {
   GetPartnerDataById,
   GetRequestDataById
@@ -28,16 +28,16 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
   const [isUpdateStatus, setIsUpdateStatus] = useState(false);
   const [isDwldModal, setIsDwldModal] = useState(false);
   const [modalContent, setModalContent] = useState("download");
-  const [dataValue, setDataValue] = useState();
+  //const [dataValue, setDataValue] = useState();
   const [isOperator,setIsOperator]= useState(false)
-
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
 
   console.log(requestData, "This is my status id");
 
-  const onChange = (e) => {
-    console.log("radio checked", e.target.value);
-    setValue(e.target.value);
-  };
+  // const onChange = (e) => {
+  //   console.log("radio checked", e.target.value);
+  //   setValue(e.target.value);
+  // };
 
   const closeModal = () => {
     setIsUpdateStatus(false);
@@ -154,17 +154,17 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
     return (
     verifyData.startsWith("tbs-op") ?
     [
-      `http://192.168.90.47:4000${requestData?.aadar_front_doc}`,
-      `http://192.168.90.47:4000${requestData?.aadar_back_doc}`,
-      `http://192.168.90.47:4000${requestData?.pancard_front_doc}`,
-      `http://192.168.90.47:4000${requestData?.pancard_back_doc}`,
-      `http://192.168.90.47:4000${requestData?.msme_docs}`,
+      `${apiImgUrl}${requestData?.aadar_front_doc}`,
+      `${apiImgUrl}${requestData?.aadar_back_doc}`,
+      `${apiImgUrl}${requestData?.pancard_front_doc}`,
+      `${apiImgUrl}${requestData?.pancard_back_doc}`,
+      `${apiImgUrl}${requestData?.msme_docs}`,
     ] : 
     [
-      `http://192.168.90.47:4000${requestData?.aadhar_card_front}`,
-      `http://192.168.90.47:4000${requestData?.aadhar_card_back}`,
-      `http://192.168.90.47:4000${requestData?.pan_card_front}`,
-      `http://192.168.90.47:4000${requestData?.pan_card_back}`,
+      `${apiImgUrl}${requestData?.aadhar_card_front}`,
+      `${apiImgUrl}${requestData?.aadhar_card_back}`,
+      `${apiImgUrl}${requestData?.pan_card_front}`,
+      `${apiImgUrl}${requestData?.pan_card_back}`,
     ]
   )
   };
@@ -267,7 +267,7 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
                       <img
                         src={
                           values?.aadar_front_doc
-                            ? `http://192.168.90.47:4000${values?.aadar_front_doc}`
+                            ? `${apiImgUrl}${values?.aadar_front_doc}`
                             : no_image_available
                         }
                         alt="Aadhar Front Img"
@@ -285,7 +285,7 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
                       <img
                         src={
                           values?.aadar_back_doc
-                            ? `http://192.168.90.47:4000${values?.aadar_back_doc}`
+                            ? `${apiImgUrl}${values?.aadar_back_doc}`
                             : no_image_available
                         }
                         alt="Aadhar Back Img"
@@ -303,7 +303,7 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
                       <img
                         src={
                           values.pancard_front_doc
-                            ? `http://192.168.90.47:4000${values?.pancard_front_doc}`
+                            ? `${apiImgUrl}${values?.pancard_front_doc}`
                             : no_image_available
                         }
                         alt="PAN Front Img"
@@ -320,7 +320,7 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
                       <img
                         src={
                           values?.pancard_back_doc
-                            ? `http://192.168.90.47:4000${values?.pancard_back_doc}`
+                            ? `${apiImgUrl}${values?.pancard_back_doc}`
                             : no_image_available
                         }
                         alt="PAN Back Img"
@@ -339,7 +339,7 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
                           <img
                           src={
                             values?.msme_docs
-                              ? `http://192.168.90.47:4000${values?.msme_docs}`
+                              ? `${apiImgUrl}${values?.msme_docs}`
                               : no_image_available
                           }
                           alt="MSME"
@@ -612,7 +612,7 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
         closeicon={false}
         onClose={closeModal}
         height="22vw"
-        width="30vw"
+        width="auto"
       >
         <Status_Update_Modal
           setIsSaveModal={setIsUpdateStatus}
@@ -627,7 +627,7 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
         />
       </ModalPopup>
 
-      <ModalPopup
+      {/* <ModalPopup
         className="border border-[#1f487c] border-b-8 border-r-8 border-b-[#1f487c] border-r-[#1f487c] rounded-md"
         show={isDwldModal}
         closeicon={false}
@@ -638,7 +638,7 @@ export default function Verify_Modal({ verifyData, setIsVerifyModal, setVerifyDa
           actionType={modalContent}
           setIsDwldModal={setIsDwldModal}
         />
-      </ModalPopup>
+      </ModalPopup> */}
       {/* </Spin> */}
     </>
   );

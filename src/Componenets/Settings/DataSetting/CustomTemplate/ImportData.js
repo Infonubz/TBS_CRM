@@ -96,7 +96,7 @@ const ImportData = ({ fetchDocuments, closeModal, selectFields }) => {
             case "Offers & deals":
                 field_id = 5;
                 break;
-            case "advertisement":
+            case "Advertisement":
                 field_id = 6;
                 break;
             default:
@@ -124,9 +124,9 @@ const ImportData = ({ fetchDocuments, closeModal, selectFields }) => {
 
     const options = [
         {
-            value: 'Select Field',
+            value: '',
             label: 'Select Field',
-            disabled: true
+            // disabled: true
         },
         {
             value: 'Operator',
@@ -239,6 +239,7 @@ const ImportData = ({ fetchDocuments, closeModal, selectFields }) => {
                                                     onChange={(e) => {
                                                         setFieldValue("upload_files", e.file);
                                                     }}
+                                                    accept=".xlsx , .xls"
                                                 >
                                                     <div
                                                         style={{
@@ -264,22 +265,22 @@ const ImportData = ({ fetchDocuments, closeModal, selectFields }) => {
                                                             </div>
                                                         </label>
                                                         <div className="flex items-center justify-center gap-6 pt-[0.2vw] pb-[1vw]">
-                                                            <BsFilePdf
+                                                            {/* <BsFilePdf
                                                                 color="#1F487C"
                                                                 style={{ height: "2.5vw", width: "2.5vw" }}
                                                             />
                                                             <MdOutlineImage
                                                                 color="#1F487C"
                                                                 style={{ height: "3.5vw", width: "3.2vw" }}
-                                                            />
+                                                            /> */}
                                                             <AiOutlineFileExcel
                                                                 color="#1F487C"
                                                                 style={{ height: "2.7vw", width: "2.7vw" }}
                                                             />
-                                                            <VscPlayCircle
+                                                            {/* <VscPlayCircle
                                                                 color="#1F487C"
                                                                 style={{ height: "2.9vw", width: "2.9vw" }}
-                                                            />
+                                                            /> */}
                                                         </div>
                                                     </div>
                                                 </Dragger>

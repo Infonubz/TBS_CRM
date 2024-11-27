@@ -5,14 +5,15 @@ import { MdDelete, MdEdit } from "react-icons/md";
 import ModalPopup from "../Common/Modal/Modal";
 import Verify_Modal from "./Verify_Modal";
 import { capitalizeFirstLetter } from "../Common/Captilization";
-import { userStatusActivate } from "../../Api/RequestManagement/RequestManagement";
+//import { userStatusActivate } from "../../Api/RequestManagement/RequestManagement";
 import { FaEye } from "react-icons/fa";
 import Status_Update_Modal from "./Status_Update_Modal";
 import UserProfile from "../../asserts/userprofile.png";
 
 export default function Operator({ data,tabfilter }) {
-  const [operatorId, setOperatorId] = useState(null);
+  //const [operatorId, setOperatorId] = useState(null);
   const [verifyData, setVerifyData] = useState("");
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const [isVerifyModal, setIsVerifyModal] = useState(false);
   const [requestData, setRequestData] = useState("");
   const [openStatusModal, setOpenStatusModal] = useState("");
@@ -31,14 +32,14 @@ export default function Operator({ data,tabfilter }) {
       // key: "photo",
       align: "center",
       render: (row) => {
-        const image = `http://192.168.90.47:4000${row?.profileimg}`;
+        const image = `${apiImgUrl}${row?.profileimg}`;
         console.log(row?.profileimg, "imageimage");
         return (
           <div className="flex justify-center items-center">
             <img
               src={`${
                 row?.profileimg
-                  ? `http://192.168.90.47:4000${row?.profileimg}`
+                  ? `${apiImgUrl}${row?.profileimg}`
                   : UserProfile
               } `}
               alt="Photo"
@@ -414,7 +415,7 @@ export default function Operator({ data,tabfilter }) {
         closeicon={false}
         onClose={closeModal}
         height="22vw"
-        width="30vw"
+        width="auto"
       >
         <Status_Update_Modal
           setIsSaveModal={setIsUpdateStatus}

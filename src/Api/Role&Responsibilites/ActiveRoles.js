@@ -26,9 +26,9 @@ export const GetRolesData = async (filter, dispatch) => {
   try {
     let roleId;
 
-    if (typeid === "OP101") {
+    if (typeid === "OP101" || typeid === "OPEMP101") {
       roleId = 1; // For OP101, always 1
-    } else if (typeid === "PRO101") {
+    } else if (typeid === "PRO101" || typeid === "PROEMP101" ) {
       if (filter === "PO") {
         roleId = 2; // For PRO101 and filter === "PO"
       } else if (filter === "OP") {

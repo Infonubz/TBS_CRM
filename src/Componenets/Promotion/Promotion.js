@@ -38,6 +38,9 @@ import { RiUpload2Fill } from "react-icons/ri";
 import { PROMO_BG_IMAGE } from "../../Store/Type";
 
 export default function Promotion() {
+  const apiUrl = process.env.REACT_APP_API_URL;
+  
+  console.log(apiUrl, "apiUrlapiUrl");
   const [view, setView] = useState("list");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -70,8 +73,7 @@ export default function Promotion() {
       payload: {},
     });
     sessionStorage.removeItem("upload");
-    sessionStorage.removeItem("promotion_logo")
-    
+    sessionStorage.removeItem("promotion_logo");
   };
 
   const dispatch = useDispatch();
@@ -133,6 +135,8 @@ export default function Promotion() {
     background_image: "",
     usage: null,
   });
+ 
+
   return (
     <>
       <div className="mb-[5vw]">
@@ -144,7 +148,7 @@ export default function Promotion() {
             backgroundPosition: "center",
           }}
         >
-          <div className="px-[5vw] h-[92vh] w-full ">
+          <div className="px-[2.5vw] h-[92vh] w-full ">
             <div className="h-[12vh] w-full flex flex-col ">
               <h1 className="text-[#1F4B7F] pt-[0.5vw] text-[1.5vw] font-bold">
                 PROMOTION
@@ -499,7 +503,7 @@ export default function Promotion() {
           <DeleteList
             setDeleteModalIsOpen={setDeleteModalIsOpen}
             title={"Want to delete this Promotion"}
-            api={`http://192.168.90.47:4000/api/promo/${promotionId}`}
+            api={`${apiUrl}/promo/${promotionId}`}
             module={"promotion"}
           />
         </ModalPopup>

@@ -70,6 +70,9 @@ export default function AddGST({
   setSuperAdminGSTData
 
 }) {
+
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
+ 
   const props = {
     name: "file",
     action: "https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload",
@@ -515,7 +518,7 @@ console.log(clientID,"ididididdhgfsudfgusfgb");
                           />
                           ) : (
                             <img
-                            src={`http://192.168.90.47:4000${inputPreview}`}
+                            src={`${apiImgUrl}${inputPreview}`}
                             className="h-[2.5vw] w-[2.5vw] absolute cursor-zoom-in top-[.15vw]  right-[.3vw]"
                             alt="Gst Image"
                             onClick={openModal} 
