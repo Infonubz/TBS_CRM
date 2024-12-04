@@ -619,6 +619,7 @@ const Ad_Advertisement = ({
                       </label>
                       <Field
                         as="textarea"
+                        style={{resize:"none"}}
                         name="ad_description"
                         placeholder="Enter Description"
                         // rows="1"

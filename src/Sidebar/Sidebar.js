@@ -409,6 +409,7 @@ export default function Sidebar() {
               show={isNotificationOpen}
               closeicon={false}
               onClose={closeNotification}
+              module={"notification"}
               // height="90%"
               // width="30vw"
             >
@@ -428,6 +429,7 @@ export default function Sidebar() {
             show={isSupportOpen}
             closeicon={false}
             onClose={colseSupport}
+            module={"support"}
             // height="90%"
             // width="30vw"
           >

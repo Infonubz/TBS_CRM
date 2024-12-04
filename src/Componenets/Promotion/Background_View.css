@@ -1,6 +1,6 @@
 .carousel {
   position: relative;
-  width: 40vw; /* Adjust width as needed */
+  width: 30vw; /* Adjust width as needed */
   margin: 0 auto;
   text-align: center;
 }
@@ -9,7 +9,6 @@
   overflow: hidden;
   width: 100%;
   position: relative;
-
 }
 
 .carousel-track {
@@ -51,7 +50,6 @@
   transform: scale(1);
   /* background-color: blueviolet; */
   position: relative;
-
 }
 .logo {
   position: absolute;
@@ -61,7 +59,6 @@
   width: 6vw;
   background-color: azure;
   z-index: 2; /* Ensure it stays above */
-
 }
 .hidden-slide {
   display: none;
@@ -104,6 +101,4 @@
 .large-slide {
   margin: 0; /* Ensure no margin between the slides */
 }
-/* .large-slide {
-  border: 2px solid #1F4B7F; 
-} */
+

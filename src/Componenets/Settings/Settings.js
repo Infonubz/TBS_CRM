@@ -51,70 +51,67 @@ export default function Settings() {
                 />
               </div>
               {type_id === "PRO101" && (
-                <span
+                <div
                   onClick={() => setSelectedSetting("system")}
-                  className=" cursor-pointer"
+                  className={` ${selectedSetting === "system" ? "border-b-[0.1vw] border-[#1F487C]" : ""
+                    } cursor-pointer`}
                 >
                   <p
-                    className={`text-[#1F487C] text-[1.4vw] pl-[1vw] ${
-                      selectedSetting === "system" ? "underline " : ""
-                    }`}
+                    className={`text-[#1F487C] text-[1.4vw] px-[0.5vw] `}
                   >
                     Company settings
                   </p>
-                </span>
+                </div>
               )}
-              <span
+              <div
                 onClick={() => setSelectedSetting("user")}
-                className=" cursor-pointer"
+                className={` ${selectedSetting === "user" ? "border-b-[0.1vw] border-[#1F487C]" : ""
+                  } cursor-pointer`}
               >
                 <p
-                  className={`text-[#1F487C] text-[1.4vw] pl-[1vw] ${
-                    selectedSetting === "user" ? "underline " : ""
-                  }`}
+                  className={`text-[#1F487C] text-[1.4vw] px-[0.5vw]`}
                 >
                   User settings
                 </p>
-              </span>
-              <span
-                onClick={() => setSelectedSetting("data")}
-                className=" cursor-pointer"
-              >
-                <p
-                  className={`text-[#1F487C] text-[1.4vw] pl-[1vw] ${
-                    selectedSetting === "data" ? "underline" : ""
-                  }`}
-                >
-                  Data settings
-                </p>
-              </span>
+              </div>
               {type_id === "PRO101" && (
-                <span
-                  onClick={() => setSelectedSetting("configuration")}
-                  className=" cursor-pointer"
+                <div
+                  onClick={() => setSelectedSetting("data")}
+                  className={` ${selectedSetting === "data" ? "border-b-[0.1vw] border-[#1F487C]" : ""
+                    } cursor-pointer`}
                 >
                   <p
-                    className={`text-[#1F487C] text-[1.4vw] pl-[1vw] ${
-                      selectedSetting === "configuration" ? "underline" : ""
-                    }`}
+                    className={`text-[#1F487C] text-[1.4vw] px-[0.5vw]`}
+                  >
+                    Data settings
+                  </p>
+                </div>
+              )}
+              {type_id === "PRO101" && (
+                <div
+                  onClick={() => setSelectedSetting("configuration")}
+                  className={` ${selectedSetting === "configuration" ? "border-b-[0.1vw] border-[#1F487C]" : ""
+                    } cursor-pointer`}
+                >
+                  <p
+                    className={`text-[#1F487C] text-[1.4vw] px-[0.5vw]`}
                   >
                     Configuration
                   </p>
-                </span>
+                </div>
               )}
               {type_id === "PRO101" && (
-                <span
+                <div
                   onClick={() => setSelectedSetting("integrations")}
-                  className=" cursor-pointer"
+                  className={` ${selectedSetting === "integrations" ? "border-b-[0.1vw] border-[#1F487C]" : ""
+                    } cursor-pointer`}
                 >
                   <p
-                    className={`text-[#1F487C] text-[1.4vw] pl-[1vw] ${
-                      selectedSetting === "integrations" ? "underline" : ""
-                    }`}
+                    className={`text-[#1F487C] text-[1.4vw] px-[0.5vw]`}
                   >
                     Product Integrations
                   </p>
-                </span>
+                </div>
               )}
             </div>
           </div>

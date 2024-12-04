@@ -65,7 +65,7 @@ export default function Status_Update_Modal({ currentid, setIsSaveModal, setIsVe
         <p className="text-[1.5vw] text-[]">Update the status of Operator</p>
         <img src={image} className="h-[6vw] w-[6vw] mt-[1vw]"></img>
         <div className="mt-[1vw] w-[100%] relative">
-          <label className="text-[#1F487C] text-[1.3vw]">Comments <span className="text-[.9vw] text-gray-600">{`(optional)`}</span> </label>
+          <label className="text-[#1F487C] font-semibold text-[1.3vw]">Comments <span className="text-[.9vw] text-gray-600">{`(optional)`}</span> </label>
           <input
             type="text"
             name="comments"
@@ -79,7 +79,7 @@ export default function Status_Update_Modal({ currentid, setIsSaveModal, setIsVe
               // setShowError(inputValue?.trim() !=="")
               setInputValue(e.target.value)
             }}
-            className="border-r-[0.3vw] pl-[1vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none "
+            className="border-r-[0.3vw] text-[1vw] pl-[1vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C]  h-[3vw] w-[100%] rounded-[0.5vw] outline-none "
           />
           {
             showError === false && <span className="text-[.9vw] text-red-600 absolute bottom-[-1.2vw] left-[.5vw]"> Comments is required for Reject and On Hold</span>

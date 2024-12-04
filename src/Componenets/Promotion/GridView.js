@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import image from "../../asserts/promotion_image.png";
+//import image from "../../asserts/promotion_image.png";
 import "../../App.css";
 import dayjs from "dayjs";
 import userimg from "../../asserts/userprofile.png";
@@ -25,11 +25,13 @@ export default function GridView({
   const closeModal = () => {
     setEyeModalIsOpen(false);
   };
-
+  const [visiblePopover, setVisiblePopover] = useState(null); 
   const [hoverid, setHoverId] = useState("");
+  
   const [openPopovers, setOpenPopovers] = useState({});
   const dataArr = Array.from(currentData);
   const handleEdit = (promo_id) => {
+    setVisiblePopover(null); 
     setModalIsOpen(true);
     setPromotionId(promo_id);
     togglePopover(promo_id);
@@ -37,6 +39,7 @@ export default function GridView({
   };
 
   const handleDelete = (promo_id) => {
+    setVisiblePopover(null); 
     setPromotionId(promo_id);
     togglePopover(promo_id);
     setDeleteModalIsOpen(true);
@@ -70,102 +73,93 @@ export default function GridView({
             <div className="flex items-center justify-center py-[0.5vw] ">
               <img
                 src={
-                  item.promo_image != null
-                    ? `${apiImgUrl}${item.promo_image}`
+                  item.background_image != null
+                    ? `${apiImgUrl}${item.background_image}`
                     : userimg
                 }
                 className="h-[4.5vw] w-[4.5vw]  rounded-[0.5vw] flex items-center justify-center"
               />
-              <div className=" ">
-                <Popover
-                  placement="bottomRight"
-                  className=""
-                  content={
-                    <div className="flex flex-col  border-[0.1vw] border-[#1F4B7F] px-[1vw] py-[0.5vw] rounded-[0.5vw]">
-                      {/* {(item?.promo_status_id === 1 ||
-                        item?.promo_status_id === 0) && ( */}
-                      <div className="flex items-center gap-x-[0.5vw] py-[0.25vw] border-b-[0.1vw] border-[#1F487C]">
-                        <span>
-                          <FaEye
-                            className="text-[1.2vw] text-[#1F487C]"
-                            onClick={() => {
-                              setEyeModalIsOpen(true);
-                              setPromoImage(item.background_image);
-                              console.log(item.background_image, "bg image");
-                            }}
-                          />
-                        </span>
-                        <a
-                          onClick={() => {
-                            setEyeModalIsOpen(true);
-                            setPromoImage(item.background_image);
-                            console.log(item.background_image, "bg image");
-                          }}
-                          className="flex font-semibold items-center cursor-pointer text-[1vw] text-[#1F4B7F] hover:text-[#1f487c]"
-                        >
-                          View
-                        </a>
-                      </div>
-                      <div className="flex items-center gap-x-[0.5vw] py-[0.25vw] border-b-[0.1vw] border-[#1F487C]">
-                        <span>
-                          <MdEdit
-                            size={"1.2vw"}
-                            color="#1F4B7F"
-                            className=" cursor-pointer"
-                            // onClick={() => {
-                            //   setPromotionId(row.promo_id);
-                            //   SetUpdateData(row.promo_id);
-                            //   setModalIsOpen(true);
-                            // }}
-                          />
-                        </span>
-                        <a
-                          onClick={() => handleEdit(item.promo_id)}
-                          className="flex font-semibold items-center cursor-pointer text-[1vw] text-[#1F4B7F] hover:text-[#1f487c]"
-                        >
-                          Edit
-                        </a>
-                      </div>
-                      {/* // )} */}
-                      <div className="flex items-center gap-x-[0.5vw] py-[0.25vw]">
-                        <span>
-                          <MdDelete
-                            size={"1.2vw"}
-                            color="#1F4B7F"
-                            className=" cursor-pointer"
-                            // onClick={() => {
-                            //   handleDelete(row.promo_id);
-                            // }}
-                          />
-                        </span>
-                        <a
-                          onClick={() => handleDelete(item.promo_id)}
-                          className="flex font-semibold items-center cursor-pointer text-[1vw] text-[#1F4B7F] hover:text-[#1f487c]"
-                        >
-                          Delete
-                        </a>
-                      </div>
-                    </div>
-                  }
-                  trigger="click"
-                  // open={openPopovers[item.promo_id] || false}
-                  //onOpenChange={() => togglePopover(item.promo_id)}
-                >
-                  <FontAwesomeIcon
-                    icon={faEllipsisVertical}
-                    color="#1f487c"
-                    className={`
-                 absolute right-[0.2vw] top-[0.8vw]
-                    cursor-pointer rounded-[0.5vw]`}
-                    // onMouseEnter={() => setHoverId(item.promo_id)}
-                    // onMouseLeave={() => setHoverId("")}
-                    style={{
-                      height: "1.5vw",
-                      width: "1.5vw",
+                <div className=" " key={item.promo_id}>
+          <Popover
+            placement="bottomRight"
+            className=""
+            content={
+              <div className="flex flex-col border-[0.1vw] border-[#1F4B7F] px-[1vw] py-[0.5vw] rounded-[0.5vw]">
+                <div className="flex items-center gap-x-[0.5vw] py-[0.25vw] border-b-[0.1vw] border-[#1F487C]">
+                  <span>
+                    <FaEye
+                      className="text-[1.2vw] text-[#1F487C]"
+                      onClick={() => {
+                        setVisiblePopover(null); // Close the Popover
+                        setEyeModalIsOpen(true);
+                        setPromoImage(item.background_image);
+                        console.log(item.background_image, "bg image");
+                      }}
+                    />
+                  </span>
+                  <a
+                    onClick={() => {
+                      setVisiblePopover(null); // Close the Popover
+                      setEyeModalIsOpen(true);
+                      setPromoImage(item.background_image);
+                      console.log(item.background_image, "bg image");
                     }}
-                  />
-                </Popover>
+                    className="flex font-semibold items-center cursor-pointer text-[1vw] text-[#1F4B7F] hover:text-[#1f487c]"
+                  >
+                    View
+                  </a>
+                </div>
+                <div className="flex items-center gap-x-[0.5vw] py-[0.25vw] border-b-[0.1vw] border-[#1F487C]">
+                  <span>
+                    <MdEdit
+                      size={"1.2vw"}
+                      color="#1F4B7F"
+                      className="cursor-pointer"
+                      onClick={() => handleEdit(item.promo_id)}
+                    />
+                  </span>
+                  <a
+                    onClick={() => handleEdit(item.promo_id)}
+                    className="flex font-semibold items-center cursor-pointer text-[1vw] text-[#1F4B7F] hover:text-[#1f487c]"
+                  >
+                    Edit
+                  </a>
+                </div>
+                <div className="flex items-center gap-x-[0.5vw] py-[0.25vw]">
+                  <span>
+                    <MdDelete
+                      size={"1.2vw"}
+                      color="#1F4B7F"
+                      className="cursor-pointer"
+                      onClick={() => handleDelete(item.promo_id)}
+                    />
+                  </span>
+                  <a
+                    onClick={() => handleDelete(item.promo_id)}
+                    className="flex font-semibold items-center cursor-pointer text-[1vw] text-[#1F4B7F] hover:text-[#1f487c]"
+                  >
+                    Delete
+                  </a>
+                </div>
               </div>
+            }
+            trigger="click"
+            open={visiblePopover === item.promo_id} // Open only the selected Popover
+            onOpenChange={(visible) =>
+              setVisiblePopover(visible ? item.promo_id : null)
+            } 
+          >
+            <FontAwesomeIcon
+              icon={faEllipsisVertical}
+              color="#1f487c"
+              className="absolute right-[0.2vw] top-[0.8vw] cursor-pointer rounded-[0.5vw]"
+              style={{
+                height: "1.5vw",
+                width: "1.5vw",
+              }}
+            />
+          </Popover>
+        </div>
             </div>
             <div className="flex-col flex items-center justify-center gap-y-[0.3vw]">
               <label className="text-[1vw] text-[#1f4b7f] font-bold uppercase">
@@ -205,7 +199,7 @@ export default function GridView({
               </h1>
               <h1 className="text-[0.9vw]">
                 <span className="font-semibold pr-[0.5vw]">Promo Value: </span>
-                {`₹ ${item.promo_value}`}
+                {`${item.value_symbol}${item.promo_value}`}
               </h1>
               <h1 className="text-[0.9vw]">
                 <span className="font-semibold pr-[0.5vw]">Duration:</span>
@@ -216,15 +210,15 @@ export default function GridView({
               <div className="px-[0.5vw] w-ful items-center justify-center">
                 <button
                   className={`${
-                    item?.promo_status_id == 0
+                    item?.promo_status_id === 0
                       ? "bg-[#777575]"
-                      : item?.promo_status_id == 1
+                      : item?.promo_status_id === 1
                       ? "bg-[#FF9900]"
-                      : item?.promo_status_id == 2
+                      : item?.promo_status_id === 2
                       ? "bg-[#34AE2A]"
-                      : item?.promo_status_id == 3
+                      : item?.promo_status_id === 3
                       ? "bg-[#FD3434]"
-                      : item?.promo_status_id == 4
+                      : item?.promo_status_id === 4
                       ? "bg-[#2A99FF]"
                       : "bg-[#646262]"
                   }   text-[1vw] rounded-full font-bold text-white px-[1vw] py-[0.2vw] w-[9vw]`}
@@ -245,11 +239,12 @@ export default function GridView({
       >
         {
           <div className="flex justofy-center mt-[1vw]">
-            <img
-              src={`${apiImgUrl}${promoImage}`}
-              className="rounded-[0.5vw]"
-            />
-          </div>
+          <img
+          alt="prmoImage"
+            src={`${apiImgUrl}${promoImage}`}
+            className="w-full h-[15vw] rounded-[0.5vw]"
+          />
+        </div>
         }
       </ModalPopup>
     </div>

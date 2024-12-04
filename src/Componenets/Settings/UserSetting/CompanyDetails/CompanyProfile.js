@@ -5,6 +5,7 @@ import { MdOutlineModeEditOutline } from "react-icons/md";
 import { useDispatch, useSelector } from 'react-redux';
 import { GetOperatorData, SubmitCompanyData } from '../../../../Api/Settings/SystemSettings/CompanyDetails';
 import { toast } from 'react-toastify';
+import { useState } from 'react';
 
 const validationSchema = Yup.object().shape({
     phone: Yup.string()
@@ -40,7 +41,9 @@ const validationSchema = Yup.object().shape({
 });
 
 
-const CompanyProfile = ({ fileList }) => {
+const CompanyProfile = ({ fileList, isEdit, setIsEdit }) => {
+
+
 
     console.log(fileList, 'image_fileList')
     const operatorData = useSelector((state) => state?.crm?.operator_data[0])
@@ -53,11 +56,12 @@ const CompanyProfile = ({ fileList }) => {
     }, [dispatch]);
 
     const handleSubmit = async (values) => {
-        console.log(values, "hiiiiiiiiii");
+
         try {
-            const data = await SubmitCompanyData(dispatch, fileList, values);
+            const data = await SubmitCompanyData(values, dispatch, fileList);
             GetOperatorData(dispatch)
             toast.success(data?.message);
+            setIsEdit(false)
             console.log("Current page set to 2");
         } catch (error) {
             console.error("Error uploading data", error);
@@ -113,7 +117,8 @@ const CompanyProfile = ({ fileList }) => {
                                             handleChange(e);
                                         }}
                                         placeholder='Enter Company Name'
-                                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                        disabled={isEdit === false}
                                     />
                                     {/* <MdOutlineModeEditOutline
                                         color='#1F487C'
@@ -141,7 +146,8 @@ const CompanyProfile = ({ fileList }) => {
                                         onChange={(e) => {
                                             handleChange(e);
                                         }}
-                                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                        disabled={isEdit === false}
                                     />
                                     {/* <MdOutlineModeEditOutline
                                         color='#1F487C'
@@ -169,7 +175,8 @@ const CompanyProfile = ({ fileList }) => {
                                         onChange={(e) => {
                                             handleChange(e);
                                         }}
-                                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                        disabled={isEdit === false}
                                     />
                                     {/* <MdOutlineModeEditOutline
                                         color='#1F487C'
@@ -197,7 +204,8 @@ const CompanyProfile = ({ fileList }) => {
                                         onChange={(e) => {
                                             handleChange(e);
                                         }}
-                                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                        disabled={isEdit === false}
                                     />
                                     {/* <MdOutlineModeEditOutline
                                         color='#1F487C'
@@ -225,7 +233,8 @@ const CompanyProfile = ({ fileList }) => {
                                         onChange={(e) => {
                                             handleChange(e);
                                         }}
-                                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                        disabled={isEdit === false}
                                     />
                                     {/* <MdOutlineModeEditOutline
                                         color='#1F487C'
@@ -253,7 +262,8 @@ const CompanyProfile = ({ fileList }) => {
                                         onChange={(e) => {
                                             handleChange(e);
                                         }}
-                                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                        disabled={isEdit === false}
                                     />
                                     {/* <MdOutlineModeEditOutline
                                         color='#1F487C'
@@ -267,19 +277,21 @@ const CompanyProfile = ({ fileList }) => {
                             </div>
                         </div>
                         <div className='flex items-center justify-center pt-[2vw] pb-[0.5vw]'>
-                            <button
-                                type="submit"
-                                className="text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[12vw]"
-                                disabled={isSubmitting || !dirty || !isValid}
-                                style={{
-                                    backgroundColor: isSubmitting || !dirty || !isValid ? '#d3d3d3' : '#1F487C',
-                                    color: isSubmitting || !dirty || !isValid ? '#9e9e9e' : '#fff',
-                                    cursor: isSubmitting || !dirty || !isValid ? 'not-allowed' : 'pointer',
-                                }}
-                            >
-                                Submit
-                            </button>
-
+                            {isEdit === false ?
+                                <div
+                                    onClick={() => setIsEdit(true)}
+                                    className="cursor-pointer text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[12vw] text-center"
+                                >
+                                    Edit
+                                </div>
+                                :
+                                <button
+                                    type="submit"
+                                    className="text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[12vw]"
+                                >
+                                    Submit
+                                </button>
+                            }
                         </div>
                     </Form>
                 )}

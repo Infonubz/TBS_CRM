@@ -17,6 +17,7 @@ import "../../App.css";
 import {
   GetOffersData,
   handleoffersearch,
+  SearchDiscountOffer,
   SubmitOfferExcel,
 } from "../../Api/Offers/Offers";
 import { useDispatch, useSelector } from "react-redux";
@@ -37,11 +38,22 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import RedeemListView from "./RedeemOffer/RedeemListView";
 import RedeemGridView from "./RedeemOffer/RedeemGridView";
-import { GetRedeemOffersData, handleRedeemoffersearch, SubmitRedeemExcel } from "../../Api/Offers/RedeemOffers";
+import {
+  GetRedeemOffersData,
+  handleRedeemoffersearch,
+  SearchRedeemOffer,
+  SubmitRedeemExcel,
+} from "../../Api/Offers/RedeemOffers";
 import { Tooltip } from "antd";
-
+import IndexAddOffer from "./IndexAddOffer";
 
 export default function Offers() {
+  const userType = sessionStorage.getItem("type_name");
+  const typeId = sessionStorage.getItem("type_id")
+    ? sessionStorage.getItem("type_id")
+    : localStorage.getItem("type_id");
+  const userID = sessionStorage.getItem("USER_ID");
+
   const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
 
   const [view, setView] = useState("list");
@@ -50,36 +62,40 @@ export default function Offers() {
   const [offerdata, setOfferData] = useState("");
   const [updatedata, SetUpdateData] = useState(null);
   const getofferlist = useSelector((state) => state.crm.offers_list);
-  console.log(getofferlist, 'get_offer_list')
-  const getredeemlist = useSelector((state) => state.crm.redeem_offer)
-  console.log(getredeemlist, 'get_redeme_selection')
+  console.log(getofferlist, "get_offer_list");
+  const getredeemlist = useSelector((state) => state.crm.redeem_offer);
+  console.log(getredeemlist, "get_redeme_selection");
   const [selectedOccupation, setSelectedOccupation] = useState(0);
-  const [offerType, setOfferType] = useState('discount')
+  const [offerType, setOfferType] = useState("discount");
   const [offerimage, setOfferImage] = useState("");
   const [offerview, setOfferView] = useState(false);
-  const [offerFilter, setOfferFilter] = useState('all')
+  const [offerFilter, setOfferFilter] = useState("all");
+  const [valueSymbol, setValueSymbol] = useState("₹");
+ 
+  console.log(valueSymbol, "value_symbol");
 
-  console.log(offerdata, 'Offers_datas')
+  console.log(offerdata, "Offers_datas");
 
   const handleOccupationChange = (value) => {
     setSelectedOccupation(value);
   };
 
-
-
   const filtered_Discount = Array.isArray(getofferlist)
     ? getofferlist.filter(
-      (offer) => offer.occupation_id === selectedOccupation || selectedOccupation === 0
-    )
+        (offer) =>
+          offer.occupation_id === selectedOccupation || selectedOccupation === 0
+      )
     : [];
 
   const filtered_Redeem = Array.isArray(getredeemlist)
     ? getredeemlist.filter(
-      (offer) => offer.occupation_id === selectedOccupation || selectedOccupation === 0
-    )
+        (offer) =>
+          offer.occupation_id === selectedOccupation || selectedOccupation === 0
+      )
     : [];
 
-  const filtered_Offers = offerType === 'discount' ? filtered_Discount : filtered_Redeem
+  const filtered_Offers =
+    offerType === "discount" ? filtered_Discount : filtered_Redeem;
 
   console.log(filtered_Offers, "filtered_Offers");
 
@@ -178,7 +194,6 @@ export default function Offers() {
     }
   };
 
-
   const handleRedeemClick = async (file) => {
     console.log(file, "adfdsfadsfa_praveeen_007_00011");
     try {
@@ -191,7 +206,6 @@ export default function Offers() {
       // toast.error("Failed to upload file");
     }
   };
-
 
   // const handleOnClick = async (file) => {
   //   console.log(file, "adfdsfadsfa_praveeen_007_00011");
@@ -213,13 +227,12 @@ export default function Offers() {
   //   }
   // };
 
-
   const dispatch = useDispatch();
 
   useEffect(() => {
-    GetOffersData(dispatch);
-    GetRedeemOffersData(dispatch);
-  }, [dispatch]);
+    GetOffersData(dispatch, offerFilter);
+    GetRedeemOffersData(dispatch, offerFilter);
+  }, [dispatch, offerFilter]);
 
   // console.log(updatedata, "updatedataupdatedata");
   console.log(getofferlist, "getofferlist");
@@ -230,18 +243,20 @@ export default function Offers() {
   const indexOfLastItem = activePage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
-  const currentItems = filtered_Offers?.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filtered_Offers?.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
 
-  console.log(activePage, 'active_page')
-  console.log(itemsPerPage, 'items_per_page')
-  console.log(indexOfFirstItem, 'Index_of_first_items')
-  console.log(indexOfLastItem, 'index_of_last_item')
-  console.log(currentItems, 'current_itmes')
+  console.log(activePage, "active_page");
+  console.log(itemsPerPage, "items_per_page");
+  console.log(indexOfFirstItem, "Index_of_first_items");
+  console.log(indexOfLastItem, "index_of_last_item");
+  console.log(currentItems, "current_itmes");
   // Handle page change
   const handlePageChange = (pageNumber) => {
     setActivePage(pageNumber);
   };
-
 
   // const handleExport = () => {
   //   if (getofferlist.length === 0) {
@@ -264,8 +279,8 @@ export default function Offers() {
   // };
 
   const handleExport = () => {
-
-    const offerToExport = offerType === 'discount' ? getofferlist : getredeemlist;
+    const offerToExport =
+      offerType === "discount" ? getofferlist : getredeemlist;
 
     if (offerToExport.length === 0) {
       alert("No data to export!");
@@ -286,6 +301,14 @@ export default function Offers() {
     saveAs(excelBlob, "exported_data.xlsx");
   };
 
+  const SearchRequest = (e) => {
+    if (offerType === "discount") {
+      SearchDiscountOffer(e.target.value, offerFilter, dispatch);
+    } else {
+      SearchRedeemOffer(e.target.value, offerFilter, dispatch);
+    }
+  };
+
   return (
     <>
       <div className="">
@@ -302,7 +325,7 @@ export default function Offers() {
               <h1 className="text-[#1F4B7F] pt-[0.5vw] text-[1.5vw] font-bold">
                 OFFERS
               </h1>
-              <div className="pb-[0.5vw] flex h-full items-center gap-[1.25vw]">
+              <div className="pb-[0.5vw] flex  items-center justify-between ">
                 {/* <div className="flex border-[#1F4B7F] h-[5vh] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw]">
                   <button
                     className={`${view == "list" ? "bg-[#1F4B7F]" : "bg-white"
@@ -348,40 +371,49 @@ export default function Offers() {
                   </button>
                 </div> */}
                 <div className="flex border-[#1F4B7F] h-[5vh] ">
-                <Tooltip
-                placement="top"
-                title='List'
-                className="cursor-pointer"
-                color="black"
-              >
-                  <button
-                    className={`${view === 'list' ? "bg-[#1F487C]" : "bg-[white]"} px-[0.75vw] rounded-l-xl border-[0.1vw] border-b-[0.2vw] border-r-0  border-[#1F487C]`}
-                    style={{
-                      transition: "all 1s",
-                    }}
-                    onClick={() => setView('list')}>
-                    <IoMdMenu color={`${view === 'list' ? "white" : "#1F487C"}`} />
-                  </button>
-                  </Tooltip>
-               
                   <Tooltip
-                placement="top"
-                title='Grid'
-                className="cursor-pointer"
-                color="black"
-              >
-                  <button
-                    className={`${view === 'Grid' ? "bg-[#1F487C]" : "bg-[white]"} px-[0.75vw] rounded-r-xl border-[0.1vw] border-b-[0.2vw] border-r-[0.2vw] border-l-0  border-[#1F487C]`}
-                    style={{
-                      transition: "all 1s",
-                    }}
-                    onClick={() => setView('Grid')}>
-                    <IoGrid color={`${view === 'Grid' ? "white" : "#1F487C"}`} />
-                  </button>
+                    placement="top"
+                    title="List"
+                    className="cursor-pointer"
+                    color="black"
+                  >
+                    <button
+                      className={`${
+                        view === "list" ? "bg-[#1F487C]" : "bg-[white]"
+                      } px-[0.75vw] rounded-l-xl border-[0.1vw] border-b-[0.2vw] border-r-0  border-[#1F487C]`}
+                      style={{
+                        transition: "all 1s",
+                      }}
+                      onClick={() => setView("list")}
+                    >
+                      <IoMdMenu
+                        color={`${view === "list" ? "white" : "#1F487C"}`}
+                      />
+                    </button>
+                  </Tooltip>
+                  <Tooltip
+                    placement="top"
+                    title="Grid"
+                    className="cursor-pointer"
+                    color="black"
+                  >
+                    <button
+                      className={`${
+                        view === "Grid" ? "bg-[#1F487C]" : "bg-[white]"
+                      } px-[0.75vw] rounded-r-xl border-[0.1vw] border-b-[0.2vw] border-r-[0.2vw] border-l-0  border-[#1F487C]`}
+                      style={{
+                        transition: "all 1s",
+                      }}
+                      onClick={() => setView("Grid")}
+                    >
+                      <IoGrid
+                        color={`${view === "Grid" ? "white" : "#1F487C"}`}
+                      />
+                    </button>
                   </Tooltip>
                 </div>
-                <div className="flex gap-[1.25vw]">
-                  {/* <div className="relative flex items-center">
+
+                {/* <div className="relative flex items-center">
                     <input
                       type="text"
                       className="bg-white outline-none pl-[2vw] w-[25vw] h-[5vh] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw] border-r-[0.2vw] border-b-[0.2vw]"
@@ -395,42 +427,48 @@ export default function Offers() {
                       color="#1F4B7F"
                     />
                   </div> */}
-                  <div className="relative flex items-center">
-                    <input
-                      type="text"
-                      className="bg-white placeholder-[#1f477c76] text-[#1F487C] outline-none pl-[3vw] w-[13.85vw] h-[5vh] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw]"
-                      placeholder="Search Offer"
-                      onChange={(e) => {
-                        { offerType === 'discount' ? handleoffersearch(e, dispatch) : handleRedeemoffersearch(e, dispatch) }
-                      }}
-                    />
-                    <LiaSearchSolid
-                      className="absolute left-[0.5vw]"
-                      size={"1vw"}
-                      color="#1F4B7F"
-                    />
-                  </div>
 
-                  <div className="w-[34vw]">
-                    <div className="flex gap-x-[2.25vw] text-[1.2vw]">
-                      <div
-                        className={` cursor-pointer ${offerFilter == "all"
+                {/* --------------------------------------searchBar------------------------------------- */}
+
+                <div className="relative flex items-center">
+                  <input
+                    type="text"
+                    className="bg-white placeholder-[#1f477c76] text-[#1F487C] outline-none pl-[3vw] w-[13.85vw] h-[5vh] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw]"
+                    placeholder="Search Offer"
+                    onChange={(e) => {
+                      SearchRequest(e);
+                    }}
+                  />
+                  <LiaSearchSolid
+                    className="absolute left-[0.5vw]"
+                    size={"1vw"}
+                    color="#1F4B7F"
+                  />
+                </div>
+
+                <div className="w-[34vw]">
+                  <div className="flex gap-x-[2.25vw] text-[1.2vw]">
+                    <div
+                      className={` cursor-pointer ${
+                        offerFilter == "all"
                           ? "border-b-[0.25vw] font-bold border-[#1f487c]"
                           : ""
-                          } `}
-                        onClick={() => {
-                          setOfferFilter("all");
-                        }}
-                      >
-                        <p className="text-[1.3vw] text-[#1f487c] text-center">
-                          All
-                        </p>
-                      </div>
+                      } `}
+                      onClick={() => {
+                        setOfferFilter("all");
+                      }}
+                    >
+                      <p className="text-[1.3vw] text-[#1f487c] text-center">
+                        All
+                      </p>
+                    </div>
+                    {typeId === "PRO101" ? (
                       <div
-                        className={` cursor-pointer ${offerFilter == "pending"
-                          ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                          : ""
-                          } `}
+                        className={` cursor-pointer ${
+                          offerFilter == "pending"
+                            ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                            : ""
+                        } `}
                         onClick={() => {
                           setOfferFilter("pending");
                         }}
@@ -439,11 +477,29 @@ export default function Offers() {
                           Pending
                         </p>
                       </div>
+                    ) : (
                       <div
-                        className={` cursor-pointer ${offerFilter == "approved"
-                          ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                          : ""
-                          } `}
+                        className={` cursor-pointer ${
+                          offerFilter == "posted"
+                            ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                            : ""
+                        } `}
+                        onClick={() => {
+                          setOfferFilter("posted");
+                        }}
+                      >
+                        <p className="text-[1.3vw] text-[#1f487c] text-center">
+                          Posted
+                        </p>
+                      </div>
+                    )}
+                    {typeId === "PRO101" ? (
+                      <div
+                        className={` cursor-pointer ${
+                          offerFilter == "approved"
+                            ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                            : ""
+                        } `}
                         onClick={() => {
                           setOfferFilter("approved");
                         }}
@@ -452,222 +508,275 @@ export default function Offers() {
                           Approved
                         </p>
                       </div>
+                    ) : (
                       <div
-                        className={` cursor-pointer ${offerFilter == "hold"
-                          ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                          : ""
-                          } `}
+                        className={` cursor-pointer ${
+                          offerFilter == "active"
+                            ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                            : ""
+                        } `}
                         onClick={() => {
-                          setOfferFilter("hold");
+                          setOfferFilter("active");
                         }}
                       >
                         <p className="text-[1.3vw] text-[#1f487c] text-center">
-                          Hold
+                          Active
                         </p>
                       </div>
-                      <div
-                        className={` cursor-pointer ${offerFilter == "rejected"
+                    )}
+                    <div
+                      className={` cursor-pointer ${
+                        offerFilter == "hold"
                           ? "border-b-[0.25vw] font-bold border-[#1f487c]"
                           : ""
-                          } `}
-                        onClick={() => {
-                          setOfferFilter("rejected");
-                        }}
-                      >
-                        <p className="text-[1.3vw] text-[#1f487c] text-center">
-                          Rejected
-                        </p>
-                      </div>
-                      <div
-                        className={` cursor-pointer ${offerFilter == "draft"
+                      } `}
+                      onClick={() => {
+                        setOfferFilter("hold");
+                      }}
+                    >
+                      <p className="text-[1.3vw] text-[#1f487c] text-center">
+                        Hold
+                      </p>
+                    </div>
+                    <div
+                      className={` cursor-pointer ${
+                        offerFilter == "rejected"
                           ? "border-b-[0.25vw] font-bold border-[#1f487c]"
                           : ""
-                          } `}
-                        onClick={() => {
-                          setOfferFilter("draft");
-                        }}
-                      >
-                        <p className="text-[1.3vw] text-[#1f487c] text-center">
-                          Draft
-                        </p>
-                      </div>
+                      } `}
+                      onClick={() => {
+                        setOfferFilter("rejected");
+                      }}
+                    >
+                      <p className="text-[1.3vw] text-[#1f487c] text-center">
+                        Rejected
+                      </p>
+                    </div>
+                    <div
+                      className={` cursor-pointer ${
+                        offerFilter == "draft"
+                          ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                          : ""
+                      } `}
+                      onClick={() => {
+                        setOfferFilter("draft");
+                      }}
+                    >
+                      <p className="text-[1.3vw] text-[#1f487c] text-center">
+                        Draft
+                      </p>
                     </div>
                   </div>
+                </div>
 
-                  <div className="relative flex items-center  text-[1.1vw]">
-                    <div className={`${offerType === 'redeem' ? "bg-[#1F4B7F] text-white font-semibold " : "bg-white"
-                      }  px-[0.5vw]  gap-[0.5vw] items-center rounded-tl-xl rounded-bl-xl border-[0.1vw] border-b-[0.25vw] border-r-0 border-[#1F487C] cursor-pointer w-[6vw] h-[5vh] flex item-center justify-center`}
+                <div className="relative flex items-center justify-center text-[1.1vw]">
+                  <div
+                    className={`${
+                      offerType === "redeem"
+                        ? "bg-[#1F4B7F] text-white font-semibold "
+                        : "bg-white text-[#1F487C]"
+                    }  px-[0.5vw]  gap-[0.5vw] items-center rounded-tl-xl rounded-bl-xl border-[0.1vw] border-b-[0.25vw] border-r-0 border-[#1F487C] cursor-pointer w-[6vw] h-[5vh] flex item-center justify-center`}
                     style={{
                       transition: "all 0.5s",
                     }}
-                      onClick={() => setOfferType('redeem')}>Redeem</div>
-                    <div className={`${offerType === 'discount' ? "bg-[#1F4B7F] text-white font-semibold " : "bg-white"
-                      }  px-[0.5vw]  gap-[0.5vw] items-center rounded-r-xl border-[0.1vw] border-r-[0.25vw] border-b-[0.25vw] border-l-0 border-[#1F487C] cursor-pointer w-[6vw] h-[5vh] flex item-center justify-center` }
-                      style={{
-                        transition: "all 0.5s",
-                      }}
-                      onClick={() => setOfferType('discount')}>Discount</div>
+                    onClick={() => setOfferType("redeem")}
+                  >
+                    Redeem
                   </div>
-                  <div>
-                    <ConfigProvider
-                      theme={{
-                        components: {
-
-                          Select: {
-                            optionActiveBg: '#aebed1',
-                            optionSelectedColor: '#FFF',
-                            optionSelectedBg: '#aebed1',
-                            optionHeight: '2',
-                          }
-                        }
-                      }}>
-                      <Select
-                        showSearch
-                        className=" custom-select bg-white outline-none w-[11vw] h-[5vh] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw]"
-                        placeholder="Select Categories"
-                        optionFilterProp="label"
-                        onChange={handleOccupationChange}
-                        suffixIcon={<span style={{ fontSize: '1vw', color: '#1f487c' }}><IoMdArrowDropdown size="2vw" /></span>}
-                        defaultValue={{
-                          value: '',
-                          label: <div className="text-[1vw] px-[0.2vw] pb-[0.1vw] text-[#1F487C] opacity-50">Select Category</div>,
-                          // value: 0,
-                          // // label: "All",
-                          // label: <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw]">All</div>,
-                        }}
-                        style={{
-                          padding: 4,
-                        }}
-                        options={[
-                          // {
-                          //   value: '',
-                          //   label: <div className="">Select the Category</div>
-                          // },
-                          {
-                            value: 0,
-                            // label: "All",
-                            label: <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">All</div>,
-
-                          },
-                          {
-                            value: 1,
-                            // label: "Business",
-                            label: <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">Business</div>,
-
-                          },
-                          {
-                            value: 2,
-                            // label: "General Public",
-                            label: <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">General Public</div>,
-
-                          },
-                          {
-                            value: 3,
-                            // label: "Handicapped",
-                            label: <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">Handicapped</div>,
-
-                          },
-                          {
-                            value: 4,
-                            // label: "Pilgrim",
-                            label: <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">Pilgrim</div>,
-
-                          },
-                          {
-                            value: 5,
-                            // label: "Senior Citizen",
-                            label: <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">Senior Citizen</div>,
-
-                          },
-                          {
-                            value: 6,
-                            // label: "Student",
-                            label: <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">Student</div>,
-
-                          },
-                          {
-                            value: 7,
-                            // label: "Tourist",
-                            label: <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">Tourist</div>,
-
-                          },
-                        ]}
-                      />
-                    </ConfigProvider>
+                  <div
+                    className={`${
+                      offerType === "discount"
+                        ? "bg-[#1F4B7F] text-white font-semibold "
+                        : "bg-white  text-[#1F487C]"
+                    }  px-[0.5vw]  gap-[0.5vw] items-center rounded-r-xl border-[0.1vw] border-r-[0.25vw] border-b-[0.25vw] border-l-0 border-[#1F487C] cursor-pointer w-[6vw] h-[5vh] flex item-center justify-center`}
+                    style={{
+                      transition: "all 0.5s",
+                    }}
+                    onClick={() => setOfferType("discount")}
+                  >
+                    Discount
                   </div>
                 </div>
-                <div className="flex items-center gap-x-[0.75vw] h-full ">
-                  <div className="flex items-center gap-[0.75vw]">
-                    
+                <div>
+                  <ConfigProvider
+                    theme={{
+                      components: {
+                        Select: {
+                          optionActiveBg: "#aebed1",
+                          optionSelectedColor: "#FFF",
+                          optionSelectedBg: "#aebed1",
+                          optionHeight: "2",
+                        },
+                      },
+                    }}
+                  >
+                    <Select
+                      showSearch
+                      className=" custom-select bg-white outline-none w-[11vw] h-[5vh] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw]"
+                      placeholder="Select Categories"
+                      optionFilterProp="label"
+                      onChange={handleOccupationChange}
+                      suffixIcon={
+                        <span style={{ fontSize: "1vw", color: "#1f487c" }}>
+                          <IoMdArrowDropdown size="2vw" />
+                        </span>
+                      }
+                      defaultValue={{
+                        value: "",
+                        label: (
+                          <div className="text-[1vw] px-[0.2vw] pb-[0.1vw] text-[#1F487C] opacity-50">
+                            Select Category
+                          </div>
+                        ),
+                        // value: 0,
+                        // // label: "All",
+                        // label: <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw]">All</div>,
+                      }}
+                      style={{
+                        padding: 4,
+                      }}
+                      options={[
+                        // {
+                        //   value: '',
+                        //   label: <div className="">Select the Category</div>
+                        // },
+                        {
+                          value: 0,
+                          // label: "All",
+                          label: (
+                            <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                              All
+                            </div>
+                          ),
+                        },
+                        {
+                          value: 1,
+                          // label: "Business",
+                          label: (
+                            <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                              Business
+                            </div>
+                          ),
+                        },
+                        {
+                          value: 2,
+                          // label: "General Public",
+                          label: (
+                            <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                              General Public
+                            </div>
+                          ),
+                        },
+                        {
+                          value: 3,
+                          // label: "Handicapped",
+                          label: (
+                            <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                              Handicapped
+                            </div>
+                          ),
+                        },
+                        {
+                          value: 4,
+                          // label: "Pilgrim",
+                          label: (
+                            <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                              Pilgrim
+                            </div>
+                          ),
+                        },
+                        {
+                          value: 5,
+                          // label: "Senior Citizen",
+                          label: (
+                            <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                              Senior Citizen
+                            </div>
+                          ),
+                        },
+                        {
+                          value: 6,
+                          // label: "Student",
+                          label: (
+                            <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                              Student
+                            </div>
+                          ),
+                        },
+                        {
+                          value: 7,
+                          // label: "Tourist",
+                          label: (
+                            <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                              Tourist
+                            </div>
+                          ),
+                        },
+                      ]}
+                    />
+                  </ConfigProvider>
+                </div>
+                <div className="flex items-center gap-[0.75vw]">
                   <Tooltip
-                placement="top"
-                title='Export'
-                className="cursor-pointer"
-                color="black"
-              >
+                    placement="top"
+                    title="Export"
+                    className="cursor-pointer"
+                    color="black"
+                  >
                     <button
                       className="bg-[#1F4B7F] flex px-[0.5vw] h-[5vh] justify-center gap-[0.5vw] items-center rounded-xl"
                       onClick={handleExport}
                     >
-                      < TbUpload
-                        color="white"
-                        size={"1.5vw"}
-                        className=""
-                      />
+                      <TbUpload color="white" size={"1.5vw"} className="" />
                       {/* <span className="text-white text-[1.1vw]">Export</span> */}
                     </button>
-                    </Tooltip>
-                    <input
-                      id="xlsxFile"
-                      name="xlsxFile"
-                      type="file"
-                      style={{ display: "none" }}
-                      onChange={(event) => {
-                        const file = event.target.files[0];
-                        console.log(file, "file_excel");
-                        setExcelData(file);
-                        { offerType === 'discount' ? handleOnClick(file) : handleRedeemClick(file) }
-
-                        // handleFileChange(event)
-                      }}
-                    />
-                    <button
-                      className="bg-[#1F4B7F] flex px-[0.5vw] h-[5vh] justify-center gap-[0.5vw] items-center rounded-xl"
-                      onClick={() =>
-                        document.getElementById("xlsxFile").click()
+                  </Tooltip>
+                  <input
+                    id="xlsxFile"
+                    name="xlsxFile"
+                    type="file"
+                    style={{ display: "none" }}
+                    onChange={(event) => {
+                      const file = event.target.files[0];
+                      console.log(file, "file_excel");
+                      setExcelData(file);
+                      {
+                        offerType === "discount"
+                          ? handleOnClick(file)
+                          : handleRedeemClick(file);
                       }
-                    >
-                      <Tooltip
-                placement="top"
-                title='Import'
-                className="cursor-pointer"
-                color="black"
-              >
-               < GoDownload
-                        color="white"
-                        size={"1.5vw"}
-                        className=""
-                      />
-              </Tooltip>
-                     
-                      {/* <span className="text-white text-[1.1vw]">Import</span> */}
-                    </button>
 
-                  </div>
+                      // handleFileChange(event)
+                    }}
+                  />
+                  <button
+                    className="bg-[#1F4B7F] flex px-[0.5vw] h-[5vh] justify-center gap-[0.5vw] items-center rounded-xl"
+                    onClick={() => document.getElementById("xlsxFile").click()}
+                  >
+                    <Tooltip
+                      placement="top"
+                      title="Import"
+                      className="cursor-pointer"
+                      color="black"
+                    >
+                      <GoDownload color="white" size={"1.5vw"} className="" />
+                    </Tooltip>
+
+                    {/* <span className="text-white text-[1.1vw]">Import</span> */}
+                  </button>
                   <button
                     className="bg-[#1F4B7F] flex px-[0.75vw]  h-[5vh] gap-[0.25vw] items-center rounded-xl"
                     onClick={() => {
                       setModalIsOpen(true);
                       SetUpdateData(null);
                       setOfferData("");
+                      setValueSymbol("₹");
                     }}
                   >
                     <span>
-                      <IoAdd size={"1.8vw"} color="white" />
+                      <IoAdd size={"1.5vw"} color="white" />
                     </span>
-                    <span className="text-white  text-[1vw]">
-                      Add
-                    </span>
+                    <span className="text-white  text-[1vw]">Add</span>
                   </button>
                 </div>
               </div>
@@ -701,8 +810,8 @@ export default function Offers() {
 
             <div className="h-[72vh] w-full">
               {/* Conditionally render ListView or GridView based on offerType and view */}
-              {offerType === 'redeem' ? (
-                view === 'list' ? (
+              {offerType === "redeem" ? (
+                view === "list" ? (
                   <RedeemListView
                     currentData={currentItems}
                     setModalIsOpen={setModalIsOpen}
@@ -713,6 +822,7 @@ export default function Offers() {
                     setOfferImage={setOfferImage}
                     offerview={offerview}
                     setOfferView={setOfferView}
+                    offerFilter={offerFilter}
                   />
                 ) : (
                   <RedeemGridView
@@ -725,8 +835,8 @@ export default function Offers() {
                     setOfferView={setOfferView}
                   />
                 )
-              ) : offerType === 'discount' ? (
-                view === 'list' ? (
+              ) : offerType === "discount" ? (
+                view === "list" ? (
                   <ListView
                     currentData={currentItems}
                     setModalIsOpen={setModalIsOpen}
@@ -737,6 +847,9 @@ export default function Offers() {
                     setOfferImage={setOfferImage}
                     offerview={offerview}
                     setOfferView={setOfferView}
+                    offerFilter={offerFilter}
+                    setValueSymbol={setValueSymbol}
+                    valueSymbol={valueSymbol}
                   />
                 ) : (
                   <GridView
@@ -747,67 +860,82 @@ export default function Offers() {
                     setOfferImage={setOfferImage}
                     offerview={offerview}
                     setOfferView={setOfferView}
+                    setValueSymbol={setValueSymbol}
+                    valueSymbol={valueSymbol}
                   />
                 )
               ) : null}
             </div>
 
-            {
-              (offerType === 'discount' ? getofferlist?.length > 10 : getredeemlist?.length > 10) && (
-                <div className="w-full h-[8vh] flex justify-between items-center">
-                  <div className="text-[#1f4b7f] flex text-[1.1vw] gap-[0.5vw]">
-                    <span>Showing</span>
-                    <span className="font-bold">
-                      {currentItems && currentItems?.length > 0 ? (
-                        <div>{indexOfFirstItem + 1} - {indexOfFirstItem + currentItems?.length}</div>
-                      ) : (
-                        "0"
-                      )}
-                    </span>
-                    <span>from</span>
-                    <span className="font-bold">
-                      {offerType === 'discount'
-                        ? getofferlist?.length > 0
-                          ? getofferlist.length
-                          : 0
-                        : getredeemlist?.length > 0
-                          ? getredeemlist.length
-                          : 0}
-                    </span>
-                    <span>data</span>
-                  </div>
-                  <div>
-                    {/* Pagination Component */}
-                    <ReactPaginate
-                      activePage={activePage}
-                      itemsCountPerPage={itemsPerPage}
-                      totalItemsCount={offerType === 'discount' ? getofferlist?.length : getredeemlist?.length}
-                      pageRangeDisplayed={3}
-                      onChange={handlePageChange}
-                      itemClass="page-item"
-                      linkClass="page-link"
-                      activeClass="active"
-                      prevPageText={<FontAwesomeIcon icon={faChevronLeft} size="1vw" />}
-                      nextPageText={<FontAwesomeIcon icon={faChevronRight} size="1vw" />}
-                      firstPageText={<FontAwesomeIcon icon={faAngleDoubleLeft} size="1vw" />}
-                      lastPageText={<FontAwesomeIcon icon={faAngleDoubleRight} size="1vw" />}
-                    />
-                  </div>
+            {(offerType === "discount"
+              ? getofferlist?.length > 10
+              : getredeemlist?.length > 10) && (
+              <div className="w-full h-[8vh] flex justify-between items-center">
+                <div className="text-[#1f4b7f] flex text-[1.1vw] gap-[0.5vw]">
+                  <span>Showing</span>
+                  <span className="font-bold">
+                    {currentItems && currentItems?.length > 0 ? (
+                      <div>
+                        {indexOfFirstItem + 1} -{" "}
+                        {indexOfFirstItem + currentItems?.length}
+                      </div>
+                    ) : (
+                      "0"
+                    )}
+                  </span>
+                  <span>from</span>
+                  <span className="font-bold">
+                    {offerType === "discount"
+                      ? getofferlist?.length > 0
+                        ? getofferlist.length
+                        : 0
+                      : getredeemlist?.length > 0
+                      ? getredeemlist.length
+                      : 0}
+                  </span>
+                  <span>data</span>
                 </div>
-              )
-            }
-
+                <div>
+                  {/* Pagination Component */}
+                  <ReactPaginate
+                    activePage={activePage}
+                    itemsCountPerPage={itemsPerPage}
+                    totalItemsCount={
+                      offerType === "discount"
+                        ? getofferlist?.length
+                        : getredeemlist?.length
+                    }
+                    pageRangeDisplayed={3}
+                    onChange={handlePageChange}
+                    itemClass="page-item"
+                    linkClass="page-link"
+                    activeClass="active"
+                    prevPageText={
+                      <FontAwesomeIcon icon={faChevronLeft} size="1vw" />
+                    }
+                    nextPageText={
+                      <FontAwesomeIcon icon={faChevronRight} size="1vw" />
+                    }
+                    firstPageText={
+                      <FontAwesomeIcon icon={faAngleDoubleLeft} size="1vw" />
+                    }
+                    lastPageText={
+                      <FontAwesomeIcon icon={faAngleDoubleRight} size="1vw" />
+                    }
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </div>
         <ModalPopup
           show={modalIsOpen}
           onClose={closeModal}
-          height="75h"
+          height="35vw"
           width="55vw"
           className=""
         >
-          <AddOffer
-       
+          <IndexAddOffer
             setModalIsOpen={setModalIsOpen}
             updatedata={updatedata}
             SetUpdateData={SetUpdateData}
@@ -815,6 +943,8 @@ export default function Offers() {
             offerdata={offerdata}
             offerType={offerType}
             setOfferType={setOfferType}
+            setValueSymbol={setValueSymbol}
+            valueSymbol={valueSymbol}
           />
         </ModalPopup>
       </div>

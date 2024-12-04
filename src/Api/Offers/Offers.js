@@ -4,12 +4,18 @@ import { toast } from "react-toastify";
 import { GetEmployeeData } from "../UserManagement/Employee";
 import { GetOperatorData } from "../UserManagement/SuperAdmin";
 import { GetPartnerData } from "../UserManagement/Partner";
-import { GetAdsData } from "../Ads/Ads";
-import { GetPromotionData } from "../Promotion/Promotion";
+import { GetAdsData, GetMobileAds } from "../Ads/Ads";
+import {
+  GetPromotionData,
+  GetPromotionDataByStatus,
+} from "../Promotion/Promotion";
 import { GetClientData } from "../UserManagement/Client";
 import { GetRedeemOffersData } from "./RedeemOffers";
 import { GetRolesData } from "../Role&Responsibilites/ActiveRoles";
-import { GetPermissionCount, GetPermissionData } from "../Role&Responsibilites/ActivePermission";
+import {
+  GetPermissionCount,
+  GetPermissionData,
+} from "../Role&Responsibilites/ActivePermission";
 const api = axios.create({
   headers: {
     "Content-Type": "application/json",
@@ -17,10 +23,31 @@ const api = axios.create({
 });
 const apiUrl = process.env.REACT_APP_API_URL;
 
-export const GetOffersData = async (dispatch) => {
+export const GetOffersData = async (dispatch, filter) => {
   try {
     // const response = await axios.get(`${apiUrl}/offers-deals-occupation/${occuTab}`);
-    const response = await axios.get(`${apiUrl}/offers-deals`);
+    // const response = await axios.get(`${apiUrl}/offers-deals`);
+    const response = await api.get(
+      `${apiUrl}/request-DiscountofferStatus/${
+        filter == "all"
+          ? 5
+          : filter == "pending"
+          ? 1
+          : filter == "posted"
+          ? 1
+          : filter == "approved"
+          ? 2
+          : filter == "active"
+          ? 2
+          : filter == "hold"
+          ? 3
+          : filter == "rejected"
+          ? 4
+          : filter == "draft"
+          ? 0
+          : 5
+      }`
+    );
     dispatch({ type: OFFERS_LIST, payload: response.data });
     return response.data;
   } catch (error) {
@@ -28,7 +55,15 @@ export const GetOffersData = async (dispatch) => {
     // return null;
   }
 };
-export const Deleteall = async (api, dispatch, module, filter, setPermission) => {
+
+export const Deleteall = async (
+  api,
+  dispatch,
+  module,
+  filter,
+  setPermission,
+  CurrentTab
+) => {
   try {
     const response = await axios.delete(api);
     console.log(module === "offer", "responsedata5555");
@@ -46,21 +81,20 @@ export const Deleteall = async (api, dispatch, module, filter, setPermission) =>
     } else if (module === "ads") {
       GetAdsData(dispatch);
     } else if (module === "promotion") {
-      GetPromotionData(dispatch);
+      GetPromotionDataByStatus(dispatch, CurrentTab);
     } else if (module === "client") {
       GetClientData(dispatch);
     } else if (module === "redeemoffer") {
       GetRedeemOffersData(dispatch);
-    }
-    else if (module === "roles") {
+    } else if (module === "roles") {
       GetRolesData(filter, dispatch);
-    }
-    else if(module === "permissions"){
+    } else if (module === "permissions") {
       setPermission(true);
       GetPermissionData(filter, dispatch);
       GetPermissionCount(filter, dispatch);
-    }
-    else {
+    } else if (module === "mobads") {
+      GetMobileAds(dispatch);
+    } else {
       console.log("testt");
     }
     return response.data;
@@ -119,7 +153,10 @@ export const SubmitOfferExcel = async (file) => {
     console.log("Offers_Response", response);
 
     if (response.status >= 200 && response.status < 300) {
-      if (typeof response.data === "string" && response.data.includes("Error")) {
+      if (
+        typeof response.data === "string" &&
+        response.data.includes("Error")
+      ) {
         toast.error(response.data); // Use the actual error message
       } else {
         toast.success(response.data);
@@ -138,19 +175,18 @@ export const SubmitOfferExcel = async (file) => {
   }
 };
 
-
 export const SubmitOffersData = async (
+  dispatch,
   promotionvalues,
   updatedata,
-  dispatch,
   offerlist,
-  useage
+  offerBackGround
 ) => {
-  console.log(promotionvalues, "promotionvalues.file");
+  console.log(offerlist, "promotionvalues.file");
   const formData = new FormData();
   formData.append(
     "offer_name",
-    promotionvalues.promotion_name ? promotionvalues.promotion_name : null
+    promotionvalues.offer_name ? promotionvalues.offer_name : null
   );
   formData.append("code", promotionvalues.code ? promotionvalues.code : null);
   formData.append(
@@ -168,44 +204,43 @@ export const SubmitOffersData = async (
   formData.append(
     "usage",
     // promotionvalues.usage ? promotionvalues.usage : null
-    useage ? useage : null
+    offerlist.usage ? offerlist.usage : null
   );
   formData.append(
     "status",
     promotionvalues.status ? promotionvalues.status : null
   );
 
-
   formData.append(
     "status_id",
     promotionvalues.status == "Draft"
+      ? 0
+      : promotionvalues.status == "Active"
+      ? 2
+      : promotionvalues.status == "Posted"
       ? 1
-      : promotionvalues.status == "Requested"
-        ? 2
-        : 3
+      : ""
   );
   formData.append(
     "req_status",
     promotionvalues.status == "Draft"
       ? "Draft"
-      : promotionvalues.status == "Requested"
-        ? "Pending"
-        : "Approved"
+      : promotionvalues.status == "Posted"
+      ? "Pending"
+      : "Approved"
   );
   formData.append(
     "req_status_id",
     promotionvalues.status == "Draft"
       ? 0
-      : promotionvalues.status == "Requested"
-        ? 1
-        : 3
+      : promotionvalues.status == "Posted"
+      ? 1
+      : 2
   );
 
   formData.append(
     "offer_desc",
-    promotionvalues.promotion_description
-      ? promotionvalues.promotion_description
-      : null
+    promotionvalues.offer_desc ? promotionvalues.offer_desc : null
   );
   formData.append(
     "offer_img",
@@ -217,29 +252,25 @@ export const SubmitOffersData = async (
     offerlist?.occupation == 1
       ? "Business"
       : offerlist?.occupation == 2
-        ? "General Public"
-        : offerlist?.occupation == 3
-          ? "Handicapped"
-          : offerlist?.occupation == 4
-            ? "Pilgrim"
-            : offerlist?.occupation == 5
-              ? "Senior Citizen"
-              : offerlist?.occupation == 6
-                ? "Student"
-                : offerlist?.occupation == 7
-                  ? "Tourist"
-                  : ""
+      ? "General Public"
+      : offerlist?.occupation == 3
+      ? "Handicapped"
+      : offerlist?.occupation == 4
+      ? "Pilgrim"
+      : offerlist?.occupation == 5
+      ? "Senior Citizen"
+      : offerlist?.occupation == 6
+      ? "Student"
+      : offerlist?.occupation == 7
+      ? "Tourist"
+      : ""
   );
-  formData.append("theme", offerlist?.offer_bgImgae);
-  // formData.append("tbs_user_id", sessionStorage.getItem("USER_ID"));
+  formData.append("theme", offerBackGround);
+  formData.append("value_symbol", promotionvalues?.value_symbol);
+
   formData.append("tbs_user_id", sessionStorage.getItem("USER_ID"));
 
-  // formData.append("image_size", promotionvalues.file_size);
-  // formData.append("image_type", promotionvalues.file_type);
-  console.log(
-    updatedata,
-    "ADD_UPDATE_OFFERS_DATA"
-  );
+  console.log(updatedata, "ADD_UPDATE_OFFERS_DATA");
   const url = updatedata
     ? `${apiUrl}/offers-deals/${updatedata}`
     : `${apiUrl}/offers-deals`;
@@ -260,6 +291,82 @@ export const SubmitOffersData = async (
   } catch (error) {
     handleError(error);
     return null;
+  }
+};
+
+export const ChangeDisscountStatus = async (
+  id,
+  currentid,
+  dispatch,
+  filterid,
+  cmnt
+) => {
+  const payload = {
+    req_status:
+      id === 2 ? "Approved" : id === 3 ? "On Hold" : id === 4 ? "Rejected" : "",
+    req_status_id: id,
+    status:
+      id === 2 ? "Active" : id === 3 ? "On Hold" : id === 4 ? "Rejected" : "",
+    status_id: id,
+    comments: cmnt,
+  };
+
+  const url = `${apiUrl}/request-management-Discountoffer/${currentid}`;
+  const method = "put";
+
+  try {
+    const response = await api({
+      method,
+      url,
+      data: payload,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    toast.success("Status Updated");
+    GetOffersData(dispatch, filterid);
+    console.log(response, "responseresponse");
+    return response.data;
+  } catch (error) {
+    handleError(error);
+    return null;
+  }
+};
+
+export const SearchDiscountOffer = async (e, filter, dispatch) => {
+  const SearchID =
+    filter == "all"
+      ? 5
+      : filter == "pending"
+      ? 1
+      : filter == "posted"
+      ? 1
+      : filter == "approved"
+      ? 2
+      : filter == "active"
+      ? 2
+      : filter == "hold"
+      ? 3
+      : filter == "rejected"
+      ? 4
+      : filter == "draft"
+      ? 0
+      : 5;
+  try {
+    if (e) {
+      const response = await axios.post(
+        `${apiUrl}/request-management-DiscountofferSearch`,
+        {
+          req_status_id: SearchID,
+          search_term: e,
+        }
+      );
+      dispatch({ type: OFFERS_LIST, payload: response.data });
+    } else {
+      GetOffersData(dispatch, filter);
+    }
+  } catch (err) {
+    handleError(err);
   }
 };
 

@@ -38,7 +38,7 @@ export default function ClientStatusUpdate({ clientid, setViewModal }) {
       <div className="flex gap-2 mt-[1vw]">
         <button
           className="items-center text-[0.9vw] text-white  space-x-[0.7vw] px-[0.8vw] w-[8vw] h-[2vw] bg-[#2A99FF] rounded-[0.5vw]"
-          onClick={() => handlechange(3, "Under Review")}
+          onClick={() => handlechange(3, "UnderReview")}
         >
           Under review
         </button>

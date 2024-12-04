@@ -1,12 +1,14 @@
-import { render } from "@testing-library/react";
-import { Table, Pagination, Tooltip } from "antd";
+//import { render } from "@testing-library/react";
+import { Table, 
+  //Pagination, 
+  Tooltip } from "antd";
 import React, { useState } from "react";
-import { IoMdEye } from "react-icons/io";
+//import { IoMdEye } from "react-icons/io";
 import { MdDelete, MdEdit } from "react-icons/md";
 import "../../App.css";
 import dayjs from "dayjs";
 import ModalPopup from "../Common/Modal/Modal";
-import DeleteList from "../Offers/DeleteList";
+//import DeleteList from "../Offers/DeleteList";
 import { capitalizeFirstLetter } from "../Common/Captilization";
 import { FaEye } from "react-icons/fa";
 
@@ -20,7 +22,7 @@ export default function ListView({
   activePage,
   itemsPerPage,
 }) {
-  const apiUrl = process.env.REACT_APP_API_URL;
+  //const apiUrl = process.env.REACT_APP_API_URL;
   const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const [eyeModalIsOpen, setEyeModalIsOpen] = useState(false);
   const [promoImage, setPromoImage] = useState("");
@@ -32,8 +34,6 @@ export default function ListView({
     setPromotionId(promo_id);
     setDeleteModalIsOpen(true);
   };
-
-  const modalOpen = () => {};
 
   // const [promotionId, setPromotionId] = useState(null);
   const columns = [
@@ -115,25 +115,14 @@ export default function ListView({
           Promo Code
         </h1>
       ),
-      sorter: (a, b) => a.promo_description.localeCompare(b.promo_description),
+      sorter: (a, b) => a.promo_code.localeCompare(b.promo_code),
       render: (row, rowdta, index) => {
         return (
           <div className="flex items-center text-[#1F487C] justify-center">
-            {/* <h1 className="text-[1.1vw]">
-              {row?.promo_description?.length > 15 ? (
-                <Tooltip
-                  placement="bottom"
-                  title={row?.promo_description}
-                  className="cursor-pointer"
-                  color="#1F487C"
-                >
-                  {`${row?.promo_description?.slice(0, 15)}...`}
-                </Tooltip>
-              ) : (
-                row?.promo_description?.slice(0, 15)
-              )}
-            </h1> */}
-          </div>
+          <div className="flex items-center justify-center">
+          <p className="text-[1.1vw] text-[#1F487C]">{row?.promo_code}</p>
+        </div>
+        </div>
         );
       },
       // width: "15vw",
@@ -144,24 +133,13 @@ export default function ListView({
           Promo Value
         </h1>
       ),
-      sorter: (a, b) => a.promo_description.localeCompare(b.promo_description),
+      sorter: (a, b) => a.promo_value.localeCompare(b.promo_value),
       render: (row, rowdta, index) => {
         return (
           <div className="flex items-center text-[#1F487C] justify-center">
-            {/* <h1 className="text-[1.1vw]">
-              {row?.promo_description?.length > 15 ? (
-                <Tooltip
-                  placement="bottom"
-                  title={row?.promo_description}
-                  className="cursor-pointer"
-                  color="#1F487C"
-                >
-                  {`${row?.promo_description?.slice(0, 15)}...`}
-                </Tooltip>
-              ) : (
-                row?.promo_description?.slice(0, 15)
-              )}
-            </h1> */}
+            <div className="flex items-center justify-center">
+            <p className="text-[1.1vw] text-[#1F487C]">{row?.promo_value}{row?.value_symbol}</p>
+          </div>
           </div>
         );
       },
@@ -234,21 +212,21 @@ export default function ListView({
       ),
       // width: "11vw",
       render: (row) => {
-        console.log(row.promo_status_id == 0, "schjbsdc");
+        console.log(row.promo_status_id === 0, "schjbsdc");
         return (
           <div className="flex items-center justify-center">
             {row?.promo_status_id != null ? (
               <button
                 className={`${
-                  row.promo_status_id == 0
+                  row.promo_status_id === 0
                     ? "bg-[#777575]"
-                    : row.promo_status_id == 1
+                    : row.promo_status_id === 1
                     ? "bg-[#FF9900]"
-                    : row.promo_status_id == 2
+                    : row.promo_status_id === 2
                     ? "bg-[#34AE2A]"
-                    : row.promo_status_id == 3
+                    : row.promo_status_id === 3
                     ? "bg-[#FD3434]"
-                    : row.promo_status_id == 4
+                    : row.promo_status_id === 4
                     ? "bg-[#2A99FF]"
                     : "bg-[#646262]"
                 } rounded-[0.5vw] text-[1.1vw]  font-bold text-white w-[9vw] py-[0.2vw]`}
@@ -275,10 +253,10 @@ export default function ListView({
           <div className="flex gap-[0.7vw] items-center justify-center">
             {/* <div><IoMdEye size={"1.6vw"} color="#1F4B7F" onClick={() => { setEyeModalIsOpen(true) }} /></div> */}
             <FaEye
-              className="text-[1.5vw] text-[#1F487C]"
+              className="text-[1.5vw] text-[#1F487C] cursor-pointer"
               onClick={() => {
-                setEyeModalIsOpen(true);
                 setPromoImage(row.background_image);
+                setEyeModalIsOpen(true);
                 console.log(row.background_image, "bg image");
               }}
             />
@@ -307,9 +285,11 @@ export default function ListView({
       },
     },
   ];
-  const closeDeleteModal = () => {
-    setDeleteModalIsOpen(false);
-  };
+
+  // const closeDeleteModal = () => {
+  //   setDeleteModalIsOpen(false);
+  // };
+
   return (
     // <div style={{ height: "100%" }} className="table-container">
     <>
@@ -331,8 +311,9 @@ export default function ListView({
         {
           <div className="flex justofy-center mt-[1vw]">
             <img
+            alt="prmoImage"
               src={`${apiImgUrl}${promoImage}`}
-              className="rounded-[0.5vw]"
+              className="w-full h-[15vw] rounded-[0.5vw]"
             />
           </div>
         }

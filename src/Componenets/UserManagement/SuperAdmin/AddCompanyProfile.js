@@ -53,6 +53,8 @@ const validationSchema = Yup.object().shape({
     .required("Company Name is required"),
   ownername: Yup.string()
     .required("Owner Name is required")
+    .min(3, "At least 3 characters long")
+    .max(30, "Maximum 30 characters only")
     .matches(
       /^[^!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+$/,
       "Special characters are not allowed"

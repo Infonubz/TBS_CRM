@@ -5,6 +5,7 @@ import { MdOutlineModeEditOutline } from "react-icons/md";
 import { toast } from 'react-toastify';
 import { SubmitAddressData } from '../../../../Api/Settings/SystemSettings/CompanyDetails';
 import { useDispatch } from 'react-redux';
+import { useState } from 'react';
 
 
 const validationSchema = Yup.object().shape({
@@ -21,6 +22,8 @@ const validationSchema = Yup.object().shape({
 });
 const AddressDetails = ({ operatorData }) => {
 
+  const [isEdit, setIsEdit] = useState(false)
+
   const dispatch = useDispatch()
   const handleSubmit = async (values) => {
     console.log("hiihih");
@@ -30,6 +33,7 @@ const AddressDetails = ({ operatorData }) => {
         dispatch
       );
       toast.success(data?.message);
+      setIsEdit(false)
     } catch (error) {
       console.error("Error uploading data", error);
     }
@@ -78,7 +82,8 @@ const AddressDetails = ({ operatorData }) => {
                     name="address"
                     placeholder="Enter Address"
                     // value={values.firstname}
-                    className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                    className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                    disabled={isEdit === false}
                   />
                   {/* <MdOutlineModeEditOutline
                     color='#1F487C'
@@ -104,7 +109,8 @@ const AddressDetails = ({ operatorData }) => {
                     name="state"
                     id="state"
                     value={values.state}
-                    className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                    className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                    disabled={isEdit === false}
                   >
                     <option label="Select State" value="" className="" />
                     <option
@@ -144,7 +150,8 @@ const AddressDetails = ({ operatorData }) => {
                     name="region"
                     id="region"
                     value={values.region}
-                    className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                    className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                    disabled={isEdit === false}
                   >
                     <option label="Select State" value="" className="" />
                     <option
@@ -197,7 +204,8 @@ const AddressDetails = ({ operatorData }) => {
                     name="city"
                     id="city"
                     value={values.city}
-                    className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                    className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                    disabled={isEdit === false}
                   >
 
                     <option label="Select City" value="" className="" />
@@ -238,7 +246,8 @@ const AddressDetails = ({ operatorData }) => {
                     name="country"
                     id="country"
                     value={values.country}
-                    className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                    className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                    disabled={isEdit === false}
                   >
                     <option label="Select Country" value="" className="" />
                     <option label="India" value="India" className="" />
@@ -278,7 +287,8 @@ const AddressDetails = ({ operatorData }) => {
                     name="postal"
                     placeholder="Enter Postal Code"
                     // value={values.firstname}
-                    className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                    className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                    disabled={isEdit === false}
                   />
                   {/* <MdOutlineModeEditOutline
                     color='#1F487C'
@@ -293,18 +303,21 @@ const AddressDetails = ({ operatorData }) => {
               </div>
             </div>
             <div className='flex items-center justify-center pt-[2vw] pb-[0.5vw]'>
-              <button
-                type="submit"
-                className=" text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[12vw] "
-                disabled={isSubmitting || !dirty || !isValid}
-                style={{
-                  backgroundColor: isSubmitting || !dirty || !isValid ? '#d3d3d3' : '#1F487C',
-                  color: isSubmitting || !dirty || !isValid ? '#9e9e9e' : '#fff',
-                  cursor: isSubmitting || !dirty || !isValid ? 'not-allowed' : 'pointer',
-                }}
-              >
-                Save
-              </button>
+              {isEdit === false ?
+                <div
+                  onClick={() => setIsEdit(true)}
+                  className="cursor-pointer text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[12vw] text-center"
+                >
+                  Edit
+                </div>
+                :
+                <button
+                  type="submit"
+                  className="text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[12vw]"
+                >
+                  Submit
+                </button>
+              }
             </div>
           </Form>
         )}

@@ -66,7 +66,7 @@ export default function ClientGridView({
           {currentData?.length > 0 &&
             currentData?.map((item) => (
               <div
-                className={` bg-white h-[15.8vw] border-[#1f4b7f] border-l-[0.1vw] cursor-pointer border-r-[0.3vw] border-b-[0.3vw] border-t-[0.1vw] rounded-[0.5vw]`}
+                className={` bg-white h-[33.5vh] border-[#1f4b7f] border-l-[0.1vw] cursor-pointer border-r-[0.3vw] border-b-[0.3vw] border-t-[0.1vw] rounded-[0.5vw]`}
                 onMouseEnter={() => setHoverId(item.tbs_client_id)}
                 onMouseLeave={() => setHoverId("")}
                 style={{
@@ -85,7 +85,7 @@ export default function ClientGridView({
                       : userimg
                       } `}
                       alt="Profile"
-                    className="w-[5vw] h-[5vw] object-cover rounded-[0.2vw]"
+                    className="h-[10vh] w-[5vw] object-cover rounded-[0.2vw]"
                   />
                   <div className="text-right pl-[3vw]">
                     <Popover
@@ -135,7 +135,7 @@ export default function ClientGridView({
                   </div>
                 </div>
 
-                <div className="flex-col flex items-center justify-center gap-y-[0.5vw]">
+                <div className="flex-col flex h-[19vh] items-center justify-center gap-y-[0.5vw]">
                   <h1 className="font-bold text-[1vw] pt-[1.5vw] text-[#1f4b7f] ">
                     {/* {capitalizeFirstLetter(item.owner_name)} */}
                     {

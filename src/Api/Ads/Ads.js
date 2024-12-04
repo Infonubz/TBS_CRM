@@ -16,11 +16,15 @@ const apiUrl = process.env.REACT_APP_API_URL;
 const typeId = sessionStorage.getItem("type_id");
 
 export const GetAdsData = async (dispatch) => {
+  const proempid = sessionStorage.getItem("USER_ID")
   try {
-    const response =
-      typeId == "PRO101" ? await axios.get(`${apiUrl}/ads-all`) : " ";
+    // const response =
+    //   typeId == "PRO101" ? await axios.get(`${apiUrl}/ads-all`) : " ";
+    const response = typeId == "PRO101" ? await axios.get(`${apiUrl}/ads-userId/tbs-pro1001`) : await axios.get(`${apiUrl}/ads-userId/${proempid}`);
     dispatch({ type: GET_ADS, payload: response.data });
-    return response.data;
+    console.log(response.data, "adsadsadsasdadsadsadsadsadaadsadsads");
+
+    return response.data ;
   } catch (error) {
     handleError(error);
     // return null;
@@ -28,9 +32,12 @@ export const GetAdsData = async (dispatch) => {
 };
 
 export const GetMobileAds = async (dispatch) => {
+  const proempid = sessionStorage.getItem("USER_ID")
   try {
-    const response =
-      typeId == "PRO101" ? await axios.get(`${apiUrl}/mobads-all`) : " ";
+    // const response =
+    //   typeId == "PRO101" ? await axios.get(`${apiUrl}/mobads-all`) : " ";
+    const response = typeId == "PRO101" ? await axios.get(`${apiUrl}/mobads-userId/tbs-pro1001`) : await axios.get(`${apiUrl}/mobads-userId/${proempid}`);
+
     dispatch({ type: GET_MOBILE_ADS, payload: response.data });
     return response.data;
   } catch (error) {
@@ -94,10 +101,10 @@ export const SubmitAdsData = async (
     advalues.page_name == "Home"
       ? 1
       : advalues.page_name == "Dashboard"
-      ? 2
-      : advalues.page_name == "Filter"
-      ? 3
-      : 4
+        ? 2
+        : advalues.page_name == "Filter"
+          ? 3
+          : 4
   );
 
   webFormData.append(
@@ -110,8 +117,8 @@ export const SubmitAdsData = async (
     advalues.status === "Draft"
       ? "Draft"
       : advalues.status === "Requested"
-      ? "Pending"
-      : "Approved"
+        ? "Pending"
+        : "Approved"
   );
   webFormData.append(
     "ads_req_status_id",
@@ -249,10 +256,10 @@ export const SubmitAdsMobile = async (
     advalues.page_name == "Home"
       ? 1
       : advalues.page_name == "Dashboard"
-      ? 2
-      : advalues.page_name == "Filter"
-      ? 3
-      : 4
+        ? 2
+        : advalues.page_name == "Filter"
+          ? 3
+          : 4
   );
   // mbleFormData.append(
   //   "status_id",
@@ -267,8 +274,8 @@ export const SubmitAdsMobile = async (
     advalues.status === "Draft"
       ? "Draft"
       : advalues.status === "Requested"
-      ? "Pending"
-      : "Approved"
+        ? "Pending"
+        : "Approved"
   );
   mbleFormData.append(
     "ads_req_status_id",
@@ -311,7 +318,7 @@ export const GetAdsById = async (updatedata, showtable, setAdData) => {
     console.log(response, "responseresponse");
     // SetUpdateData(null);
     // setAdData("");
-    return showtable == 4 ? response?.data : showtable == 6 ? response.data[0] : response?.data  ;
+    return showtable == 4 ? response?.data : showtable == 6 ? response.data[0] : response?.data;
   } catch (error) {
     handleError(error);
     return null;
@@ -333,9 +340,11 @@ export const GetMbleAdsById = async (updatedata, SetUpdateData, setAdData) => {
 };
 
 export const handleAdsearch = async (e, dispatch) => {
+  const proempid = sessionStorage.getItem("USER_ID")
   try {
     if (e.target.value) {
-      const response = await api.get(`${apiUrl}/ads/search/${e.target.value}`);
+      // const response = await api.get(`${apiUrl}/ads/search/${e.target.value}`);
+      const response = typeId == "PRO1001" ? await api.get(`${apiUrl}/ads-search/tbs-pro1001/${e.target.value}`) : await api.get(`${apiUrl}/ads-search/${proempid}/${e.target.value}`)
       dispatch({ type: GET_ADS, payload: response.data });
       return response.data[0];
     } else {
@@ -348,13 +357,16 @@ export const handleAdsearch = async (e, dispatch) => {
 };
 
 export const handleMbleAdsearch = async (e, dispatch) => {
+  const proempid = sessionStorage.getItem("USER_ID")
   try {
     if (e.target.value) {
-      const response = await api.get(
-        `${apiUrl}/mobads/search/${e.target.value}`
-      );
+      // const response = await api.get(
+      //   `${apiUrl}/mobads/search/${e.target.value}`
+      // );
+      const response = typeId == "PRO1001" ? await api.get(`${apiUrl}/mobads-search/tbs-pro1001/${e.target.value}`) : await api.get(`${apiUrl}/mobads-search/${proempid}/${e.target.value}`)
+
       dispatch({ type: GET_MOBILE_ADS, payload: response.data });
-      return response.data[0];
+      return response.data[0] ;
     } else {
       GetAdsData(dispatch);
       GetMobileAds(dispatch);

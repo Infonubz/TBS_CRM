@@ -5,6 +5,10 @@ import * as Yup from "yup";
 import { message } from "antd";
 import { PiPhonePlusBold } from "react-icons/pi";
 import { TbMailShare } from "react-icons/tb";
+import { BsTelephoneForwardFill } from "react-icons/bs";
+import { IoMdMail } from "react-icons/io";
+import { PostSupportData } from "../../Api/Support/Support";
+import { toast } from "react-toastify";
 
 export default function Support() {
   const validationSchema = Yup.object().shape({
@@ -22,6 +26,8 @@ export default function Support() {
 
   const handleSubmit = (values) => {
     console.log(values);
+    const responce = PostSupportData(values)
+    toast.success(responce)
     message.success("Form submitted successfully!");
   };
 
@@ -41,34 +47,37 @@ export default function Support() {
       }}
     >
       {({ isSubmitting }) => (
-        <div className="overflow-auto  max-h-[36vw] ">
+        <div className=" ">
           <Form>
-            <div className="flex justify-center text-[#1f487c] text-[1.9vw] font-bold mb-[1.3vw]">
+            <div className="bg-gray-200 p-[1vw] rounded-[0.8vw]" >
+            <div className="flex justify-center text-[#1f487c] text-[1.7vw] font-bold mb-[1.3vw]">
               <h1>Get In Touch</h1>
             </div>
 
-            <div className="mt-[1vw] mb-[.8vw] flex flex-col gap-y-[1vw] text-[#1f487c] text-base">
+            <div className="mt-[1vw] mb-[vw] justify-center flex flex-col gap-y-[1vw] text-[#1f487c] text-base">
               {/* <div className="mb-2">
               <strong>Phone:</strong> <span>1234567890</span>
             </div>
             <div>
               <strong>Mail:</strong> <span>nubiznez@nubiznez.com</span>
             </div> */}
-              <div className="flex justify-start font-semibold gap-x-[1.5vw]">
-                <div className="text-[2vw]">
-                  <PiPhonePlusBold />
+              <div className="flex justify-start items-center font-semibold gap-x-[1.3vw]">
+                <div className="text-[1.3vw]">
+                  {/* <PiPhonePlusBold /> */}
+                  <BsTelephoneForwardFill />
                 </div>
-                <div className="text-[1.2vw]">1234567890</div>
+                <div className="text-[1vw]">1234567890</div>
               </div>
-              <div className="flex justify-start font-semibold gap-x-[1.5vw]">
-                <div className="text-[2vw]">
-                  <TbMailShare />
+              <div className="flex justify-start items-center font-semibold gap-x-[1.3vw]">
+                <div className="text-[1.3vw]">
+                  {/* <TbMailShare /> */}
+                  <IoMdMail />
                 </div>
-                <div className="text-[1.2vw]">tbscustomerquery@tbs.com</div>
+                <div className="text-[1vw]">tbscustomerquery@tbs.com</div>
               </div>
             </div>
 
-            <div className="overflow-auto  max-h-[21vw] ">
+            <div className=" ">
               <div>
                 {/* <label
                 htmlFor="name"
@@ -76,19 +85,21 @@ export default function Support() {
               >
                 Name
               </label> */}
+              <div className="relative">
                 <Field
                   id="name"
                   name="name"
                   type="text"
                   placeholder="Name"
-                  className="input-field mt-[1.5vw] w-[97%] h-[3vw] placeholder-[#444b62] text-top border border-b-2 border-r-2 border-b-[#1f487c] border-r-[#1f487c] 
+                  className="input-field mt-[1.5vw] text-[1vw] w-[97%] h-[2.5vw] pl-[1vw] text-[#1f487c] placeholder-gray-400 text-top 
             focus:outline-none focus:border-2 border-gray-300  px-[.5vw] py-[.5vw] rounded-md"
                 />
                 <ErrorMessage
                   name="name"
                   component="div"
-                  className="text-red-500 text-[1vw]"
+                  className="text-red-500 absolute bottom-[-1.2vw] left-[.3vw] text-[.8vw]"
                 />
+                </div>
 
                 {/* <label
                 htmlFor="phone"
@@ -96,19 +107,21 @@ export default function Support() {
               >
                 Phone
               </label> */}
+              <div className="relative">
                 <Field
                   id="phone"
                   name="phone"
                   type="text"
                   placeholder="Phone"
-                  className="input-field mt-[1.5vw] w-[97%] h-[3vw] placeholder-[#444b62] text-top border border-b-2 border-r-2 border-b-[#1f487c] border-r-[#1f487c] 
+                  className="input-field mt-[1.5vw] w-[97%] text-[1vw] h-[2.5vw] text-[#1f487c] pl-[1vw] placeholder-gray-400 text-top  
             focus:outline-none focus:border-2 border-gray-300  px-[.5vw] py-[.5vw] rounded-md"
                 />
                 <ErrorMessage
                   name="phone"
                   component="div"
-                  className="text-red-500 text-[1vw] "
+                  className="text-red-500 absolute bottom-[-1.2vw] left-[.3vw] text-[.8vw] "
                 />
+                </div>
 
                 {/* <label
                 htmlFor="mail"
@@ -116,19 +129,21 @@ export default function Support() {
               >
                 E-Mail
               </label> */}
+              <div className="relative">
                 <Field
                   id="mail"
                   name="mail"
                   type="email"
                   placeholder="Email"
-                  className="input-field mt-[1.5vw] w-[97%] h-[3vw] placeholder-[#444b62] text-top border border-b-2 border-r-2 border-b-[#1f487c] border-r-[#1f487c] 
+                  className="input-field mt-[1.5vw] w-[97%] text-[1vw] h-[2.5vw] text-[#1f487c] pl-[1vw] placeholder-gray-400 text-top  
             focus:outline-none focus:border-2 border-gray-300  px-[.5vw] py-[.5vw] rounded-md"
                 />
                 <ErrorMessage
                   name="mail"
                   component="div"
-                  className="text-red-500 text-[1vw] "
+                  className="text-red-500 absolute bottom-[-1.2vw] left-[.3vw] text-[.8vw] "
                 />
+                </div>
 
                 {/* <label
                 htmlFor="message"
@@ -136,24 +151,27 @@ export default function Support() {
               >
                 Message
               </label> */}
+              <div className="relative">
                 <Field
+                style={{resize:"none"}}
                   id="message"
                   name="message"
                   as="textarea"
                   placeholder="Enter your message here..."
-                  className="input-field mt-[1.5vw] w-[97%] h-[6vw] placeholder-[#444b62] text-top border border-b-2 border-r-2 border-b-[#1f487c] border-r-[#1f487c] 
+                  className="input-field mt-[1.5vw] w-[97%] h-[5vw] text-[1vw] text-[#1f487c] pl-[1vw] placeholder-gray-400 text-top  
             focus:outline-none focus:border-2 border-gray-300 px-[.5vw] py-[.5vw] rounded-md"
                 />
                 <ErrorMessage
                   name="message"
                   component="div"
-                  className="text-red-500 text-[1vw] "
+                  className="text-red-500 absolute bottom-[-.8vw] left-[.3vw] text-[.8vw] "
                 />
+                </div>
               </div>
             </div>
-            <div className="flex justify-end">
+            <div className="flex justify-center">
               <button
-                className="flex h-[2.5vw] me-2 bg-[#1F4B7F] mt-[0.3vw] px-[0.8vw] gap-[0.5vw] py-[0.3vw] rounded-[0.6vw] items-center justify-center"
+                className="flex h-[3vw] w-full me-2 bg-[#1F4B7F] mt-[1vw] px-[0.8vw] gap-[0.5vw] py-[0.3vw] rounded-[0.6vw] items-center justify-center"
                 type="submit"
                 //disabled={isSubmitting} // Disable button while submitting
               >
@@ -163,7 +181,7 @@ export default function Support() {
                 <span className="text-white text-[1vw]">Submit</span>
               </button>
             </div>
-          </Form>
+         </div> </Form>
         </div>
       )}
     </Formik>

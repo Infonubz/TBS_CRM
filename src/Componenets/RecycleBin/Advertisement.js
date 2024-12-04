@@ -37,71 +37,80 @@ export default function Advertisement({ currentItems, selectedTab ,activePage, i
 
   const columns = [
     {
-      title: <div className="flex font-bold text-[1.2vw]">S.No</div>,
+      title: <div className="flex font-bold text-[1.2vw] justify-center">S.No</div>,
       width: "5vw",
       render: (row, rowdta, index) => {
         const pageNo = (activePage - 1) * itemsPerPage + index+1
         return(
         <div className="">
-          <h1 className="pl-[1vw] text-[#1F4B7F]">{pageNo}</h1>
+          <h1 className="pl-[1vw] text-center text-[1.1vw] text-[#1F4B7F]">{pageNo}</h1>
         </div>
    ) },
     },
     {
-      title: <div className="flex font-bold text-[1.2vw]">Title</div>,
+      title: <div className="flex font-bold justify-center  text-[1.2vw]">Title</div>,
       render: (row) => (
+        <div className="flex py-[.3vw] h-[12.8vh] items-center justify-center">
         <div className="flex flex-col text-[#1F4B7F] gap-y-[.4vw] ">
-          <h1 className="text-[1.1vw] font-semibold">{row?.deleted_data?.client_details}</h1>
+          <h1 className="text-[1.1vw] font-bold">{row?.deleted_data?.client_details}</h1>
           <p className="text-[.9vw]">{row?.emailid}</p>
           <p className="text-[.9vw]">{row?.phone}</p>
+        </div>
         </div>
       ),
       width: "14vw",
     },
     {
-      title: <div className="flex font-bold text-[1.2vw]">Description</div>,
+      title: <div className="flex font-bold justify-center text-[1.2vw]">Description</div>,
       width: "17vw",
       render: (row) => (
+        <div className="flex justify-center">
         <div className="text-[#1F4B7F]">
-          <h1 className="text-[1.1vw] font-bold">
+          <h1 className="text-[1.1vw]  font-bold">
             {row?.deleted_data?.ad_title}
           </h1>
-          <p>Usage Per day - {row?.deleted_data?.usage_per_day}</p>
+          <p className="text-[0.9vw]">Usage Per day - {row?.deleted_data?.usage_per_day}</p>
           <p className="text-[0.9vw] pt-[0.3vw] text-[#1F4B7F] font-medium">
             {`${dayjs(row?.deleted_data.created_date).format("DD MMM, YY")}`} -{" "}
             {`${dayjs(row?.deleted_data?.end_date).format("DD MMM, YY")}`}
           </p>
         </div>
+        </div>
       ),
     },
     {
       title: (
-        <div className="flex  font-bold text-[1.2vw]">Status</div>
+        <div className="flex  font-bold justify-center text-[1.2vw]">Status</div>
       ),
       width: "10vw",
       render: (row) => {
         return (
-          <div className="flex">
+          <div className="flex justify-center">
             <button
               className={`${
-                row.deleted_data.status?.toLowerCase() === "active"
+                row.deleted_data.ads_status_id == 0
+                  ? "bg-[#646262]"
+                  : row.deleted_data.ads_status_id == 1
+                  ? " bg-[#FF9900]"
+                   : row.deleted_data.ads_status_id == 2
                   ? "bg-[#34AE2A]"
-                  : row.deleted_data.status?.toLowerCase() === "draft"
-                  ? "bg-[#FF9900]"
+                    : row.deleted_data.ads_status_id == 3
+                  ? "bg-[#2A99FF]"
                   : "bg-[#FD3434]"
               } rounded-[0.5vw] text-[1.1vw]  font-semibold text-white w-[7vw] cursor-not-allowed py-[0.2vw]`}
             >
-              {row.deleted_data.status}
+              {row.deleted_data.ads_status}
             </button>
+           
           </div>
         );
       },
     },
     {
-      title: <div className="flex font-bold text-[1.2vw]">Deleted Date</div>,
+      title: <div className="flex font-bold justify-center text-[1.2vw]">Deleted Date</div>,
       width: "15vw",
       render: (row) => (
-        <div className="flex text-[#1F4B7F]">
+        <div className="flex justify-center text-[#1F4B7F]">
           <p className="text-[1.1vw]">{`${dayjs(row?.deleted_date).format(
             "DD MMM, YY"
           )}`}</p>
@@ -109,9 +118,10 @@ export default function Advertisement({ currentItems, selectedTab ,activePage, i
       ),
     },
     {
-      title: <div className="flex font-bold text-[1.2vw]">Actions</div>,
+      title: <div className="flex font-bold justify-center text-[1.2vw]">Actions</div>,
       width: "15vw",
       render: (row) => (
+        <div className="flex justify-center">
         <div className="flex gap-[1vw] items-center">
           <BsEyeFill
           className="cursor-pointer"
@@ -149,13 +159,14 @@ export default function Advertisement({ currentItems, selectedTab ,activePage, i
             />
           </span>
         </div>
+        </div>
       ),
     },
   ];
 
   return (
     <>
-      <div className="h-[72vh] w-full">
+      <div className="h-[75vh] w-full">
         <Table
           dataSource={currentItems}
           columns={columns}

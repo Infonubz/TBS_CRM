@@ -182,10 +182,10 @@ const AboutUs = () => {
                         const data = await SubmitAboutUs(file, li_id);
                         console.log(data, 'about_us');
                         toast.success(data?.message);
-                        setFileContents((prevContents) => ({
-                            ...prevContents,
-                            about_us: '',
-                        }));
+                        // setFileContents((prevContents) => ({
+                        //     ...prevContents,
+                        //     about_us: '',
+                        // }));
                         setAboutUs('');
 
                         setUploadStatus((prevStatus) => ({
@@ -201,10 +201,10 @@ const AboutUs = () => {
                     try {
                         const data = await SubmitPrivacyPolicy(file, li_id);
                         toast.success(data?.message);
-                        setFileContents((prevContents) => ({
-                            ...prevContents,
-                            privacy_policy: '',
-                        }));
+                        // setFileContents((prevContents) => ({
+                        //     ...prevContents,
+                        //     privacy_policy: '',
+                        // }));
                         setPrivacyPolicy('');
                         setUploadStatus((prevStatus) => ({
                             ...prevStatus,
@@ -219,10 +219,10 @@ const AboutUs = () => {
                     try {
                         const data = await SubmitTermsConditions(file, li_id);
                         toast.success(data?.message);
-                        setFileContents((prevContents) => ({
-                            ...prevContents,
-                            terms_condition: '',
-                        }));
+                        // setFileContents((prevContents) => ({
+                        //     ...prevContents,
+                        //     terms_condition: '',
+                        // }));
                         setTermsConditions('');
 
                         setUploadStatus((prevStatus) => ({
@@ -238,10 +238,10 @@ const AboutUs = () => {
                     try {
                         const data = await SubmitUserAgreement(file, li_id);
                         toast.success(data?.message);
-                        setFileContents((prevContents) => ({
-                            ...prevContents,
-                            user_agreement: '',
-                        }));
+                        // setFileContents((prevContents) => ({
+                        //     ...prevContents,
+                        //     user_agreement: '',
+                        // }));
                         setUserAgreement('');
                         setUploadStatus((prevStatus) => ({
                             ...prevStatus,

@@ -55,7 +55,7 @@ const validationSchema = Yup.object().shape({
 });
 
 
-const PersonalDetail = ({ setSelectedFile, fileList }) => {
+const PersonalDetail = ({ setSelectedFile, fileList, isEdit, setIsEdit }) => {
 
     const [personalData, setPersonalData] = useState()
     console.log(personalData, 'personal_data')
@@ -81,8 +81,10 @@ const PersonalDetail = ({ setSelectedFile, fileList }) => {
                 values,
                 fileList,
             );
+            console.log(data, 'data_data')
             GetEmployeePersonalData()
-            toast.success(data?.message);
+            toast.success(data);
+            setIsEdit(false)
             console.log(data);
         } catch (error) {
             console.error("Error uploading data", error);
@@ -136,7 +138,8 @@ const PersonalDetail = ({ setSelectedFile, fileList }) => {
                                         type="text"
                                         name="firstname"
                                         placeholder="Enter First Name"
-                                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                        disabled={isEdit === false}
                                     />
                                     {/* <MdOutlineModeEditOutline
                                         color='#1F487C'
@@ -162,7 +165,8 @@ const PersonalDetail = ({ setSelectedFile, fileList }) => {
                                         name="lastname"
                                         placeholder="Enter Last Name"
                                         value={values.lastname}
-                                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                        disabled={isEdit === false}
                                     />
                                     {/* <MdOutlineModeEditOutline
                                         color='#1F487C'
@@ -187,10 +191,11 @@ const PersonalDetail = ({ setSelectedFile, fileList }) => {
                                         type="text"
                                         name="phone"
                                         placeholder="Enter Number"
-                                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                        disabled={isEdit === false}
                                         value={values.phone}
                                     />
-{/* 
+                                    {/* 
                                     <MdOutlineModeEditOutline
                                         color='#1F487C'
                                         className='absolute top-[0.75vw] right-[1vw]'
@@ -215,7 +220,8 @@ const PersonalDetail = ({ setSelectedFile, fileList }) => {
                                         name="alt_phone"
                                         placeholder="Enter Alternate Number"
                                         value={values.alt_phone}
-                                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                        disabled={isEdit === false}
                                     />
                                     {/* <MdOutlineModeEditOutline
                                         color='#1F487C'
@@ -241,7 +247,8 @@ const PersonalDetail = ({ setSelectedFile, fileList }) => {
                                         name="emailid"
                                         placeholder="Enter Email Address"
                                         value={values.emailid}
-                                        className="border-r-[0.2vw]  flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                        disabled={isEdit === false}
                                     />
                                     {/* <MdOutlineModeEditOutline
                                         color='#1F487C'
@@ -270,7 +277,8 @@ const PersonalDetail = ({ setSelectedFile, fileList }) => {
                                         onChange={(e) => {
                                             handleChange(e);
                                         }}
-                                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                        disabled={isEdit === false}
                                     />
                                     {/* <MdOutlineModeEditOutline
                                         color='#1F487C'
@@ -295,7 +303,8 @@ const PersonalDetail = ({ setSelectedFile, fileList }) => {
                                         as="select"
                                         name="gender"
                                         value={values.gender}
-                                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                        disabled={isEdit === false}
                                         onChange={(e) => {
                                             handleChange(e);
                                             sessionStorage.setItem("status", e.target.value);
@@ -330,7 +339,8 @@ const PersonalDetail = ({ setSelectedFile, fileList }) => {
                                         name="blood"
                                         placeholder="Enter Blood Group"
                                         value={values.blood}
-                                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                        disabled={isEdit === false}
                                     />
                                     {/* <MdOutlineModeEditOutline
                                         color='#1F487C'
@@ -345,18 +355,21 @@ const PersonalDetail = ({ setSelectedFile, fileList }) => {
                             </div>
                         </div>
                         <div className='flex items-center justify-center pt-[2vw] pb-[0.5vw]'>
-                            <button
-                                type="submit"
-                                disabled={isSubmitting || !dirty || !isValid}
-                                style={{
-                                    backgroundColor: isSubmitting || !dirty || !isValid ? '#d3d3d3' : '#1F487C',
-                                    color: isSubmitting || !dirty || !isValid ? '#9e9e9e' : '#fff',
-                                    cursor: isSubmitting || !dirty || !isValid ? 'not-allowed' : 'pointer',
-                                }}
-                                className=" text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[12vw] "
-                            >
-                                Save
-                            </button>
+                            {isEdit === false ?
+                                <div
+                                    onClick={() => setIsEdit(true)}
+                                    className="cursor-pointer text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[12vw] text-center"
+                                >
+                                    Edit
+                                </div>
+                                :
+                                <button
+                                    type="submit"
+                                    className="text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[12vw]"
+                                >
+                                    Submit
+                                </button>
+                            }
                         </div>
                     </Form>
                 )}

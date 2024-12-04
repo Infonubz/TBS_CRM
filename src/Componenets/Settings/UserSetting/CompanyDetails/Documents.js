@@ -7,6 +7,7 @@ import { GetOperatorData, SubmitDocumentsData } from '../../../../Api/Settings/S
 import { toast } from 'react-toastify';
 import { MdOutlineModeEditOutline } from "react-icons/md";
 import { Modal } from "antd";
+import { useEffect } from 'react';
 
 const FILE_SIZE = 1024 * 1024 * 5; // 5MB
 const SUPPORTED_FORMATS = [
@@ -83,17 +84,29 @@ const Documents = ({ operatorData }) => {
     const [previewTitle, setPreviewTitle] = useState("");
     const handleCancel = () => setPreviewOpen(false);
 
+    const [inputPreview, setInputPreview] = useState({
+        aadharfront: null,
+        aadharback: null,
+        panfront: null,
+        panback: null,
+        msme: null,
+        gst: null,
+    });
+    console.log(inputPreview.gst, 'input_preview')
+    useEffect(() => {
+        setInputPreview({
+            aadharfront: operatorData?.aadar_front_doc,
+            aadharback: operatorData?.aadar_back_doc,
+            panfront: operatorData?.pancard_front_doc,
+            panback: operatorData?.pancard_back_doc,
+            msme: operatorData?.msme_docs,
+            gst: operatorData?.upload_gst
+        })
+    }, [operatorData])
+
+    const [isEdit, setIsEdit] = useState(false)
 
     console.log(previewImage, 'previewimage')
-
-    // const handlePreview = (file) => {
-    //     const reader = new FileReader();
-    //     reader.onload = () => {
-    //         setPreviewImage(reader.result);
-    //         setPreviewTitle(file.name);
-    //     };
-    //     reader?.readAsDataURL(file);
-    // };
 
     const handlePreview = (file) => {
         // Ensure the file is a valid Blob/File object
@@ -116,6 +129,25 @@ const Documents = ({ operatorData }) => {
         }
     };
 
+    const handleFileChange = (event, key) => {
+        const file = event?.currentTarget?.files[0];
+
+        // Check if the file is selected and it's a valid file
+        if (file) {
+            // Validate if the selected file is an actual file object
+            if (file instanceof File) {
+                setInputPreview((prevState) => ({
+                    ...prevState,
+                    [key]: URL.createObjectURL(file), // Create object URL for valid file
+                }));
+            } else {
+                console.error("Selected item is not a valid file.");
+            }
+        } else {
+            console.error("No file selected.");
+        }
+    };
+
     const dispatch = useDispatch()
 
     const handleSubmit = async (values,) => {
@@ -126,6 +158,7 @@ const Documents = ({ operatorData }) => {
             );
             GetOperatorData(dispatch)
             toast.success(data?.message);
+            setIsEdit(false)
             console.log('Checking_checking')
         }
         catch (error) {
@@ -133,6 +166,24 @@ const Documents = ({ operatorData }) => {
             toast.error("Failed to submit document. Please try again.");
         }
     };
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalImage, setModalImage] = useState(null);
+
+    const openModal = (event) => {
+        // Get the image source (src) using `getElementById`
+        const imageSrc = event.target.getAttribute('src');
+
+        // Set the modal image source
+        setModalImage(imageSrc);
+
+        // Open the modal
+        setIsModalOpen(true);
+    };
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
+
 
     return (
         <>
@@ -178,12 +229,13 @@ const Documents = ({ operatorData }) => {
                                                     "aadhar_front",
                                                     files[0]
                                                 );
-                                                handlePreview(files[0]);
+                                                handleFileChange(event, "aadharfront");
                                             }}
                                         />
                                         <button
                                             type="button"
-                                            className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                                            className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                            disabled={isEdit === false}
                                             onClick={(event) => {
                                                 event.preventDefault();
                                                 document.getElementById("aadhar_front").click();
@@ -191,48 +243,31 @@ const Documents = ({ operatorData }) => {
                                         >
                                             {values.aadhar_front ? (
                                                 <div
-                                                    // onClick={() => {
-                                                    //     setPreviewImage(
-                                                    //         operatorData?.aadar_back_doc
-                                                    //     );
-                                                    //     setPreviewOpen(true);
-                                                    // }}
-                                                    className="cursor-pointer underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]"
+                                                     className={`${isEdit === false ? 'cursor-not-allowed' : ''}  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
                                                 >
                                                     {values.aadhar_front.name
                                                         ? values.aadhar_front.name
                                                         : values.aadhar_front}
-                                                    {/* <p>Aadhar Back</p> */}
                                                 </div>
                                             )
                                                 :
                                                 <span className="opacity-50">Upload Aadhar Back</span>}
-                                            {/* <MdOutlineModeEditOutline
-                                                color="#1F487C"
-                                                size={"1.5vw"}
-                                                className="absolute right-[1vw]"
-                                            /> */}
-                                            {/* <MdOutlineModeEditOutline
-                                                color="#1F487C"
-                                                size={"1.5vw"}
-                                                className="absolute right-[1vw]"
-                                            /> */}
                                         </button>
-                                        {/* {values.aadhar_front ? (
-                                            <div
-                                                onClick={() => {
-                                                    setPreviewImage(
-                                                        operatorData?.aadar_front_doc
-                                                    );
-                                                    setPreviewOpen(true);
-                                                }}
-                                                className="cursor-pointer underline-offset-1 text-slate-400 text-[0.9vw] absolute bottom-[-1.4vw] left-[0.5vw]"
-                                            >
-                                                <p>Preview</p>
-                                            </div>
-                                        ) :
-                                            ''
-                                        } */}
+                                        {inputPreview?.aadharfront?.startsWith("blob") ? (
+                                            <img
+                                                src={inputPreview.aadharfront}
+                                                className="h-[2.5vw] w-[2.5vw] absolute cursor-zoom-in top-[.2vw]  right-[.3vw]"
+                                                alt="Aadhar Front"
+                                                onClick={openModal}
+                                            />
+                                        ) : (
+                                            <img
+                                                src={`${apiImgUrl}${inputPreview.aadharfront}`}
+                                                className="h-[2.5vw] w-[2.5vw] absolute  top-[.2vw] cursor-zoom-in right-[.8vw]"
+                                                alt="Aadhar Front"
+                                                onClick={openModal}
+                                            />
+                                        )}
                                         <ErrorMessage
                                             name="aadhar_front"
                                             component="div"
@@ -261,7 +296,8 @@ const Documents = ({ operatorData }) => {
                                         />
                                         <button
                                             type="button"
-                                            className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                                            className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                            disabled={isEdit === false}
                                             onClick={(event) => {
                                                 event.preventDefault();
                                                 document.getElementById("aadhar_back").click();
@@ -269,28 +305,34 @@ const Documents = ({ operatorData }) => {
                                         >
                                             {values.aadhar_back ? (
                                                 <div
-                                                    // onClick={() => {
-                                                    //     setPreviewImage(
-                                                    //         operatorData?.aadar_back_doc
-                                                    //     );
-                                                    //     setPreviewOpen(true);
-                                                    // }}
-                                                    className="cursor-pointer underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]"
+
+                                                     className={`${isEdit === false ? 'cursor-not-allowed' : ''}  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
                                                 >
                                                     {values.aadhar_back.name
                                                         ? values.aadhar_back.name
                                                         : values.aadhar_back}
-                                                    {/* <p>Aadhar Back</p> */}
+
                                                 </div>
                                             )
                                                 :
                                                 <span className="opacity-50">Upload Aadhar Back</span>}
-                                            {/* <MdOutlineModeEditOutline
-                                                color="#1F487C"
-                                                size={"1.5vw"}
-                                                className="absolute right-[1vw]"
-                                            /> */}
+
                                         </button>
+                                        {inputPreview?.aadharback?.startsWith("blob") ? (
+                                            <img
+                                                src={inputPreview.aadharback}
+                                                className="h-[2.5vw] w-[2.5vw] absolute cursor-zoom-in top-[.2vw]  right-[.3vw]"
+                                                alt="Aadhar Front"
+                                                onClick={openModal}
+                                            />
+                                        ) : (
+                                            <img
+                                                src={`${apiImgUrl}${inputPreview.aadharback}`}
+                                                className="h-[2.5vw] w-[2.5vw] absolute  top-[.2vw] cursor-zoom-in right-[.8vw]"
+                                                alt="Aadhar Front"
+                                                onClick={openModal}
+                                            />
+                                        )}
                                         <ErrorMessage
                                             name="aadhar_back"
                                             component="div"
@@ -327,7 +369,8 @@ const Documents = ({ operatorData }) => {
                                         />
                                         <button
                                             type="button"
-                                            className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                                            className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                            disabled={isEdit === false}
                                             onClick={(event) => {
                                                 event.preventDefault();
                                                 document.getElementById("pan_front").click();
@@ -335,29 +378,34 @@ const Documents = ({ operatorData }) => {
                                         >
                                             {values.pan_front ? (
                                                 <div
-                                                    // onClick={() => {
-                                                    //     setPreviewImage(
-                                                    //         operatorData?.pancard_front_doc
-                                                    //     );
-                                                    //     setPreviewOpen(true);
-                                                    // }}
-                                                    className="cursor-pointer underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]"
+
+                                                className={`${isEdit === false ? 'cursor-not-allowed' : ''}  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
                                                 >
                                                     {values.pan_front.name
                                                         ? values.pan_front.name
                                                         : values.pan_front}
-                                                    {/* <p>Pan Front</p> */}
+
                                                 </div>
                                             )
                                                 :
                                                 <span className="opacity-50">Upload Pancard Front</span>}
-                                            {/* <MdOutlineModeEditOutline
-                                                color="#1F487C"
-                                                size={"1.5vw"}
-                                                className="absolute right-[1vw]"
-                                            /> */}
-                                        </button>
 
+                                        </button>
+                                        {inputPreview?.panfront?.startsWith("blob") ? (
+                                            <img
+                                                src={inputPreview.panfront}
+                                                className="h-[2.5vw] w-[2.5vw] absolute cursor-zoom-in top-[.2vw]  right-[.3vw]"
+                                                alt="Aadhar Front"
+                                                onClick={openModal}
+                                            />
+                                        ) : (
+                                            <img
+                                                src={`${apiImgUrl}${inputPreview.panfront}`}
+                                                className="h-[2.5vw] w-[2.5vw] absolute  top-[.2vw] cursor-zoom-in right-[.8vw]"
+                                                alt="Aadhar Front"
+                                                onClick={openModal}
+                                            />
+                                        )}
                                         <ErrorMessage
                                             name="pan_front"
                                             component="div"
@@ -383,7 +431,7 @@ const Documents = ({ operatorData }) => {
                                             onChange={(event) => {
                                                 const files = Array.from(event.target.files);
                                                 console.log(files, "filesfiles");
-                                                // setFieldValue("pan_back", files);
+
                                                 setFieldValue(
                                                     "pan_back",
                                                     event.currentTarget.files[0]
@@ -393,7 +441,8 @@ const Documents = ({ operatorData }) => {
                                         />
                                         <button
                                             type="button"
-                                            className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                                            className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                            disabled={isEdit === false}
                                             onClick={(event) => {
                                                 event.preventDefault();
                                                 document.getElementById("pan_back").click();
@@ -402,13 +451,8 @@ const Documents = ({ operatorData }) => {
                                             {values.pan_back ?
                                                 (
                                                     <div
-                                                        // onClick={() => {
-                                                        //     setPreviewImage(
-                                                        //         operatorData?.pancard_back_doc
-                                                        //     );
-                                                        //     setPreviewOpen(true);
-                                                        // }}
-                                                        className="cursor-pointer underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]"
+
+                                                    className={`${isEdit === false ? 'cursor-not-allowed' : ''}  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
                                                     >
                                                         {values.pan_back.name
                                                             ? values.pan_back.name
@@ -417,12 +461,23 @@ const Documents = ({ operatorData }) => {
                                                     </div>
                                                 )
                                                 : <span className="opacity-50">Upload Pancard Back</span>}
-                                            {/* <MdOutlineModeEditOutline
-                                                color="#1F487C"
-                                                size={"1.5vw"}
-                                                className="absolute right-[1vw]"
-                                            /> */}
+
                                         </button>
+                                        {inputPreview?.panback?.startsWith("blob") ? (
+                                            <img
+                                                src={inputPreview.panback}
+                                                className="h-[2.5vw] w-[2.5vw] absolute cursor-zoom-in top-[.2vw]  right-[.3vw]"
+                                                alt="Aadhar Front"
+                                                onClick={openModal}
+                                            />
+                                        ) : (
+                                            <img
+                                                src={`${apiImgUrl}${inputPreview.panback}`}
+                                                className="h-[2.5vw] w-[2.5vw] absolute  top-[.2vw] cursor-zoom-in right-[.8vw]"
+                                                alt="Aadhar Front"
+                                                onClick={openModal}
+                                            />
+                                        )}
                                         <ErrorMessage
                                             name="pan_back"
                                             component="div"
@@ -448,7 +503,7 @@ const Documents = ({ operatorData }) => {
                                             onChange={(event) => {
                                                 const files = Array.from(event.target.files);
                                                 console.log(files, "filesfiles");
-                                                // setFieldValue("msme_docs", files);
+
                                                 setFieldValue(
                                                     "msme_docs",
                                                     event.currentTarget.files[0]
@@ -459,7 +514,8 @@ const Documents = ({ operatorData }) => {
                                         />
                                         <button
                                             type="button"
-                                            className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                                            className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                            disabled={isEdit === false}
                                             onClick={(event) => {
                                                 event.preventDefault();
                                                 document.getElementById("msme_docs").click();
@@ -467,13 +523,8 @@ const Documents = ({ operatorData }) => {
                                         >
                                             {values.msme_docs ? (
                                                 <div
-                                                    // onClick={() => {
-                                                    //     setPreviewImage(
-                                                    //         operatorData?.msme_docs
-                                                    //     );
-                                                    //     setPreviewOpen(true);
-                                                    // }}
-                                                    className="cursor-pointer underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]"
+
+                                                className={`${isEdit === false ? 'cursor-not-allowed' : ''}  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
                                                 >
                                                     {values.msme_docs.name
                                                         ? values.msme_docs.name
@@ -482,13 +533,23 @@ const Documents = ({ operatorData }) => {
                                                 </div>
                                             )
                                                 : <span className="opacity-50">Upload MSME Image</span>}
-                                            {/* <MdOutlineModeEditOutline
-                                                color="#1F487C"
-                                                size={"1.5vw"}
-                                                className="absolute right-[1vw]"
-                                            /> */}
-                                        </button>
 
+                                        </button>
+                                        {inputPreview?.msme?.startsWith("blob") ? (
+                                            <img
+                                                src={inputPreview.msme}
+                                                className="h-[2.5vw] w-[2.5vw] absolute cursor-zoom-in top-[.2vw]  right-[.3vw]"
+                                                alt="Aadhar Front"
+                                                onClick={openModal}
+                                            />
+                                        ) : (
+                                            <img
+                                                src={`${apiImgUrl}${inputPreview.msme}`}
+                                                className="h-[2.5vw] w-[2.5vw] absolute  top-[.2vw] cursor-zoom-in right-[.8vw]"
+                                                alt="Aadhar Front"
+                                                onClick={openModal}
+                                            />
+                                        )}
                                         <ErrorMessage
                                             name="msme_docs"
                                             component="div"
@@ -497,14 +558,14 @@ const Documents = ({ operatorData }) => {
                                         />
                                     </div>
                                 </div>
-                                <div className="col-span-1">
+                                <div className="">
                                     <label className="text-[#1F4B7F] text-[1vw] font-bold">
                                         GST Doc
                                         <span className="text-[1vw] text-red-600 pl-[0.2vw]">
                                             *
                                         </span>
                                     </label>
-                                    <div>
+                                    <div className='relative'>
                                         <input
                                             id="gst_file"
                                             name="gst_file"
@@ -521,7 +582,8 @@ const Documents = ({ operatorData }) => {
                                             }}
                                         />
                                         <button
-                                            className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                                            className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                            disabled={isEdit === false}
                                             onClick={(event) => {
                                                 event.preventDefault();
                                                 document.getElementById("gst_file").click();
@@ -529,13 +591,8 @@ const Documents = ({ operatorData }) => {
                                         >
                                             {values.gst_file ? (
                                                 <div
-                                                    // onClick={() => {
-                                                    //     setPreviewImage(
-                                                    //         operatorData?.upload_gst
-                                                    //     );
-                                                    //     setPreviewOpen(true);
-                                                    // }}
-                                                    className="cursor-pointer underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]"
+
+                                                    className={`${isEdit === false ? 'cursor-not-allowed' : ''}  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
                                                 >
                                                     {values.gst_file.name
                                                         ? values.gst_file.name
@@ -546,12 +603,23 @@ const Documents = ({ operatorData }) => {
                                                 :
                                                 <span className="opacity-50">Upload GST Image</span>
                                             }
-                                            {/* <MdOutlineModeEditOutline
-                                                color="#1F487C"
-                                                size={"1.5vw"}
-                                                className="absolute right-[1vw]"
-                                            /> */}
+
                                         </button>
+                                        {inputPreview?.gst?.startsWith("blob") ? (
+                                            <img
+                                                src={inputPreview.gst}
+                                                className="h-[2.5vw] w-[2.5vw] absolute cursor-zoom-in top-[.2vw]  right-[.3vw]"
+                                                alt="Aadhar Front"
+                                                onClick={openModal}
+                                            />
+                                        ) : (
+                                            <img
+                                                src={`${apiImgUrl}${inputPreview.gst}`}
+                                                className="h-[2.5vw] w-[2.5vw] absolute  top-[.2vw] cursor-zoom-in right-[.8vw]"
+                                                alt="Aadhar Front"
+                                                onClick={openModal}
+                                            />
+                                        )}
                                         <ErrorMessage
                                             name="gst_file"
                                             component="div"
@@ -562,35 +630,43 @@ const Documents = ({ operatorData }) => {
                                 </div>
                             </div>
                             <div className='flex items-center justify-center pt-[2vw] pb-[0.5vw]'>
-                                <button
-                                    type="submit"
-                                    className=" text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[12vw]"
-                                    disabled={isSubmitting || !dirty || !isValid}
-                                    style={{
-                                        backgroundColor: isSubmitting || !dirty || !isValid ? '#d3d3d3' : '#1F487C',
-                                        color: isSubmitting || !dirty || !isValid ? '#9e9e9e' : '#fff',
-                                        cursor: isSubmitting || !dirty || !isValid ? 'not-allowed' : 'pointer',
-                                    }}
-                                >
-                                    Save
-                                </button>
+                                {isEdit === false ?
+                                    <div
+                                        onClick={() => setIsEdit(true)}
+                                        className="cursor-pointer text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[12vw] text-center"
+                                    >
+                                        Edit
+                                    </div>
+                                    :
+                                    <button
+                                        type="submit"
+                                        className="text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[12vw]"
+                                    >
+                                        Submit
+                                    </button>
+                                }
                             </div>
-                            {console.log(dirty, 'dirty_dirty')}
+
                         </Form>
                     )}
                 </Formik>
             </div >
             <Modal
-                open={previewOpen}
-                title={previewTitle}
+                visible={isModalOpen}
+                onCancel={closeModal}
                 footer={null}
-                onCancel={handleCancel}
+                centered
+                bodyStyle={{ padding: 0 }}
+                destroyOnClose={true}
             >
-                <img
-                    alt="example"
-                    style={{ width: "100%" }}
-                    src={`${apiImgUrl}${previewImage}`}
-                />
+                {modalImage && (
+                    <img
+                        src={modalImage}
+                        alt="Documents Preview"
+                        style={{ width: "100%" }}
+                        className=""
+                    />
+                )}
             </Modal>
         </>
     )

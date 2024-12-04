@@ -16,8 +16,8 @@ const userID = sessionStorage.getItem("USER_ID") ? sessionStorage.getItem('USER_
 
 export const GetPartnerPersonalData = async () => {
     try {
-        // const response = await api.get(`${apiUrl}/partner_details${typeId === "PAT101" ? `/${userID}` : ""}`);
-        const response = await api.get(`${apiUrl}/partner_details${typeId === "PRO101" ? `/tbs-pat1113` : ""}`);
+        const response = await api.get(`${apiUrl}/partner_details${typeId === "PART101" ? `/${userID}` : ""}`);
+        // const response = await api.get(`${apiUrl}/partner_details${typeId === "PRO101" ? `/tbs-pat1113` : ""}`);
         return response.data;
     } catch (error) {
         handleError(error);
@@ -27,8 +27,8 @@ export const GetPartnerPersonalData = async () => {
 
 export const GetPartnerAddressData = async () => {
     try {
-        // const response = await api.get(`${apiUrl}/partner_address_details${typeId === "PAT101" ? `/${userID}` : ""}`);
-        const response = await api.get(`${apiUrl}/partner_address_details${typeId === "PRO101" ? `/tbs-pat1113` : ""}`);
+        const response = await api.get(`${apiUrl}/partner_address_details${typeId === "PART101" ? `/${userID}` : ""}`);
+        // const response = await api.get(`${apiUrl}/partner_address_details${typeId === "PRO101" ? `/tbs-pat1113` : ""}`);
         return response.data;
     } catch (error) {
         handleError(error);
@@ -38,8 +38,8 @@ export const GetPartnerAddressData = async () => {
 
 export const GetPartnerDocuments = async () => {
     try {
-        // const response = await api.get(`${apiUrl}/partner-documents${typeId === "PAT101" ? `/${userID}` : ""}`);
-        const response = await api.get(`${apiUrl}/partner-documents${typeId === "PRO101" ? `/tbs-pat1113` : ""}`);
+        const response = await api.get(`${apiUrl}/partner-documents${typeId === "PART101" ? `/${userID}` : ""}`);
+        // const response = await api.get(`${apiUrl}/partner-documents${typeId === "PRO101" ? `/tbs-pat1113` : ""}`);
         return response.data;
     } catch (error) {
         handleError(error);
@@ -62,8 +62,8 @@ export const submitPartnerPersonalData = async (
         formData.append('profile_img', fileList[0].originFileObj)
     }
     formData.append('occupation', values.occupation)
-    // const url = `${apiUrl}/partner_details_update${typeId === "PAT101" ? `/${userID}` : ""}`
-    const url = `${apiUrl}/partner_details_update${typeId === "PRO101" ? `/tbs-pat1113` : ""}`
+    const url = `${apiUrl}/partner_details_update${typeId === "PART101" ? `/${userID}` : ""}`
+    // const url = `${apiUrl}/partner_details_update${typeId === "PRO101" ? `/tbs-pat1113` : ""}`
     const method = "put"
 
     try {
@@ -99,8 +99,8 @@ export const submitPartnerAddressData = async (values) => {
         perm_region: values.per_region,
     };
 
-    // const url = `${apiUrl}/partner_address_details${typeId === "PAT101" ? `/${userID}` : ""}`
-    const url = `${apiUrl}/partner_address_details${typeId === "PRO101" ? `/tbs-pat1113` : ""}`
+    const url = `${apiUrl}/partner_address_details${typeId === "PART101" ? `/${userID}` : ""}`
+    // const url = `${apiUrl}/partner_address_details${typeId === "PRO101" ? `/tbs-pat1113` : ""}`
     const method = "put";
 
     try {
@@ -132,8 +132,8 @@ export const SubmitPartnerDocumentData = async (
     formData.append("pan_card_front", values.pan_fr_doc);
     formData.append("pan_card_back", values.pan_bk_doc);
 
-    // const url = `${apiUrl}/partner-documents${typeId === "PAT101" ? `/${userID}` : ""}`
-    const url = `${apiUrl}/partner-documents${typeId === "PRO101" ? `/tbs-pat1113` : ""}`
+    const url = `${apiUrl}/partner-documents${typeId === "PART101" ? `/${userID}` : ""}`
+    // const url = `${apiUrl}/partner-documents${typeId === "PRO101" ? `/tbs-pat1113` : ""}`
     const method = "put";
 
     try {

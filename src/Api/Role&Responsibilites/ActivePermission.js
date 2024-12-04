@@ -10,17 +10,15 @@ const api = axios.create({
 const apiUrl = process.env.REACT_APP_API_URL;
 const typeid = sessionStorage.getItem("type_id");
 const userId = sessionStorage.getItem("USER_ID");
-const opId = sessionStorage.getItem("OP_ID");
-const proId = sessionStorage.getItem("PRO_ID");
 
 export const GetPermissionData = async (filter, dispatch) => {
   const payload = {
     term : filter 
   };
 
-  const roleId = typeid === "OP101" || typeid === "OPEMP101" ? 1 : 3;
-  const user = typeid === "OPEMP101" ? opId : typeid === "PROEMP101" ? proId : userId;
-  const url = `${apiUrl}/permission/${user}/${roleId}`;
+  const roleId = typeid === "OP101" ? 1 : 3 
+
+  const url = `${apiUrl}/permission/${userId}/${roleId}`;
 
   try {
     console.log("Sending payload:", payload); 
@@ -65,24 +63,25 @@ export const SubmitOPPermissionData = async (
   const module_permission = permissions?.module_permissions || [];
   const selectedUser =
   filter === "OP" && typeid === "PRO101"
-    ? "Operator"
-    : filter === "PO" && typeid === "PRO101"
-    ? "Employee"
-    : typeid === "OP101" || typeid === "OPEMP101" 
-    ? "Operator"
-    : ""; 
+  ? "Operator"
+  : filter === "PO" && typeid === "PRO101"
+  ? "Employee"
+  : typeid === "OP101"
+  ? "Operator"
+  : "";
 
-const payload = {
-  role_id: role_type_id,
-  user: selectedUser,
-  user_id: typeid,
-  tbs_user_id: sessionStorage.getItem("USER_ID"),
-  role_type: permissions.role_type,
-  crud_permissions: crud_permission,
-  module_permissions: module_permission,
-};
 
-console.log(payload, rolesPermisionData, selectedUser, "payload payload");
+  const payload = {
+    role_id : role_type_id,
+    user: selectedUser,
+    user_id: typeId,
+    tbs_user_id: sessionStorage.getItem("USER_ID"),
+    role_type: permissions.role_type,
+    crud_permissions: crud_permission,
+    module_permissions: module_permission,
+  };
+
+  console.log(payload,rolesPermisionData, "payload payload")
 
   const url = permissionupdate
     ? `${apiUrl}/permissions/${permissionupdate}`
@@ -176,16 +175,14 @@ export const GetPermissionById = async (
   SetPermissionData,
   role_type_id 
 ) => {
-  const user = typeid === "OPEMP101" ? opId : typeid === "PROEMP101" ? proId : userId;
-
-  const payload = typeid === "PRO101" || typeid === "PROEMP101" 
+  const payload =  typeid === "PRO101"
   ? { 
     crud_permission_id: permissionupdate 
   }: { 
     permission_id: permissionupdate 
   };
 
-  const url = `${apiUrl}/permissions/${user}`
+  const url = `${apiUrl}/permissions/${userId}`
   const method = "post";
 
   try {

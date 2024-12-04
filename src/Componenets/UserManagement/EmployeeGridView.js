@@ -66,7 +66,7 @@ export default function EmployeeGridView({
                       const fullname = `${capitalizeFirstLetter(item?.emp_first_name)} ${item.emp_last_name}`
               return(
               <div
-                className={`  bg-white h-[16vw] border-[#1f4b7f] border-l-[0.1vw] cursor-pointer border-r-[0.3vw] border-b-[0.3vw] border-t-[0.1vw] rounded-[0.5vw]`}
+                className={`  bg-white h-[33.5vh] border-[#1f4b7f] border-l-[0.1vw] cursor-pointer border-r-[0.3vw] border-b-[0.3vw] border-t-[0.1vw] rounded-[0.5vw]`}
                 onMouseEnter={() => {
                   if (user?.startsWith("tbs-pro")) {
                     setHoverId(item.tbs_pro_emp_id);
@@ -94,7 +94,7 @@ export default function EmployeeGridView({
                         : userimg
                     } `}
                       alt="Profile"
-                    className="w-[5vw] h-[5vw] object-cover rounded-[0.2vw]"
+                    className="w-[5vw] h-[10vh] object-cover rounded-[0.2vw]"
                   />
                   <div className="text-right pl-[3vw]">
                     <Popover
@@ -181,7 +181,7 @@ export default function EmployeeGridView({
                     </Popover>
                   </div>
                 </div>
-                <div className="flex-col flex items-center justify-center gap-y-[0.5vw]">
+                <div className="flex-col h-[19vh] flex items-center justify-center gap-y-[0.5vw]">
                   <h1 className="font-bold text-[1vw] mt-[.7vw] pt-[0.7vw] text-[#1f4b7f] ">
                     {/* {`${capitalizeFirstLetter(item.emp_first_name)} ${item.emp_last_name}`} */}
                     {

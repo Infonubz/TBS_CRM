@@ -145,6 +145,65 @@ const Documents = () => {
       toast.error("Failed to submit document. Please try again.");
     }
   }
+  const [inputPreview, setInputPreview] = useState({
+    aadharfront: null,
+    aadharback: null,
+    panfront: null,
+    panback: null,
+    qualification: null,
+    offerletter: null,
+  });
+  console.log(inputPreview.gst, 'input_preview')
+  useEffect(() => {
+    setInputPreview({
+      aadharfront: empDocument?.aadhar_card_front_doc,
+      aadharback: empDocument?.aadhar_card_back_doc,
+      panfront: empDocument?.pan_card_front_doc,
+      panback: empDocument?.pan_card_back_doc,
+      qualification: empDocument?.qualification_doc,
+      offerletter: empDocument?.offer_letter_doc
+    })
+  }, [empDocument])
+
+  const [isEdit, setIsEdit] = useState(false)
+
+  const handleFileChange = (event, key) => {
+    const file = event?.currentTarget?.files[0];
+
+    // Check if the file is selected and it's a valid file
+    if (file) {
+      // Validate if the selected file is an actual file object
+      if (file instanceof File) {
+        setInputPreview((prevState) => ({
+          ...prevState,
+          [key]: URL.createObjectURL(file), // Create object URL for valid file
+        }));
+      } else {
+        console.error("Selected item is not a valid file.");
+      }
+    } else {
+      console.error("No file selected.");
+    }
+  };
+
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalImage, setModalImage] = useState(null);
+
+  const openModal = (event) => {
+    // Get the image source (src) using `getElementById`
+    const imageSrc = event.target.getAttribute('src');
+
+    // Set the modal image source
+    setModalImage(imageSrc);
+
+    // Open the modal
+    setIsModalOpen(true);
+  };
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
 
   return (
     <div>
@@ -184,7 +243,8 @@ const Documents = () => {
                       placeholder="Enter Aadhar Number"
                       accept=".png, .jpg, .jpeg, .pdf, .doc, .docx"
                       value={values.aadhar_number}
-                      className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                      className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                      disabled={isEdit === false}
                     />
                     {/* <MdOutlineModeEditOutline
                       color='#1F487C'
@@ -212,7 +272,8 @@ const Documents = () => {
                       placeholder="Enter Pan Number"
                       accept=".png, .jpg, .jpeg, .pdf, .doc, .docx"
                       value={values.pan_number}
-                      className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                      className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                      disabled={isEdit === false}
                     />
                     {/* <MdOutlineModeEditOutline
                       color='#1F487C'
@@ -233,7 +294,7 @@ const Documents = () => {
                       *
                     </span>
                   </label>
-                  <div>
+                  <div className='relative'>
                     <input
                       id="aadhar_doc"
                       name="aadhar_doc"
@@ -257,7 +318,8 @@ const Documents = () => {
                         event.preventDefault();
                         document.getElementById("aadhar_doc").click();
                       }}
-                      className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                      className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                      disabled={isEdit === false}
                     >
                       {values.aadhar_doc ? (
                         <div
@@ -265,7 +327,7 @@ const Documents = () => {
                           //   setPreviewImage(empDocument?.aadhar_card_front_doc);
                           //   setPreviewOpen(true);
                           // }}
-                          className="cursor-pointer underline-offset-1 underline text-[#1F4B7F] text-[0.8vw]"
+                            className={`${isEdit === false ? 'cursor-not-allowed' : ''}  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
                         >
                           {values.aadhar_doc.name
                             ? values.aadhar_doc.name
@@ -279,7 +341,21 @@ const Documents = () => {
                         className='absolute top-[0.75vw] right-[1vw]'
                         size='1.5vw' /> */}
                     </button>
-
+                    {inputPreview?.aadharfront?.startsWith("blob") ? (
+                      <img
+                        src={inputPreview.aadharfront}
+                        className="h-[2.5vw] w-[2.5vw] absolute cursor-zoom-in top-[.2vw]  right-[.3vw]"
+                        alt="Aadhar Front"
+                        onClick={openModal}
+                      />
+                    ) : (
+                      <img
+                        src={`${apiImgUrl}${inputPreview.aadharfront}`}
+                        className="h-[2.5vw] w-[2.5vw] absolute  top-[.2vw] cursor-zoom-in right-[.8vw]"
+                        alt="Aadhar Front"
+                        onClick={openModal}
+                      />
+                    )}
                     <ErrorMessage
                       name="aadhar_doc"
                       component="div"
@@ -295,7 +371,7 @@ const Documents = () => {
                       *
                     </span>
                   </label>
-                  <div>
+                  <div className='relative'>
                     <input
                       id="aadhar_bk_doc"
                       name="aadhar_bk_doc"
@@ -319,7 +395,8 @@ const Documents = () => {
                         event.preventDefault();
                         document.getElementById("aadhar_bk_doc").click();
                       }}
-                      className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                      className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                      disabled={isEdit === false}
                     >
                       {values.aadhar_bk_doc ? (
                         <div
@@ -327,7 +404,7 @@ const Documents = () => {
                           //   setPreviewImage(empDocument?.aadhar_card_back_doc);
                           //   setPreviewOpen(true);
                           // }}
-                          className="cursor-pointer underline-offset-1 underline text-[#1F4B7F] text-[0.8vw]"
+                            className={`${isEdit === false ? 'cursor-not-allowed' : ''}  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
                         >
                           {values.aadhar_bk_doc.name
                             ? values.aadhar_bk_doc.name
@@ -342,7 +419,21 @@ const Documents = () => {
                         className='absolute top-[0.75vw] right-[1vw]'
                         size='1.5vw' /> */}
                     </button>
-
+                    {inputPreview?.aadharback?.startsWith("blob") ? (
+                      <img
+                        src={inputPreview.aadharback}
+                        className="h-[2.5vw] w-[2.5vw] absolute cursor-zoom-in top-[.2vw]  right-[.3vw]"
+                        alt="Aadhar back"
+                        onClick={openModal}
+                      />
+                    ) : (
+                      <img
+                        src={`${apiImgUrl}${inputPreview.aadharback}`}
+                        className="h-[2.5vw] w-[2.5vw] absolute  top-[.2vw] cursor-zoom-in right-[.8vw]"
+                        alt="Aadhar back"
+                        onClick={openModal}
+                      />
+                    )}
                     <ErrorMessage
                       name="aadhar_bk_doc"
                       component="div"
@@ -358,7 +449,7 @@ const Documents = () => {
                       *
                     </span>
                   </label>
-                  <div>
+                  <div className='relative'>
                     <input
                       id="pan_doc"
                       name="pan_doc"
@@ -382,7 +473,8 @@ const Documents = () => {
                         event.preventDefault();
                         document.getElementById("pan_doc").click();
                       }}
-                      className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                      className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                      disabled={isEdit === false}
                     >
                       {values.pan_doc ? (
                         <div
@@ -390,7 +482,7 @@ const Documents = () => {
                           //   setPreviewImage(empDocument?.pan_card_front_doc);
                           //   setPreviewOpen(true);
                           // }}
-                          className="cursor-pointer underline-offset-1 underline text-[#1F4B7F] text-[0.8vw]"
+                            className={`${isEdit === false ? 'cursor-not-allowed' : ''}  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
                         >
                           {values.pan_doc.name
                             ? values.pan_doc.name
@@ -402,6 +494,21 @@ const Documents = () => {
                         className='absolute top-[0.75vw] right-[1vw]'
                         size='1.5vw' /> */}
                     </button>
+                    {inputPreview?.panfront?.startsWith("blob") ? (
+                      <img
+                        src={inputPreview.panfront}
+                        className="h-[2.5vw] w-[2.5vw] absolute cursor-zoom-in top-[.2vw]  right-[.3vw]"
+                        alt="Pan card Front"
+                        onClick={openModal}
+                      />
+                    ) : (
+                      <img
+                        src={`${apiImgUrl}${inputPreview.panfront}`}
+                        className="h-[2.5vw] w-[2.5vw] absolute  top-[.2vw] cursor-zoom-in right-[.8vw]"
+                        alt="Pan card Front"
+                        onClick={openModal}
+                      />
+                    )}
                     <ErrorMessage
                       name="pan_doc"
                       component="div"
@@ -417,7 +524,7 @@ const Documents = () => {
                       *
                     </span>
                   </label>
-                  <div>
+                  <div className='relative'>
                     <input
                       id="pan_bk_doc"
                       name="pan_doc"
@@ -441,7 +548,8 @@ const Documents = () => {
                         event.preventDefault();
                         document.getElementById("pan_bk_doc").click();
                       }}
-                      className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                      className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                      disabled={isEdit === false}
                     >
                       {values.pan_bk_doc ? (
                         <div
@@ -449,7 +557,7 @@ const Documents = () => {
                           //   setPreviewImage(empDocument?.pan_card_back_doc);
                           //   setPreviewOpen(true);
                           // }}
-                          className="cursor-pointer underline-offset-1 underline text-[#1F4B7F] text-[0.8vw]"
+                            className={`${isEdit === false ? 'cursor-not-allowed' : ''}  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
                         >
                           {values.pan_bk_doc.name
                             ? values.pan_bk_doc.name
@@ -461,7 +569,21 @@ const Documents = () => {
                         className='absolute top-[0.75vw] right-[1vw]'
                         size='1.5vw' /> */}
                     </button>
-
+                    {inputPreview?.panback?.startsWith("blob") ? (
+                      <img
+                        src={inputPreview.panback}
+                        className="h-[2.5vw] w-[2.5vw] absolute cursor-zoom-in top-[.2vw]  right-[.3vw]"
+                        alt="pancard back"
+                        onClick={openModal}
+                      />
+                    ) : (
+                      <img
+                        src={`${apiImgUrl}${inputPreview.panback}`}
+                        className="h-[2.5vw] w-[2.5vw] absolute  top-[.2vw] cursor-zoom-in right-[.8vw]"
+                        alt="pancard back"
+                        onClick={openModal}
+                      />
+                    )}
                     <ErrorMessage
                       name="pan_bk_doc"
                       component="div"
@@ -477,7 +599,7 @@ const Documents = () => {
                       *
                     </span>
                   </label>
-                  <div>
+                  <div className='relative'>
                     <input
                       id="qualification"
                       name="qualification"
@@ -502,7 +624,8 @@ const Documents = () => {
                         event.preventDefault();
                         document.getElementById("qualification").click();
                       }}
-                      className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                      className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                      disabled={isEdit === false}
                     >
                       {values.qualification ? (
                         <div
@@ -512,7 +635,7 @@ const Documents = () => {
                           //   );
                           //   setPreviewOpen(true);
                           // }}
-                          className="cursor-pointer underline-offset-1 underline text-[#1F4B7F] text-[0.8vw]"
+                            className={`${isEdit === false ? 'cursor-not-allowed' : ''}  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
                         >
                           {values.qualification.name
                             ? values.qualification.name
@@ -528,7 +651,21 @@ const Documents = () => {
                         className='absolute top-[0.75vw] right-[1vw]'
                         size='1.5vw' /> */}
                     </button>
-
+                    {inputPreview?.qualification?.startsWith("blob") ? (
+                      <img
+                        src={inputPreview.qualification}
+                        className="h-[2.5vw] w-[2.5vw] absolute cursor-zoom-in top-[.2vw]  right-[.3vw]"
+                        alt="qualification"
+                        onClick={openModal}
+                      />
+                    ) : (
+                      <img
+                        src={`${apiImgUrl}${inputPreview.qualification}`}
+                        className="h-[2.5vw] w-[2.5vw] absolute  top-[.2vw] cursor-zoom-in right-[.8vw]"
+                        alt="qualification"
+                        onClick={openModal}
+                      />
+                    )}
                     <ErrorMessage
                       name="qualification"
                       component="div"
@@ -544,7 +681,7 @@ const Documents = () => {
                       *
                     </span>
                   </label>
-                  <div>
+                  <div className='relative'>
                     <input
                       id="offerletter"
                       name="offerletter"
@@ -569,7 +706,8 @@ const Documents = () => {
                         event.preventDefault();
                         document.getElementById("offerletter").click();
                       }}
-                      className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                      className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                      disabled={isEdit === false}
                     >
                       {values.offerletter ? (
                         <div
@@ -577,7 +715,7 @@ const Documents = () => {
                             setPreviewImage(empDocument?.offer_letter_doc);
                             setPreviewOpen(true);
                           }}
-                          className="cursor-pointer underline-offset-1 underline text-[#1F4B7F] text-[0.8vw]"
+                            className={`${isEdit === false ? 'cursor-not-allowed' : ''}  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
                         >
                           {values.offerletter.name
                             ? values.offerletter.name
@@ -592,7 +730,21 @@ const Documents = () => {
                         className='absolute top-[0.75vw] right-[1vw]'
                         size='1.5vw' /> */}
                     </button>
-
+                    {inputPreview?.offerletter?.startsWith("blob") ? (
+                      <img
+                        src={inputPreview.offerletter}
+                        className="h-[2.5vw] w-[2.5vw] absolute cursor-zoom-in top-[.2vw]  right-[.3vw]"
+                        alt="offerletter"
+                        onClick={openModal}
+                      />
+                    ) : (
+                      <img
+                        src={`${apiImgUrl}${inputPreview.offerletter}`}
+                        className="h-[2.5vw] w-[2.5vw] absolute  top-[.2vw] cursor-zoom-in right-[.8vw]"
+                        alt="offerletter"
+                        onClick={openModal}
+                      />
+                    )}
                     <ErrorMessage
                       name="offerletter"
                       component="div"
@@ -603,24 +755,21 @@ const Documents = () => {
                 </div>
               </div>
               <div className='flex items-center justify-center pt-[2vw] pb-[0.5vw]'>
-                <button
-                  type="submit"
-                  // disabled={isSubmitting || !dirty || !isValid}
-                  // style={{
-                  //   backgroundColor: isSubmitting || !dirty || !isValid ? '#d3d3d3' : '#1F487C',
-                  //   color: isSubmitting || !dirty || !isValid ? '#9e9e9e' : '#fff',
-                  //   cursor: isSubmitting || !dirty || !isValid ? 'not-allowed' : 'pointer',
-                  // }}
-                  disabled={isSubmitting || !dirty || !isValid}
-                  style={{
-                    backgroundColor: isSubmitting || !dirty || !isValid ? '#d3d3d3' : '#1F487C',
-                    color: isSubmitting || !dirty || !isValid ? '#9e9e9e' : '#fff',
-                    cursor: isSubmitting || !dirty || !isValid ? 'not-allowed' : 'pointer',
-                  }}
-                  className=" text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[12vw] "
-                >
-                  Save
-                </button>
+                {isEdit === false ?
+                  <div
+                    onClick={() => setIsEdit(true)}
+                    className="cursor-pointer text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[12vw] text-center"
+                  >
+                    Edit
+                  </div>
+                  :
+                  <button
+                    type="submit"
+                    className="text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[12vw]"
+                  >
+                    Submit
+                  </button>
+                }
               </div>
             </div>
             {console.log(dirty, 'dirty_dirty')}
@@ -629,16 +778,21 @@ const Documents = () => {
       </Formik>
 
       <Modal
-        open={previewOpen}
-        title={previewTitle}
+        visible={isModalOpen}
+        onCancel={closeModal}
         footer={null}
-        onCancel={handleCancel}
+        centered
+        bodyStyle={{ padding: 0 }}
+        destroyOnClose={true}
       >
-        <img
-          alt="example"
-          style={{ width: "100%" }}
-          src={`${apiImgUrl}${previewImage}`}
-        />
+        {modalImage && (
+          <img
+            src={modalImage}
+            alt="Documents Preview"
+            style={{ width: "100%" }}
+            className=""
+          />
+        )}
       </Modal>
     </div>
   )

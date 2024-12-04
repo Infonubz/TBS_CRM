@@ -1,4 +1,4 @@
-import { Progress } from "antd";
+import { Modal, Progress } from "antd";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { FaCloudUploadAlt, FaPlus } from "react-icons/fa";
@@ -48,6 +48,7 @@ export default function AddGSTDetails({
 
   const closeModal = () => {
     setmodalIsOpen1(false);
+    setIsModalOpen(false);
   };
 
   const handleSubmit = async (values) => {
@@ -87,6 +88,20 @@ export default function AddGSTDetails({
       console.error("Error fetching additional user data", error);
     }
   };
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalImage, setModalImage] = useState(null);
+  const openModal = (event) => {
+    // Get the image source (src) using `getElementById`
+    const imageSrc = event.target.getAttribute('src');
+    
+    // Set the modal image source
+    setModalImage(imageSrc);
+    
+    // Open the modal
+    setIsModalOpen(true);
+  };
+  
 
   useEffect(() => {
     console.log(clientID, "clientididid");
@@ -264,7 +279,7 @@ export default function AddGSTDetails({
                         <div className="grid grid-cols-2 mt-[1vw]">
                           <div className="font-semibold">Upload Documents:</div>
                           {/* <div>{superadmingstdata?.upload_gst}</div> */}
-                          <span className="h-[8vw] w-[9vw] flex items center"><img src={`${apiImgUrl}/${superadmingstdata?.upload_gst}`} alt="Gst Document"/></span>
+                          <span className="h-[8vw] w-[9vw] flex items center cursor-zoom-in"><img src={`${apiImgUrl}/${superadmingstdata?.upload_gst}`}  onClick={openModal}  alt="Gst Document"/></span>
                         </div>
                       </div>
                     ) : (
@@ -340,6 +355,25 @@ export default function AddGSTDetails({
           setSuperAdminGSTData={setSuperAdminGSTData}
         />
       </ModalPopup>
+      <Modal
+        visible={isModalOpen}
+        onCancel={closeModal}
+        footer={null}
+        centered
+        // width="35vw"
+        bodyStyle={{ padding: 0 }}
+        destroyOnClose={true} // Ensures modal is destroyed on close
+      >
+        {/* Display the image in the modal */}
+        {modalImage && (
+          <img
+            src={modalImage}
+            alt="Gst Preview"
+            style={{ width: "100%" }}
+            className=""
+          />
+        )}
+      </Modal>
     </div>
   );
 }

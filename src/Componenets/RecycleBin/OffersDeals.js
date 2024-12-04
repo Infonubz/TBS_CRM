@@ -7,7 +7,12 @@ import ModalPopup from "../Common/Modal/Modal";
 import BinDelete from "./BinDelete";
 import BinRestore from "./BinRestore";
 
-export default function OffersDeals({ currentItems, selectedTab ,activePage, itemsPerPage }) {
+export default function OffersDeals({
+  currentItems,
+  selectedTab,
+  activePage,
+  itemsPerPage,
+}) {
   const [tbsId, setTbsId] = useState();
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [restoreModalOpen, SetRestoreModalOpen] = useState(false);
@@ -21,21 +26,23 @@ export default function OffersDeals({ currentItems, selectedTab ,activePage, ite
   const columns = [
     {
       title: (
-        <div className="flex font-bold text-[1.2vw]">S.No</div>
+        <div className="flex font-bold  justify-center text-[1.2vw]">S.No</div>
       ),
       width: "5vw",
       render: (row, rowdta, index) => {
-        const pageNo = (activePage - 1) * itemsPerPage + index+1
+        const pageNo = (activePage - 1) * itemsPerPage + index + 1;
         return (
           <div className="">
-            <h1 className="pl-[1vw] text-[#1F4B7F]">{pageNo}</h1>
+            <h1 className="pl-[1vw] text-[#1F4B7F] text-[1.1vw] text-center">
+              {pageNo}
+            </h1>
           </div>
         );
       },
     },
     {
       title: (
-        <h1 className="text-[1.2vw] font-semibold  flex items-center  ">
+        <h1 className="text-[1.2vw] font-semibold  flex items-center justify-center  ">
           Name
         </h1>
       ),
@@ -43,7 +50,7 @@ export default function OffersDeals({ currentItems, selectedTab ,activePage, ite
         a.deleted_data.offer_name.localeCompare(b.deleted_data.offer_name),
       render: (row, rowdta, index) => {
         return (
-          <div className="flex items-center  text-[#1F4B7F] ">
+          <div className="flex items-center justify-center font-semibold  text-[#1F4B7F] ">
             {row?.deleted_data.offer_name?.length > 15 ? (
               <Tooltip
                 placement="bottom"
@@ -64,18 +71,18 @@ export default function OffersDeals({ currentItems, selectedTab ,activePage, ite
           </div>
         );
       },
-      width: "20vw",
+      width: "15vw",
     },
     {
       title: (
-        <h1 className="text-[1.2vw] font-semibold  flex items-center ">
+        <h1 className="text-[1.2vw] font-semibold justify-center  flex items-center ">
           Code
         </h1>
       ),
-      width: "15vw",
+      width: "18vw",
       render: (row) => {
         return (
-          <div className="flex items-center ">
+          <div className="flex items-center justify-center ">
             {row?.deleted_data.code?.length > 15 ? (
               <Tooltip
                 placement="right"
@@ -99,14 +106,14 @@ export default function OffersDeals({ currentItems, selectedTab ,activePage, ite
 
     {
       title: (
-        <div className="flex font-bold text-[1.2vw]">
+        <div className="flex font-bold justify-center text-[1.2vw]">
           Duration
         </div>
       ),
       width: "15vw",
       render: (row) => {
         return (
-          <div className="flex  text-[#1F4B7F] ">
+          <div className="flex justify-center text-[#1F4B7F] ">
             <p className="text-[1.1vw]">{`${dayjs(
               row?.deleted_data.start_date
             ).format("MMM DD")} - ${dayjs(row?.deleted_data.expiry_date).format(
@@ -118,12 +125,12 @@ export default function OffersDeals({ currentItems, selectedTab ,activePage, ite
     },
     {
       title: (
-        <div className="flex  font-bold text-[1.2vw]">Usage</div>
+        <div className="flex  justify-center font-bold text-[1.2vw]">Usage</div>
       ),
       width: "7vw",
       render: (row) => {
         return (
-          <div className="flex  text-[#1F4B7F] ">
+          <div className="flex justify-center text-[#1F4B7F] ">
             <p className="text-[1.1vw]">{row.deleted_data.usage}</p>
           </div>
         );
@@ -131,7 +138,7 @@ export default function OffersDeals({ currentItems, selectedTab ,activePage, ite
     },
     {
       title: (
-        <h1 className="text-[1.2vw] font-semibold  flex items-center">
+        <h1 className="text-[1.2vw] font-semibold justify-center  flex items-center">
           Deleted Date
         </h1>
       ),
@@ -140,7 +147,7 @@ export default function OffersDeals({ currentItems, selectedTab ,activePage, ite
       width: "15vw",
       render: (row) => {
         return (
-          <div className="flex items-center  text-[#1F4B7F] ">
+          <div className="flex items-center justify-center  text-[#1F4B7F] ">
             <p className="text-[1.1vw]">{`${dayjs(row?.deleted_date).format(
               "DD MMM, YY"
             )}`}</p>
@@ -150,19 +157,23 @@ export default function OffersDeals({ currentItems, selectedTab ,activePage, ite
     },
     {
       title: (
-        <div className="flex  font-bold text-[1.2vw]">Status</div>
+        <div className="flex justify-center font-bold text-[1.2vw]">Status</div>
       ),
       width: "10vw",
       render: (row) => {
         return (
-          <div className="flex  text-[#1F4B7F] ">
+          <div className="flex justify-center  text-[#1F4B7F] ">
             <button
               className={`${
-                row.deleted_data.status?.toLowerCase() === "active"
+                row.deleted_data.status_id === 0
+                  ? "bg-[#646262]"
+                  : row.deleted_data.status_id === 1
+                  ? "bg-[#FF6B00]"
+                  : row.deleted_data.status_id === 2
                   ? "bg-[#34AE2A]"
-                  : row.deleted_data.status?.toLowerCase() == "draft"
-                  ? "bg-[#FF9900]"
-                  : "bg-[#FD3434] "
+                  : row.deleted_data.status_id === 3
+                  ? "bg-[#2A99FF]"
+                  : "bg-[#FF0000]"
               } rounded-[0.5vw] text-[1.1vw]  font-semibold text-white w-[7vw] cursor-not-allowed py-[0.2vw]`}
             >
               {row.deleted_data.status}
@@ -173,37 +184,39 @@ export default function OffersDeals({ currentItems, selectedTab ,activePage, ite
     },
     {
       title: (
-        <div className="flex font-bold text-[1.2vw]">
+        <div className="flex justify-center font-bold text-[1.2vw]">
           Actions
         </div>
       ),
       width: "10vw",
       render: (row) => {
         return (
-          <div className="flex gap-[0.7vw] items-center">
-            <span
-              className="cursor-pointer"
-              onClick={() => {
-                SetRestoreModalOpen(true);
-                setTbsId(row?.tbs_recycle_id);
-                SetRowName(row?.deleted_data.offer_name);
-                console.log(selectedTab, "heifhjbdfh");
-              }}
-            >
-              <TbRestore size={"1.6vw"} color="#1F4B7F" />
-            </span>
-            <span>
-              <MdDelete
-                size={"1.3vw"}
-                color="#1F4B7F"
-                className=" cursor-pointer"
+          <div className="flex justify-center">
+            <div className="flex gap-[0.7vw] items-center">
+              <span
+                className="cursor-pointer"
                 onClick={() => {
-                  setDeleteModalOpen(true);
+                  SetRestoreModalOpen(true);
                   setTbsId(row?.tbs_recycle_id);
                   SetRowName(row?.deleted_data.offer_name);
+                  console.log(selectedTab, "heifhjbdfh");
                 }}
-              />
-            </span>
+              >
+                <TbRestore size={"1.6vw"} color="#1F4B7F" />
+              </span>
+              <span>
+                <MdDelete
+                  size={"1.3vw"}
+                  color="#1F4B7F"
+                  className=" cursor-pointer"
+                  onClick={() => {
+                    setDeleteModalOpen(true);
+                    setTbsId(row?.tbs_recycle_id);
+                    SetRowName(row?.deleted_data.offer_name);
+                  }}
+                />
+              </span>
+            </div>
           </div>
         );
       },
@@ -235,7 +248,9 @@ export default function OffersDeals({ currentItems, selectedTab ,activePage, ite
           // title={`want to delete ( ${rowName} ) offer Permenantly`}
           title={
             <>
-             want to delete <span style={{ fontWeight: 'bold' }}>{rowName}</span> offer Permenantly
+              want to delete{" "}
+              <span style={{ fontWeight: "bold" }}>{rowName}</span> offer
+              Permenantly
             </>
           }
           id={tbsId}
@@ -255,7 +270,8 @@ export default function OffersDeals({ currentItems, selectedTab ,activePage, ite
           // title={`want to restore ( ${rowName} ) offer`}
           title={
             <>
-             want to restore <span style={{ fontWeight: 'bold' }}>{rowName}</span> offer
+              want to restore{" "}
+              <span style={{ fontWeight: "bold" }}>{rowName}</span> offer
             </>
           }
           id={tbsId}

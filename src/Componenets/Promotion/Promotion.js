@@ -1,28 +1,30 @@
 import React, { useEffect, useState } from "react";
 import Backdrop from "../../asserts/CRMbg.png";
 import { IoGrid, IoSearch } from "react-icons/io5";
-import { GoDownload } from "react-icons/go";
-import { MdOutlineFileDownload } from "react-icons/md";
+// import { GoDownload } from "react-icons/go";
+// import { MdOutlineFileDownload } from "react-icons/md";
 import { IoMdMenu } from "react-icons/io";
-import { FaCloudUploadAlt, FaPlus } from "react-icons/fa";
+import { 
+  //FaCloudUploadAlt, 
+  FaPlus } from "react-icons/fa";
 import ListView from "../Promotion/ListView";
-import { Pagination } from "antd";
+// import { Pagination } from "antd";
 import GridView from "../Promotion/GridView";
-import axios from "axios";
+// import axios from "axios";
 import ModalPopup from "../Common/Modal/Modal";
-import AddPromotion from "./AddPromotion";
+// import AddPromotion from "./AddPromotion";
 import DeleteList from "../Offers/DeleteList";
 import "../../App.css";
 // import DeleteList from "./DeleteList";
 // import { APiUrl } from "../../Api/ApiUrl";
 import {
-  GetPromotionData,
+  GetPromotionDataByStatus,
   handlePromosearch,
   SubmitPromoExcel,
 } from "../../Api/Promotion/Promotion";
 import { useDispatch, useSelector } from "react-redux";
-import * as XLSX from "xlsx";
-import { toast } from "react-toastify";
+// import * as XLSX from "xlsx";
+// import { toast } from "react-toastify";
 import ReactPaginate from "react-js-pagination";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -33,7 +35,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import ExportButton from "../Common/Download/Excel";
 import AddPromoIndex from "./AddPromoIndex";
-import { CiImport } from "react-icons/ci";
+// import { CiImport } from "react-icons/ci";
 import { RiUpload2Fill } from "react-icons/ri";
 import { PROMO_BG_IMAGE } from "../../Store/Type";
 
@@ -42,26 +44,32 @@ export default function Promotion() {
   
   console.log(apiUrl, "apiUrlapiUrl");
   const [view, setView] = useState("list");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  // const [currentPage, setCurrentPage] = useState(1);
+  // const [pageSize, setPageSize] = useState(10);
   const [promodata, setPromoData] = useState("");
+  console.log(promodata,'promodata_promodata')
   const [updatedata, SetUpdateData] = useState(null);
   const getpromotionlist = useSelector((state) => state.crm.promotion_data);
-  const [promotionDataList, setpromotionDataList] = useState({});
-  const currentData =
-    getpromotionlist?.length > 0 &&
-    getpromotionlist?.slice(
-      (currentPage - 1) * pageSize,
-      currentPage * pageSize
-    );
-  console.log(currentData, "currentdata passed first phase");
+  const dispatch = useDispatch();
+  const [CurrentTab, SetCurrentTab] = useState("All");
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [promotionId, setPromotionId] = useState(null);
+  const [excelData, setExcelData] = useState(null);
+  const [activePage, setActivePage] = useState(1);
+  const [deletemodalIsOpen, setDeleteModalIsOpen] = useState(false);
+  const itemsPerPage = 10; // Number of items to display per page
+  //const [promotionDataList, setpromotionDataList] = useState({});
+  const type_Id = sessionStorage.getItem("type_id");
+  // const currentData =
+  //   getpromotionlist?.length > 0 &&
+  //   getpromotionlist?.slice(
+  //     (currentPage - 1) * pageSize,
+  //     currentPage * pageSize
+  //   );
   // const handlePageChange = (page, pageSize) => {
   //   setCurrentPage(page);
   //   setPageSize(pageSize);
   // };
-
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [promotionId, setPromotionId] = useState(null);
 
   const closeModal = () => {
     setModalIsOpen(false);
@@ -76,16 +84,6 @@ export default function Promotion() {
     sessionStorage.removeItem("promotion_logo");
   };
 
-  const dispatch = useDispatch();
-  const [CurrentTab, SetCurrentTab] = useState("All");
-
-  useEffect(() => {
-    GetPromotionData(dispatch, CurrentTab);
-  }, [CurrentTab]);
-
-  console.log(updatedata, "updated_Data_of_Promolist");
-  console.log(currentData, "getpromotionlist_listed_successfully");
-
   // const [excelData, setExcelData] = useState(null);
 
   // const handleonclick = async (values) => {
@@ -99,22 +97,19 @@ export default function Promotion() {
   //   }
   // };
 
-  const [excelData, setExcelData] = useState(null);
-
   const handleOnClick = async (file) => {
     console.log(file, "adfdsfadsfa");
     try {
       const response = await SubmitPromoExcel(file, dispatch);
       // toast.success(response);
-      GetPromotionData(dispatch);
+      GetPromotionDataByStatus(dispatch);
       console.log("praveeen");
     } catch (error) {
       console.error("Error uploading file:", error);
       // toast.error("Failed to upload file");
     }
   };
-  const [activePage, setActivePage] = useState(1);
-  const itemsPerPage = 10; // Number of items to display per page
+
 
   // Calculate pagination slice based on activePage
   const indexOfLastItem = activePage * itemsPerPage;
@@ -127,15 +122,24 @@ export default function Promotion() {
   const handlePageChange = (pageNumber) => {
     setActivePage(pageNumber);
   };
-  const [deletemodalIsOpen, setDeleteModalIsOpen] = useState(false);
+
   const closeDeleteModal = () => {
     setDeleteModalIsOpen(false);
   };
-  const [promolist, setPromolist] = useState({
-    background_image: "",
-    usage: null,
-  });
+
+
+  useEffect(() =>{
+    if(currentItems?.length === 0){
+      setActivePage(activePage - 1);
+    }
+  }, [currentItems, setActivePage, activePage])
  
+
+  useEffect(() => {
+    GetPromotionDataByStatus(dispatch, CurrentTab);
+  }, [CurrentTab]);
+
+  console.log(CurrentTab, "CurrentTab");
 
   return (
     <>
@@ -158,7 +162,7 @@ export default function Promotion() {
                   <div className="flex border-[#1F4B7F] h-[2.5vw] border-l-[0.1vw] border-t-[0.1vw] rounded-l-[0.5vw] rounded-r-[0.5vw] border-r-[0.2vw] border-b-[0.2vw]">
                     <button
                       className={`${
-                        view == "list" ? "bg-[#1F4B7F]" : "bg-white"
+                        view === "list" ? "bg-[#1F4B7F]" : "bg-white"
                       } flex px-[1vw] justify-center gap-[0.5vw] items-center rounded-tl-[0.4vw]   rounded-bl-[0.3vw] `}
                       style={{
                         transition: "all 1s",
@@ -168,13 +172,13 @@ export default function Promotion() {
                       <span>
                         <IoMdMenu
                           size={"1.2vw"}
-                          color={`${view == "list" ? "white" : "#1F4B7F"}`}
+                          color={`${view === "list" ? "white" : "#1F4B7F"}`}
                         />
                       </span>
                     </button>
                     <button
                       className={`${
-                        view == "grid" ? "bg-[#1F4B7F]" : "bg-white"
+                        view === "grid" ? "bg-[#1F4B7F]" : "bg-white"
                       } flex px-[1vw] justify-center gap-[0.5vw] items-center rounded-r-[0.3vw]`}
                       style={{
                         transition: "all 1s",
@@ -184,7 +188,7 @@ export default function Promotion() {
                       <span>
                         <IoGrid
                           size={"1.2vw"}
-                          color={`${view == "grid" ? "white" : "#1F4B7F"}`}
+                          color={`${view === "grid" ? "white" : "#1F4B7F"}`}
                         />
                       </span>
                     </button>
@@ -194,7 +198,7 @@ export default function Promotion() {
                       type="text"
                       className="bg-white outline-none pl-[2vw] w-[15vw] h-[2.5vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw] border-r-[0.2vw] border-b-[0.2vw]"
                       placeholder="Search..."
-                      onChange={(e) => handlePromosearch(e, dispatch)}
+                      onChange={(e) => handlePromosearch(e, dispatch, CurrentTab)}
                     />
                     <IoSearch
                       className="absolute left-[0.5vw]"
@@ -202,10 +206,10 @@ export default function Promotion() {
                       color="#1F4B7F"
                     />
                   </div>
-                  <div className="flex items-center gap-x-[2.5vw] pl-[1vw]">
+                  <div className="flex items-center gap-x-[3vw] pl-[1vw]">
                     <div
                       className={` cursor-pointer ${
-                        CurrentTab == "All"
+                        CurrentTab === "All"
                           ? "border-b-[0.25vw] font-bold border-[#1f487c]"
                           : ""
                       } `}
@@ -220,19 +224,19 @@ export default function Promotion() {
                     </div>
                     <div
                       className={` cursor-pointer ${
-                        CurrentTab == "Pending"
+                        CurrentTab === "Pending"
                           ? "border-b-[0.25vw] font-bold border-[#1f487c]"
                           : ""
                       } `}
                       onClick={() => SetCurrentTab("Pending")}
                     >
                       <div className="text-[1.3vw] text-[#1f487c] text-center">
-                        Pending
+                       {type_Id === "PRO101" ? "Pending" : "Posted"}
                       </div>
                     </div>
                     <div
                       className={` cursor-pointer ${
-                        CurrentTab == "Approved"
+                        CurrentTab === "Approved"
                           ? "border-b-[0.25vw] font-bold border-[#1f487c]"
                           : ""
                       } `}
@@ -244,19 +248,19 @@ export default function Promotion() {
                     </div>
                     <div
                       className={` cursor-pointer ${
-                        CurrentTab == "OnHold"
+                        CurrentTab === "OnHold"
                           ? "border-b-[0.25vw] font-bold border-[#1f487c]"
                           : ""
                       } `}
                       onClick={() => SetCurrentTab("OnHold")}
                     >
                       <div className="text-[1.3vw] text-[#1f487c] text-center">
-                        On Hold
+                       Hold
                       </div>
                     </div>
                     <div
                       className={` cursor-pointer ${
-                        CurrentTab == "Rejected"
+                        CurrentTab === "Rejected"
                           ? "border-b-[0.25vw] font-bold border-[#1f487c]"
                           : ""
                       } `}
@@ -268,7 +272,7 @@ export default function Promotion() {
                     </div>
                     <div
                       className={` cursor-pointer ${
-                        CurrentTab == "Draft"
+                        CurrentTab === "Draft"
                           ? "border-b-[0.25vw] font-bold border-[#1f487c]"
                           : ""
                       } `}
@@ -378,7 +382,7 @@ export default function Promotion() {
               </div>
             </div>
             <div className="h-[72vh]  w-full ">
-              {view == "list" ? (
+              {view === "list" ? (
                 <ListView
                   currentData={currentItems}
                   setModalIsOpen={setModalIsOpen}
@@ -468,7 +472,7 @@ export default function Promotion() {
         <ModalPopup
           show={modalIsOpen}
           onClose={closeModal}
-          height="35vw"
+          height="35.3vw"
           width="50vw"
         >
           {/* <AddPromotion
@@ -487,6 +491,7 @@ export default function Promotion() {
             promodata={promodata}
             setPromoData={setPromoData}
             promotionId={promotionId}
+            CurrentTab = {CurrentTab}
             setPromotionId={setPromotionId}
             // setPromolist={setPromolist}
             // promolist={promolist}
@@ -505,6 +510,7 @@ export default function Promotion() {
             title={"Want to delete this Promotion"}
             api={`${apiUrl}/promo/${promotionId}`}
             module={"promotion"}
+            CurrentTab = {CurrentTab}
           />
         </ModalPopup>
       </div>

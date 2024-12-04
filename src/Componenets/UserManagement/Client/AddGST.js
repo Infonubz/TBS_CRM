@@ -220,7 +220,7 @@ export default function AddGST({
               state: superadmingstdata?.state_name || "",
               head_office: superadmingstdata?.head_office || "",
               gst_file: superadmingstdata?.upload_gst || null,
-              ctc: superadmingstdata?.aggregate_turnover_exceeded  == true ? 1 : 0 || "",
+              ctc: superadmingstdata?.aggregate_turnover_exceeded  == true ? 1 : superadmingstdata?.aggregate_turnover_exceeded  == false ? 0 :"" || "",
             }}
             validationSchema={validationSchema}
             onSubmit={(values) => {

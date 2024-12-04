@@ -58,7 +58,7 @@ export default function OwnerEmployee({ setAuthtoken }) {
 
   return (
     <div className="absolute left-0 top-0 bg-[#E5FFF1] rounded-tl-[2vw] rounded-bl-[2vw] h-full w-[35vw] bg-opacity-90 flex flex-col items-center justify-center">
-      <label className="text-[#1F487C] font-bold text-[2vw] ">PO EMPLOYEE</label>
+      <label className="text-[#1F487C] font-bold text-[2vw] ">PRO EMPLOYEE</label>
       <p className="text-[#1F487C] text-[1vw] py-[2vw]">
         Welcome Back, Please sign in to your account
       </p>

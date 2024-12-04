@@ -3,7 +3,7 @@ import image from "../../../asserts/promotion_image.png";
 import "../../../App.css";
 import dayjs from "dayjs";
 import userimg from "../../../asserts/userprofile.png";
-import { Popover } from "antd";
+import { Popover, Modal } from "antd";
 import {
   faEdit,
   faEllipsisVertical,
@@ -21,7 +21,8 @@ export default function GridView({
   offerimage,
   setOfferImage,
   setOfferView,
-  offerview
+  offerview,
+  setValueSymbol,
 }) {
   const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
 
@@ -35,9 +36,10 @@ export default function GridView({
 
   const [openPopovers, setOpenPopovers] = useState({});
 
+  console.log(offerimage, "grid_offferimaeg");
   // Function to handle popover visibility based on offer ID
   const handlePopoverToggle = (offerId) => {
-    setOpenPopovers(prevState => ({
+    setOpenPopovers((prevState) => ({
       ...prevState,
       [offerId]: !prevState[offerId], // Toggle the popover for this specific offerId
     }));
@@ -45,7 +47,7 @@ export default function GridView({
 
   // Function to close the popover when any option is clicked
   const handleOptionClick = (offerId) => {
-    setOpenPopovers(prevState => ({
+    setOpenPopovers((prevState) => ({
       ...prevState,
       [offerId]: false, // Close the popover when an option is clicked
     }));
@@ -56,10 +58,9 @@ export default function GridView({
       <div className="grid grid-cols-5 w-full gap-x-[4vw] gap-[0.75vw] pb-[5vw]">
         {currentData.map((item) => (
           <div
-            className={`${hoverid == item.tbs_offer_id
-              ? "shadow-lg shadow-[#1F487C]"
-              : ""
-              }  h-[16.75vw] border-[#1f4b7f] border-l-[0.1vw] cursor-pointer border-r-[0.3vw] border-b-[0.3vw] border-t-[0.1vw] rounded-[0.5vw] bg-white text-[#1F487C]`}
+            className={`${
+              hoverid == item.tbs_offer_id ? "shadow-lg shadow-[#1F487C]" : ""
+            }  h-[16.75vw] border-[#1f4b7f] border-l-[0.1vw] cursor-pointer border-r-[0.3vw] border-b-[0.3vw] border-t-[0.1vw] rounded-[0.5vw] bg-white text-[#1F487C]`}
             onMouseEnter={() => setHoverId(item.tbs_offer_id)}
             onMouseLeave={() => setHoverId("")}
             style={{
@@ -71,30 +72,25 @@ export default function GridView({
                 placement="bottomRight"
                 content={
                   <div className="flex flex-col px-[0.5vw]">
-                    <div>
+                    {/* <div>
                       <a
                         onClick={() => {
                           setOfferView(true);
                           setOfferImage(item.theme);
-                          handleOptionClick(item.tbs_offer_id)
+                          handleOptionClick(item.tbs_offer_id);
                         }}
                         className="flex pt-[1vw] items-center cursor-pointer text-[0.9vw] text-[#1F4B7F] hover:text-[#1f487c]"
                       >
-                        <FaEye
-
-                          color="#1F4B7F"
-                          className="mr-1"
-
-                        />
+                        <FaEye color="#1F4B7F" className="mr-1" />
                         View
                       </a>
-                    </div>
+                    </div> */}
                     <div>
                       <a
                         onClick={() => {
                           setModalIsOpen(true);
-                          SetUpdateData(item.tbs_offer_id)
-                          handleOptionClick(item.tbs_offer_id)
+                          SetUpdateData(item.tbs_offer_id);
+                          handleOptionClick(item.tbs_offer_id);
                         }}
                         className=" pt-[0.5vw] flex items-center cursor-pointer text-[0.9vw] text-[#1F4B7F] hover:text-[#1f487c]"
                       >
@@ -110,8 +106,9 @@ export default function GridView({
                       <a
                         onClick={() => {
                           setDeleteModalIsOpen(true);
-                          setPromoId(item.tbs_offer_id)
-                          handleOptionClick(item.tbs_offer_id)
+                          setPromoId(item.tbs_offer_id);
+                          handleOptionClick(item.tbs_offer_id);
+                          setValueSymbol("₹");
                         }}
                         className="flex py-[0.5vw] items-center cursor-pointer text-[0.9vw] text-[#1F4B7F] hover:text-[#1f487c]"
                       >
@@ -142,18 +139,27 @@ export default function GridView({
                     height: "1.5vw",
                     width: "1.5vw",
                   }}
-
                 />
               </Popover>
             </div>
             <div className="flex-col flex items-center  h-full w-full gap-y-[0.1vw]">
               <img
+                // src={
+                //   item?.offer_img != null
+                //     ? `${apiImgUrl}${item.offer_img}`
+                //     : userimg
+                // }
                 src={
                   item?.offer_img != null
-                    ? `${apiImgUrl}${item.offer_img}`
+                    ? `${apiImgUrl}${item.theme}`
                     : userimg
                 }
-                className="h-[5vw] w-[5vw] rounded-[0.5vw]"
+                onClick={() => {
+                  setOfferView(true);
+                  setOfferImage(item.theme);
+                  handleOptionClick(item.tbs_offer_id);
+                }}
+                className="h-[5vw] w-auto rounded-[0.5vw]"
               />
               <div className="font-bold text-[0.9vw] ">{item.offer_name}</div>
               <div className="text-[0.9vw] flex">
@@ -161,23 +167,38 @@ export default function GridView({
                 <span className="">{`0/${item.usage}`}</span>
               </div>
               <div className="text-[0.9vw] flex">
-                <span className="font-semibold pr-[0.5vw] ">Offers Value: </span>
-                <span className="">{`₹ ${item.offer_value}`}</span>
+                <span className="font-semibold pr-[0.5vw] ">
+                  Offers Value:{" "}
+                </span>
+                <span className="">
+                  {" "}
+                  {item?.value_symbol === "₹"
+                    ? `${item?.value_symbol} ${item?.offer_value}`
+                    : `${item?.offer_value} ${item?.value_symbol}`}
+                </span>
               </div>
               <div className="text-[0.9vw] flex">
                 <span className="font-semibold pr-[0.5vw]">Duration:</span>
-                <span className=""> {`${dayjs(item?.start_date).format("MMM DD")} - ${dayjs(
-                  item?.expiry_date
-                ).format("MMM DD")}`}</span>
+                <span className="">
+                  {" "}
+                  {`${dayjs(item?.start_date).format("MMM DD")} - ${dayjs(
+                    item?.expiry_date
+                  ).format("MMM DD")}`}
+                </span>
               </div>
-              <div className="px-[0.5vw] w-full">
+              <div className="px-[1.5vw] w-full">
                 <button
-                  className={`${item.status == "Active"
-                    ? "bg-[#34AE2A]"
-                    : item.status == "Draft"
-                      ? "bg-[#FD3434]"
+                  className={`${
+                    item.req_status_id == 2
+                      ? "bg-[#34AE2A]"
+                      : item.req_status_id == 0
+                      ? "bg-[#646262]"
+                      : item.req_status_id == 3
+                      ? "bg-[#2A99FF]"
+                      : item.req_status_id == 4
+                      ? "bg-[#FF0000]"
                       : "bg-[#FF9900]"
-                    } border-dashed  border-white border-[0.2vw] text-[1.1vw] rounded-full text-white px-[0.5vw] py-[0.2vw] w-full `}
+                  } border-dashed  border-white border-[0.2vw] text-[1.1vw] rounded-full text-white  py-[0.2vw] w-full `}
                 >
                   {item.code}
                 </button>
@@ -186,19 +207,19 @@ export default function GridView({
           </div>
         ))}
       </div>
-      <ModalPopup
-        show={offerview}
-        onClose={() => setOfferView(false)}
-        height="20vw"
-        width="30vw"
-        closeicon={false}
+      <Modal
+        visible={offerview}
+        onCancel={() => setOfferView(false)}
+        footer={null}
+        centered
+        bodyStyle={{ padding: 0 }}
+        destroyOnClose={true}
       >
         <img
-          src={`${apiImgUrl}${offerimage}`}
+          src={offerimage != null ? `${apiImgUrl}${offerimage}` : userimg}
           className="w-full h-full"
         />
-      </ModalPopup>
-
+      </Modal>
       <ModalPopup
         show={deletemodalIsOpen}
         onClose={closeDeleteModal}

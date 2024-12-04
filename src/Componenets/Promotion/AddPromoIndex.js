@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { LiaSave } from "react-icons/lia";
 import AddPromotion from "./AddPromotion";
 import Background_View from "./Background_View";
@@ -6,7 +6,8 @@ import { Form, Formik } from "formik";
 import dayjs from "dayjs";
 import * as Yup from "yup";
 import {
-  GetPromotionData,
+  GetPromotionById,
+  GetPromotionDataByStatus,
   SubmitPromotionData,
 } from "../../Api/Promotion/Promotion";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,10 +17,30 @@ import { Spin } from "antd";
 const validationSchema = Yup.object().shape({
   promotion_name: Yup.string()
     .required("Promotion Title is required")
-    .max(17, "Max 17 characters only"),
+    .max(23, "Max 23 characters only"),
+  operator_details: Yup.string().required("Operator Detail is required"),
+  promo_value: Yup.string()
+    .required("Promo Value is required")
+    .matches(/^\d+$/, "Promo Value must contain only numbers")
+    .test(
+      "range-check",
+      "The value you entered is out of range",
+      function (value) {
+        const { value_symbol } = this.parent; // Access value_symbol
+        const numValue = Number(value);
+
+        if (value_symbol === "₹") {
+          return numValue >= 1 && numValue <= 1000;
+        } else if (value_symbol === "%") {
+          return numValue >= 1 && numValue <= 100;
+        }
+        return false;
+      }
+    ),
+  value_symbol: Yup.string().required(),
   promotion_description: Yup.string()
     .required("Promotion Description is required")
-    .max(43, "Max 57 characters only"),
+    .max(53, "Max 53 characters only"),
   // usage: Yup.string()
   //   .required("Enter Usage Value")
   //   .min(1, "usage must be at least 1")
@@ -73,12 +94,17 @@ export default function AddPromoIndex({
   promodata,
   promotionId,
   setPromotionId,
+  CurrentTab
   // setPromolist,
   // promolist,
 }) {
-  const promo_background = useSelector((state) => state.crm.promo_bg);
+  // const promo_background = useSelector((state) => state.crm.promo_bg);
+
+  console.log(promodata, "promo_file_check");
+
   const [CurrentPage, setCurrentPage] = useState(1);
   const [currentPromodata, setCurrentPromodata] = useState("");
+  console.log(currentPromodata, "currentPromotion_data");
   const [currentPromo, setCurrentPromo] = useState([]);
   const [bgimage, setBgImage] = useState(false);
   const [promolist, setPromolist] = useState({
@@ -93,92 +119,218 @@ export default function AddPromoIndex({
   const [SaveFun, SetSaveFun] = useState(false);
   const [loading, setLoading] = useState(false);
   const [Bg_Promo, setBgPromo] = useState("");
+  const [newbg, setNewBg] = useState("");
+  const [valuesymbol, setValueSymbol] = useState("₹");
+  const [usageError, setUsageError] = useState("");
+  // const promoBackgroundRef = useRef(promo_background);
+  // const [promolist, setPromolist] = useState({ background_image: "", usage: null });
+  const [promo_background, setPromoBackground] = useState("");
+  const type_Id = sessionStorage.getItem("type_id");
+  const user_name = sessionStorage.getItem("user_name");
+  const [isImageConverted, setIsImageConverted] = useState(false);
+  // const [loading, setLoading] = useState(false);
+  // const handleSubmit = async (values) => {
+  //   // const promo_background = useSelector((state) => state.crm.promo_bg);
+  //   console.log(newbg, "promo_background987456");
 
-  const handleSubmit = async (values) => {
-    console.log(Bg_Promo, "Bg_Promo initial");
-  
-    if (CurrentPage === 1) {
-      console.log(values, "Values on Page 1");
-      setCurrentPromodata(values);
-      setBgImage(true);
-      setCurrentPage(2);
-    } else {
-      try {
-        SetSaveFun(true);
-        setLoading(true);
-        console.log(promo_background, "promo_background on Page 2");
-  
-        if (promo_background) {
-          setLoading(false);
-  
-          console.log(currentPromodata, "---Promo List Data");
-          console.log(promolist, "Promo List");
-          console.log(promo_background, "Promotion Background ID");
-  
-          const data = await SubmitPromotionData(
-            promolist,
-            currentPromodata,
-            promotionId,
-            dispatch,
-            promo_background
-          );
-  
-          toast.success(data?.message);
-  
-          if (data?.message) {
-            // Clear Bg_Promo only if required
-            console.log("Clearing Bg_Promo after successful submission.");
-            // Uncomment the line below only if you want to clear Bg_Promo
-            // setBgPromo("");
-          }
-  
-          GetPromotionData(dispatch);
-          setBgImage(false);
-          setModalIsOpen(false);
-          console.log(promolist, currentPromodata, "---Promo Submission Complete");
-          console.log(data);
-        }
-      } catch (error) {
-        console.error("Error uploading data", error);
-      }
-    }
-  };
-  
+  //   console.log(Bg_Promo, "Bg_Promo initial");
+
+  //   if (CurrentPage === 1) {
+  //     console.log(values, "Values on Page 1");
+  //     setCurrentPromodata(values);
+  //     setBgImage(true);
+  //     setCurrentPage(2);
+  //   } else {
+  //     try {
+  //       SetSaveFun(true);
+  //       // setLoading(true);
+  //       console.log(promo_background, "promo_background on Page 2");
+
+  //       // if (newbg) {
+  //         // setLoading(false);
+
+  //         console.log(currentPromodata, "---Promo List Data");
+  //         console.log(promolist, "Promo List");
+  //         console.log(newbg, "PromotionBackgroundID");
+
+  //         const data = await SubmitPromotionData(
+  //           promolist,
+  //           currentPromodata,
+  //           promotionId,
+  //           dispatch,
+  //           newbg
+  //         );
+
+  //         toast.success(data?.message);
+
+  //         if (data?.message) {
+  //           // Clear Bg_Promo only if required
+  //           console.log("Clearing Bg_Promo after successful submission.");
+  //           // Uncomment the line below only if you want to clear Bg_Promo
+  //           // setBgPromo("");
+  //         }
+
+  //         GetPromotionData(dispatch);
+  //         setBgImage(false);
+  //         setModalIsOpen(false);
+  //         console.log(
+  //           promolist,
+  //           currentPromodata,
+  //           "---Promo Submission Complete"
+  //         );
+  //         console.log(data);
+  //       // }
+  //     } catch (error) {
+  //       console.error("Error uploading data", error);
+  //     }
+  //   }
+  // };
+  // const handleSubmit = async (values) => {
+  //   console.log(promo_background, "promo_background987456"); // Debug log for newbg
+
+  //   if (CurrentPage === 1) {
+  //     setCurrentPromodata(values);
+  //     setBgImage(true);
+  //     setCurrentPage(2);
+  //   } else {
+  //     try {
+  //       SetSaveFun(true);
+  //       console.log(promo_background, "newbg before SubmitPromotionData"); // Check state
+  //       console.log(Bg_Promo,"Bg_PromoBg_PromoBg_Promo");
+
+  //       if (!promo_background) {
+  //         console.log("newbg is undefined or empty.");
+  //         return;
+  //       }
+
+  //       const data = await SubmitPromotionData(
+  //         promolist,
+  //         currentPromodata,
+  //         promotionId,
+  //         dispatch,
+  //         promo_background
+  //       );
+
+  //       if (data?.message) {
+  //         toast.success(data?.message);
+  //         GetPromotionData(dispatch);
+  //         setModalIsOpen(false);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error uploading data", error);
+  //     }
+  //   }
+  // };
+
   // console.log(sessionStorage.getItem("promo_bg"),"imageData741852");
   // const bg = sessionStorage.getItem("promo_bg");
   // console.log(bg, "bgbgbgbgbgbg");
 
   // const final = bg && JSON.parse(bg);
-  console.log(sample, "finaldata");
-  console.log(promo_background, "promo_backgroundpromo_background");
-  console.log(Bg_Promo, "Bg_PromoBg_Promo888");
+
+  // Handle form submission
+  const handleSubmit = async (values) => {
+    if (CurrentPage === 1) {
+      setCurrentPromodata(values);
+      setCurrentPage(2);
+    } else {
+      setLoading(true); // Show spinner while submitting
+
+      // Check if the image conversion is complete
+      if (!isImageConverted) {
+        toast.warning("Please wait, image is still processing.");
+        return;
+      }
+      try {
+        if (promolist.usage) {
+          const data = await SubmitPromotionData(
+            promolist,
+            currentPromodata,
+            promotionId,
+            promo_background,
+            valuesymbol
+            //promo_image
+          );
+          if (data?.message) {
+            toast.success(data?.message);
+            GetPromotionDataByStatus(dispatch, CurrentTab); // Reload promotion data
+            setModalIsOpen(false); // Close modal
+          }
+        } else {
+          setUsageError("Usage is required");
+        }
+      } catch (error) {
+        console.error("Error uploading data", error);
+      } finally {
+        setLoading(false); // Hide spinner
+      }
+    }
+  };
+
+  const fetchGetPromo = async () => {
+    try {
+      const data = await GetPromotionById(
+        promotionId,
+        setPromotionId,
+        setPromoData
+      );
+      console.log(data.promo_name, "datadata");
+      setPromoData(data);
+      setPromolist({
+        ...promolist,
+        usage: data.usage,
+        background_image: data.background_image,
+      });
+      setValueSymbol(data?.value_symbol);
+    } catch (error) {
+      console.error("Error fetching additional user data", error);
+    }
+  };
+
+  useEffect(() => {
+    if (promo_background) {
+      setNewBg(promo_background);
+    }
+  }, [promo_background]);
+  // useEffect(() => {
+  //   promoBackgroundRef.current = promo_background;
+  // }, [promo_background]);
+
+  useEffect(() => {
+    if (updatedata) {
+      fetchGetPromo();
+    }
+  }, [promotionId, setPromotionId, setPromoData]);
+
 
   return (
     <>
       <Formik
         initialValues={{
           promotion_name: promodata ? promodata.promo_name : "",
-          operator_details: promodata ? promodata.operator_details : "",
+          operator_details:
+          type_Id === "PRO101" ? promodata ? promodata.operator_details : "" : user_name,        
           start_date: promodata
             ? dayjs(promodata.start_date).format("YYYY-MM-DD")
             : "",
           expiry_date: promodata
             ? dayjs(promodata.expiry_date).format("YYYY-MM-DD")
             : "",
-          // usage: promodata ? promodata.usage : "",
+          usage: promodata ? promodata.usage || promolist.usage : "",
           status: promodata ? promodata.promo_status : "",
           promotion_description: promodata ? promodata.promo_description : "",
           file: promodata ? promodata.promo_image : "",
+          value_symbol: promodata ? promodata.value_symbol : valuesymbol,
           // background_image: promodata
           //   ? promodata.background_image
           //   : promolist?.name,
           promo_value: promodata ? promodata.promo_value : "",
           promo_code: promodata ? promodata.promo_code : "",
         }}
-        // validationSchema={validationSchema}
+        validationSchema={validationSchema}
         context={{ isEdit: true }}
         onSubmit={(values) => handleSubmit(values)}
-        //   enableReinitialize
+        enableReinitialize
       >
         {({
           isSubmitting,
@@ -249,6 +401,15 @@ export default function AddPromoIndex({
                   values={values}
                   handleChange={handleChange}
                   setFieldValue={setFieldValue}
+                  valuesymbol={valuesymbol}
+                  previewUrl={previewUrl}
+                  setPreviewUrl={setPreviewUrl}
+                  setValueSymbol={setValueSymbol}
+                  setPromolist={setPromolist}
+                  promolist={promolist}
+                  setDraggerImage={setDraggerImage}
+                  draggerImage={draggerImage}
+                  CurrentTab = {CurrentTab}
                 />
               ) : (
                 <Background_View
@@ -270,6 +431,13 @@ export default function AddPromoIndex({
                   setSample={setSample}
                   sample={sample}
                   setBgPromo={setBgPromo}
+                  onImageConversionComplete={() => setIsImageConverted(true)} // Notify image conversion completion
+                  // setPromolist={setPromolist}
+                  setPromoBackground={setPromoBackground}
+                  usageError={usageError}
+                  setUsageError={setUsageError}
+                  handleChange={handleChange}
+                  setFieldValue={setFieldValue}
                 />
               )}
             </Form>

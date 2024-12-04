@@ -78,7 +78,7 @@ const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPag
 
   return (
     <>
-      <div className='grid grid-items-3 gap-[1.5vw] py-[1vw]'>
+      <div className='grid grid-items-3 gap-[1vw] py-[1vw]'>
 
         {tabType == 'Web' ?
           (
@@ -132,9 +132,11 @@ const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPag
                       }</p>
                     </div>
 
-                    <div className='col-span-2 text-[1vw] text-[#1F487C] '>
+                    <div className='col-span-2 text-[1vw] text-[#1F487C] h-[21vh]'>
                       <div className='flex justify-between'>
-                        <div className='grid grid-items-4 gap-[0.75vw] pt-[0.75vw] order-first'>
+                        <div className='grid grid-items-4 gap-[0.75vw] pt-[0.75vw] h-[21vh] justify-between order-first'>
+                          {/* <div className='flex flex-col justify-between'> */}
+                        <div className=" pt-[8vw] sm:pt-[4vw]  md:pt-[3vw] lg:pt-[1vw] xl:pt-[.9vw] 2xl:pt-[.8vw] content-center items-center">
                           <p className="text-[1.2vw] text-[#1F4B7F] font-bold">
                             {item?.ad_title?.length > 20 ? (
                               <Tooltip
@@ -176,7 +178,9 @@ const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPag
                             {`${dayjs(item?.end_date).format("DD MMM, YY")}`}
                           </p>
                           </span>
-                          <div className=''>
+                          </div>
+                          {/* </div> */}
+                          <div className='flex flex-col items-end content-end justify-end'>
                             <button
                               className={`${item.ads_status_id == 2
                                 ? "bg-[#34AE2A]"
@@ -189,6 +193,7 @@ const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPag
                             >
                               {capitalizeFirstLetter(item?.ads_status)}
                             </button>
+                          
                           </div>
                         </div>
                         <div className="order-last py-[0.5vw]">
@@ -242,7 +247,7 @@ const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPag
                     </div>
                     <div className='col-span-7 border-l-[0.1vw] border-[#1F487C]'>
                       <p>
-                        <div className="w-full h-[9.5vw] overflow-hidden ">
+                        <div className="w-full h-[21vh] overflow-hidden ">
                           {item?.ad_file_type && item?.ad_file_type.startsWith("image/") ? (
                             <img
                               src={`${apiImgUrl}${item?.ad_video}`}
@@ -289,7 +294,7 @@ const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPag
                       <p className='font-bold text-[1.2vw]'>{item?.client_details}</p>
                       <p className='flex items-center gap-[.5vw]'><FaPhoneAlt size={"0.8vw"} color="#1F4B7F" />{item?.phone}</p>
                       <p className="text-[1vw] text-[#1F4B7F] font-medium">
-                        {item?.web_url?.length > 20 ? (
+                      {item?.web_url?.length > 20 ? (
                           <Tooltip
                             placement="top"
                             title={item?.web_url}
@@ -328,9 +333,11 @@ const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPag
                       }</p>
                     </div>
 
-                    <div className='col-span-2 text-[1vw] text-[#1F487C] '>
+                    <div className='col-span-2 text-[1vw] text-[#1F487C] h-[21vh]'>
                       <div className='flex justify-between'>
-                        <div className='grid grid-items-4 gap-[0.75vw] pt-[0.75vw] order-first'>
+                        <div className='grid grid-items-4 gap-[0.75vw] pt-[0.75vw] h-[21vh] justify-between order-first'>
+                          {/* <div className='flex flex-col justify-between'> */}
+                        <div className=" pt-[8vw] sm:pt-[4vw]  md:pt-[3vw] lg:pt-[1vw] xl:pt-[.9vw] 2xl:pt-[.8vw] content-center items-center">
                           <p className="text-[1.2vw] text-[#1F4B7F] font-bold">
                             {item?.mobad_title?.length > 20 ? (
                               <Tooltip
@@ -356,7 +363,7 @@ const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPag
                                 className="cursor-pointer"
                                 color="#1F487C"
                               >
-                                <div className="text-[1vw] text-[#1F4B7F] font-medium">
+                                <div className="text-[1vw] text-[#1F4B7C] font-medium">
                                   {`${item?.mobad_description?.slice(0, 20)}...`}
                                 </div>
                               </Tooltip>
@@ -372,7 +379,9 @@ const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPag
                             {`${dayjs(item?.end_date).format("DD MMM, YY")}`}
                           </p>
                           </span>
-                          <div className=''>
+                          </div>
+                          {/* </div> */}
+                          <div className='flex flex-col items-end content-end justify-end'>
                             <button
                               className={`${item.ads_status_id == 2
                                 ? "bg-[#34AE2A]"
@@ -385,6 +394,7 @@ const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPag
                             >
                               {capitalizeFirstLetter(item?.ads_status)}
                             </button>
+                          
                           </div>
                         </div>
                         <div className="order-last py-[0.5vw]">
@@ -438,7 +448,7 @@ const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPag
                     </div>
                     <div className='col-span-7 border-l-[0.1vw] border-[#1F487C]'>
                       <p>
-                        <div className="w-full h-[9.5vw] overflow-hidden ">
+                        <div className="w-full h-[21vh] overflow-hidden ">
                           {item?.mobad_file_type && item?.mobad_file_type.startsWith("image/") ? (
                             <img
                               src={`${apiImgUrl}${item?.mobad_vdo}`}
@@ -508,7 +518,7 @@ const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPag
               ? `${apiUrl}/ads/${deleteData}`
               : `${apiUrl}/mobads/${deleteData}`
           }
-          module={"ads"}
+          module={tabType === "Web" ? "ads" : "mobads"}
         />
       </ModalPopup>
     </>

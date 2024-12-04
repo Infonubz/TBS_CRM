@@ -1,4 +1,5 @@
 import axios from "axios";
+import { toast } from "react-toastify";
 const api = axios.create({
   headers: {
     "content-Type": "application/json",
@@ -18,9 +19,10 @@ export const PostSupportData = async (values) => {
 
   try {
     const responce = await api.post(`${apiUrl}/submit-inquiry`, payload);
+    console.log(responce.data, "responcesupprot");
+    // toast.success(responce.data);
     return responce.data;
   } catch (error) {
     console.log(error);
-    return null;
   }
 };

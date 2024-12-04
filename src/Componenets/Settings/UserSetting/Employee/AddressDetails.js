@@ -34,6 +34,8 @@ const AddressDetails = ({ addressType }) => {
     postalcode: "",
   })
 
+  const [isEdit, setIsEdit] = useState(false)
+
   console.log(empAddress, 'emp_address')
   const fetchEmpAddress = async () => {
     try {
@@ -116,7 +118,8 @@ const AddressDetails = ({ addressType }) => {
                             // onChange={() => {
                             //   setTempAddress({ address: values.temp_address })
                             // }}
-                            className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                            className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                            disabled={isEdit === false}
                           />
                           {/* <MdOutlineModeEditOutline
                             color='#1F487C'
@@ -142,7 +145,8 @@ const AddressDetails = ({ addressType }) => {
                             // onChange={(e) => {
                             //   setTempAddress({ state: values.temp_state })
                             // }}
-                            className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                            className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                            disabled={isEdit === false}
                           >
                             <option value="">Select State</option>
                             <option value="Tamilnadu">Tamilnadu</option>
@@ -174,7 +178,8 @@ const AddressDetails = ({ addressType }) => {
                             // onChange={() => {
                             //   setTempAddress({ region: values.temp_region })
                             // }}
-                            className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                            className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                            disabled={isEdit === false}
                           >
 
                             <option value="">Select Region</option>
@@ -208,7 +213,8 @@ const AddressDetails = ({ addressType }) => {
                             // onChange={() => {
                             //   setTempAddress({ city: values.temp_city })
                             // }}
-                            className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                            className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                            disabled={isEdit === false}
                           >
                             <option value="">Select City</option>
                             <option value="Tiruppur">Tiruppur</option>
@@ -239,7 +245,8 @@ const AddressDetails = ({ addressType }) => {
                             // onChange={() => {
                             //   setTempAddress({ country: values.temp_country })
                             // }}
-                            className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                            className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                            disabled={isEdit === false}
                           >
                             <option value="">Select Country</option>
                             <option value="India">India</option>
@@ -271,7 +278,8 @@ const AddressDetails = ({ addressType }) => {
                             // onChange={() => {
                             //   setTempAddress({ postalcode: values.temp_postal })
                             // }}
-                            className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                            className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                            disabled={isEdit === false}
                           />
                           {/* <MdOutlineModeEditOutline
                             color='#1F487C'
@@ -288,6 +296,7 @@ const AddressDetails = ({ addressType }) => {
 
                     <div className='absolute bottom-[-2.5vw]'>
                       <Checkbox
+                        disabled={isEdit === false}
                         onChange={(e) => {
                           if (e.target.checked) {
 
@@ -325,7 +334,8 @@ const AddressDetails = ({ addressType }) => {
                           name="per_address"
                           placeholder="Enter Address"
                           value={values.per_address}
-                          className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                          className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                          disabled={isEdit === false}
                         />
                         {/* <MdOutlineModeEditOutline
                           color='#1F487C'
@@ -349,7 +359,8 @@ const AddressDetails = ({ addressType }) => {
                           name="per_state"
                           value={values.per_state}
 
-                          className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                          className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                          disabled={isEdit === false}
                         >
                           <option value="">Select State</option>
                           <option value="Tamilnadu">Tamilnadu</option>
@@ -381,7 +392,8 @@ const AddressDetails = ({ addressType }) => {
                           // onChange={() => {
                           //   setTempAddress({ region: values.temp_region })
                           // }}
-                          className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                          className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                          disabled={isEdit === false}
                         >
 
                           <option value="">Select Region</option>
@@ -413,7 +425,8 @@ const AddressDetails = ({ addressType }) => {
                           name="per_city"
                           value={values.per_city}
 
-                          className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                          className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                          disabled={isEdit === false}
                         >
                           <option value="">Select City</option>
                           <option value="Tiruppur">Tiruppur</option>
@@ -442,7 +455,8 @@ const AddressDetails = ({ addressType }) => {
                           name="per_country"
                           value={values.per_country}
 
-                          className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                          className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                          disabled={isEdit === false}
                         >
                           <option value="">Select Country</option>
                           <option value="India">India</option>
@@ -471,7 +485,8 @@ const AddressDetails = ({ addressType }) => {
                           name="per_postal"
                           placeholder="Enter Postal Code"
                           value={values.per_postal}
-                          className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                          className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                          disabled={isEdit === false}
                         />
                         {/* <MdOutlineModeEditOutline
                           color='#1F487C'
@@ -490,18 +505,21 @@ const AddressDetails = ({ addressType }) => {
               </div>
 
               <div className='flex items-center justify-center pt-[2vw] pb-[0.5vw]'>
-                <button
-                  type="submit"
-                  className=" text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[12vw] "
-                  disabled={isSubmitting || !dirty || !isValid}
-                  style={{
-                    backgroundColor: isSubmitting || !dirty || !isValid ? '#d3d3d3' : '#1F487C',
-                    color: isSubmitting || !dirty || !isValid ? '#9e9e9e' : '#fff',
-                    cursor: isSubmitting || !dirty || !isValid ? 'not-allowed' : 'pointer',
-                  }}
-                >
-                  Save
-                </button>
+                {isEdit === false ?
+                  <div
+                    onClick={() => setIsEdit(true)}
+                    className="cursor-pointer text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[12vw] text-center"
+                  >
+                    Edit
+                  </div>
+                  :
+                  <button
+                    type="submit"
+                    className="text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[12vw]"
+                  >
+                    Submit
+                  </button>
+                }
               </div>
             </div>
           </Form>

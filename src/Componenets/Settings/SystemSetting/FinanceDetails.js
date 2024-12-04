@@ -10,6 +10,9 @@ import {
   SubmitCompanySetting,
 } from "../../../Api/Settings/SystemSettings/CompanySettings";
 import dayjs from "dayjs";
+import { IoMdArrowDropdown } from "react-icons/io";
+import { ConfigProvider, Select } from "antd";
+import { GetCurrencyList } from "../../../Api/UserManagement/SuperAdmin";
 
 const FinanceDetails = ({ companyData, setCompanyData }) => {
   const [companysetting, setCompanysetting] = useState(null);
@@ -20,7 +23,7 @@ const FinanceDetails = ({ companyData, setCompanyData }) => {
   const companyId = companysetting?.tbs_company_id;
   const CompanyData = getcompanylist[0];
 
-  console.log(getcompanylist, 'get_companyList')
+  console.log(getcompanylist, "get_companyList");
 
   const validationSchema = Yup.object().shape({
     company_name: Yup.string().required("Company name doesn't Exist "),
@@ -29,6 +32,9 @@ const FinanceDetails = ({ companyData, setCompanyData }) => {
     tax_name: Yup.string().required("Enter Your Tax Name"),
     tax_rate: Yup.string().required("Enter Your Tax Rate"),
   });
+  const [isEdit, setIsEdit] = useState(false);
+  const [CurrencyData,setCurrencyData] = useState([])
+
 
   const handleSubmit = async (values, { resetForm }) => {
     try {
@@ -36,8 +42,9 @@ const FinanceDetails = ({ companyData, setCompanyData }) => {
       toast.success(data);
       GetCompanySetting(dispatch);
       // setCompanysetting(data)
-      fetchCompanyData()
+      fetchCompanyData();
       resetForm();
+      setIsEdit(false);
     } catch (error) {
       console.error("Error uploading data", error);
     }
@@ -46,7 +53,7 @@ const FinanceDetails = ({ companyData, setCompanyData }) => {
   useEffect(() => {
     if (UserId) {
       fetchCompanyData();
-      GetCompanySetting(dispatch)
+      GetCompanySetting(dispatch);
     }
   }, [UserId, setCompanyData]);
 
@@ -54,13 +61,48 @@ const FinanceDetails = ({ companyData, setCompanyData }) => {
     try {
       const data = await GetCompanyDataById(UserId, setCompanyData);
       setCompanysetting(data);
-      console.log(data, 'handlesubmitbuttonforFinanceDetails')
+      console.log(data, "handlesubmitbuttonforFinanceDetails");
     } catch (error) {
       console.error("Error fetching company data:", error);
     }
   };
+  const fetchCurrency = async () =>{
+    try{
+      const curdata = await GetCurrencyList()
+      setCurrencyData(curdata)
+      console.log(curdata,"currresponse");
+    }
+    catch(err){
+      console.log(err);
+      
+    }
+  }
+  useEffect(()=>{
+fetchCurrency()
+  },[])
 
   console.log(UserId, companysetting, "getcompanylist getcompanylist");
+  const getCurrencyOptions = CurrencyData.map(currency => ({
+    value: currency.code,
+    label: (
+      <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+        {currency.value}
+      </div>
+    ),
+    search:currency.value
+  }));
+
+  const defaultCurrency = {
+    value: '',
+    label: (
+      <div className="text-[1vw] px-[0.2vw] pb-[0.1vw] text-gray-400">
+        Select Currency
+      </div>
+    ),
+    disabled: true,
+  };
+
+  const curOption = [defaultCurrency , ...getCurrencyOptions]
 
   return (
     <div>
@@ -86,11 +128,11 @@ const FinanceDetails = ({ companyData, setCompanyData }) => {
           handleSubmit,
           values,
           handleChange,
-          dirty
+          dirty,
         }) => (
           <Form onSubmit={handleSubmit}>
             <div>
-            <div className="grid grid-cols-2 gap-x-[20vw] mr-[15vw] gap-y-[3vw] pr-[6vw] px-[6vw] pt-[2vw]">
+              <div className="grid grid-cols-2 gap-x-[20vw] mr-[15vw] gap-y-[3vw] pr-[6vw] px-[6vw] pt-[2vw]">
                 <div className="grid grid-cols-2 ">
                   <span className=" flex items-center">
                     <label
@@ -107,8 +149,10 @@ const FinanceDetails = ({ companyData, setCompanyData }) => {
                         name="company_name"
                         placeholder="Enter Company Name"
                         value={values.company_name}
-                        className=" customize-placeholder placeholder-[#1F487C] placeholder:text-[1vw] border-r-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] px-[1vw] border-b-[0.2vw] placeholder-blue 
-                      border-[#1F487C] text-[#1F487C] text-[1vw] h-[2.8vw] w-[20vw] rounded-xl outline-none"
+                        className={` ${
+                          isEdit === false ? "cursor-not-allowed" : ""
+                        } customize-placeholder placeholder-[#1F487C] placeholder:text-[1vw] rounded-[.5vw] border-r-[0.2vw] border-b-[0.2vw] border-t-[0.1vw] border-l-[0.1vw] border-[#1F487C] text-[#1F487C] px-[1vw] text-[1vw] h-[2.8vw] w-[20vw]  outline-none`}
+                        disabled={isEdit === false}
                       />
                       <ErrorMessage
                         name="company_name"
@@ -135,8 +179,10 @@ const FinanceDetails = ({ companyData, setCompanyData }) => {
                         id="financial_year_end"
                         name="financial_year_end"
                         value={values.financial_year_end}
-                        className=" customize-placeholder placeholder:text-[1vw] placeholder-blue 
-                    border-[#1F487C] text-[#1F487C] text-[1vw] h-[2.8vw] w-[20vw] rounded-xl outline-none border-t-[0.1vw] border-r-[0.2vw] border-l-[0.1vw] px-[1vw] border-b-[0.2vw]"
+                        className={` ${
+                          isEdit === false ? "cursor-not-allowed" : ""
+                        } customize-placeholder placeholder-[#1F487C] placeholder:text-[1vw] border-r-[0.2vw] border-b-[0.2vw] border-t-[0.1vw] border-l-[0.1vw] border-[#1F487C] text-[#1F487C] px-[1vw] text-[1vw] h-[2.8vw] w-[20vw] rounded-[0.5vw] outline-none`}
+                        disabled={isEdit === false}
                       />
                       <ErrorMessage
                         name="financial_year_end"
@@ -155,23 +201,74 @@ const FinanceDetails = ({ companyData, setCompanyData }) => {
                       Base Currency
                     </label>
                   </span>
-                  <span className="">
-                    <div className="relative">
-                      <Field
+                  <span className="umselect">
+                    <div className=" relative ">
+                      {/* <Field
                         as="select"
                         id="base_currency"
                         name="base_currency"
                         placeholder="Enter Company Name"
                         value={values.base_currency}
-                        className=" customize-placeholder placeholder-[#1F487C] placeholder:text-[1vw] placeholder-blue 
-                      border-[#1F487C] text-[#1F487C] px-[1vw] text-[1vw] h-[2.8vw] w-[20vw] rounded-xl border-r-[0.2vw] border-t-[0.1vw] border-b-[0.2vw] border-l-[0.1vw] outline-none"
+                        className={` ${
+                          isEdit === false ? "cursor-not-allowed" : ""
+                        } customize-placeholder placeholder-[#1F487C] placeholder:text-[1vw] border-r-[0.2vw] border-b-[0.2vw] border-t-[0.1vw] border-l-[0.1vw] border-[#1F487C] text-[#1F487C] px-[1vw] text-[1vw] h-[2.8vw] w-[20vw] rounded-[0.5vw] outline-none`}
+                        disabled={isEdit === false}
                       >
                         <option label="Base Currency" value="" className="" />
                         <option label="USD" value="USD" className="" />
                         <option label="INR" value="INR" className="" />
                         <option label="EUR" value="EUR" className="" />
                         <option label="RUB" value="RUB" className="" />
-                      </Field>
+                      </Field> */}
+                         <ConfigProvider
+                        theme={{
+                          components: {
+                            Select: {
+                              optionActiveBg: '#aebed1',
+                              optionSelectedColor: '#FFF',
+                              optionSelectedBg: '#aebed1',
+                              optionHeight: '2',
+                            },
+                            searchInput: {
+                              color: '#1f487c',  // Set the search text color here
+                            },
+                          },
+                        }}
+                      >
+                        <Select
+                          showSearch
+                          value={values.base_currency}
+                          onChange={(value) => {
+                            handleChange({ target: { name: 'base_currency', value } })
+                          }}
+                          // disabled={
+                          //   updatedata || documentback
+                          //     ? enable
+                          //       ? false
+                          //       : true
+                          //     : false
+                          // }
+                          name="base_currency"
+                          // className={` ${
+                          //   isEdit === false ? "cursor-not-allowed" : ""
+                          // } customize-placeholder placeholder-[#1F487C] placeholder:text-[1vw] border-r-[0.2vw] border-b-[0.2vw] border-t-[0.1vw] border-l-[0.1vw] border-[#1F487C] text-[#1F487C] px-[1vw] text-[1vw] h-[2.8vw] w-[20vw] rounded-[0.5vw] outline-none`}
+                          disabled={isEdit === false}
+                          className={`${
+                            isEdit === false ? "cursor-not-allowed" : ""
+                          } custom-select  border-r-[0.2vw]  border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[2.8vw] w-[20vw] rounded-[0.5vw] outline-none`}
+                          placeholder="Select currency code"
+                          optionFilterProp="search"
+                          filterOption={(input, option) => 
+                            option?.search?.toLowerCase()?.includes(input.toLowerCase()) // Make it case-insensitive
+                          }
+                          suffixIcon={<span style={{ fontSize: '1vw', color: '#1f487c' }}>
+                            <IoMdArrowDropdown size="2vw" />
+                          </span>}
+                          style={{ padding: 4,color:"#1f487c" }}
+                          options={curOption}
+                          
+                        />
+                      </ConfigProvider>
                       <ErrorMessage
                         name="base_currency"
                         component="div"
@@ -196,7 +293,10 @@ const FinanceDetails = ({ companyData, setCompanyData }) => {
                         name="tax_name"
                         placeholder="Enter Tax Name"
                         value={values.tax_name}
-                        className=" customize-placeholder placeholder-[#1F487C] placeholder:text-[1vw] border-r-[0.2vw] border-b-[0.2vw] border-t-[0.1vw] border-l-[0.1vw] border-[#1F487C] text-[#1F487C] px-[1vw] text-[1vw] h-[2.8vw] w-[20vw] rounded-xl outline-none"
+                        className={` ${
+                          isEdit === false ? "cursor-not-allowed" : ""
+                        } customize-placeholder placeholder-[#1F487C] placeholder:text-[1vw] border-r-[0.2vw] border-b-[0.2vw] border-t-[0.1vw] border-l-[0.1vw] border-[#1F487C] text-[#1F487C] px-[1vw] text-[1vw] h-[2.8vw] w-[20vw] rounded-[0.5vw] outline-none`}
+                        disabled={isEdit === false}
                       />
                       <ErrorMessage
                         name="tax_name"
@@ -222,10 +322,12 @@ const FinanceDetails = ({ companyData, setCompanyData }) => {
                         name="tax_rate"
                         placeholder="Enter Tax Rate"
                         value={values.tax_rate}
-                        className="customize-placeholder placeholder-[#1F487C] placeholder:text-[1vw] border-r-[0.2vw]  border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-blue 
-                    border-[#1F487C] text-[#1F487C] px-[1vw] text-[1vw] h-[2.8vw] w-[20vw] rounded-xl outline-none"
+                        className={` ${
+                          isEdit === false ? "cursor-not-allowed" : ""
+                        } customize-placeholder placeholder-[#1F487C] placeholder:text-[1vw] border-r-[0.2vw] border-b-[0.2vw] border-t-[0.1vw] border-l-[0.1vw] border-[#1F487C] text-[#1F487C] px-[1vw] text-[1vw] h-[2.8vw] w-[20vw] rounded-[0.5vw] outline-none`}
+                        disabled={isEdit === false}
                       ></Field>
-                      <div className="absolute left-[17vw] right-[0] bottom-[0.5vw]  flex justify-items-center">
+                      <div className="absolute left-[17vw] right-[0] bottom-[0.4vw]  flex justify-items-center">
                         <div className=" bg-[#1F4B7F] w-[2vw] h-[2vw] rounded-md text-white px-[0.5vw] text-[1.3vw]">
                           %
                         </div>
@@ -239,19 +341,22 @@ const FinanceDetails = ({ companyData, setCompanyData }) => {
                   </span>
                 </div>
               </div>
-              <div className="flex justify-center items-center py-[1vw]">
-                <button
-                  className="w-1/6 h-[2.5vw] text-[1.3vw] bg-[#1F487C] text-white rounded-md"
-                  type="submit"
-                  disabled={isSubmitting || !dirty || !isValid}
-                  style={{
-                    backgroundColor: isSubmitting || !dirty || !isValid ? '#d3d3d3' : '#1F487C',
-                    color: isSubmitting || !dirty || !isValid ? '#9e9e9e' : '#fff',
-                    cursor: isSubmitting || !dirty || !isValid ? 'not-allowed' : 'pointer',
-                  }}
-                >
-                  Save
-                </button>
+              <div className="flex items-center justify-center pt-[2vw] pb-[0.5vw]">
+                {isEdit === false ? (
+                  <div
+                    onClick={() => setIsEdit(true)}
+                    className="cursor-pointer text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[10vw] text-center"
+                  >
+                    Edit
+                  </div>
+                ) : (
+                  <button
+                    type="submit"
+                    className="text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[10vw]"
+                  >
+                    Save
+                  </button>
+                )}
               </div>
             </div>
           </Form>

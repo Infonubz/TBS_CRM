@@ -29,7 +29,7 @@ const CustomTemplate = () => {
     const apiUrl = process.env.REACT_APP_API_URL;
     const [errors, setErrors] = useState()
     const [selectItems, setSelectItems] = useState();
-
+    console.log(selectItems, 'select_items')
     const [modalIsOpen, setModalIsOpen] = useState(false);
 
     const [deletemodalIsOpen, setDeleteModalIsOpen] = useState(false);
@@ -161,6 +161,16 @@ const CustomTemplate = () => {
             render: (row) => (
                 <div className="flex items-center font-normal justify-center">
                     <div className='flex items-center justify-center gap-[1vw]'>
+
+                        <MdDownloadForOffline
+                            size='1.5vw'
+                            color='#1F487C'
+                            onClick={() => handleDownload(row)} />
+                        <MdEdit
+                            size='1.5vw'
+                            color='#1F487C'
+                            className='cursor-pointer'
+                            onClick={() => { setModalIsOpen(true) }} />
                         <MdDelete
                             size='1.5vw'
                             className='cursor-pointer'
@@ -168,17 +178,9 @@ const CustomTemplate = () => {
                             onClick={() => {
                                 setDeleteModalIsOpen(true);
                             }} />
-                        <MdEdit
-                            size='1.5vw'
-                            color='#1F487C'
-                            className='cursor-pointer'
-                            onClick={() => { setModalIsOpen(true) }} />
 
                         <div className='cursor-pointer'>
-                            <MdDownloadForOffline
-                                size='1.5vw'
-                                color='#1F487C'
-                                onClick={() => handleDownload(row)} />
+
                         </div>
                     </div>
                 </div>
@@ -190,11 +192,21 @@ const CustomTemplate = () => {
     return (
         <>
             <div className='p-[1vw] '>
-                <div className='rounded-xl border-[#1F487C] border-[0.1vw] border-b-[0.1vw]' >
+                <div className='flex justify-end pb-[1vw]'>
+                    <button
+                        onClick={() => {
+                            setModalIsOpen(true)
+                            setSelectItems('')
+                        }}
+                        className='order-last w-[7.5vw]   bg-[#1F487C] mr-[1vw] text-white rounded-md text-[1.2vw] h-[2.5vw] font-semibold flex items-center justify-center gap-[0.5vw]'>
+                        <span><FaDownload /></span><span>Add</span>
+                    </button>
+                </div>
+                {/* <div className='rounded-xl border-[#1F487C] border-[0.1vw] border-b-[0.1vw]' > */}
 
-                    {/* -------------------------------------------SearchTab------------------------------------- */}
+                {/* -------------------------------------------SearchTab------------------------------------- */}
 
-                    <div className='flex bg-[#1F487C] rounded-t-xl py-[0.5vw] items-center gap-[1vw] justify-between'>
+                {/* <div className='flex bg-[#1F487C] rounded-t-xl py-[0.5vw] items-center gap-[1vw] justify-between'>
                         <div className='flex gap-[1vw]'>
                             <div className='relative pl-[1vw]'>
                                 <input
@@ -222,10 +234,10 @@ const CustomTemplate = () => {
                             className='order-last w-[7.5vw] px-[1.5vw] bg-white mr-[2vw] text-[#1F487C] rounded-md text-[1.2vw] h-[2.5vw] font-semibold flex items-center justify-center gap-[0.5vw]'>
                             <span><FaDownload /></span><span>Import</span>
                         </button>
-                    </div>
+                    </div> */}
 
-                    {/* ------------------------------------Folders----------------------------------------------- */}
-
+                {/* ------------------------------------Folders----------------------------------------------- */}
+                {/* 
                     <div className="p-[1vw] grid grid-cols-5 justify-items-center gap-y-[1vw]">
                         {documents.map((items) => (
                             <div
@@ -254,7 +266,7 @@ const CustomTemplate = () => {
                             </div>
                         ))}
                     </div>
-                </div>
+                </div> */}
                 {/* ------------------------------------------RecentDocuments--------------------------------- */}
                 <div>
                     <div className='px-[1vw]'>
@@ -286,7 +298,7 @@ const CustomTemplate = () => {
                 width="auto"
                 className=""
             >
-                <ImportData fetchDocuments={fetchDocuments} closeModal={closeModal} selectFields={selectItems?.select_fields} />
+                <ImportData fetchDocuments={fetchDocuments} closeModal={closeModal} selectFields={selectItems?.select_fields} selectname={selectItems?.upload_files} />
             </ModalPopup>
 
             <ModalPopup

@@ -568,17 +568,31 @@ export const GetRequestAdsData = async (dispatch, adfilter, showtable) => {
     return null;
   }
 };
-export const SearchReqAdvertisement = async (e, dispatch, showtable) => {
+export const SearchReqAdvertisement = async (e, dispatch, showtable,adfilter) => {
+ const statusid = adfilter == "all"
+  ? 5
+  : adfilter == "pending"
+  ? 1
+  : adfilter == "verified"
+  ? 3
+  : adfilter == "under_review"
+  ? 2
+  : adfilter == "rejected"
+  ? 4
+  : 5
   const url =
     showtable == 4
       ? "request-management-adSearch"
       : "request-management-mobile-adSearch";
   try {
     if (e) {
-      const responce = await axios.get(`${apiUrl}/${url}/${e}`);
+      const responce = await axios.post(`${apiUrl}/${url}`,{
+    ads_req_status_id:statusid ,
+    search_term: e
+      });
       dispatch({ type: GET_REQ_ADS, payload: responce.data });
     } else {
-      GetRequestAdsData(dispatch, 5, showtable);
+      GetRequestAdsData(dispatch, adfilter, showtable);
     }
   } catch (err) {
     console.log(err);

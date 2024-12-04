@@ -179,13 +179,13 @@ export const SubmitClientAddressData = async (
 
 
 export const SubmitClientGSTData = async (documentsdata, clientID, setSuperAdminGSTData, dispatch) => {
-  console.log(documentsdata, "documentsdata");
+  console.log(documentsdata.ctc == 1 ? true : false, "documentsdata");
   const getid =  sessionStorage.getItem("CLIENT_ID")?sessionStorage.getItem("CLIENT_ID") : sessionStorage.getItem("CLI_ID");
 
   const formData = new FormData();
   formData.append(
     "aggregate_turnover_exceeded",
-    documentsdata.ctc == "1" || 1 ? "true" : "false"
+    documentsdata.ctc == 1 ? true : false
   );
   formData.append("state_name", documentsdata.state);
   formData.append("state_code_number", documentsdata.state_code);

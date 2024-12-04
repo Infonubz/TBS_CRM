@@ -48,7 +48,7 @@ const validationSchema = Yup.object().shape({
     occupation: Yup.string().required("please select the occupation")
 });
 
-const PersonalDetails = ({ setSelectedFile, fileList }) => {
+const PersonalDetails = ({ setSelectedFile, fileList, isEdit, setIsEdit }) => {
 
     const [partnerData, setPartnereData] = useState()
 
@@ -77,8 +77,9 @@ const PersonalDetails = ({ setSelectedFile, fileList }) => {
                 fileList,
             );
             GetPartnerPersonalData()
-            toast.success(data?.message);
-            console.log(data);
+            toast.success(data);
+            console.log(data, 'data_data');
+            setIsEdit(false)
         } catch (error) {
             console.error("Error uploading data", error);
         }
@@ -132,7 +133,8 @@ const PersonalDetails = ({ setSelectedFile, fileList }) => {
                                         name="firstname"
                                         placeholder="Enter First Name"
                                         value={values.firstname}
-                                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                        disabled={isEdit === false}
                                     />
                                     {/* <MdOutlineModeEditOutline
                                         color='#1F487C'
@@ -158,7 +160,8 @@ const PersonalDetails = ({ setSelectedFile, fileList }) => {
                                         name="lastname"
                                         placeholder="Enter Last Name"
                                         value={values.lastname}
-                                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                        disabled={isEdit === false}
                                     />
                                     {/* <MdOutlineModeEditOutline
                                         color='#1F487C'
@@ -184,7 +187,8 @@ const PersonalDetails = ({ setSelectedFile, fileList }) => {
                                         name="phone"
                                         placeholder="Enter Number"
                                         value={values.phone}
-                                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                        disabled={isEdit === false}
                                     />
                                     {/* <button className="absolute right-[0.5vw] text-[1vw] text-white w-[5vw] bg-[#1F4B7F] rounded-full h-[1.7vw]">
                           Verify
@@ -215,7 +219,8 @@ const PersonalDetails = ({ setSelectedFile, fileList }) => {
                                         name="emailid"
                                         placeholder="Enter Email Address"
                                         value={values.emailid}
-                                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                        disabled={isEdit === false}
                                     />
                                     {/* <MdOutlineModeEditOutline
                                         color='#1F487C'
@@ -241,7 +246,8 @@ const PersonalDetails = ({ setSelectedFile, fileList }) => {
                                         name="alt_phone"
                                         placeholder="Enter Alternate Number"
                                         value={values.alt_phone}
-                                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                        disabled={isEdit === false}
                                     />
                                     {/* <MdOutlineModeEditOutline
                                         color='#1F487C'
@@ -270,7 +276,8 @@ const PersonalDetails = ({ setSelectedFile, fileList }) => {
                                             handleChange(e);
                                             sessionStorage.setItem("status", e.target.value);
                                         }}
-                                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                        disabled={isEdit === false}
                                     >
                                         <option label="Select Gender" value="" className="" />
                                         <option label="Male" value="Male" className="" />
@@ -305,7 +312,8 @@ const PersonalDetails = ({ setSelectedFile, fileList }) => {
                                             handleChange(e);
                                             sessionStorage.setItem("dob", e.target.value);
                                         }}
-                                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                        disabled={isEdit === false}
                                     />
                                     {/* <MdOutlineModeEditOutline
                                         color='#1F487C'
@@ -333,7 +341,8 @@ const PersonalDetails = ({ setSelectedFile, fileList }) => {
                                         onChange={(e) => {
                                             handleChange(e);
                                         }}
-                                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                        disabled={isEdit === false}
                                     >
                                         <option label="Select Occupation" value="" className="" />
                                         <option label="Student" value="student" className="" />
@@ -354,18 +363,21 @@ const PersonalDetails = ({ setSelectedFile, fileList }) => {
                             </div>
                         </div>
                         <div className='flex items-center justify-center pt-[2vw] pb-[0.5vw]'>
-                            <button
-                                type="submit"
-                                disabled={isSubmitting || !dirty || !isValid}
-                                style={{
-                                    backgroundColor: isSubmitting || !dirty || !isValid ? '#d3d3d3' : '#1F487C', 
-                                    color: isSubmitting || !dirty || !isValid ? '#9e9e9e' : '#fff',
-                                    cursor: isSubmitting || !dirty || !isValid ? 'not-allowed' : 'pointer', 
-                                }}
-                                className=" text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[12vw] "
-                            >
-                                Save
-                            </button>
+                            {isEdit === false ?
+                                <div
+                                    onClick={() => setIsEdit(true)}
+                                    className="cursor-pointer text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[12vw] text-center"
+                                >
+                                    Edit
+                                </div>
+                                :
+                                <button
+                                    type="submit"
+                                    className="text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[12vw]"
+                                >
+                                    Submit
+                                </button>
+                            }
                         </div>
                     </Form>
                 )}

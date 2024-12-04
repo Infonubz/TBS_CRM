@@ -41,11 +41,15 @@ const ProfessionalDetails = () => {
     fetchEmpProfessionalData();
   }, []);
 
+  const [isEdit, setIsEdit] = useState(false)
+
+
   const handleSubmit = async (values) => {
     try {
       const data = await submitEmployeeProffesionalData(values);
       GetEmployeeProfessionalData()
       toast.success(data);
+      setIsEdit(false)
       console.log("Data submitted successfully:", data);
     } catch (error) {
       console.error("Error uploading data", error);
@@ -104,7 +108,8 @@ const ProfessionalDetails = () => {
                           handleChange(e);
                           sessionStorage.setItem("dob", e.target.value);
                         }}
-                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                        disabled={isEdit === false}
                       />
                       {/* <MdOutlineModeEditOutline
                         color='#1F487C'
@@ -129,7 +134,8 @@ const ProfessionalDetails = () => {
                         as="select"
                         name="role"
                         value={values.role}
-                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                        disabled={isEdit === false}
                       >
                         <option label="Select Role" value="" className="" />
                         <option label="Manager" value="Manager" className="" />
@@ -158,7 +164,8 @@ const ProfessionalDetails = () => {
                         name="designation"
                         placeholder="Enter Last Name"
                         // value={values.firstname}
-                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                        disabled={isEdit === false}
                       />
                       {/* <MdOutlineModeEditOutline
                         color='#1F487C'
@@ -184,7 +191,8 @@ const ProfessionalDetails = () => {
                         name="department"
                         placeholder="Enter Department"
                         value={values.department}
-                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                        disabled={isEdit === false}
                       />
                       {/* <MdOutlineModeEditOutline
                         color='#1F487C'
@@ -210,7 +218,8 @@ const ProfessionalDetails = () => {
                         name="report_manager"
                         placeholder="Enter Name"
                         value={values.report_manager}
-                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                        disabled={isEdit === false}
                       />
                       {/* <MdOutlineModeEditOutline
                         color='#1F487C'
@@ -239,7 +248,8 @@ const ProfessionalDetails = () => {
                           handleChange(e);
                           sessionStorage.setItem("branch", e.target.value);
                         }}
-                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                        disabled={isEdit === false}
                       >
                         <option label="Select Branch" value="" className="" />
                         <option
@@ -278,7 +288,8 @@ const ProfessionalDetails = () => {
                         name="qualification"
                         placeholder="Qualification"
                         value={values.qualification}
-                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                        disabled={isEdit === false}
                       />
                       {/* <MdOutlineModeEditOutline
                         color='#1F487C'
@@ -304,7 +315,8 @@ const ProfessionalDetails = () => {
                         name="language"
                         placeholder="Language"
                         value={values.language}
-                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                        disabled={isEdit === false}
                       />
                       {/* <MdOutlineModeEditOutline
                         color='#1F487C'
@@ -319,18 +331,21 @@ const ProfessionalDetails = () => {
                   </div>
                 </div>
                 <div className='flex items-center justify-center pt-[2vw] pb-[0.5vw]'>
-                  <button
-                    type="submit"
-                    className=" text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[12vw] "
-                    disabled={isSubmitting || !dirty || !isValid}
-                    style={{
-                      backgroundColor: isSubmitting || !dirty || !isValid ? '#d3d3d3' : '#1F487C',
-                      color: isSubmitting || !dirty || !isValid ? '#9e9e9e' : '#fff',
-                      cursor: isSubmitting || !dirty || !isValid ? 'not-allowed' : 'pointer',
-                    }}
-                  >
-                    Save
-                  </button>
+                  {isEdit === false ?
+                    <div
+                      onClick={() => setIsEdit(true)}
+                      className="cursor-pointer text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[12vw] text-center"
+                    >
+                      Edit
+                    </div>
+                    :
+                    <button
+                      type="submit"
+                      className="text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[12vw]"
+                    >
+                      Submit
+                    </button>
+                  }
                 </div>
               </div>
             </Form>

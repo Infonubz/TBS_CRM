@@ -194,7 +194,7 @@ const ClientTableView = ({
             {row.status_id != null ? (
               <button
                 className={`${row.status_id == 0
-                  ? "bg-[#FF6B00]"
+                  ? "bg-[#646262]"
                   : row.status_id == 1
                     ? "bg-[#38ac2c]"
                     : row.status_id == 2

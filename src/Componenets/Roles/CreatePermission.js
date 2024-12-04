@@ -6,12 +6,13 @@ import * as Yup from "yup";
 import { toast } from "react-toastify";
 import { LiaSave } from "react-icons/lia";
 import "../../App.css";
+import { capitalizeFirstLetter } from "../Common/Captilization"
 import { GET_PERMISSIONS } from "../../Store/Type";
 import {
   GetPermissionById,
-  GetPermissionData,
+  //GetPermissionData,
   SubmitPermissionData,
-  SubmitOPPermissionData
+  SubmitOPPermissionData,
 } from "../../Api/Role&Responsibilites/ActivePermission";
 import {
   GetUserRoles,
@@ -26,7 +27,7 @@ export default function CreatePermission({
   SetPermissionData,
   permissionData,
   filter,
-  setPermission
+  setPermission,
 }) {
   const validationSchema = Yup.object().shape({
     role_type: Yup.string()
@@ -47,24 +48,49 @@ export default function CreatePermission({
   const [user, setUser] = useState("");
   // const [rolesData, setRoleData] = useState();
   const [showModulePermissions, setShowModulePermissions] = useState(true);
-  const [userlist, setUserlist] = useState({
-    user: "",
-  });
+  // const [userlist, setUserlist] = useState({
+  //   user: "",
+  // });
   const [rolesPermisionData, setRolesPermissionData] = useState();
   //const getroleName = useSelector((state) => state.crm.role_name_list);
-  const dispatch = useDispatch(); 
+  const dispatch = useDispatch();
   const type_id = sessionStorage.getItem("type_id");
 
-  const modulePermissionsData = [
+  let modulePermissionsData = [
     { module_id: 1, module_name: "Partner - (UM)" },
     { module_id: 2, module_name: "Client - (UM)" },
     { module_id: 3, module_name: "Employee - (UM)" },
     { module_id: 4, module_name: "Offers & Deals" },
     { module_id: 5, module_name: "Advertisement" },
     { module_id: 6, module_name: "Promotions" },
-    { module_id: 7, module_name: "Roles" },
+    { module_id: 7, module_name: "Roles" }
   ];
+  
+  // Apply the condition based on the type_id
+  if (type_id === "OP101") {
+    modulePermissionsData = modulePermissionsData.filter((module) =>
+      ["Employee - (UM)", "Promotions"].includes(module.module_name)
+    );
+  } else if (type_id === "OPEMP101") {
+    modulePermissionsData = modulePermissionsData.filter((module) =>
+      ["Employee - (UM)", "Promotions"].includes(module.module_name)
+    );
+  } else if (type_id === "PROEMP101") {
+    modulePermissionsData = modulePermissionsData.filter((module) =>
+      [
+        "Partner - (UM)",
+        "Client - (UM)",
+        "Employee - (UM)",
+        "Offers & Deals",
+        "Advertisement",
+        "Promotions",
+      ].includes(module.module_name)
+    );
+  } else if (type_id !== "PRO101") {
+    modulePermissionsData = []; 
+  }
 
+  
   const modulePermissionOptions = modulePermissionsData.map((module) => ({
     label: module.module_name,
     value: module.module_name,
@@ -78,22 +104,20 @@ export default function CreatePermission({
   ];
 
   const permissionIdMap = {
-    "User Management": 1,
-    "Request Management": 2,
-    "Offers & Deals": 3,
-    Advertisement: 4,
-    Promotions: 5,
-    Roles: 6,
-    Report: 7,
-    Subscription: 8,
+    "Partner - (UM)": 1,
+    "Client - (UM)": 2,
+    "Employee - (UM)": 3,
+    "Offers & Deals": 4,
+    Advertisement: 5,
+    Promotions: 6,
+    Roles: 7
   };
-
 
   const fetchRolesPermission = async (roleId) => {
     try {
       const data = await GetPermissions(roleId, dispatch);
       setRolesPermissionData(data);
-      setRoleId(roleId); 
+      setRoleId(roleId);
       console.log(data, "rolesPermission");
     } catch (error) {
       console.log(error, "Error fetching Roles permission data.");
@@ -107,7 +131,7 @@ export default function CreatePermission({
         module_id: permissionIdMap[permission.module_name],
         module_name: permission.module_name,
       }));
-      if(type_id === "PRO101" || type_id === "PROEMP101"){
+      if (type_id === "PRO101" || type_id === "PROEMP101") {
         const data = await SubmitPermissionData(
           { ...values, module_permissions: modulePermissions },
           permissionupdate,
@@ -116,8 +140,7 @@ export default function CreatePermission({
           rolesPermisionData
         );
         toast.success(data?.message);
-      }
-      else{
+      } else {
         const data = await SubmitOPPermissionData(
           { ...values, module_permissions: modulePermissions },
           permissionupdate,
@@ -156,10 +179,10 @@ export default function CreatePermission({
             value: permission,
           }))
         );
-        setUserlist((prevState) => ({
-          ...prevState,
-          user: data.user,
-        }));
+        // setUserlist((prevState) => ({
+        //   ...prevState,
+        //   user: data.user,
+        // }));
         const mappedModulePermissions = data.module_permissions.map(
           (permission) => ({
             module_id: permissionIdMap[permission.module_name],
@@ -210,7 +233,10 @@ export default function CreatePermission({
   };
 
   useEffect(() => {
-    if (type_id === "PRO101" && rolesPermisionData?.crud_permission_id != null) {
+    if (
+      type_id === "PRO101" &&
+      rolesPermisionData?.crud_permission_id != null
+    ) {
       SetPermissionUpdate(rolesPermisionData?.crud_permission_id);
     }
   }, [rolesPermisionData, SetPermissionUpdate, type_id]);
@@ -236,7 +262,6 @@ export default function CreatePermission({
     }
   }, [permissionupdate, SetPermissionUpdate, SetPermissionData]);
 
-
   return (
     <Formik
       initialValues={{
@@ -260,12 +285,12 @@ export default function CreatePermission({
     >
       {({ handleSubmit, values, setFieldValue, handleChange }) => (
         <Form onSubmit={handleSubmit}>
-          <div className="flex justify-between mr-[3vw]">
-            <div className="text-[1.1vw] text-[#1F4B7F] pt-[0.4vw] font-bold">
+          {/* <div className="flex justify-between mr-[3vw]">
+            <div className="text-[1.35vw] text-[#1F4B7F] mt-[0.3vw] mb-[1vw] font-bold">
             { (type_id === "PRO101" && permissionData?.crud_permissions) || (type_id === "OP101" && permissionupdate) ? "UPDATE PERMISSION" : "CREATE NEW PERMISSION"}  
             </div>
             <button
-              className="flex bg-[#1F4B7F] mt-[0.3vw] px-[0.6vw] gap-[0.5vw] py-[0.3vw] rounded-[0.75vw] items-center justify-center"
+              className="flex bg-[#1F4B7F] mt-[0.3vw] px-[0.6vw] gap-[0.5vw] rounded-[0.75vw] items-center justify-center"
               type="submit"
             >
               <span>
@@ -273,6 +298,26 @@ export default function CreatePermission({
               </span>
               <span className="text-white text-[1vw]">Save</span>
             </button>
+          </div> */}
+
+          <div className="tline flex justify-between mb-[1vw]">
+            <div className="text-[1.35vw] text-[#1F4B7F] font-bold mt-[0.25vw]">
+              {(type_id === "PRO101" && permissionData?.crud_permissions) ||
+              (type_id === "OP101" && permissionupdate)
+                ? "UPDATE PERMISSION"
+                : "CREATE NEW PERMISSION"}
+            </div>
+            <div className="w-1/2 pl-[6vw] flex items-end justify-around mt-[0.16vw]">
+              <button
+                type="submit"
+                className="bg-[#1f487c] h-[2.2vw] w-[6vw] ml-[4.5vw] text-white rounded-[0.75vw] focus:border-[#78ccfc] focus:outline-none focus:border-2"
+              >
+                <div className="flex justify-center">
+                  <LiaSave size={"1.4vw"} />
+                  <div className="pl-[0.5vw] text-[1vw]">Save</div>
+                </div>
+              </button>
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-[1vw] pt-[2vw]">
             {/* {viewMode !== "Operator" && (
@@ -476,71 +521,75 @@ export default function CreatePermission({
                   ))}
                 </Field> */}
 
-{((type_id === "OP101" || type_id === "OPEMP101") && permissionupdate != null) ||
-(type_id === "PRO101" || type_id === "PROEMP101") && permissionData?.crud_permissions ? (
-  <Field
-    as="input"
-    id="role_type"
-    name="role_type"
-    type="text"
-    disabled={!!permissionupdate} // Explicitly convert to boolean
-    className="cursor-not-allowed border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C]
-    text-[#1F487C] text-[1.2vw] h-[2.90vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
-  />
-) : (
-  <ConfigProvider
-    theme={{
-      components: {
-        Select: {
-          optionActiveBg: "#aebed1",
-          optionSelectedColor: "#FFF",
-          optionSelectedBg: "#aebed1",
-          optionHeight: "2",
-        },
-      },
-    }}
-  >
-    <Select
-      placeholder="Select Role"
-      className="custom-select bg-white outline-none w-full mt-[0.5vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw]
+              {((type_id === "OP101" || type_id === "OPEMP101") &&
+                permissionupdate != null) ||
+              ((type_id === "PRO101" || type_id === "PROEMP101") &&
+                permissionData?.crud_permissions) ? (
+                <Field
+                  as="input"
+                  id="role_type"
+                  name="role_type"
+                  type="text"
+                  disabled={!!permissionupdate} // Explicitly convert to boolean
+                  className="cursor-not-allowed border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C]
+    text-[#1F487C] text-[1vw] h-[2.90vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                />
+              ) : (
+                <ConfigProvider
+                  theme={{
+                    components: {
+                      Select: {
+                        optionActiveBg: "#aebed1",
+                        optionSelectedColor: "#FFF",
+                        optionSelectedBg: "#aebed1",
+                        optionHeight: "2",
+                      },
+                    },
+                  }}
+                >
+                  <Select
+                    placeholder="Select Role"
+                    className="custom-select bg-white outline-none w-full mt-[0.5vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw]
       border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
-      value={values.role_type}
-      onChange={(value) => {
-        setFieldValue("role_type", value);
-        const selectedRole = roleNames?.find(
-          (role) => role.role_type === value
-        );
-        fetchRolesPermission(selectedRole?.role_id);
-        sessionStorage.setItem("role_type", value);
-        console.log(selectedRole?.role_id, "Role Type");
-      }}
-      suffixIcon={
-        <span style={{ fontSize: "1vw", color: "#1f487c" }}>
-          <IoMdArrowDropdown size="2vw" />
-        </span>
-      }
-      options={[
-        {
-          value: "",
-          label: (
-            <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-              Select Role
-            </div>
-          ),
-          disabled: true,
-        },
-        ...(Array.isArray(roleNames) ? roleNames : []).map((roleName) => ({
-          value: roleName.role_type,
-          label: (
-            <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-              {roleName.role_type}
-            </div>
-          ),
-        })),
-      ]}
-    />
-  </ConfigProvider>
-)}
+                    value={values.role_type}
+                    onChange={(value) => {
+                      setFieldValue("role_type", value);
+                      const selectedRole = roleNames?.find(
+                        (role) => role.role_type === value
+                      );
+                      fetchRolesPermission(selectedRole?.role_id);
+                      sessionStorage.setItem("role_type", value);
+                      console.log(selectedRole?.role_id, "Role Type");
+                    }}
+                    suffixIcon={
+                      <span style={{ fontSize: "1vw", color: "#1f487c" }}>
+                        <IoMdArrowDropdown size="2vw" />
+                      </span>
+                    }
+                    options={[
+                      {
+                        value: "",
+                        label: (
+                          <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw]  text-[#9ba6bbe3]">
+                            Select Role
+                          </div>
+                        ),
+                        disabled: true,
+                      },
+                      ...(Array.isArray(roleNames) ? roleNames : []).map(
+                        (roleName) => ({
+                          value: roleName.role_type,
+                          label: (
+                            <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                              {capitalizeFirstLetter(roleName.role_type)}
+                            </div>
+                          ),
+                        })
+                      ),
+                    ]}
+                  />
+                </ConfigProvider>
+              )}
 
               <ErrorMessage
                 name="role_type"
@@ -548,26 +597,23 @@ export default function CreatePermission({
                 className="text-red-500 text-[0.8vw]"
               />
             </div>
-
             <div>
-              <div className="flex items-center gap-[0.2vw]">
                 <label className="text-[#1F4B7F] text-[1.1vw] font-semibold">
                   Description
                 </label>
-              </div>
               <Field
                 as="textarea"
-                placeholder="Description"
-                disabled 
+                placeholder="Enter Description"
+                style={{ resize: "none", lineHeight: "2.2vw" }}
+                disabled
                 value={rolesPermisionData?.description}
                 rows="3"
                 cols="50"
-                className="cursor-not-allowed border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C]
-                   text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw] py-[0.3vw]"
+                className="cursor-not-allowed border-r-[0.2vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-blue border-[#1F487C]
+                   text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw] py-[0.3vw]"
               />
             </div>
           </div>
-
           {viewMode !== "Operator" && (
             <div className=" pt-[1vw]">
               <label
@@ -589,7 +635,7 @@ export default function CreatePermission({
                               name="crud_permissions"
                               value={option.value}
                               disabled={type_id === "OP101"}
-                              className="checkbox-custom transform scale-150 mr-[0.5vw] cursor-pointer"
+                              className="checkbox-custom mr-[0.5vw] cursor-pointer"
                               checked={field.value?.includes(option.value)}
                               onChange={(e) => {
                                 const selectedValues = field.value
@@ -613,7 +659,7 @@ export default function CreatePermission({
                             />
                             <label
                               htmlFor={option.value}
-                              className="text-[0.90vw] text-[#1F4B7F]"
+                              className="text-[1vw] text-[#1F4B7F]"
                             >
                               {option.label}
                             </label>
@@ -691,46 +737,47 @@ export default function CreatePermission({
                 Module Permission
               </label>
               <Field name="module_permissions">
-                {({ field, form }) => (
-                  <div className="grid grid-cols-4 ml-[0.5vw] pt-[0.5vw] gap-3">
-                    {modulePermissionOptions.map((option) => (
-                      <div key={option.value} className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id={option.value}
-                          name="module_permissions"
-                          value={option.value}
-                          checked={field.value.some(
-                            (item) => item.module_name === option.value
-                          )}
-                          onChange={(e) => {
-                            const selectedValues = [...field.value];
-                            if (e.target.checked) {
-                              selectedValues.push({
-                                module_id: permissionIdMap[option.value],
-                                module_name: option.value,
-                              });
-                            } else {
-                              const index = selectedValues.findIndex(
-                                (item) => item.module_name === option.value
-                              );
-                              if (index > -1) selectedValues.splice(index, 1);
-                            }
-                            setFieldValue("module_permissions", selectedValues);
-                          }}
-                          className="mr-[0.5vw] transform scale-150 cursor-pointer"
-                        />
-                        <label
-                          htmlFor={option.value}
-                          className="text-[0.90vw] text-[#1F4B7F]"
-                        >
-                          {option.label}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </Field>
+  {({ field, form }) => (
+    <div className="grid grid-cols-4 ml-[0.5vw] pt-[0.5vw] gap-3">
+      {modulePermissionOptions.map((option) => (
+        <div key={option.value} className="flex items-center">
+          <input
+            type="checkbox"
+            id={option.value}
+            name="module_permissions"
+            value={option.value}
+            checked={field.value.some(
+              (item) => item.module_name === option.value
+            )}
+            onChange={(e) => {
+              const selectedValues = [...field.value];
+              if (e.target.checked) {
+                selectedValues.push({
+                  module_id: permissionIdMap[option.value],
+                  module_name: option.value,
+                });
+              } else {
+                const index = selectedValues.findIndex(
+                  (item) => item.module_name === option.value
+                );
+                if (index > -1) selectedValues.splice(index, 1);
+              }
+              setFieldValue("module_permissions", selectedValues);
+            }}
+            className="checkbox-custom cursor-pointer"
+          />
+          <label
+            htmlFor={option.value}
+            className="text-[1vw] text-[#1F4B7F] pl-[0.5vw]"
+          >
+            {option.label}
+          </label>
+        </div>
+      ))}
+    </div>
+  )}
+</Field>
+
 
               <ErrorMessage
                 name="module_permissions"

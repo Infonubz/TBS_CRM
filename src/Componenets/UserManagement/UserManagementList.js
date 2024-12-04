@@ -348,6 +348,8 @@ export default function Discounts() {
   const handleOperatorPageChange = (pageNumber) => {
     setOperatorActivePage(pageNumber);
   };
+  console.log(currentOperatorItems?.length,"operatorpage");
+  
   // pagination for Employee
   const [EmployeeActivePage, setEmployeeActivePage] = useState(1);
   const employeeItemsPerPage = 10;
@@ -473,17 +475,47 @@ export default function Discounts() {
     if (adminUser == "super_admin" && get_operator_list?.length > 10) {
       // console.log(currentOperatorItems?.length,"jajajajajajajajajaj") 
       setShowPage(true);
+      if(currentOperatorItems?.length == 0 ){
+        setOperatorActivePage(OperatorActivePage - 1)
+      }
     } else if (adminUser == "partner" && get_partner_list?.length > 10) {
       setShowPage(true);
+      // if(currentPartnerItems?.length == 0){
+      //   setPartnerActivePage(PartnerActivePage - 1)
+      // }
     } else if (adminUser == "client" && get_all_client?.length > 10) {
       setShowPage(true);
+      // if(currentClientItems?.length == 0){
+      //   setClientActivePage(ClientActivePage - 1)
+      // }
     } else if (adminUser == "employee" && get_employee_list?.length > 10) {
       setShowPage(true);
+      // if(currentEmployeeItems?.length == 0){
+      //   setEmployeeActivePage(EmployeeActivePage - 1)
+      // }
     } 
     else{
       setShowPage(false)
     }
   }, [adminUser, currentOperatorItems, currentPartnerItems, currentClientItems, currentEmployeeItems]); // Add these items to the dependencies
+
+  useEffect(()=>{
+    if(currentOperatorItems?.length == 0 ){
+      setOperatorActivePage(OperatorActivePage - 1)
+    }
+    else if(currentPartnerItems?.length == 0){
+      setPartnerActivePage(PartnerActivePage - 1)
+    }
+    else if(currentClientItems?.length == 0){
+      setClientActivePage(ClientActivePage - 1)
+    }
+   else if(currentEmployeeItems?.length == 0){
+      setEmployeeActivePage(EmployeeActivePage - 1)
+    }
+
+  },[currentOperatorItems,currentPartnerItems,currentClientItems,currentEmployeeItems])
+  // console.log(OperatorActivePage,"operatoractivepafe");
+  
   return (
     <>
       <Spin size="large" spinning={loading} fullscreen />
@@ -594,7 +626,7 @@ export default function Discounts() {
                         </p>
                       </div>
                     )}
-                    <div
+                    {user?.startsWith("tbs-pro") && (  <div
                       className={` cursor-pointer ${adminUser == "partner"
                         ? "border-b-[0.25vw] font-bold border-[#1f487c]"
                         : ""
@@ -604,7 +636,8 @@ export default function Discounts() {
                       <div className="text-[1.3vw] text-[#1f487c] text-center">
                         Partner
                       </div>
-                    </div>
+                    </div>)}
+                  
                     {user?.startsWith("tbs-pro") && (
                       <div
                         className={` cursor-pointer ${adminUser == "client"
@@ -631,7 +664,7 @@ export default function Discounts() {
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-x-[1vw] h-full ">
+                <div className="flex items-center gap-x-[1vw] h-[5vh] ">
                   <ExportButton
                     dataArray={
                       adminUser == "employee"
@@ -803,6 +836,7 @@ export default function Discounts() {
                   />
                 ) : (
                   <TableList
+                    //  currentData={ currentOperatorItems?.length == 0 ? get_operator_list : currentOperatorItems}
                     currentData={currentOperatorItems}
                     SetSPAID={SetSPAID}
                     SPA_ID={SPA_ID}

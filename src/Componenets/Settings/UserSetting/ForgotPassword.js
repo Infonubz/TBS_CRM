@@ -13,6 +13,7 @@ import {
   EditUserSettings,
   UpdateEditUserSettings,
 } from "../../../Api/Settings/UserSettings/EditProfile";
+import { Spin } from "antd";
 
 const validationSchema = Yup.object().shape({
   email_id: Yup.string()
@@ -37,6 +38,21 @@ const validationFullSchema = Yup.object().shape({
     .required("Please confirm your password"),
 });
 const ForgotPassword = () => {
+
+  const userType = sessionStorage.getItem('type_name');
+  const typeId = sessionStorage.getItem("type_id") ? sessionStorage.getItem("type_id") : localStorage.getItem("type_id");
+  const userID = sessionStorage.getItem("USER_ID")
+
+  const loginMap = {
+    'PRO101': 'product_owner',
+    'OP101': 'operators',
+    'PROEMP101': 'pro-emp-personal-details',
+    'OPEMP101': 'emp-personal-details',
+    'PART101': 'partner_details'
+  };
+  
+  const Login = loginMap[typeId] || '';
+  
   const [otpEnabled, setOtpEnabled] = useState(false);
   const [otpDigits, setOtpDigits] = useState(["", "", "", "", "", ""]);
   const [showPassword, setShowPassword] = useState(false);
@@ -45,17 +61,22 @@ const ForgotPassword = () => {
   const [emailid, setEmailId] = useState({
     email_id: "",
   });
+  const [spinning, setSpinning] = useState(false);
+
+
   const handleSendOTP = async (values) => {
     console.log(values, "values emailid");
     try {
+      setSpinning(true)
       const otpMail = values.email_id;
       setEmailId({ email_id: otpMail });
-      const response = await SendOTP(otpMail);
+      const response = await SendOTP(otpMail, setSpinning);
       console.log(response, "-----response emailid");
       // toast.success(response?.data?.message);
       console.log(response.data.otp, "this is otp my");
       SetOtpVerification(response?.data?.otp);
       setOtpEnabled(true);
+     
     } catch (error) {
       console.error("Error sending OTP", error);
     }
@@ -80,20 +101,23 @@ const ForgotPassword = () => {
   useEffect(() => {
     const id = sessionStorage.getItem("USER_ID");
     console.log(id, "session id");
-    EditUserSettings(id, dispatch);
+    EditUserSettings(id, dispatch, Login);
   }, []);
   // const pass = sessionStorage.getItem("password");
   const pass = sessionStorage.getItem("password");
   console.log(pass, "password");
 
+
   const handleSubmit = async (values) => {
     if (otpDigits.join("") == otpVerification.toString()) {
       if (values.newPassword !== pass) {
         try {
-          const response = await ResetPassword(values);
-          setTimeout(() => {
-            setOtpEnabled(false);
-          }, 2000);
+          setSpinning(true)
+          const response = await ResetPassword(values ,setSpinning);
+          // setTimeout(() => {
+          //   setOtpEnabled(false); 
+          // }, 2000);
+          setOtpEnabled(false);
           sessionStorage.setItem("password", values.newPassword);
 
           // console.log("i am true");
@@ -122,7 +146,8 @@ const ForgotPassword = () => {
     <div className="  h-full py-[2vw] flex justify-center ">
       <Formik
         initialValues={{
-          email_id: getUserSettingsEdit.email_id,
+          email_id: getUserSettingsEdit?.email_id ? getUserSettingsEdit?.email_id : getUserSettingsEdit?.emailid?getUserSettingsEdit?.emailid : getUserSettingsEdit[0]?.emailid
+          ,
           otp: "",
           newPassword: "",
           confirm: "",
@@ -130,19 +155,33 @@ const ForgotPassword = () => {
         validationSchema={() => {
           return !otpEnabled ? validationSchema : validationFullSchema;
         }}
-        onSubmit={(values, { setSubmitting }) => {
+        onSubmit={(values, { setSubmitting, resetForm }) => {
           if (!otpEnabled) {
             handleSendOTP(values);
           } else {
             values.otp = otpDigits.join("");
             handleSubmit(values);
           }
+          resetForm({
+            values: {
+              ...values,
+              newPassword: "", // explicitly reset these fields
+              confirm: "",     // explicitly reset these fields
+            }
+          });
         }}
         enableReinitialize
       >
         {({ isSubmitting, setFieldValue }) => (
           <Form>
+           
             <div className="gap-y-[1.5vw] flex-col flex pt-[1vw]">
+            {spinning ? (
+              <div className="h-[10vw]  flex justify-center items-center ">
+                <Spin size="large" />
+              </div>
+            ) : (
+              <>
               {otpEnabled ? (
                 <>
                   <div className="relative col-span-1">
@@ -190,7 +229,7 @@ const ForgotPassword = () => {
                         name="newPassword"
                         placeholder="Enter New Password"
                         autoFocus={false}
-                        className="placeholder-[#1F487C] border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-xl outline-none px-[1vw]"
+                        className="placeholder-[#1F487C] border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[.5vw] outline-none px-[1vw]"
                       />
                       <div
                         className="absolute right-[1vw] cursor-pointer"
@@ -217,16 +256,17 @@ const ForgotPassword = () => {
                         name="confirm"
                         placeholder="Enter Confirm Password"
                         autoFocus={false}
-                        className="placeholder-[#1F487C] border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-xl outline-none px-[1vw]"
+                        className="placeholder-[#1F487C] border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[.5vw] outline-none px-[1vw]"
                       />
                       <div
                         className="absolute right-[1vw] cursor-pointer"
                         onClick={toggleConfirmPassword}
                       >
                         {showConfirmPassword ? (
-                          <FaEye className="text-[1.5vw] text-[#1F487C]" />
+                             <FaEyeSlash className="text-[1.5vw] text-[#1F487C]" />
+                        
                         ) : (
-                          <FaEyeSlash className="text-[1.5vw] text-[#1F487C]" />
+                          <FaEye className="text-[1.5vw] text-[#1F487C]" />
                         )}
                       </div>
                     </div>
@@ -271,9 +311,9 @@ const ForgotPassword = () => {
                         type="text"
                         name="email_id"
                         placeholder="Enter Email Address"
-                        // value={getUserSettingsEdit.email_id}
+                        value={getUserSettingsEdit.email_id}
                         readOnly
-                        className="placeholder-[#1F487C] border-r-[0.3vw] cursor-not-allowed mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[25vw] rounded-xl outline-none px-[1vw]"
+                        className="placeholder-[#1F487C] border-r-[0.3vw] cursor-not-allowed mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[25vw] rounded-[.5vw] outline-none px-[1vw]"
                       />
                       <ErrorMessage
                         name="email_id"
@@ -293,6 +333,7 @@ const ForgotPassword = () => {
                   </div>
                 </>
               )}
+              </>)}
             </div>
           </Form>
         )}

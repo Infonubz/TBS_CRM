@@ -11,6 +11,9 @@ const api = axios.create({
   },
 });
 
+const user = sessionStorage.getItem("USER_ID");
+
+
 
 export const GetOperatorData = async (dispatch) => {
   try {
@@ -333,7 +336,7 @@ export const SubmitGSTData = async (documentsdata, operatorID, setSuperAdminGSTD
   const formData = new FormData();
   formData.append(
     "aggregate_turnover_exceeded",
-    documentsdata.ctc == "1" || 1 ? "true" : "false"
+    documentsdata.ctc == 1 ? true : false
   );
   formData.append("state_name", documentsdata.state);
   formData.append("state_code_number", documentsdata.state_code);

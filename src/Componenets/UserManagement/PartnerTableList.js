@@ -210,10 +210,7 @@ const PartnerTableList = ({
                   : row.partner_status_id == 3
                     ? "bg-[#FD3434]"
                     : "bg-[#2A99FF] cursor-not-allowed"
-                } ${row.partner_status_id == 0
-                  ? "cursor-not-allowed"
-                  : "cursor-pointer"
-                } h-[1.8vw] text-[1.1vw] text-white w-[8vw] rounded-[0.5vw]`}
+                }  h-[1.8vw] text-[1.1vw] text-white w-[8vw] rounded-[0.5vw]`}
               onClick={() => {
                 if (row.partner_status_id === 2 ||row.partner_status_id === 3 ) {
                   setViewModal(true);

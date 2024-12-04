@@ -25,13 +25,13 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
   const columns = [
     {
       title: (
-        <div className="flex font-bold text-[1.2vw]">S.No</div>
+        <div className="flex font-bold justify-center text-[1.2vw]">S.No</div>
       ),
       width: "5vw",
       render: (row, rowdta, index) => {
         const pageNo = (activePage - 1) * itemsPerPage + index + 1
         return (
-          <div className="text-[#1F4B7F] ">
+          <div className="text-[#1F4B7F] flex justify-center text-[1.1vw] ">
             <h1 className="pl-[1vw]">{pageNo}</h1>
           </div>
         );
@@ -39,7 +39,7 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
     },
     {
       title: (
-        <div className="flex  items-center font-bold text-[1.2vw]">
+        <div className="flex justify-center  items-center font-bold text-[1.2vw]">
           Photo
         </div>
       ),
@@ -59,7 +59,7 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
           }`;
         console.log(row?.deleted_data?.operator?.profileimg, "imageimage");
         return (
-          <div className="flex  items-center">
+          <div className="flex justify-center  items-center">
             <img
               src={`${apiImgUrl}${selectedTab === 5
                   ? row?.deleted_data?.operator?.profileimg
@@ -83,7 +83,7 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
     },
     {
       title: (
-        <div className="flex items-center  font-bold text-[1.2vw]">
+        <div className="flex items-center justify-center  font-bold text-[1.2vw]">
           {" "}
           Name
         </div>
@@ -118,8 +118,8 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
       },
       width: "12vw",
       render: (row) => (
-        <div className="flex items-center">
-          <p className="text-[1vw] text-[#1F4B7F] font-semibold ">{`${selectedTab === 5
+        <div className="flex justify-center items-center">
+          <p className="text-[1.1vw] text-[#1F4B7F] font-semibold ">{`${selectedTab === 5
               ? row?.deleted_data?.operator?.company_name
               : selectedTab === 7
                 ? row?.deleted_data?.clientCompanyDetails?.company_name
@@ -131,7 +131,7 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
                       ? row.deleted_data?.empPersonal?.emp_first_name
                       : ""
             }`}</p>
-          <p className="text-[1vw] text-[#1F4B7F] pl-[.4vw] font-semibold ">{`${
+          <p className="text-[1.1vw] text-[#1F4B7F] pl-[.4vw] font-semibold ">{`${
             // selectedTab === 5
             //   ? row?.deleted_data?.partnerDetails?.partner_first_name 
             selectedTab === 8
@@ -146,7 +146,7 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
 
     {
       title: (
-        <div className="flex items-center  font-bold text-[1.2vw]">
+        <div className="flex items-center justify-center  font-bold text-[1.2vw]">
           Mobile
         </div>
       ),
@@ -186,8 +186,8 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
       width: "10vw",
       render: (text, row) => {
         return (
-          <div className="flex items-center text-[#1F4B7F] ">
-            <p className="text-[1vw]">
+          <div className="flex items-center justify-center text-[#1F4B7F] ">
+            <p className="text-[1.1vw]">
               {selectedTab === 5
                 ? row?.deleted_data?.operator?.phone
                 : selectedTab === 7
@@ -207,7 +207,7 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
 
     {
       title: (
-        <div className="flex items-center  font-bold text-[1.2vw]">
+        <div className="flex items-center justify-center font-bold text-[1.2vw]">
           Email
         </div>
       ),
@@ -264,8 +264,8 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
       width: "15vw",
       render: (row) => {
         return (
-          <div className="flex items-center text-[#1F4B7F] ">
-            <p className="text-[1vw]">
+          <div className="flex items-center justify-center text-[#1F4B7F] ">
+            <p className="text-[1.1vw]">
               {selectedTab === 5
                 ? row.deleted_data?.operator?.emailid
                 : selectedTab === 7
@@ -285,7 +285,7 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
 
     {
       title: (
-        <div className="flex items-center  font-bold text-[1.2vw]">
+        <div className="flex items-center justify-center font-bold text-[1.2vw]">
           Deleted Date
         </div>
       ),
@@ -295,8 +295,8 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
       width: "10vw",
       render: (row) => {
         return (
-          <div className="flex  items-center text-[#1F4B7F] ">
-            <p className="text-[1vw]">
+          <div className="flex justify-center items-center text-[#1F4B7F] ">
+            <p className="text-[1.1vw]">
               {dayjs(row.deleted_date).format("DD MMM, YY")}
             </p>
           </div>
@@ -317,35 +317,49 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
               className={`cursor-not-allowed ${(() => {
                 if (selectedTab === 5) {
                   return row.deleted_data?.operator?.user_status_id == 0
-                    ? "bg-[#FF6B00]"
+                    ? "bg-[#646262]"
                     : row.deleted_data?.operator?.user_status_id == 1
+                      ? "bg-[#FF6B00]"
+                       : row.deleted_data?.operator?.user_status_id == 2
                       ? "bg-[#38ac2c]"
-                      : "bg-[#FD3434] cursor-not-allowed";
+                         : row.deleted_data?.operator?.user_status_id == 3
+                      ? "bg-[#FD3434]"
+                      : "bg-[#2A99FF] cursor-not-allowed";
                 } else if (selectedTab === 7) {
                   return row.deleted_data?.clientCompanyDetails?.status_id == 0
-                    ? "bg-[#FF6B00]"
+                    ? "bg-[#646262]"
                     : row.deleted_data?.clientCompanyDetails?.status_id == 1
                       ? "bg-[#38ac2c]"
-                      : "bg-[#FD3434] cursor-not-allowed";
+                      : row.deleted_data?.clientCompanyDetails?.status_id == 2
+                      ? "bg-[#FD3434]"
+                      : "bg-[#2A99FF] cursor-not-allowed";
                 } else if (selectedTab === 9) {
                   return row.deleted_data?.partnerDetails?.partner_status_id ==
                     0
-                    ? "bg-[#FF6B00]"
+                    ? "bg-[#646262]"
                     : row.deleted_data?.partnerDetails?.partner_status_id == 1
+                      ? "bg-[#FF6B00]"
+                       : row.deleted_data?.partnerDetails?.partner_status_id == 2
                       ? "bg-[#38ac2c]"
-                      : "bg-[#FD3434] cursor-not-allowed";
+                       : row.deleted_data?.partnerDetails?.partner_status_id == 3
+                      ? "bg-[#FD3434]"
+                      : "bg-[#2A99FF]  cursor-not-allowed";
                 } else if (selectedTab === 8) {
                   return row.deleted_data?.empPersonal?.emp_status_id == 0
-                    ? "bg-[#FF6B00]"
+                    ? "bg-[#646262]"
                     : row.deleted_data?.empPersonal?.emp_status_id == 1
                       ? "bg-[#38ac2c]"
-                      : "bg-[#FD3434] cursor-not-allowed";
+                      : row.deleted_data?.empPersonal?.emp_status_id == 2
+                      ? "bg-[#FD3434]"
+                      : "bg-[#2A99FF] cursor-not-allowed";
                 } else if (selectedTab === 6) {
                   return row.deleted_data?.empPersonal?.emp_status_id == 0
-                    ? "bg-[#FF6B00]"
+                    ? "bg-[#646262]"
                     : row.deleted_data?.empPersonal?.emp_status_id == 1
                       ? "bg-[#38ac2c]"
-                      : "bg-[#FD3434] cursor-not-allowed";
+                      : row.deleted_data?.empPersonal?.emp_status_id == 2
+                      ? "bg-[#FD3434]"
+                      : "bg-[#2A99FF] cursor-not-allowed";
                 } else {
                   return "bg-[#FF6B00] cursor-not-allowed";
                 }

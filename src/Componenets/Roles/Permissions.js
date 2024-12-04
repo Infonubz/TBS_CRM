@@ -53,10 +53,10 @@ export default function Permission({
     ? storedCrudPermissions.split(",")
     : [];
 
-  const showCreateIcon = crudPermissions.includes("create");
+ // const showCreateIcon = crudPermissions.includes("create");
   const showEditIcon = crudPermissions.includes("update");
   const showDeleteIcon = crudPermissions.includes("delete");
-  const showViewIcon = crudPermissions.includes("view");
+ // const showViewIcon = crudPermissions.includes("view");
 
   const type =  type_id === "PRO101" || type_id === "OP101";
 
@@ -101,60 +101,59 @@ export default function Permission({
     //     );
     //   },
     // },
-    {
-      title: <span className="text-[1.1vw] font-bold pl-[2vw]">User</span>,
-      render: (row) => {
-        return (
-          <span className="flex">
-            <h1 className="text-[1vw] pl-[2vw]">{capitalizeFirstLetter(row?.user ==="operator" || row?.user ==="Operator" ? "Operator Employee" : "Product Owner Employee")}</h1>
-          </span>
-        );
-      },
-      className: viewMode === "Operator" ? "hidden" : "",
-    },
+    // {
+    //   title: <span className="text-[1.1vw] font-bold pl-[2vw]">User</span>,
+    //   render: (row) => {
+    //     return (
+    //       <span className="flex">
+    //         <h1 className="text-[1vw] pl-[2vw]">{capitalizeFirstLetter(row?.user ==="operator" || row?.user ==="Operator" ? "Operator Employee" : "Product Owner Employee")}</h1>
+    //       </span>
+    //     );
+    //   },
+    //   className: viewMode === "Operator" ? "hidden" : "",
+    // },
     // Role column
     {
-      title: <span className="text-[1.1vw] font-bold">Role</span>,
+      title: <span className="text-[1.2vw] font-bold text-[#1F487C] pl-[2.5vw]">Role</span>,
       render: (row) => {
         return (
-          <span className="flex">
-            <h1 className="text-[1vw]">{row?.role_type}</h1>
+          <span className="flex items-center pl-[2.5vw]">
+            <h1 className="text-[1.1vw] text-[#1F487C]">{capitalizeFirstLetter(row?.role_type)}</h1>
           </span>
         );
       },
       // Conditionally set `className` to hide/show based on `viewMode`
       className: viewMode === "product" ? "hidden" : "",
     },
-    // Permission column
     {
-      title: <span className="text-[1.1vw] font-bold">Permission</span>,
+      title: <span className="text-[1.2vw] font-bold text-[#1F487C] pl-[2.5vw]">Permission</span>,
       render: (row) => {
         const permissions = row.crud_permissions || [];
         const icons = {
           view: (
             <Tooltip className="cursor-pointer" color="#1F487C" title="View">
-              <LuEye size={"1.5vw"} key="view" />
+              <LuEye size={"1.5vw"} key="view" color="#1F487C" />
             </Tooltip>
           ),
           create: (
             <Tooltip className="cursor-pointer" color="#1F487C" title="Create">
-              <HiOutlineDocumentPlus size={"1.4vw"} key="create" />
+              <HiOutlineDocumentPlus size={"1.4vw"} key="create" color="#1F487C" />
             </Tooltip>
           ),
           update: (
             <Tooltip className="cursor-pointer" color="#1F487C" title="Update">
-              <FiEdit size={"1.2vw"} key="update" />
+              <FiEdit size={"1.2vw"} key="update" color="#1F487C" />
             </Tooltip>
           ),
           delete: (
             <Tooltip className="cursor-pointer" color="#1F487C" title="Delete">
-              <RiDeleteBin6Line size={"1.3vw"} key="delete" />
+              <RiDeleteBin6Line size={"1.3vw"} key="delete" color="#1F487C" />
             </Tooltip>
           ),
         };
 
         return (
-          <span className="flex gap-6">
+          <span className="flex gap-6 items-center pl-[2.5vw]">
             {permissions.includes("view") && icons.view}
             {permissions.includes("create") && icons.create}
             {permissions.includes("update") && icons.update}
@@ -164,7 +163,9 @@ export default function Permission({
       },
     },
     {
-      title: <span className="text-[1.1vw] font-bold">Module Permission</span>,
+      title: <span className="text-[1.2vw] font-bold text-[#1F487C] pl-[2.5vw]">Module Permission</span>,
+      width:"22vw",
+      className: filter === "OP" ? "hidden" : "",
       render: (row) => {
         const modulePermissions = Array.isArray(row?.module_permissions)
           ? row.module_permissions
@@ -175,53 +176,55 @@ export default function Permission({
         const moduleName = moduleNames.join(", ");
     
         return (
-          <div className="flex items-center">
-            {moduleName.length > 20 ? (
-              <Tooltip
-                placement="bottom"
-                title={moduleName}
-                className="cursor-pointer"
-                color="#1F487C"
-              >
-                <h1 className="text-[1.1vw]">{`${moduleName.slice(0, 20)}...`}</h1>
-              </Tooltip>
-            ) : (
-              <h1 className="text-[1.1vw]">{moduleName}</h1>
-            )}
-          </div>
+              <div className="flex items-center pl-4">
+              {moduleName?.length > 30 ? (
+                <Tooltip
+                color="#1f4b7f"
+                  placement="top"
+                  title={moduleName}
+                  className="cursor-pointer"
+                >
+                  <div className="text-[1.1vw] pl-8 text-center text-[#1f4b7f]">
+                    {" "}
+                    {`${moduleName?.slice(0, 30)}...`}
+                  </div>
+                </Tooltip>
+              ) : (
+                <div className="text-[1.1vw] pl-8 text-center text-[#1f4b7f]">
+                  {moduleName?.slice(0, 30)}
+                </div>
+              )}
+            </div>
+           
         );
       },
     },
-    
-    // Created column
     {
-      title: <span className="text-[1.1vw] font-bold">Created</span>,
+      title: <span className="text-[1.2vw] font-bold text-[#1F487C] pl-[2.5vw]">Created</span>,
       render: (row) => {
         return (
-          <span className="flex">
-            <h1 className="text-[1vw]">{`${dayjs(row?.created_date).format(
+          <span className="flex items-center pl-[2.5vw]">
+            <h1 className="text-[1.1vw] text-[#1F487C]">{`${dayjs(row?.created_date).format(
               "DD MMM YY - hh:mm a"
             )}`}</h1>
           </span>
         );
       },
     },
-    // Updated column
     {
-      title: <span className="text-[1.1vw] font-bold">Updated</span>,
+      title: <span className="text-[1.2vw] font-bold text-[#1F487C] pl-[2.5vw]">Updated</span>,
       render: (row) => {
         return (
-          <span>
-            <h1 className="text-[1vw]">{`${dayjs(row?.updated_date).format(
+          <span className="flex items-center pl-[2.5vw]">
+            <h1 className="text-[1.1vw] text-[#1F487C]">{`${dayjs(row?.updated_date).format(
               "DD MMM YY - hh:mm a"
             )}`}</h1>
           </span>
         );
       },
     },
-    // Actions column
     {
-      title: <span className="text-[1.1vw] font-bold">Actions</span>,
+      title: <span className="text-[1.2vw] font-bold text-[#1F487C] pl-[2.5vw]">Actions</span>,
       render: (row) => {
         const handleDelete = () => {
           setDeleteModalIsOpen(true);
@@ -233,7 +236,7 @@ export default function Permission({
        }
         };
         return (
-          <span className="action-icons flex gap-2">
+          <span className="flex items-center pl-[2.5vw]">
            {(showEditIcon || type) && (
             <MdModeEdit
               className="h-[1.8vw] w-[1.8vw] cursor-pointer"
@@ -281,6 +284,11 @@ export default function Permission({
     permissionData(filter);
   }, [filter]);
 
+ useEffect(() =>{
+if(currentItems?.length === 0){
+  setActivePage(activePage-1);
+}
+ },[currentItems])
 
   return (
     <>
@@ -289,14 +297,15 @@ export default function Permission({
           columns={permissionColumns}
           dataSource={currentItems}
           size="middle"
+          className="pb-[1vw]"
           pagination={false}
           rowClassName={(record, index) =>
             index % 2 === 1 ? "bg-white" : "bg-[#1F487C]/[10%]"
           }
         />
         {getpermissionlist?.length > 3 ? (
-        <div className="w-full h-[8vh] px-[1vw] flex justify-between items-center">
-          <div className="text-[#1f4b7f]  flex text-[1.1vw] gap-[0.5vw]">
+        <div className={`w-full h-[7vh] px-[1vw] flex justify-between items-center`}>
+          <div className={`text-[#1f4b7f] flex text-[1vw] gap-[0.5vw]`}>
             <span>Showing</span>
             <span className="font-bold">{currentItems && currentItems?.length > 0
               ? <div>{indexOfFirstItem + 1} - {indexOfFirstItem + currentItems?.length}</div> : '0'}</span>
@@ -343,7 +352,8 @@ export default function Permission({
               /> */}
           </div>
         </div>
-        ) : ""}
+      ) : ""}
+
         <ModalPopup
           show={deletemodalIsOpen}
           onClose={closeDeleteModal}

@@ -36,6 +36,7 @@ const EmployeeTableList = ({
   const [sortedInfo, setSortedInfo] = useState({});
   const [viewmodal, setViewModal] = useState(false);
   const [userName, setUserName] = useState("")
+  const typeId = sessionStorage.getItem("type_id");
 
   const handleChange = (pagination, filters, sorter) => {
     console.log("Various parameters", pagination, filters, sorter);
@@ -88,7 +89,7 @@ const EmployeeTableList = ({
       render: (text, row) => {
         return (
           <div className="flex items-center justify-center">
-            <p className="text-[1.1vw] text-[#1F4B7F]">{user?.startsWith("tbs-pro") ? row.tbs_pro_emp_id : row.tbs_pro_emp_id}</p>
+            <p className="text-[1.1vw] text-[#1F4B7F]">{user?.startsWith("tbs-pro") ? row.tbs_pro_emp_id : row.tbs_op_emp_id}</p>
           </div>
         );
       },
@@ -215,7 +216,7 @@ const EmployeeTableList = ({
           <div className="flex items-center justify-center">
             <button
               className={`${row.emp_status_id == 0
-                  ? "bg-[#FF6B00]"
+                  ? "bg-[#646262]"
                   : row.emp_status_id == 1
                     ? "bg-[#38ac2c]"
                     : row.emp_status_id == 2

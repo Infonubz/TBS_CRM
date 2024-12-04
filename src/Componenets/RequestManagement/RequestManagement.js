@@ -591,6 +591,25 @@ const partnerIndexOfFirtsItem = partnerIndexOfLastItem - partnerItemsPerPage
     SetPromoFilter("All")
   },[showtable])
 
+  useEffect(()=>{
+    if(currentItems?.length == 0 && activePage > 1 ){
+      setActivePage(activePage -1)
+    }
+   else if(partnerCurrentItems?.length == 0 && partnerActivePage > 1 ){
+      setPartnerActivePage(partnerActivePage -1)
+    }
+   else if(promocurrentItems?.length == 0 && promoactivePage > 1 ){
+      setPromoActivePage(promoactivePage -1)
+    }
+    else if(adscurrentItems?.length == 0 && adsactivePage > 1 ){
+      setAdsActivePage(adsactivePage -1)
+    }
+    else if(offerCurrentItems?.length == 0 && offerActivePage > 1 ){
+      setOfferActivePage(offerActivePage -1)
+    }
+
+  },[currentItems,partnerCurrentItems,promocurrentItems,adscurrentItems,offerCurrentItems])
+
   return (
     <>
       <div

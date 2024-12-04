@@ -31,6 +31,8 @@ import PartnerLoginPage from "./Componenets/LoginPage/Partner";
 import OperatorEmployeeLoginPage from "./Componenets/LoginPage/OperatorEmployee";
 // import dotenv from 'dotenv';
 // dotenv.config();
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 function App() {
   // const [authtoken, setAuthtoken] = useState(sessionStorage.getItem("token"));

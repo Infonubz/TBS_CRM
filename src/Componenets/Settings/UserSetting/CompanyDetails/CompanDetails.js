@@ -14,7 +14,7 @@ const CompanDetails = ({ operatorData, selectedFile }) => {
   const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const apiurl = process.env.REACT_APP_API_URL;
 
-  console.log(apiImgUrl,selectedFile,'selectZ_file')
+  console.log(apiImgUrl, selectedFile, 'selectZ_file')
 
   const [switchTab, setSwitchTab] = useState('companyProfile')
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -23,6 +23,7 @@ const CompanDetails = ({ operatorData, selectedFile }) => {
   const [fileList, setFileList] = useState([]);
   const [profileImage, setProfileImage] = useState(false)
   const [enableUpload, setEnableUpload] = useState(false)
+  const [isEdit, setIsEdit] = useState(false)
 
   console.log(selectedFile, 'testing_subjectF')
 
@@ -137,7 +138,7 @@ const CompanDetails = ({ operatorData, selectedFile }) => {
                     fileList={fileList}
                     onChange={handleChange}
                     onPreview={handlePreview}
-                    disabled={enableUpload}
+                    disabled={isEdit === false}
                     accept=".png, .jpg, .jpeg"
                     size="large"
                   >
@@ -174,7 +175,7 @@ const CompanDetails = ({ operatorData, selectedFile }) => {
             {switchTab == 'companyProfile' ?
               <CompanyProfile
                 operatorData={operatorData}
-                fileList={fileList} /> : switchTab == 'BusinessDetails' ? <BusinessDetails operatorData={operatorData} /> : switchTab == 'AddressDetails' ? <AddressDetails operatorData={operatorData} /> : switchTab == 'Documents' ? <Documents operatorData={operatorData} /> : ''}
+                fileList={fileList} isEdit={isEdit} setIsEdit={setIsEdit} /> : switchTab == 'BusinessDetails' ? <BusinessDetails operatorData={operatorData} /> : switchTab == 'AddressDetails' ? <AddressDetails operatorData={operatorData} /> : switchTab == 'Documents' ? <Documents operatorData={operatorData} /> : ''}
           </div>
         </div>
       </div>

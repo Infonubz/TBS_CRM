@@ -989,6 +989,7 @@ export default function Advertisement() {
 
 
 
+console.log(getadlist,"listofads");
 
 
   const togglePopover = (adId) => {
@@ -1517,7 +1518,7 @@ export default function Advertisement() {
   const mobileAds =
     getMobileadlist?.length > 0 &&
     getMobileadlist?.slice(indexOfFirst, indexOfLast);
-  console.log(mobileAds, 'mobileads')
+  console.log(getadlist, 'mobileads')
 
   // const AdsList = tabType === "Web" ? currentItems : mobileAds;
   // const columns = tabType === "Web" ? webColumns : mobileColumns;
@@ -1537,6 +1538,20 @@ export default function Advertisement() {
       setMble_ActivePage(pageNumber);
     }
   };
+
+  useEffect(()=>{
+    if(tabType == "Web")  {
+    if(currentItems?.length == 0){
+      setActivePage(activePage-1)
+    }
+  }
+  else{
+    if(mobileAds?.length == 0){
+      setMble_ActivePage(mble_activePage - 1)
+    }
+  }
+
+  },[currentItems,mobileAds])
 
   return (
     <>
@@ -1579,7 +1594,7 @@ export default function Advertisement() {
                 <div className="relative flex items-center">
                   <input
                     type="text"
-                    className="bg-white outline-none pl-[2vw] w-[17.25vw] h-[5vh] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.3vw] border-b-[0.3vw]"
+                    className="bg-white outline-none pl-[2vw] w-[17.25vw] h-[5vh] text-[#1F4B7F] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.3vw] border-b-[0.3vw]"
                     placeholder="Search Ads"
                     onChange={(e) => {
                       Search(e);

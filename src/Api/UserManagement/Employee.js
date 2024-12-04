@@ -9,12 +9,13 @@ const api = axios.create({
 });
 
 const apiUrl = process.env.REACT_APP_API_URL;
+const typeId = sessionStorage.getItem("type_id");
 
 const user = sessionStorage.getItem("USER_ID");
 export const GetEmployeeData = async (dispatch) => {
   const endpoint = user?.startsWith("tbs-pro")
     ? `${apiUrl}/pro-All-emp-details`
-    : `${apiUrl}/All-emp-details`;
+    : `${apiUrl}/All-emp-details/${user}`;
 
   try {
     const response = await api.get(endpoint);
@@ -30,9 +31,9 @@ export const GetEmployeeData = async (dispatch) => {
 export const handleEmployeeSearch = async (e, dispatch) => {
   try {
     if (e.target.value) {
-      const response = await api.get(
-        `${apiUrl}/proemp-search/${e.target.value}`
-      );
+      const response = user?.startsWith("tbs-pro") ? await api.get(
+        `${apiUrl}/proemp-search/${e.target.value}`) : await api.get(
+          `${apiUrl}/employee-search/${user}/${e.target.value}`)
       dispatch({ type: GET_EMPLOYEE_LIST, payload: response.data });
       return response.data[0];
     } else {
@@ -79,6 +80,8 @@ export const EmployeeStatusUpdateApi = async (
   }
 };
 
+
+
 export const submitPersonalData = async (
   personalvalues,
   enable,
@@ -120,7 +123,13 @@ export const submitPersonalData = async (
   if (fileList[0]?.originFileObj) {
     formData.append("profile_img", fileList[0].originFileObj);
   }
-  formData.append("owner_id", sessionStorage.getItem("USER_ID"));
+
+  if(typeId === "PRO101"){
+    formData.append("owner_id", sessionStorage.getItem("USER_ID"));
+  }
+  else{
+    formData.append("tbs_operator_id", sessionStorage.getItem("USER_ID"))
+  }
 
   // Now `formData` is ready to be used
 

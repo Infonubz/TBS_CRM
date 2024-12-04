@@ -35,10 +35,10 @@ const validationSchema = Yup.object().shape({
     select_fields: Yup.string().required("Field selection is required"),
 });
 
-const ImportData = ({ fetchDocuments, closeModal, selectFields }) => {
+const ImportData = ({ fetchDocuments, closeModal, selectFields, selectname }) => {
 
     const { Dragger } = Upload;
-    const [fileName, setFileName] = useState("");
+    const [fileName, setFileName] = useState(selectname);
     const [fileList, setFileList] = useState([]);
     const [formValues, setFormValues] = useState({
         select_fields: selectFields ? selectFields : "",
@@ -284,7 +284,12 @@ const ImportData = ({ fetchDocuments, closeModal, selectFields }) => {
                                                         </div>
                                                     </div>
                                                 </Dragger>
-                                                {fileName && (
+                                                {/* {selectname && (
+                                                    <p className="text-[#1F4B7F] text-[0.8vw] mt-2">
+                                                        {selectname}
+                                                    </p>
+                                                )} */}
+                                                   {fileName && (
                                                     <p className="text-[#1F4B7F] text-[0.8vw] mt-2">
                                                         {fileName}
                                                     </p>

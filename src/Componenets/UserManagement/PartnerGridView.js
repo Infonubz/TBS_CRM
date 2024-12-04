@@ -63,7 +63,7 @@ export default function PartnerGridView({
             )} ${item.partner_last_name}`;
             return (
               <div
-                className={` bg-white h-[16vw] border-[#1f4b7f] border-l-[0.1vw] cursor-pointer border-r-[0.3vw] border-b-[0.3vw] border-t-[0.1vw] rounded-[0.5vw]`}
+                className={` bg-white h-[33.5vh] border-[#1f4b7f] border-l-[0.1vw] cursor-pointer border-r-[0.3vw] border-b-[0.3vw] border-t-[0.1vw] rounded-[0.5vw]`}
                 onMouseEnter={() => setHoverId(item.tbs_partner_id)}
                 onMouseLeave={() => setHoverId("")}
                 style={{
@@ -83,7 +83,7 @@ export default function PartnerGridView({
                         : userimg
                     } `}
                     alt="Profile"
-                    className="h-[5vw] w-[5vw] rounded-[0.5vw]"
+                    className="h-[10vh] w-[5vw] rounded-[0.5vw]"
                   />
                   <div className="text-right pl-[3vw]">
                     <Popover
@@ -143,7 +143,7 @@ export default function PartnerGridView({
                     </Popover>
                   </div>
                 </div>
-                <div className="flex-col flex items-center justify-center gap-y-[0.4vw] pt-[2vw]">
+                <div className="flex-col h-[19vh] flex items-center justify-center gap-y-[0.4vw] pt-[2vw]">
                   {/* <h1 className="font-bold text-[1vw] text-[#1f4b7f]">{capitalizeFirstLetter(item.partner_first_name)}</h1> */}
                   {
                     // Define fullname variable outside JSX

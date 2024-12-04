@@ -238,7 +238,7 @@
 import React, { useEffect, useState } from 'react'
 import { IoIosSearch } from "react-icons/io";
 import { capitalizeFirstLetter } from '../../../Common/Captilization';
-import { Button, Dropdown, Grid, Space, Table } from "antd";
+import { Button, Grid, Space, Table } from "antd";
 import axios from 'axios';
 import dayjs from "dayjs";
 import JSZip from 'jszip';
@@ -250,7 +250,8 @@ import Image_Video from '../../../Common/Download/Image_Video';
 const Documents = () => {
 
   const [selectTab, setSelectTab] = useState()
-  const [documents, setDocuments] = useState([]);
+  const [poEmpDocuments, setPoEmpDocuments] = useState([]);
+  const [opEmpDocuments, setOpEmpDocuments] = useState([]);
   const [partnerDocuments, setPartnerDocuments] = useState([]);
   const [operatorDocuments, setOperatorDocuments] = useState([]);
   const [clientDocuments, setClientDocuments] = useState([])
@@ -260,12 +261,24 @@ const Documents = () => {
   const [discountOffers, setDiscountOffers] = useState([])
   const [redeemOffers, setRedeemOffers] = useState([])
   const [error, setError] = useState(null);
-  const [dropDown, setDropDown] = useState('employee')
+  const [dropDown, setDropDown] = useState('operator')
+  const [folder, setFolder] = useState('usermanagement')
   const apiUrl = process.env.REACT_APP_API_URL;
 
-  console.log(documents, 'documents_documentes')
+  console.log(poEmpDocuments, 'documents_documentes')
 
+  useEffect(() => {
+    setDropDown(
+      folder === 'usermanagement' ? 'operator' :
+        folder === 'offers' ? 'redeemOffer' :
+          folder === 'advertisment' ? 'advertisment' : dropDown === 'promotion' ?
+            'promotion' : ''
+    ); 
+  }, [folder,setFolder]);
 
+  console.log(folder,dropDown,"toggletoggle");
+
+  
   const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const apiurl = process.env.REACT_APP_API_URL;
 
@@ -273,13 +286,11 @@ const Documents = () => {
 
   const user = sessionStorage.getItem("USER_ID");
 
-  const fetchDocuments = async () => {
+  const GetPoEmployeeDocument = async () => {
     try {
-      const URL = user?.startsWith("tbs-pro")
-        ? `${apiUrl}/pro-emp-professional-documents`
-        : `${apiUrl}/emp-professional-documents`;
+      const URL = `${apiUrl}/pro-emp-professional-documents`
       const response = await axios.get(URL);
-      setDocuments(response.data);
+      setPoEmpDocuments(response.data);
       console.log(response, "response documents");
     } catch (error) {
       setError(error.message);
@@ -287,6 +298,17 @@ const Documents = () => {
     }
   };
 
+  const GetOpEmployeeDocument = async () => {
+    try {
+      const URL = `${apiUrl}/emp-professional-documents`;
+      const response = await axios.get(URL);
+      setOpEmpDocuments(response.data);
+      console.log(response, "response documents");
+    } catch (error) {
+      setError(error.message);
+      // setLoading(false);
+    }
+  };
 
   const GetpartnerDocuments = async () => {
     try {
@@ -370,7 +392,8 @@ const Documents = () => {
   }
 
   useEffect(() => {
-    fetchDocuments();
+    GetOpEmployeeDocument()
+    GetPoEmployeeDocument();
     GetpartnerDocuments();
     GetOperatorDocumeents();
     GetAdvertisment();
@@ -381,10 +404,16 @@ const Documents = () => {
     GetMobAdvertisment();
   }, []);
 
-  const toggleDropDown = (section) => {
-    setDropDown(dropDown === section ? null : section);
+  const toggleFolder = (section) => {
+    setFolder(folder === section ? null : section);
   };
 
+  
+
+  const toggleDropDown = (section) => {
+    setSelectItems("")
+    setDropDown(dropDown === section ? null : section);
+  };
 
   const [selectItems, setSelectItems] = useState();
 
@@ -407,7 +436,7 @@ const Documents = () => {
     }
 
     zip.generateAsync({ type: 'blob' }).then(content => {
-      saveAs(content, `${dropDown == 'operator' ? selectItems?.tbs_operator_id : dropDown == 'partner' ? selectItems?.tbs_partner_id : selectItems?.tbs_pro_emp_id}.zip`);
+      saveAs(content, `${dropDown == 'operator' ? selectItems?.tbs_operator_id : dropDown == 'partner' ? selectItems?.tbs_partner_id : dropDown == 'poemployee' ? selectItems?.tbs_pro_emp_id : dropDown == 'opemployee' ? selectItems?.tbs_op_emp_id : selectItems?.tbs_client_id}.zip`);
     });
   };
 
@@ -428,22 +457,41 @@ const Documents = () => {
         `${apiImgUrl}${selectItems?.pan_card_front}`,
         `${apiImgUrl}${selectItems?.pan_card_back}`,
       ];
-    } else if (dropDown == 'employee') {
+    } else if (dropDown == 'opemployee') {
       images = [
         `${apiImgUrl}${selectItems?.aadhar_card_front_doc}`,
         `${apiImgUrl}${selectItems?.aadhar_card_back_doc}`,
         `${apiImgUrl}${selectItems?.pan_card_front_doc}`,
         `${apiImgUrl}${selectItems?.pan_card_back_doc}`,
+        `${apiImgUrl}${selectItems?.qualification_doc}`,
+        `${apiImgUrl}${selectItems?.offer_letter_doc}`,
+      ];
+    }
+    else if (dropDown == 'poemployee') {
+      images = [
+        `${apiImgUrl}${selectItems?.aadhar_card_front_doc}`,
+        `${apiImgUrl}${selectItems?.aadhar_card_back_doc}`,
+        `${apiImgUrl}${selectItems?.pan_card_front_doc}`,
+        `${apiImgUrl}${selectItems?.pan_card_back_doc}`,
+        `${apiImgUrl}${selectItems?.qualification_doc}`,
+        `${apiImgUrl}${selectItems?.offer_letter_doc}`,
 
+      ];
+    }
+    else if (dropDown == 'clientDocuments') {
+      images = [
+        `${apiImgUrl}/${selectItems?.upload_gst}`
       ];
     }
 
     return images;
   };
+  console.log(selectItems,"selecteditems");
+  
 
   const columns = [
     {
-      title: <span className="text-[1.1vw] text-[#1F487C] flex items-center justify-center">{dropDown === 'partner' ? <p>First Name</p> : dropDown === 'operator' ? <p>Owner Name</p> : dropDown === 'employee' ? <p>First Name</p> : <p>Name</p>}</span>,
+      title: <span className="text-[1.1vw] text-[#1F487C] flex items-center justify-center">{dropDown === 'partner' ? <p>First Name</p> : dropDown === 'clientDocuments' ? <p>Owner name</p> : dropDown === 'operator' ? <p>Owner Name</p> : dropDown === 'poemployee' ? <p>First Name</p> : dropDown === 'opemployee' ? <p>First Name</p> : <p>Name</p>}</span>,
       // dataIndex: "name",
       //sorter: (a, b) => a.name.length - b.name.length,
       render: (row) => (
@@ -454,7 +502,7 @@ const Documents = () => {
       width: '10vw'
     },
     {
-      title: <span className="text-[1.1vw]  text-[#1F487C] flex items-center justify-center">{dropDown === 'partner' ? <p>Last Name</p> : dropDown === 'operator' ? <p>Company Name</p> : dropDown === 'employee' ? <p>Last Name</p> : <p>Modified</p>}</span>,
+      title: <span className="text-[1.1vw]  text-[#1F487C] flex items-center justify-center">{dropDown === 'partner' ? <p>Last Name</p> : dropDown === 'operator' ? <p>Company Name</p> : dropDown === 'clientDocuments' ? <p>Company Name</p> : dropDown === 'poemployee' ? <p>Last Name</p> : dropDown === 'opemployee' ? <p>Last Name</p> : <p>Modified</p>}</span>,
       // dataIndex: "name",
       //sorter: (a, b) => a.name.length - b.name.length,
       render: (row) => (
@@ -465,12 +513,12 @@ const Documents = () => {
       width: '10vw'
     },
     {
-      title: <span className="text-[1.1vw]  text-[#1F487C] flex items-center justify-center">{dropDown === 'partner' ? <p>ID</p> : dropDown === 'operator' ? <p>ID</p> : dropDown === 'employee' ? <p>ID</p> : <p>Size</p>}</span>,
+      title: <span className="text-[1.1vw]  text-[#1F487C] flex items-center justify-center">{dropDown === 'partner' ? <p>ID</p> : dropDown === 'clientDocuments' ? <p>ID</p> : dropDown === 'operator' ? <p>ID</p> : dropDown === 'employee' ? <p>ID</p> : <p>Size</p>}</span>,
       // dataIndex: "name",
       //sorter: (a, b) => a.name.length - b.name.length,
       render: (row) => (
         <div className="flex items-center font-normal justify-center">
-          <p className="text-[0.9vw]">{row?.tbs_operator_id ? row?.tbs_operator_id : row?.tbs_partner_id ? row?.tbs_partner_id : row?.tbs_pro_emp_id ? row?.tbs_pro_emp_id : row?.tbs_op_emp_id ? row?.tbs_op_emp_id : row?.image_size ? (row?.image_size / 1024).toFixed(2) + ' KB' : row?.promo_img_details ? (row?.promo_img_details?.background_image?.size / 1024).toFixed(2) + ' KB' : row?.mobad_file_size ? (row?.mobad_file_size / 1024).toFixed(2) + ' KB' : (row?.ad_file_size / 1024).toFixed(2) + ' KB'}</p>
+          <p className="text-[0.9vw]">{row?.tbs_operator_id ? row?.tbs_operator_id : row?.tbs_client_id ? row?.tbs_client_id : row?.tbs_partner_id ? row?.tbs_partner_id : row?.tbs_pro_emp_id ? row?.tbs_pro_emp_id : row?.tbs_op_emp_id ? row?.tbs_op_emp_id : row?.image_size ? (row?.image_size / 1024).toFixed(2) + ' KB' : row?.promo_img_details ? (row?.promo_img_details?.background_image?.size / 1024).toFixed(2) + ' KB' : row?.mobad_file_size ? (row?.mobad_file_size / 1024).toFixed(2) + ' KB' : (row?.ad_file_size / 1024).toFixed(2) + ' KB'}</p>
         </div>
       ),
       width: '10vw'
@@ -482,8 +530,11 @@ const Documents = () => {
 
   useEffect(() => {
     switch (dropDown) {
-      case 'employee':
-        setDataDocuments(documents);
+      case 'poemployee':
+        setDataDocuments(poEmpDocuments);
+        break;
+      case 'opemployee':
+        setDataDocuments(opEmpDocuments);
         break;
       case 'partner':
         setDataDocuments(partnerDocuments);
@@ -513,7 +564,7 @@ const Documents = () => {
         setDataDocuments([]);
         break;
     }
-  }, [dropDown, documents, partnerDocuments, operatorDocuments, clientDocuments, advertisement, promotions, discountOffers, redeemOffers]);
+  }, [dropDown, opEmpDocuments, poEmpDocuments, partnerDocuments, operatorDocuments, clientDocuments, advertisement, promotions, discountOffers, redeemOffers]);
 
 
   const videoUrl = selectItems?.ad_video
@@ -540,6 +591,11 @@ const Documents = () => {
         : selectItems?.offer_img?.filename
           ? selectItems?.offer_img?.filename
           : "Untitled";
+
+
+
+
+
 
   return (
     <>
@@ -570,10 +626,13 @@ const Documents = () => {
 
           {/* ------------------------------------Folders----------------------------------------------- */}
 
-          <div className="p-[1vw] grid grid-cols-5 justify-items-center gap-y-[1vw]">
+          <div className="p-[1vw] grid grid-cols-4 justify-items-center gap-y-[1vw]">
             <div
-              onClick={() => toggleDropDown('employee')}
-              className={`${dropDown === 'employee' ? 'shadow-[#1F487C] shadow-md ' : ''} w-[15vw] h-[10vw] border-[0.2vw] border-[#1F487C] bg-white  rounded-xl border-t-[0.5vw]`}>
+              onClick={() => {
+                toggleFolder('usermanagement')
+                toggleDropDown('')
+              }}
+              className={`${folder === 'usermanagement' ? 'bg-[#1F487C]' : 'bg-white'} w-[15vw] h-[10vw] border-[0.2vw] border-[#1F487C]  rounded-xl border-t-[0.5vw]`}>
               <div className="pl-[1vw] pt-[0.5vw] grid grid-rows-3 gap-y-[1vw]">
                 <div>
                   <svg
@@ -583,21 +642,53 @@ const Documents = () => {
                   >
                     <path
                       d="M448 480H64c-35.3 0-64-28.7-64-64V96C0 60.7 28.7 32 64 32H192c20.1 0 39.1 9.5 51.2 25.6l19.2 25.6c6 8.1 15.5 12.8 25.6 12.8H448c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64zM184 272c-13.3 0-24 10.7-24 24s10.7 24 24 24H328c13.3 0 24-10.7 24-24s-10.7-24-24-24H184z"
-                      fill="#1F487C"
+                      fill={folder === 'usermanagement' ? '#ffffff' : "#1F487C"}
                     />
                   </svg>
                 </div>
-                <div className="text-[1.1vw] text-[#8398B7]">
-                  Employee
+                <div className={`text-[1.1vw] ${folder === 'usermanagement' ? 'text-white' : 'text-[#8398B7]'} `}>
+                  User Management
                 </div>
-                <div className="text-[0.9vw] text-[#1F487C]">
-                  {documents?.length} files
+                <div className={`text-[0.9vw] ${folder === 'usermanagement' ? 'text-white' : 'text-[#1F487C]'}`}>
+                  {(poEmpDocuments?.length || 0) + (opEmpDocuments?.length || 0) + (operatorDocuments?.length || 0) + (partnerDocuments?.length || 0) + (clientDocuments?.length)} files
+                </div>
+              </div>
+            </div>
+
+            <div
+              onClick={() => {
+                toggleFolder('offers')
+                toggleDropDown('')
+              }}
+              className={`${folder === 'offers' ? 'bg-[#1F487C]' : 'bg-white'} w-[15vw] h-[10vw] border-[0.2vw] border-[#1F487C]  rounded-xl border-t-[0.5vw]`}>
+              <div className="pl-[1vw] pt-[0.5vw] grid grid-rows-3 gap-y-[1vw]">
+                <div>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 512 512"
+                    className="w-[1.5vw] h-[1.5vw]"
+                  >
+                    <path
+                      d="M448 480H64c-35.3 0-64-28.7-64-64V96C0 60.7 28.7 32 64 32H192c20.1 0 39.1 9.5 51.2 25.6l19.2 25.6c6 8.1 15.5 12.8 25.6 12.8H448c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64zM184 272c-13.3 0-24 10.7-24 24s10.7 24 24 24H328c13.3 0 24-10.7 24-24s-10.7-24-24-24H184z"
+                      fill={folder === 'offers' ? '#ffffff' : "#1F487C"}
+                    />
+                  </svg>
+                </div>
+                <div className={`text-[1.1vw] ${folder === 'offers' ? 'text-white' : 'text-[#8398B7]'} `}>
+                  Offers
+                </div>
+                <div className={`text-[0.9vw] ${folder === 'offers' ? 'text-white' : 'text-[#1F487C]'}`}>
+                  {(discountOffers?.length || 0) + (redeemOffers?.length || 0)} files
                 </div>
               </div>
             </div>
             <div
-              onClick={() => toggleDropDown('partner')}
-              className={`${dropDown === 'partner' ? 'shadow-[#1F487C] shadow-md ' : ''} w-[15vw] h-[10vw] border-[0.2vw] border-[#1F487C] bg-white  rounded-xl border-t-[0.5vw]`}>
+              onClick={() => {
+                toggleDropDown('promotion')
+                toggleFolder('promotion')
+              }
+              }
+              className={`${dropDown === 'promotion' ? 'bg-[#1F487C]' : 'bg-white'} w-[15vw] h-[10vw] border-[0.2vw] border-[#1F487C]   rounded-xl border-t-[0.5vw]`}>
               <div className="pl-[1vw] pt-[0.5vw] grid grid-rows-3 gap-y-[1vw]">
                 <div>
                   <svg
@@ -607,117 +698,24 @@ const Documents = () => {
                   >
                     <path
                       d="M448 480H64c-35.3 0-64-28.7-64-64V96C0 60.7 28.7 32 64 32H192c20.1 0 39.1 9.5 51.2 25.6l19.2 25.6c6 8.1 15.5 12.8 25.6 12.8H448c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64zM184 272c-13.3 0-24 10.7-24 24s10.7 24 24 24H328c13.3 0 24-10.7 24-24s-10.7-24-24-24H184z"
-                      fill="#1F487C"
+                      fill={dropDown === 'promotion' ? '#ffffff' : "#1F487C"}
                     />
                   </svg>
                 </div>
-                <div className="text-[1.1vw] text-[#8398B7]">
-                  Partner
-                </div>
-                <div className="text-[0.9vw] text-[#1F487C]">
-                  {partnerDocuments?.length} files
-                </div>
-              </div>
-            </div>
-            <div
-              onClick={() => toggleDropDown('operator')}
-              className={`${dropDown === 'operator' ? 'shadow-[#1F487C] shadow-md ' : ''} w-[15vw] h-[10vw] border-[0.2vw] border-[#1F487C] bg-white  rounded-xl border-t-[0.5vw]`}>
-              <div className="pl-[1vw] pt-[0.5vw] grid grid-rows-3 gap-y-[1vw]">
-                <div>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 512 512"
-                    className="w-[1.5vw] h-[1.5vw]"
-                  >
-                    <path
-                      d="M448 480H64c-35.3 0-64-28.7-64-64V96C0 60.7 28.7 32 64 32H192c20.1 0 39.1 9.5 51.2 25.6l19.2 25.6c6 8.1 15.5 12.8 25.6 12.8H448c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64zM184 272c-13.3 0-24 10.7-24 24s10.7 24 24 24H328c13.3 0 24-10.7 24-24s-10.7-24-24-24H184z"
-                      fill="#1F487C"
-                    />
-                  </svg>
-                </div>
-                <div className="text-[1.1vw] text-[#8398B7]">
-                  Operator
-                </div>
-                <div className="text-[0.9vw] text-[#1F487C]">
-                  {operatorDocuments?.length} files
-                </div>
-              </div>
-            </div>
-            <div
-              onClick={() => toggleDropDown('redeemOffer')}
-              className={`${dropDown === 'redeemOffer' ? 'shadow-[#1F487C] shadow-md ' : ''} w-[15vw] h-[10vw] border-[0.2vw] border-[#1F487C] bg-white  rounded-xl border-t-[0.5vw]`}>
-              <div className="pl-[1vw] pt-[0.5vw] grid grid-rows-3 gap-y-[1vw]">
-                <div>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 512 512"
-                    className="w-[1.5vw] h-[1.5vw]"
-                  >
-                    <path
-                      d="M448 480H64c-35.3 0-64-28.7-64-64V96C0 60.7 28.7 32 64 32H192c20.1 0 39.1 9.5 51.2 25.6l19.2 25.6c6 8.1 15.5 12.8 25.6 12.8H448c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64zM184 272c-13.3 0-24 10.7-24 24s10.7 24 24 24H328c13.3 0 24-10.7 24-24s-10.7-24-24-24H184z"
-                      fill="#1F487C"
-                    />
-                  </svg>
-                </div>
-                <div className="text-[1.1vw] text-[#8398B7]">
-                  Redeem Offers
-                </div>
-                <div className="text-[0.9vw] text-[#1F487C]">
-                  {redeemOffers?.length} files
-                </div>
-              </div>
-            </div>
-            <div
-              onClick={() => toggleDropDown('discountOffer')}
-              className={`${dropDown === 'discountOffer' ? 'shadow-[#1F487C] shadow-md ' : ''} w-[15vw] h-[10vw] border-[0.2vw] border-[#1F487C] bg-white  rounded-xl border-t-[0.5vw]`}>
-              <div className="pl-[1vw] pt-[0.5vw] grid grid-rows-3 gap-y-[1vw]">
-                <div>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 512 512"
-                    className="w-[1.5vw] h-[1.5vw]"
-                  >
-                    <path
-                      d="M448 480H64c-35.3 0-64-28.7-64-64V96C0 60.7 28.7 32 64 32H192c20.1 0 39.1 9.5 51.2 25.6l19.2 25.6c6 8.1 15.5 12.8 25.6 12.8H448c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64zM184 272c-13.3 0-24 10.7-24 24s10.7 24 24 24H328c13.3 0 24-10.7 24-24s-10.7-24-24-24H184z"
-                      fill="#1F487C"
-                    />
-                  </svg>
-                </div>
-                <div className="text-[1.1vw] text-[#8398B7]">
-                  Discount Offers
-                </div>
-                <div className="text-[0.9vw] text-[#1F487C]">
-                  {discountOffers?.length} files
-                </div>
-              </div>
-            </div>
-            <div
-              onClick={() => toggleDropDown('promotion')}
-              className={`${dropDown === 'promotion' ? 'shadow-[#1F487C] shadow-md ' : ''} w-[15vw] h-[10vw] border-[0.2vw] border-[#1F487C] bg-white  rounded-xl border-t-[0.5vw]`}>
-              <div className="pl-[1vw] pt-[0.5vw] grid grid-rows-3 gap-y-[1vw]">
-                <div>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 512 512"
-                    className="w-[1.5vw] h-[1.5vw]"
-                  >
-                    <path
-                      d="M448 480H64c-35.3 0-64-28.7-64-64V96C0 60.7 28.7 32 64 32H192c20.1 0 39.1 9.5 51.2 25.6l19.2 25.6c6 8.1 15.5 12.8 25.6 12.8H448c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64zM184 272c-13.3 0-24 10.7-24 24s10.7 24 24 24H328c13.3 0 24-10.7 24-24s-10.7-24-24-24H184z"
-                      fill="#1F487C"
-                    />
-                  </svg>
-                </div>
-                <div className="text-[1.1vw] text-[#8398B7]">
+                <div className={`text-[1.1vw] ${dropDown === 'promotion' ? 'text-white' : 'text-[#8398B7]'} `}>
                   Promotion
                 </div>
-                <div className="text-[0.9vw] text-[#1F487C]">
+                <div className={`text-[0.9vw] ${dropDown === 'promotion' ? 'text-white' : 'text-[#1F487C]'}`}>
                   {promotions?.length} files
                 </div>
               </div>
             </div>
             <div
-              onClick={() => toggleDropDown('advertisment')}
-              className={`${dropDown === 'advertisment' ? 'shadow-[#1F487C] shadow-md ' : ''} w-[15vw] h-[10vw] border-[0.2vw] border-[#1F487C] bg-white  rounded-xl border-t-[0.5vw]`}>
+              onClick={() => {
+                toggleFolder('advertisment')
+                toggleDropDown('')
+              }}
+              className={`${folder === 'advertisment' ? 'bg-[#1F487C]' : 'bg-white '} w-[15vw] h-[10vw] border-[0.2vw] border-[#1F487C]  rounded-xl border-t-[0.5vw]`}>
               <div className="pl-[1vw] pt-[0.5vw] grid grid-rows-3 gap-y-[1vw]">
                 <div>
                   <svg
@@ -727,294 +725,430 @@ const Documents = () => {
                   >
                     <path
                       d="M448 480H64c-35.3 0-64-28.7-64-64V96C0 60.7 28.7 32 64 32H192c20.1 0 39.1 9.5 51.2 25.6l19.2 25.6c6 8.1 15.5 12.8 25.6 12.8H448c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64zM184 272c-13.3 0-24 10.7-24 24s10.7 24 24 24H328c13.3 0 24-10.7 24-24s-10.7-24-24-24H184z"
-                      fill="#1F487C"
+                      fill={folder === 'advertisment' ? '#ffffff' : "#1F487C"}
                     />
                   </svg>
                 </div>
-                <div className="text-[1.1vw] text-[#8398B7]">
+                <div className={`text-[1.1vw] ${folder === 'advertisment' ? 'text-white' : 'text-[#8398B7]'} `}>
                   Advertisment
                 </div>
-                <div className="text-[0.9vw] text-[#1F487C]">
-                  {advertisement?.length} files
-                </div>
-              </div>
-            </div>
-            <div
-              onClick={() => toggleDropDown('mobileAdvertisment')}
-              className={`${dropDown === 'mobileAdvertisment' ? 'shadow-[#1F487C] shadow-md ' : ''} w-[15vw] h-[10vw] border-[0.2vw] border-[#1F487C] bg-white  rounded-xl border-t-[0.5vw]`}>
-              <div className="pl-[1vw] pt-[0.5vw] grid grid-rows-3 gap-y-[1vw]">
-                <div>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 512 512"
-                    className="w-[1.5vw] h-[1.5vw]"
-                  >
-                    <path
-                      d="M448 480H64c-35.3 0-64-28.7-64-64V96C0 60.7 28.7 32 64 32H192c20.1 0 39.1 9.5 51.2 25.6l19.2 25.6c6 8.1 15.5 12.8 25.6 12.8H448c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64zM184 272c-13.3 0-24 10.7-24 24s10.7 24 24 24H328c13.3 0 24-10.7 24-24s-10.7-24-24-24H184z"
-                      fill="#1F487C"
-                    />
-                  </svg>
-                </div>
-                <div className="text-[1.1vw] text-[#8398B7]">
-                  Mobile Advertisment
-                </div>
-                <div className="text-[0.9vw] text-[#1F487C]">
-                  {advertisement?.length} files
+                <div className={`text-[0.9vw] ${folder === 'advertisment' ? 'text-white' : 'text-[#1F487C]'}`}>
+                  {(advertisement?.length || 0) + (mobAdvertisment?.length || 0)} files
                 </div>
               </div>
             </div>
           </div>
+          {/* --------------------------------------------------Tabs--------------------------------------- */}
+          {folder ? (
+            <div className='flex gap-x-[3vw] text-[1.5vw] justify-items-center px-[5vw] py-[1vw] text-[#1F487C]'>
+              {folder === 'usermanagement' ?
+                <>
+                  <div
+                    className={`${dropDown === 'operator' ? 'font-semibold border-b-[0.1vw] border-[#1F487C]' : ''} text-[#1F487C]`}
+                    onClick={() => toggleDropDown('operator')}>
+                    <span>Operator</span>
+                  </div>
+                  <div
+                    className={`${dropDown === 'poemployee' ? 'font-semibold border-b-[0.1vw] border-[#1F487C]' : ''} text-[#1F487C]`}
+                    onClick={() => toggleDropDown('poemployee')}>
+                    <span>P.O Employee</span>
+                  </div>
+                  <div
+                    className={`${dropDown === 'opemployee' ? 'font-semibold border-b-[0.1vw] border-[#1F487C]' : ''} text-[#1F487C]`}
+                    onClick={() => toggleDropDown('opemployee')}>
+                    <span>O.P Employee</span>
+                  </div>
+                  <div
+                    className={`${dropDown === 'partner' ? 'font-semibold border-b-[0.1vw] border-[#1F487C]' : ''} text-[#1F487C]`}
+                    onClick={() => toggleDropDown('partner')}>
+                    <span>Partner</span>
+                  </div>
+                  <div
+                    className={`${dropDown === 'clientDocuments' ? 'font-semibold border-b-[0.1vw] border-[#1F487C]' : ''} text-[#1F487C]`}
+                    onClick={() => toggleDropDown('clientDocuments')}>
+                    <span>Client</span>
+                  </div>
+                </> : folder === 'offers' ?
+                  <>
+                    <div
+                      className={`${dropDown === 'redeemOffer' ? 'font-semibold border-b-[0.1vw] border-[#1F487C]' : ''} text-[#1F487C]`}
+                      onClick={() => toggleDropDown('redeemOffer')}>
+                      <span>Redeem Offers</span>
+                    </div>
+                    <div
+                      className={`${dropDown === 'discountOffer' ? 'font-semibold border-b-[0.1vw] border-[#1F487C]' : ''} text-[#1F487C]`}
+                      onClick={() => toggleDropDown('discountOffer')}>
+                      <span>Discount Offers</span>
+                    </div>
+                  </>
+                  :
+                  folder === 'advertisment' ?
+                    <>
+                      <div
+                        className={`${dropDown === 'advertisment' ? 'font-semibold border-b-[0.1vw] border-[#1F487C]' : ''} text-[#1F487C]`}
+                        onClick={() => toggleDropDown('advertisment')}>
+                        <span>Website Ads</span>
+                      </div>
+                      <div
+                        className={`${dropDown === 'mobileAdvertisment' ? 'font-semibold border-b-[0.1vw] border-[#1F487C]' : ''} text-[#1F487C]`}
+                        onClick={() => toggleDropDown('mobileAdvertisment')}>
+                        <span>Mobile Ads</span>
+                      </div>
+                    </>
+                    : ''
+              }
+            </div>
+          ) : ''}
+
         </div>
 
+
         {/* ------------------------------------------RecentDocuments--------------------------------- */}
-        <div className='pt-[0.5vw]'>
-          <div className='px-[1vw] grid grid-cols-2'>
-            <div className='font-bold text-[1.25vw] text-[#1F487C] '>
-              Recent Documents
-              <div>
-                <Table
-                  columns={columns}
-                  dataSource={dataDocuments}
-                  // onChange={handleChange}  
-                  pagination={false}
-                  className="customize-table"
-                  scroll={{ y: '20vw' }}
-                  onRow={(record) => ({
-                    onClick: () =>
-                      handleOnClick(record),
-                  })}
-                />
+        {dropDown ? (
+          <div className='pt-[0.5vw]'>
+            <div className='px-[1vw] grid grid-cols-2'>
+              <div className='font-bold text-[1.25vw] text-[#1F487C] '>
+                Recent Documents
+                <div>
+                  <Table
+                    columns={columns}
+                    dataSource={dataDocuments}
+                    // onChange={handleChange}  
+                    pagination={false}
+                    className="customize-table"
+                    scroll={{ y: '20vw' }}
+                    onRow={(record) => ({
+                      onClick: () =>
+                        handleOnClick(record),
+                    })}
+                  />
+                </div>
               </div>
-            </div>
 
-            {/* -----------------------------------------------------------------FilePreview--------------------------------------------------------------------- */}
+              {/* -----------------------------------------------------------------FilePreview--------------------------------------------------------------------- */}
 
-            <div>
-              <p className="border-b-slate-400 border-b-[0.1vw] font-bold  text-[1.25vw] text-[#1F487C]">File Preview :</p>
-              <div className="pt-[1.5vw]  gap-[0.5vw] items-center">
-                {dropDown === 'employee' ?
-                  <div>
-                    <div className='grid grid-cols-2 gap-[0.5vw] justify-items-center'>
-                      {
-                        selectItems?.aadhar_card_doc ||
-                          selectItems?.pan_card_doc ||
-                          selectItems?.offer_letter_doc ||
-                          selectItems?.qualification_doc ? (
-                          <>
-                            {selectItems?.aadhar_card_doc !== null && (
-                              <img
-                                src={`${apiImgUrl}${selectItems?.aadhar_card_front_doc}`}
-                                className="h-[10vw]"
-                              />
-                            )}
-                            {selectItems?.pan_card_doc !== null && (
-                              <img
-                                src={`${apiImgUrl}${selectItems?.aadhar_card_back_doc}`}
-                                className="h-[10vw]"
-                              />
-                            )}
-                            {selectItems?.offer_letter_doc !== null && (
-                              <img
-                                src={`${apiImgUrl}${selectItems?.pan_card_front_doc}`}
-                                className="h-[10vw]"
-                              />
-                            )}
-                            {selectItems?.qualification_doc !== null && (
-                              <img
-                                src={`${apiImgUrl}${selectItems?.pan_card_back_doc}`}
-                                className="h-[10vw]"
-                              />
-                            )}
-                          </>
-                        ) : (
-                          <p>No data</p>
-                        )
-                      }
-                    </div>
-
-                    {selectItems?.aadhar_card_doc ||
-                      selectItems?.pan_card_doc ||
-                      selectItems?.offer_letter_doc ||
-                      selectItems?.qualification_doc ? <div className="flex justify-end pt-[1vw]"><MdDownloadForOffline onClick={downloadImages} color="#4283e5" size="3vw" className=" cursor-pointer" /></div> : ""}
-                  </div>
-                  :
-                  dropDown === 'partner' ?
+              <div>
+                <p className="border-b-slate-400 border-b-[0.1vw] font-bold  text-[1.25vw] text-[#1F487C]">File Preview :</p>
+                <div className="pt-[1.5vw]  gap-[0.5vw] items-center">
+                  {dropDown === 'poemployee' ?
                     <div>
-
                       <div className='grid grid-cols-2 gap-[0.5vw] justify-items-center'>
                         {
-                          selectItems?.aadhar_card_front ||
-                            selectItems?.aadhar_card_back ||
-                            selectItems?.pan_card_front ||
-                            selectItems?.pan_card_back ? (
+                          selectItems?.aadhar_card_front_doc ||
+                            selectItems?.aadhar_card_front_doc ||
+                            selectItems?.offer_letter_doc ||
+                            selectItems?.qualification_doc ? (
                             <>
-                              {selectItems?.aadhar_card_front !== null && (
+                              {selectItems?.aadhar_card_front_doc !== null && (
                                 <img
-                                  src={`${apiImgUrl}${selectItems?.aadhar_card_front}`}
+                                  src={`${apiImgUrl}${selectItems?.aadhar_card_front_doc}`}
                                   className="h-[10vw]"
                                 />
                               )}
-                              {selectItems?.aadhar_card_back !== null && (
+                              {selectItems?.aadhar_card_back_doc !== null && (
                                 <img
-                                  src={`${apiImgUrl}${selectItems?.aadhar_card_back}`}
+                                  src={`${apiImgUrl}${selectItems?.aadhar_card_back_doc}`}
                                   className="h-[10vw]"
                                 />
                               )}
-                              {selectItems?.pan_card_front !== null && (
+                              {selectItems?.pan_card_front_doc !== null && (
                                 <img
-                                  src={`${apiImgUrl}${selectItems?.pan_card_front}`}
+                                  src={`${apiImgUrl}${selectItems?.pan_card_front_doc}`}
                                   className="h-[10vw]"
                                 />
                               )}
-                              {selectItems?.pan_card_back !== null && (
+                              {selectItems?.pan_card_back_doc !== null && (
                                 <img
-                                  src={`${apiImgUrl}${selectItems?.pan_card_back}`}
+                                  src={`${apiImgUrl}${selectItems?.pan_card_back_doc}`}
+                                  className="h-[10vw]"
+                                />
+                              )}
+                              {selectItems?.qualification_doc !== null && (
+                                <img
+                                  src={`${apiImgUrl}${selectItems?.qualification_doc}`}
+                                  className="h-[10vw]"
+                                />
+                              )}
+                              {selectItems?.offer_letter_doc !== null && (
+                                <img
+                                  src={`${apiImgUrl}${selectItems?.offer_letter_doc}`}
                                   className="h-[10vw]"
                                 />
                               )}
                             </>
                           ) : (
-                            <p>No data</p>
+                            <p className='h-[20vw]'>No data</p>
                           )
                         }
-
                       </div>
 
-                      {selectItems?.aadhar_card_front ||
-                        selectItems?.aadhar_card_back ||
-                        selectItems?.pan_card_front ||
-                        selectItems?.pan_card_back ? <div className="flex justify-end pt-[1vw]"><MdDownloadForOffline onClick={downloadImages} color="#4283e5" size="3vw" className=" cursor-pointer" /></div> : ""}
+                      {selectItems?.aadhar_card_doc ||
+                        selectItems?.pan_card_doc ||
+                        selectItems?.offer_letter_doc ||
+                        selectItems?.qualification_doc ? <div className="flex justify-end pt-[1vw]"><MdDownloadForOffline onClick={downloadImages} color="#4283e5" size="3vw" className=" cursor-pointer" /></div> : ""}
                     </div>
-                    :
-                    dropDown === 'operator' ?
+                    : dropDown === 'opemployee' ?
                       <div>
-
                         <div className='grid grid-cols-2 gap-[0.5vw] justify-items-center'>
                           {
-                            selectItems?.aadar_front_doc ||
-                              selectItems?.aadar_back_doc ||
-                              selectItems?.pancard_front_doc ||
-                              selectItems?.pancard_back_doc ? (
+                            selectItems?.aadhar_card_front_doc ||
+                              selectItems?.pan_card_front_doc ||
+                              selectItems?.offer_letter_doc ||
+                              selectItems?.qualification_doc ? (
                               <>
-                                {selectItems?.aadar_front_doc && (
+                                {selectItems?.aadhar_card_front_doc !== null && (
                                   <img
-                                    src={`${apiImgUrl}${selectItems?.aadar_front_doc}`}
+                                    src={`${apiImgUrl}${selectItems?.aadhar_card_front_doc}`}
                                     className="h-[10vw]"
-                                    alt="Aadhar Front"
                                   />
                                 )}
-                                {selectItems?.aadar_back_doc && (
+                                {selectItems?.aadhar_card_back_doc !== null && (
                                   <img
-                                    src={`${apiImgUrl}${selectItems?.aadar_back_doc}`}
+                                    src={`${apiImgUrl}${selectItems?.aadhar_card_back_doc}`}
                                     className="h-[10vw]"
-                                    alt="Aadhar Back"
                                   />
                                 )}
-                                {selectItems?.pancard_front_doc && (
+                                {selectItems?.pan_card_front_doc !== null && (
                                   <img
-                                    src={`${apiImgUrl}${selectItems?.pancard_front_doc}`}
+                                    src={`${apiImgUrl}${selectItems?.pan_card_front_doc}`}
                                     className="h-[10vw]"
-                                    alt="Pan Card Front"
                                   />
                                 )}
-                                {selectItems?.pancard_back_doc && (
+                                {selectItems?.pan_card_back_doc !== null && (
                                   <img
-                                    src={`${apiImgUrl}${selectItems?.pancard_back_doc}`}
+                                    src={`${apiImgUrl}${selectItems?.pan_card_back_doc}`}
                                     className="h-[10vw]"
-                                    alt="Pan Card Back"
                                   />
                                 )}
-
+                                {selectItems?.qualification_doc !== null && (
+                                  <img
+                                    src={`${apiImgUrl}${selectItems?.qualification_doc}`}
+                                    className="h-[10vw]"
+                                  />
+                                )}
+                                {selectItems?.offer_letter_doc !== null && (
+                                  <img
+                                    src={`${apiImgUrl}${selectItems?.offer_letter_doc}`}
+                                    className="h-[10vw]"
+                                  />
+                                )}
                               </>
                             ) : (
-                              <p>No data</p>
+                              <p className='h-[20vw]'>No data</p>
                             )
                           }
-
-                        </div>
-                        {selectItems?.aadar_front_doc ||
-                          selectItems?.aadar_back_doc ||
-                          selectItems?.pancard_front_doc ||
-                          selectItems?.pancard_back_doc ? <div className="flex justify-end pt-[1vw]"><MdDownloadForOffline onClick={downloadImages} color="#4283e5" size="3vw" className=" cursor-pointer" /></div> : ""}
-                      </div>
-                      :
-
-                      <div className="py-[1.5vw] gap-[0.5vw] items-center align-center">
-                        <div className="border-[0.1vw] w-full h-[10vw] flex justify-center rounded-sm">
-
-                          {selectItems ? (
-                            selectItems?.ad_file_type?.startsWith("image/") || selectItems?.offer_img || selectItems?.background_image ? (
-                              <img
-                                src={`${apiImgUrl}${selectItems?.ad_video || selectItems?.offer_img || selectItems?.background_image}`}
-                                alt="Ad/Offer/Background"
-                                className="w-full h-full object-cover"
-                                style={{ borderRadius: "1.4vw" }}
-                              />
-                            ) : selectItems?.ad_file_type?.startsWith("video/") || selectItems?.mobad_vdo ? (
-                              <video
-                                key={selectItems?.ad_video}
-                                autoPlay
-                                loop
-                                muted
-                                className="w-full h-full object-cover"
-                                style={{ borderRadius: "1.2vw" }}
-                              >
-                                <source src={`${apiImgUrl}${selectItems?.ad_video || selectItems?.mobad_vdo}`} type={selectItems?.ad_file_type} />
-                                Your browser does not support the video tag.
-                              </video>
-                            ) : (
-                              <h1 className="pt-[3vw] text-[1vw]">Unsupported file type</h1>
-                            )
-                          ) : (
-                            <h1 className="pt-[3vw] text-[1vw]">Preselect any File</h1>
-                          )}
                         </div>
 
+                        {selectItems?.aadhar_card_doc ||
+                          selectItems?.pan_card_doc ||
+                          selectItems?.offer_letter_doc ||
+                          selectItems?.qualification_doc ? <div className="flex justify-end pt-[1vw]"><MdDownloadForOffline onClick={downloadImages} color="#4283e5" size="3vw" className=" cursor-pointer" /></div> : ""}
+                      </div> :
+                      dropDown === 'partner' ?
                         <div>
+                          <div className='grid grid-cols-2 gap-[0.5vw] justify-items-center'>
+                            {
+                              selectItems?.aadhar_card_front ||
+                                selectItems?.aadhar_card_back ||
+                                selectItems?.pan_card_front ||
+                                selectItems?.pan_card_back ? (
+                                <>
+                                  {selectItems?.aadhar_card_front !== null && (
+                                    <img
+                                      src={`${apiImgUrl}${selectItems?.aadhar_card_front}`}
+                                      className="h-[10vw]"
+                                    />
+                                  )}
+                                  {selectItems?.aadhar_card_back !== null && (
+                                    <img
+                                      src={`${apiImgUrl}${selectItems?.aadhar_card_back}`}
+                                      className="h-[10vw]"
+                                    />
+                                  )}
+                                  {selectItems?.pan_card_front !== null && (
+                                    <img
+                                      src={`${apiImgUrl}${selectItems?.pan_card_front}`}
+                                      className="h-[10vw]"
+                                    />
+                                  )}
+                                  {selectItems?.pan_card_back !== null && (
+                                    <img
+                                      src={`${apiImgUrl}${selectItems?.pan_card_back}`}
+                                      className="h-[10vw]"
+                                    />
+                                  )}
+                                </>
+                              ) : (
+                                <p className='h-[20vw]'>No data</p>
+                              )
+                            }
 
-                          <div className="grid grid-cols-12 mt-[0.5vw]">
-                            <div className="col-span-11 text-[1vw] text-[#4283e5]">
-                              {selectItems?.ad_video || selectItems?.offer_img || selectItems?.background_image ?
-                                (selectItems?.ad_video || selectItems?.offer_img || selectItems?.background_image) :
-                                (selectItems?.promo_img_details?.promo_image?.filename || selectItems?.image_file?.filename)
-                              }
-                            </div>
-                            <div className="text-[#4283e5] cursor-pointer">
-                              <Image_Video
-                                fileUrl={fileUrl}
-                                filename={filename}
-                                selectItems={selectItems}
-                              />
-                            </div>
                           </div>
 
-                          {/* File Size */}
-                          <div className="text-[1vw] text-[#818181]">
-                            {selectItems ? (
-                              <>
-                                {selectItems?.ad_file_size ? (
-                                  <p>Size: {(selectItems?.ad_file_size / (1024 * 1024)).toFixed(2)} MB</p>
-                                ) : selectItems?.image_size ? (
-                                  <p>Size: {(selectItems?.image_size / 1024).toFixed(2)} KB</p>
-                                ) : selectItems?.promo_img_details?.promo_image?.size ? (
-                                  <p>Size: {(selectItems?.promo_img_details?.promo_image?.size / 1024).toFixed(2)} KB</p>
-                                ) : selectItems?.offer_img ? (
-                                  <p>Size: {(selectItems?.offer_img?.size / 1024).toFixed(2)} KB</p>
-                                ) : null}
-                              </>
-                            ) : (
-                              <p>Size: </p>
-                            )}
-                          </div>
+                          {selectItems?.aadhar_card_front ||
+                            selectItems?.aadhar_card_back ||
+                            selectItems?.pan_card_front ||
+                            selectItems?.pan_card_back ? <div className="flex justify-end pt-[1vw]"><MdDownloadForOffline onClick={downloadImages} color="#4283e5" size="3vw" className=" cursor-pointer" /></div> : ""}
                         </div>
-                      </div>
-                  //  : ''
-                }
+                        :
+                        dropDown === 'operator' ?
+                          <div>
+                            <div className='grid grid-cols-2 gap-[0.5vw] justify-items-center'>
+                              {
+                                selectItems?.aadar_front_doc ||
+                                  selectItems?.aadar_back_doc ||
+                                  selectItems?.pancard_front_doc ||
+                                  selectItems?.pancard_back_doc ? (
+                                  <>
+                                    {selectItems?.aadar_front_doc && (
+                                      <img
+                                        src={`${apiImgUrl}${selectItems?.aadar_front_doc}`}
+                                        className="h-[10vw]"
+                                        alt="Aadhar Front"
+                                      />
+                                    )}
+                                    {selectItems?.aadar_back_doc && (
+                                      <img
+                                        src={`${apiImgUrl}${selectItems?.aadar_back_doc}`}
+                                        className="h-[10vw]"
+                                        alt="Aadhar Back"
+                                      />
+                                    )}
+                                    {selectItems?.pancard_front_doc && (
+                                      <img
+                                        src={`${apiImgUrl}${selectItems?.pancard_front_doc}`}
+                                        className="h-[10vw]"
+                                        alt="Pan Card Front"
+                                      />
+                                    )}
+                                    {selectItems?.pancard_back_doc && (
+                                      <img
+                                        src={`${apiImgUrl}${selectItems?.pancard_back_doc}`}
+                                        className="h-[10vw]"
+                                        alt="Pan Card Back"
+                                      />
+                                    )}
 
+                                  </>
+                                ) : (
+                                  <p className='h-[20vw]'>No data</p>
+                                )
+                              }
+
+                            </div>
+                            {selectItems?.aadar_front_doc ||
+                              selectItems?.aadar_back_doc ||
+                              selectItems?.pancard_front_doc ||
+                              selectItems?.pancard_back_doc ? <div className="flex justify-end pt-[1vw]"><MdDownloadForOffline onClick={downloadImages} color="#4283e5" size="3vw" className=" cursor-pointer" /></div> : ""}
+                          </div>
+                          : dropDown === 'clientDocuments' ?
+                            <div>
+                              <div className='grid grid-cols-2 gap-[0.5vw] justify-items-center'>
+                                {
+                                  selectItems?.upload_gst ? (
+                                    <>
+                                      {selectItems?.upload_gst && (
+                                        <img
+                                          src={`${apiImgUrl}/${selectItems?.upload_gst}`}
+                                          className="h-[10vw]"
+                                          alt="Aadhar Front"
+                                        />
+
+                                      )}
+                                      {console.log(`${apiImgUrl}${selectItems?.upload_gst}`, 'checking_client_image')}
+                                    </>
+                                  ) : (
+                                    <p className='h-[20vw]'>No data</p>
+                                  )
+                                }
+
+                              </div>
+                              {selectItems?.aadar_front_doc ||
+                                selectItems?.aadar_back_doc ||
+                                selectItems?.pancard_front_doc ||
+                                selectItems?.upload_gst ||
+                                selectItems?.pancard_back_doc ? <div className="flex justify-end pt-[1vw]"><MdDownloadForOffline onClick={downloadImages} color="#4283e5" size="3vw" className=" cursor-pointer" /></div> : ""}
+                            </div> :
+
+                            <div className="py-[1.5vw] gap-[0.5vw] items-center align-center">
+                              <div className={`border-[0.1vw] ${selectItems?.offer_img || selectItems?.background_image ? 'w-full h-full' : ' w-full h-[10vw] '} flex justify-center rounded-sm`}>
+
+                                {selectItems ? (
+                                  selectItems?.ad_file_type?.startsWith("image/") || selectItems?.offer_img || selectItems?.background_image || selectItems?.mobad_vdo ? (
+                                    <img
+                                      src={`${apiImgUrl}${selectItems?.ad_video || selectItems?.mobad_vdo || selectItems?.offer_img || selectItems?.background_image }`}
+                                      alt="Ad/Offer/Background"
+                                      className={` object-cover ${selectItems?.offer_img || selectItems?.background_image ? 'w-1/2 h-1/2' : 'w-full h-full'}`}
+                                      style={{ borderRadius: "1.4vw" }}
+                                    />
+                                  ) : selectItems?.ad_file_type?.startsWith("video/") || selectItems?.mobad_vdo ? (
+                                    <video
+                                      key={selectItems?.ad_video}
+                                      autoPlay
+                                      loop
+                                      muted
+                                      className="w-full h-full object-cover"
+                                      style={{ borderRadius: "1.2vw" }}
+                                    >
+                                      <source src={`${apiImgUrl}${selectItems?.ad_video || selectItems?.mobad_vdo}`} type={selectItems?.ad_file_type} />
+                                      Your browser does not support the video tag.
+                                    </video>
+                                  ) : (
+                                    <h1 className="pt-[3vw] text-[1vw]">Unsupported file type</h1>
+                                  )
+                                ) : (
+                                  <h1 className="pt-[3vw] text-[1vw]">Preselect any File</h1>
+                                )}
+                              </div>
+
+                              <div>
+
+                                <div className="grid grid-cols-12 mt-[0.5vw]">
+                                  <div className="col-span-11 text-[1vw] text-[#4283e5]">
+                                    {selectItems?.ad_video || selectItems?.offer_img || selectItems?.background_image || selectItems?.mobad_vdo ?
+                                      (selectItems?.ad_video || selectItems?.offer_img || selectItems?.background_image || selectItems?.mobad_vdo) :
+                                      (selectItems?.promo_img_details?.promo_image?.filename || selectItems?.image_file?.filename)
+                                    }
+                                  </div>
+                                  <div className="text-[#4283e5] cursor-pointer">
+                                    <Image_Video
+                                      fileUrl={fileUrl}
+                                      filename={filename}
+                                      selectItems={selectItems}
+                                    />
+                                  </div>
+                                </div>
+
+                                {/* File Size */}
+                                <div className="text-[1vw] text-[#818181]">
+                                  {selectItems ? (
+                                    <>
+                                      {selectItems?.ad_file_size ? (
+                                        <p>Size: {(selectItems?.ad_file_size / (1024 * 1024)).toFixed(2)} MB</p>
+                                      ) : selectItems?.mobad_file_size ? (
+                                        <p>Size: {(selectItems?.mobad_file_size / (1024 * 1024)).toFixed(2)} MB</p>
+                                      ) : selectItems?.image_size ? (
+                                        <p>Size: {(selectItems?.image_size / 1024).toFixed(2)} KB</p>
+                                      ) : selectItems?.promo_img_details?.promo_image?.size ? (
+                                        <p>Size: {(selectItems?.promo_img_details?.promo_image?.size / 1024).toFixed(2)} KB</p>
+                                      ) : selectItems?.offer_img ? (
+                                        <p>Size: {(selectItems?.offer_img?.size / 1024).toFixed(2)} KB</p>
+                                      ) : null}
+                                    </>
+                                  ) : (
+                                    <p>Size: </p>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                    //  : ''
+                  }
+
+                </div>
               </div>
             </div>
-          </div>
-        </div >
+          </div >
+        ) : ''}
       </div >
     </>
   )

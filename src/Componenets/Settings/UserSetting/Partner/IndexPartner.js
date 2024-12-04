@@ -5,12 +5,16 @@ import ImgCrop from "antd-img-crop";
 import { Upload } from "antd";
 import { IoTriangleSharp } from "react-icons/io5";
 import PersonalDetails from './PersonalDetails';
+import pencilshape   from '../../../../asserts/pencilicon.png'
 
 const IndexPartner = ({ }) => {
 
     const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
     const apiurl = process.env.REACT_APP_API_URL;
-    
+
+    const [isEdit, setIsEdit] = useState(false)
+
+
     const [switchTab, setSwitchTab] = useState('PersonalDetails')
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState("");
@@ -88,12 +92,13 @@ const IndexPartner = ({ }) => {
 
                                 }}>
                                     <Upload
+                                        className="custom-upload"
                                         action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                                        listType="picture-circle"
+                                        listType="picture-card"
                                         fileList={fileList}
                                         onChange={handleChange}
                                         onPreview={handlePreview}
-                                        disabled={enableUpload}
+                                        disabled={isEdit === false}
                                         accept=".png, .jpg, .jpeg"
                                         size="large"
                                     >
@@ -105,7 +110,7 @@ const IndexPartner = ({ }) => {
                                     <img
                                         src={`${apiImgUrl}${selectedFile}`}
                                         alt="Photo"
-                                        className="w-[6.1vw] h-[6.1vw] object-cover rounded-full top-[0.1vw] left-[0.15vw] absolute opacity-25 z-[1] pointer-events-none"
+                                        className="w-[8vw] h-[8vw] object-cover rounded-[0.1vw] top-[0.1vw]  absolute rounded-[0.5vw] opacity-25 z-[1] pointer-events-none"
                                     />
                                 )}
                             </div>
@@ -117,14 +122,16 @@ const IndexPartner = ({ }) => {
                                 <div className='text-[#1F487C] text-[1vw] font-semibold cursor-pointer' onClick={() => setAddressType('temporary')}>Temporary Address</div>
                                 <div className='text-[#1F487C] text-[1vw] font-semibold cursor-pointer' onClick={() => setAddressType('permenant')}>Permanent Address</div>
                             </div>
-                            <div className={`h-[0.86vw] w-[2.25vw] bg-[#1F487C] absolute ${addressType === 'temporary' ? 'top-[4.4vw]' : 'top-[6.7vw] '}  rounded-l-full`}>
-                                <div className='h-[0.5vw] w-[0.2vw] absolute top-[-0.2vw] right-[-0.7vw] rotate-90'><IoTriangleSharp size='0.95vw' color='#1F487C' /></div>
+                            <div className={`absolute ${addressType === 'temporary' ? 'top-[4.5vw]' : 'top-[6.85vw]'}`}>
+                                <img
+                                    src={pencilshape}
+                                    className='w-auto h-[0.85vw] ' />
                             </div>
                         </div> : ""}
                     </div>
                     <div className='col-span-9'>
                         {switchTab == 'PersonalDetails' ?
-                            <PersonalDetails fileList={fileList} setSelectedFile={setSelectedFile} /> : switchTab == 'AddressDetails' ? <AddressDetails addressType={addressType} /> : switchTab == 'Documents' ? <Documents /> : ''}
+                            <PersonalDetails fileList={fileList} setSelectedFile={setSelectedFile} isEdit={isEdit} setIsEdit={setIsEdit} /> : switchTab == 'AddressDetails' ? <AddressDetails addressType={addressType} /> : switchTab == 'Documents' ? <Documents /> : ''}
                     </div>
                 </div>
             </div>

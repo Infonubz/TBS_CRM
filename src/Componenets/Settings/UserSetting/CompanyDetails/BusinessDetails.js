@@ -5,6 +5,7 @@ import { MdOutlineModeEditOutline } from "react-icons/md";
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import { SubmitBusinessData } from '../../../../Api/Settings/SystemSettings/CompanyDetails';
+import { useState } from 'react';
 
 
 const validationSchema = Yup.object().shape({
@@ -26,7 +27,9 @@ const validationSchema = Yup.object().shape({
 });
 
 const BusinessDetails = ({ operatorData }) => {
- 
+
+    const [isEdit, setIsEdit] = useState(false)
+
     console.log(operatorData, 'operator_data_businessDetails')
     const dispatch = useDispatch()
     const handleSubmit = async (values) => {
@@ -37,6 +40,7 @@ const BusinessDetails = ({ operatorData }) => {
             );
             // setModalIsOpen(false);
             toast.success(data?.message);
+            setIsEdit(false)
             console.log(data);
         } catch (error) {
             console.error("Error uploading data", error);
@@ -83,7 +87,8 @@ const BusinessDetails = ({ operatorData }) => {
                                         name="constitution"
                                         id="constitution"
                                         value={values.constitution}
-                                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-[0.25vw] outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                        disabled={isEdit === false}
                                     >
                                         <option label="Select State" value="" className="" />
                                         <option
@@ -131,8 +136,8 @@ const BusinessDetails = ({ operatorData }) => {
                                         name="business"
                                         id="business"
                                         value={values.business}
-                                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
-
+                                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-[0.25vw] outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                        disabled={isEdit === false}
                                     >
                                         <option label="Select Business" value="" className="" />
                                         <option
@@ -165,7 +170,8 @@ const BusinessDetails = ({ operatorData }) => {
                                         name="msme"
                                         id="business"
                                         value={values.msme}
-                                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-[0.25vw] outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                        disabled={isEdit === false}
                                     >
                                         <option label="Select MSME" value="" className="" />
                                         <option label="Micro" value="Micro" className="" />
@@ -200,8 +206,8 @@ const BusinessDetails = ({ operatorData }) => {
                                         type="text"
                                         name="msme_number"
                                         placeholder="Enter MSME Number"
-                                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
-
+                                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-[0.25vw] outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                        disabled={isEdit === false}
                                     // value={values.firstname}
                                     />
                                     {/* <MdOutlineModeEditOutline
@@ -228,8 +234,8 @@ const BusinessDetails = ({ operatorData }) => {
                                         name="service"
                                         id="service"
                                         value={values.service}
-                                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
-
+                                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-[0.25vw] outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                        disabled={isEdit === false}
                                     >
                                         <option label="Select Service" value="" className="" />
                                         <option label="Tirupur" value="Tirupur" className="" />
@@ -268,7 +274,8 @@ const BusinessDetails = ({ operatorData }) => {
                                         name="currency_code"
                                         id="currency_code"
                                         value={values.currency_code}
-                                        className="border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none"
+                                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-[0.25vw] outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                        disabled={isEdit === false}
                                     >
                                         <option label='Select Currency code' value='' />
                                         <option label="India" value="India" className="" />
@@ -289,18 +296,21 @@ const BusinessDetails = ({ operatorData }) => {
                             </div>
                         </div>
                         <div className='flex items-center justify-center pt-[2vw] pb-[0.5vw]'>
-                            <button
-                                type="submit"
-                                className=" text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[12vw]"
-                                disabled={isSubmitting || !dirty || !isValid}
-                                style={{
-                                    backgroundColor: isSubmitting || !dirty || !isValid ? '#d3d3d3' : '#1F487C',
-                                    color: isSubmitting || !dirty || !isValid ? '#9e9e9e' : '#fff',
-                                    cursor: isSubmitting || !dirty || !isValid ? 'not-allowed' : 'pointer',
-                                }}
-                            >
-                                Save
-                            </button>
+                            {isEdit === false ?
+                                <div
+                                    onClick={() => setIsEdit(true)}
+                                    className="cursor-pointer text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[12vw] text-center"
+                                >
+                                    Edit
+                                </div>
+                                :
+                                <button
+                                    type="submit"
+                                    className="text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[12vw]"
+                                >
+                                    Submit
+                                </button>
+                            }
                         </div>
                     </Form>
                 )}

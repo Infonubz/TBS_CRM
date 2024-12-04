@@ -5,6 +5,7 @@ const api = axios.create({
     headers: { "content-Type": "application/json", }
 })
 const apiUrl = process.env.REACT_APP_API_URL;
+const webApiUrl = process.env.REACT_APP_API_WEB_URL;
 
 export const postBulkMail = async (values, email, body, view) => {
 
@@ -40,10 +41,11 @@ export const postBulkMail = async (values, email, body, view) => {
 
 }
 
-export const GetAllEmail = async (setToMailOption, dispatch) => {
+
+export const GetAllEmail = async (dispatch,setToMailOption,view) => {
     try {
-        const response = await api.get(`${apiUrl}/operators-emailid`)
-        console.log(response.data, "i got the response data")
+        const response = view === "operator" ? await api.get(`${apiUrl}/operators-emailid`) : await api.get(`${webApiUrl}/passenger-email`)
+        console.log(response.data.emailid, "i got the response data")
         dispatch({
             type: GET_OPERATOR_EMAILID,
             payload: response.data,
@@ -54,6 +56,46 @@ export const GetAllEmail = async (setToMailOption, dispatch) => {
         console.log(err);
     }
 }
+// export const GetAllEmail = async (dispatch, setToMailOption, view) => {
+//     try {
+//         // Determine the API endpoint based on the 'view'
+//         const response = view === "operator"
+//             ? await api.get(`${apiUrl}/operators-emailid`)
+//             : await api.get(`${webApiUrl}/passenger-email`);
+
+//         // Check if 'email_id' exists in the response data
+//         if (response.data.email_id) {
+//             // Transform email_id to emailid
+//             const transformedData = {
+//                 ...response.data,
+//                 emailid: response.data.email_id.replace('_', ''),  // Remove the underscore
+//             };
+
+//             // Remove the old email_id field if you don't want it
+//             delete transformedData.email_id;
+
+//             // Dispatch the transformed data to Redux
+//             dispatch({
+//                 type: GET_OPERATOR_EMAILID,
+//                 payload: transformedData,
+//             });
+
+//             // Also pass the transformed data to setToMailOption
+//             setToMailOption(transformedData);
+//         } else {
+//             // If there's no email_id field, dispatch the original data
+//             dispatch({
+//                 type: GET_OPERATOR_EMAILID,
+//                 payload: response.data,
+//             });
+
+//             setToMailOption(response.data);
+//         }
+//     } catch (err) {
+//         console.log(err);
+//     }
+// };
+
 
 
 export const GetFromMail = async (setFromMail) => {

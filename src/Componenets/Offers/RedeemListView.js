@@ -49,6 +49,13 @@ export default function RedeemListView({
     }
   };
 
+  const showComment =
+    typeId === "PRO101"
+      ? offerFilter === "rejected" ||
+        offerFilter === "hold" ||
+        offerFilter === "active"
+      : false;
+
   const CloseStatusModal = () => {
     setStatusModal(false);
     if (statusModal === false) {
@@ -341,6 +348,41 @@ export default function RedeemListView({
         );
       },
     },
+    ...(showComment
+      ? [
+          {
+            title: (
+              <h1 className="text-[1.2vw] font-semibold text-center  flex items-center justify-center">
+                Comments
+              </h1>
+            ),
+            width: "9vw",
+            render: (row) => {
+              return (
+                <div className="flex items-center justify-center">
+                  {row?.comments?.length > 10 ? (
+                    <Tooltip
+                      placement="bottom"
+                      title={row?.comments}
+                      className="cursor-pointer text-[#1F487C]"
+                      color="#1F487C"
+                    >
+                      <p className="text-[1vw] text-[#1F487C]">
+                        {" "}
+                        {`${row?.comments?.slice(0, 10)}...`}
+                      </p>
+                    </Tooltip>
+                  ) : (
+                    <h1 className="text-[1vw] text-[#1F487C]">
+                      {row?.comments?.slice(0, 10)}
+                    </h1>
+                  )}
+                </div>
+              );
+            },
+          },
+        ]
+      : ""),
   ];
   const [deletemodalIsOpen, setDeleteModalIsOpen] = useState(false);
   const closeDeleteModal = () => {

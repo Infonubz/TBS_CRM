@@ -119,17 +119,17 @@ export default function CreateActiveRole({
       {({ setFieldValue, errors, touched, values, handleChange }) => (
         <Form>
           <div className="Add-Section text-[#1f487c]">
-            <div className="tline flex justify-between mb-8 mt-[0.1vw]">
-              <div className="text-[1.1vw] text-[#1F4B7F] font-bold">
-              { updatedata ? "UPDATE ROLES" : " CREATE NEW ROLES"} 
+            <div className="tline flex justify-between mb-[2vw]">
+              <div className="text-[1.35vw] text-[#1F4B7F] font-bold mt-[0.25vw]">
+                {updatedata ? "UPDATE ROLES" : " CREATE NEW ROLES"}
               </div>
-              <div className="w-1/2 pl-4 flex items-end justify-around">
+              <div className="w-1/2 pl-[4vw] flex items-end justify-around mt-[0.16vw]">
                 <button
                   type="submit"
                   className="bg-[#1f487c] h-[2.2vw] w-[6vw] ml-[4.5vw] text-white rounded-[0.75vw] focus:border-[#78ccfc] focus:outline-none focus:border-2"
                 >
                   <div className="flex justify-center">
-                    <LiaSaveSolid size={"1.4vw"} /> 
+                    <LiaSaveSolid size={"1.4vw"} />
                     <div className="pl-[0.5vw] text-[1vw]">Save</div>
                   </div>
                 </button>
@@ -137,7 +137,7 @@ export default function CreateActiveRole({
             </div>
             <div className="fline grid grid-cols-2 gap-x-[2vw] gap-y-[1vw] justify-between mb-4">
               {/* <div> */}
-                {/* <div className="flex gap-x-[0.2vw] items-center">
+              {/* <div className="flex gap-x-[0.2vw] items-center">
                   <label
                     htmlFor="role"
                     className="text-[#1F4B7F] text-[1.1vw] font-semibold"
@@ -146,7 +146,7 @@ export default function CreateActiveRole({
                   </label>
                   <label className="text-[1vw] text-red-500">*</label>
                 </div> */}
-                {/* <div className="relative">
+              {/* <div className="relative">
                   <Field
                     as="select"
                     id="user"
@@ -172,7 +172,7 @@ export default function CreateActiveRole({
                     <BiSolidDownArrow color="#1F487C" />
                   </span>
                 </div> */}
-                {/* <ConfigProvider
+              {/* <ConfigProvider
                   theme={{
                     components: {
                       Select: {
@@ -253,18 +253,18 @@ export default function CreateActiveRole({
                 <div className="flex gap-x-[0.2vw] items-center">
                   <label
                     htmlFor="role"
-                    className="text-[#1F4B7F] text-[1.1vw] font-semibold"
+                    className="text-[#1F4B7F] text-[1.2vw] font-semibold"
                   >
                     Role Type
                   </label>
                   <label className="text-[1vw] text-red-500">*</label>
                 </div>
                 <Field
+                  placeholder="Enter Role type"
                   id="role_type"
                   name="role_type"
                   type="text"
-                  className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C]
-                   text-[#1F487C] text-[1.2vw] h-[2.90vw] w-[100%] rounded-[0.9vw] outline-none px-[1vw]"
+                  className="border-r-[0.2vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                 />
                 <ErrorMessage
                   name="role_type"
@@ -273,32 +273,32 @@ export default function CreateActiveRole({
                 />
               </div>
               <div>
-              <div className="flex items-center gap-x-[0.2vw]">
-                <label
+                <div className="flex items-center gap-x-[0.2vw]">
+                  <label
+                    name="description"
+                    className="text-[#1F4B7F] text-[1.2vw] font-semibold"
+                  >
+                    Description
+                  </label>
+                  <label className="text-[1vw] text-red-500">*</label>
+                </div>
+                <Field
+                  as="textarea"
                   name="description"
-                  className="text-[#1F4B7F] text-[1.1vw] font-semibold"
-                >
-                  Description
-                </label>
-                <label className="text-[1vw] text-red-500">*</label>
+                  placeholder="Enter Description"
+                  rows="3"
+                  cols="50"
+                  style={{ resize: "none", lineHeight: "2.6vw" }} 
+                  className="border-r-[0.2vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                />
+
+                <ErrorMessage
+                  name="description"
+                  component="div"
+                  className="text-red-500 text-[0.8vw]"
+                />
               </div>
-              <Field
-                as="textarea"
-                name="description"
-                placeholder="Description"
-                rows="3"
-                cols="50"
-                className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C]
-                   text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.9vw] outline-none px-[1vw] py-[0.3vw]"
-              />
-              <ErrorMessage
-                name="description"
-                component="div"
-                className="text-red-500 text-[0.8vw]"
-              />
             </div>
-            </div>
-     
           </div>
         </Form>
       )}

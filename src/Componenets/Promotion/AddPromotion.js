@@ -1,37 +1,43 @@
 import { ConfigProvider, DatePicker, Select, Upload } from "antd";
-import { ErrorMessage, Field, Form, Formik } from "formik";
+import { ErrorMessage, Field, 
+  //Form, Formik 
+} from "formik";
 import React, { useEffect, useState } from "react";
-import { LiaSave } from "react-icons/lia";
+//import { LiaSave } from "react-icons/lia";
 import * as Yup from "yup";
 import "../../App.css";
 import { useDispatch, useSelector } from "react-redux";
-import { PROMOTION_DATA, GET_OPERATOR_NAME } from "../../Store/Type";
-import { toast } from "react-toastify";
+//import { PROMOTION_DATA, GET_OPERATOR_NAME } from "../../Store/Type";
+//import { toast } from "react-toastify";
 import ModalPopup from "../Common/Modal/Modal";
 import {
-  GetPromotionById,
-  GetPromotionData,
-  SubmitPromotionData,
+  GetPromotionDataByStatus,
+  //SubmitPromotionData,
   GetOperatorName,
 } from "../../Api/Promotion/Promotion";
-import { submitUserData } from "../../Api/UserManagement/UserManagement";
+//import { submitUserData } from "../../Api/UserManagement/UserManagement";
 import dayjs from "dayjs";
-import { FaBus, FaUpload } from "react-icons/fa";
-import Background_View from "./Background_View";
+import { 
+  //FaBus, 
+  FaUpload } from "react-icons/fa";
+//import Background_View from "./Background_View";
 import { IoMdArrowDropdown } from "react-icons/io";
 
 const validationSchema = Yup.object().shape({
   promotion_name: Yup.string()
     .required("Promotion Title is required")
-    .max(17, "Max 17 characters only"),
+    .max(17, "Max 17 characters only")
+    .matches(/^[a-zA-Z0-9]+$/, "Only alphabets and numbers are allowed"),
   promotion_description: Yup.string()
     .required("Promotion Description is required")
-    .max(43, "Max 57 characters only"),
+    .max(43, "Max 57 characters only")
+    .matches(/^[a-zA-Z0-9]+$/, "Only alphabets and numbers are allowed"),
   usage: Yup.string()
     .required("Enter Usage Value")
     .min(1, "usage must be at least 1")
     .max(100, "usage cannot exceed 100")
     .matches(/^[0-9]+$/, "Only numbers are allowed"),
+    
   promo_code: Yup.string()
     .required("Enter Promo Code")
     .min(5, "Promo Code must be at least 5 digit")
@@ -83,7 +89,18 @@ export default function AddPromotion({
   setPromotionId,
   values,
   handleChange,
+  setPreviewUrl,
+  previewUrl,
   setFieldValue,
+  valuesymbol,
+  setValueSymbol,
+  setPromolist,
+  promolist,
+  draggerImage,
+  setDraggerImage,
+  currentPromo, 
+  setCurrentPromo,
+  CurrentTab
 }) {
   const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const { Dragger } = Upload;
@@ -91,22 +108,16 @@ export default function AddPromotion({
   const dispatch = useDispatch();
   const [userName, setUserName] = useState("");
   const [userType, setUserType] = useState("");
-  const [selectedOperator, setSelectedOperator] = useState("");
+  //const [selectedOperator, setSelectedOperator] = useState("");
   const getOperatorName = useSelector((state) => state.crm.operator_name);
   const [imageModalOpen, isImageModalOpen] = useState(false);
   const [bgimage, setBgImage] = useState(false);
-  const [currentPromo, setCurrentPromo] = useState([]);
-  const [previewUrl, setPreviewUrl] = useState("");
-  const [draggerImage, setDraggerImage] = useState(false);
+  // const [promolist, setPromolist] = useState({
+  //   background_image: "",
+  // });
+  const type_Id = sessionStorage.getItem("type_id");
+  //const [currentPromodata, setCurrentPromodata] = useState("");
 
-  console.log(promodata, "binaryDatabinaryData");
-
-  const [promolist, setPromolist] = useState({
-    background_image: "",
-  });
-
-  const [currentPromodata, setCurrentPromodata] = useState("");
-  console.log(currentPromo, "current_promo");
   const openImageModal = () => {
     isImageModalOpen(true);
   };
@@ -118,52 +129,10 @@ export default function AddPromotion({
     // sessionStorage.removeItem("promotion_logo")
   };
 
-  useEffect(() => {
-    GetPromotionData(dispatch);
-    GetOperatorName(dispatch);
-    console.log(getOperatorName, "getOperatorName");
-  }, []);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    // const userNameFromSessionStorage = sessionStorage.getItem("user_name");
-    const userNameFromSessionStorage = sessionStorage.getItem("user_name");
-    // const UserType = sessionStorage.getItem("type_id");
-    const UserType = sessionStorage.getItem("type_id");
-    if (UserType) {
-      setUserType(UserType);
-    }
-    if (userNameFromSessionStorage) {
-      setUserName(userNameFromSessionStorage);
-    }
-    console.log(UserType, "UserType");
-  }, []);
-
   const handleSubmit = async (values) => {
     setBgImage(true);
   };
 
-  const fetchGetPromo = async () => {
-    try {
-      const data = await GetPromotionById(
-        promotionId,
-        setPromotionId,
-        setPromoData
-      );
-      console.log(data.promo_name, "datadata");
-      setPromoData(data);
-    } catch (error) {
-      console.error("Error fetching additional user data", error);
-    }
-  };
-
-  useEffect(() => {
-    if (updatedata) {
-      fetchGetPromo();
-    }
-  }, [promotionId, setPromotionId, setPromoData]);
-
-  console.log(fileName, "promodatapromodata");
   // const [fileData, setFileData] = useState(null);
 
   // const handleFileChange = (event) => {
@@ -183,7 +152,42 @@ export default function AddPromotion({
   // console.log(fileData,"fileDatafileData");
 
   const [binaryData, setBinaryData] = useState(null);
-  console.log(promotionId, "occupationvalue");
+
+  const convertToBinary = (file) => {
+    const reader = new FileReader();
+    reader.readAsArrayBuffer(file);
+    reader.onloadend = () => {
+      const arrayBuffer = reader.result;
+      const binaryString = new Uint8Array(arrayBuffer).reduce((data, byte) => {
+        return data + String.fromCharCode(byte);
+      }, "");
+      setBinaryData(binaryString);
+    };
+  };
+
+  const GetStatusOpt = () => {
+    if (type_Id == "PRO101") {
+      return [
+        { label: "Draft", value: "Draft" },
+        { label: "Active", value: "Active" },
+      ];
+    } else if (type_Id == "OP101") {
+      return [
+        { label: "Draft", value: "Draft" },
+        { label: "Posted", value: "Posted" },
+      ];
+    } else {
+      return [{ label: "Select Status", value: "" }];
+    }
+  };
+
+  const options = GetStatusOpt();
+
+  const [minExpiryDate, setMinExpiryDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
+  const { RangePicker } = DatePicker;
+
   useEffect(() => {
     const fileData = {
       uid: "rc-upload-1719855563269-9",
@@ -200,46 +204,26 @@ export default function AddPromotion({
     convertToBinary(blob);
   }, []);
 
-  const convertToBinary = (file) => {
-    const reader = new FileReader();
-    reader.readAsArrayBuffer(file);
-    reader.onloadend = () => {
-      const arrayBuffer = reader.result;
-      const binaryString = new Uint8Array(arrayBuffer).reduce((data, byte) => {
-        return data + String.fromCharCode(byte);
-      }, "");
-      setBinaryData(binaryString);
-    };
-  };
-  console.log(binaryData, "binaryDatabinaryData");
+  useEffect(() => {
+    GetPromotionDataByStatus(dispatch, CurrentTab);
+    GetOperatorName(dispatch);
+    console.log(getOperatorName, "getOperatorName");
+  }, []);
+  const [error, setError] = useState("");
 
-  // const type_Id = sessionStorage.getItem("type_id");
-  const type_Id = sessionStorage.getItem("type_id");
-
-  const GetStatusOpt = () => {
-    if (type_Id == "PRO101") {
-      return [
-        { label: "Draft", value: "Draft" },
-        { label: "Active", value: "Active" },
-      ];
-    } else if (type_Id == "EMP101") {
-      return [
-        { label: "Draft", value: "Draft" },
-        { label: "Posted", value: "Posted" },
-      ];
-    } else {
-      return [{ label: "Select Status", value: "" }];
+  useEffect(() => {
+    // const userNameFromSessionStorage = sessionStorage.getItem("user_name");
+    const userNameFromSessionStorage = sessionStorage.getItem("user_name");
+    // const UserType = sessionStorage.getItem("type_id");
+    const UserType = sessionStorage.getItem("type_id");
+    if (UserType) {
+      setUserType(UserType);
     }
-  };
-
-  const options = GetStatusOpt();
-
-  const [minExpiryDate, setMinExpiryDate] = useState(
-    new Date().toISOString().split("T")[0]
-  );
-  const { RangePicker } = DatePicker;
-  console.log(currentPromodata, "currentPromodata");
-  console.log(draggerImage, "draggerImagedraggerImage");
+    if (userNameFromSessionStorage) {
+      setUserName(userNameFromSessionStorage);
+    }
+    console.log(UserType, "UserType");
+  }, []);
 
   return (
     <>
@@ -374,7 +358,7 @@ export default function AddPromotion({
                 className="custom-select bg-white outline-none w-full mt-[0.2vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw] border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
                 placeholder="Select Role"
                 optionFilterProp="label"
-                value={values.operator_details} // Update this line to reflect the current selection
+                value={values.operator_details} 
                 onChange={(value, option) => {
                   const selectedOperator = getOperatorName?.find(
                     (operator) => operator.company_name === value
@@ -409,9 +393,6 @@ export default function AddPromotion({
                     value: operatorName.company_name,
                     label: (
                       <div className="flex items-center text-[1vw] gap-x-[0.5vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                        {/* <span className="">
-                                  <FaBus color="#1F487C" size="1vw" />
-                                </span> */}
                         <span className="text-[1vw]">
                           {operatorName.company_name}
                         </span>
@@ -556,12 +537,12 @@ text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1v
           <ErrorMessage
             name="start_date"
             component="div"
-            className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]"
+            className="text-red-500 text-[0.8vw] absolute bottom-[-0.1vw]"
           />
           <ErrorMessage
             name="expiry_date"
             component="div"
-            className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[7vw]"
+            className="text-red-500 text-[0.8vw] absolute bottom-[-0.1vw] left-[8vw]"
           />
         </div>
         {/* <div className="col-span-1 flex flex-col">
@@ -594,7 +575,7 @@ text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1v
                     className="text-red-500 text-[0.8vw]"
                   />
                 </div> */}
-        <div className="col-span-1 flex-col flex">
+        <div className="col-span-1 flex-col flex relative">
           <label className="text-[#1F4B7F] text-[1.1vw] font-bold ">
             Promo Value
             <span className="text-[1vw] text-red-600 pl-[0.25vw]">*</span>
@@ -623,9 +604,33 @@ text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1v
             component="div"
             className="text-red-500 text-[0.8vw]"
           />
+          <div className="flex items-center justify-center absolute right-[0.1vw] top-[1.9vw]">
+          <button
+          type="button"
+          className={`h-[2.75vw] w-[3vw] text-[1.2vw] border-[#1F4B7F] border-[0.1vw] ${
+            values.value_symbol === "₹"
+              ? "bg-[#1F4B7F] text-white"
+              : "bg-white text-[#1F4B7F]"
+          }`}
+          onClick={() => setFieldValue("value_symbol", "₹")}
+        >
+          ₹
+        </button>
+        <button
+          type="button"
+          className={`h-[2.75vw] w-[3vw] text-[1.2vw] rounded-r-[0.4vw] border-[#1F4B7F] border-[0.1vw] ${
+            values.value_symbol === "%"
+              ? "bg-[#1F4B7F] text-white"
+              : "bg-white text-[#1F4B7F]"
+          }`}
+          onClick={() => setFieldValue("value_symbol", "%")}
+        >
+          %
+        </button>
+          </div>
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-[1.5vw] pt-[1.2vw]">
+      <div className="grid grid-cols-2 gap-[1.5vw] pt-[0.3vw]">
         <div className="col-span-1 flex-col flex relative">
           <label className="text-[#1F4B7F] text-[1.1vw] font-semibold ">
             Promo Code
@@ -791,18 +796,17 @@ text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1v
                     setPreviewUrl(tempUrl); // Set the preview URL for the background image
                     console.log("File URL:", tempUrl);
                     sessionStorage.setItem("promotion_logo", tempUrl);
-                    console.log(file,"currectimagefile");
-                    
+                    console.log(file, "currectimagefile");
                     setFieldValue("file", file);
                     setFileName(file.name);
                     setFieldValue("file_type", file.type);
                     setFieldValue("file_size", file.size);
-
-                    // const reader = new FileReader();
-                    // reader.onloadend = () => {
-                    //   setPreviewUrl(reader.result); // Set the preview URL as a DataURL (base64)
-                    // };
-                    // reader.readAsDataURL(file);
+                   
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                      setPreviewUrl(reader.result); // Set the preview URL as a DataURL (base64)
+                    };
+                    reader.readAsDataURL(file);
 
                     return false; // Prevent automatic upload
                   }}
@@ -824,8 +828,7 @@ text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1v
                     className="absolute top-0 left-0 w-full h-full"
                     style={{
                       backgroundImage: `url(${
-                        sessionStorage.getItem("upload")
-                          ? sessionStorage.getItem("promotion_logo")
+                        draggerImage ? previewUrl
                           : `${apiImgUrl}${promodata.promo_image}`
                       })`,
                       backgroundSize: "cover",
@@ -869,7 +872,7 @@ text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1v
         width="45vw"
         closeicon={false}
       >
-        <Background_View
+        {/* <Background_View
           setCurrentPromo={setCurrentPromo}
           currentPromo={currentPromo}
           currentPromodata={currentPromodata}
@@ -882,10 +885,10 @@ text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1v
           promotionId={promotionId}
           promodata={promodata}
           draggerImage={draggerImage}
-        />
+          handleChange={handleChange}
+          setFieldValue={setFieldValue}
+        /> */}
       </ModalPopup>
     </>
   );
 }
-
-
