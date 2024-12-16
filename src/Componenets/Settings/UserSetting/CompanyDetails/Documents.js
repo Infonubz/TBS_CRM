@@ -234,7 +234,7 @@ const Documents = ({ operatorData }) => {
                                         />
                                         <button
                                             type="button"
-                                            className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                            className={`border-r-[0.25vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
                                             disabled={isEdit === false}
                                             onClick={(event) => {
                                                 event.preventDefault();
@@ -296,7 +296,7 @@ const Documents = ({ operatorData }) => {
                                         />
                                         <button
                                             type="button"
-                                            className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                            className={`border-r-[0.25vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
                                             disabled={isEdit === false}
                                             onClick={(event) => {
                                                 event.preventDefault();
@@ -369,7 +369,7 @@ const Documents = ({ operatorData }) => {
                                         />
                                         <button
                                             type="button"
-                                            className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                            className={`border-r-[0.25vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
                                             disabled={isEdit === false}
                                             onClick={(event) => {
                                                 event.preventDefault();
@@ -441,7 +441,7 @@ const Documents = ({ operatorData }) => {
                                         />
                                         <button
                                             type="button"
-                                            className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                            className={`border-r-[0.25vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
                                             disabled={isEdit === false}
                                             onClick={(event) => {
                                                 event.preventDefault();
@@ -514,7 +514,7 @@ const Documents = ({ operatorData }) => {
                                         />
                                         <button
                                             type="button"
-                                            className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                            className={`border-r-[0.25vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
                                             disabled={isEdit === false}
                                             onClick={(event) => {
                                                 event.preventDefault();
@@ -582,7 +582,7 @@ const Documents = ({ operatorData }) => {
                                             }}
                                         />
                                         <button
-                                            className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                                            className={`border-r-[0.25vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
                                             disabled={isEdit === false}
                                             onClick={(event) => {
                                                 event.preventDefault();
@@ -642,7 +642,7 @@ const Documents = ({ operatorData }) => {
                                         type="submit"
                                         className="text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[12vw]"
                                     >
-                                        Submit
+                                        Update
                                     </button>
                                 }
                             </div>

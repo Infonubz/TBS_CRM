@@ -1,4 +1,4 @@
-import { ConfigProvider, Progress, Select } from "antd";
+import { ConfigProvider, Progress, Select, Spin } from "antd";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { FaCloudUploadAlt } from "react-icons/fa";
@@ -14,7 +14,7 @@ import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import umbuslogo from "../../../asserts/umbuslogo.png"
 import { GetRolesData } from "../../../Api/Role&Responsibilites/ActiveRoles";
-import { IoMdArrowDropdown } from "react-icons/io";
+import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 
 const validationSchema = Yup.object().shape({
   // emailid: Yup.string()
@@ -26,27 +26,42 @@ const validationSchema = Yup.object().shape({
   designation: Yup.string()
     .required("Designation is required")
     .matches(/^[A-Za-z\s]+$/, "contains only letters and spaces")
+    .min(2,"Minimum 2 characters long")
     .max(50,"Maximum 50 characters only"),
   department: Yup.string()
     .required("Department is required")
-    .matches(/^[A-Za-z\s]+$/, "contains only letters and spaces"),
+    .matches(/^[A-Za-z\s]+$/, "contains only letters and spaces")
+    .min(2,"Minimum 2 characters long")
+    .max(50,"Maximum 50 characters only"),
   role: Yup.string().required("Role is required"),
   report_manager: Yup.string()
     .required("Manager Name is required")
-    .matches(/^[A-Za-z\s]+$/, "contains only letters and spaces"),
+    .matches(/^[A-Za-z\s]+$/, "contains only letters and spaces")
+    .min(3,"Minimum 3 characters long")
+    .max(50,"Maximum 50 characters only"),
   // experiance: Yup.string()
   //   .matches(/^[0-9]+$/, "Experiance must be a number")
   //   // .min(5, "Experiance must be at least 10 digits")
   //   // .max(10, "Experiance maximum 10 digits only")
   //   .required("Experiance is required"),
-  branch: Yup.string().required("Branch is required").max(50,"Maximum 50 characters only"),
-  join_date: Yup.date().required("Joining Date Required"), // Validation schema for select field
+  branch: Yup.string().required("Branch is required")
+  .min(3,"Minimum 3 characters long")
+  .max(50,"Maximum 50 characters only"),
+  join_date: Yup.date().required("Joining Date Required")
+  .min(new Date().toISOString().split('T')[0], "Joining date cannot be in the past")
+  .max(
+    new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().split('T')[0],
+    "Joining date must be within 3 months"
+  ),
   language: Yup.string()
     .required("Language is required")
+    .min(3,"Minimum 3 characters long")
     .matches(/^[A-Za-z\s]+$/, "contains only letters and spaces").max(50,"Maximum 50 characters only"),
   qualification: Yup.string()
     .required("Qualification is required")
-    .matches(/^[A-Za-z\s]+$/, "contains only letters and spaces"),
+    .matches(/^[A-Za-z\s]+$/, "contains only letters and spaces")
+    .min(3,"Minimum 3 characters long")
+    .max(50,"Maximum 50 characters only"),
 });
 
 export default function AddProfessionalDetails({
@@ -59,6 +74,7 @@ export default function AddProfessionalDetails({
   updatedata
 }) {
   const [enable, setEnable] = useState(false);
+    const [spinning, setSpinning] = useState(false);
   const [currentRoleId,setCurrentRoleId] = useState("")
   const dispatch = useDispatch();
 
@@ -66,7 +82,7 @@ export default function AddProfessionalDetails({
   
   const handleSubmit = async (values) => {
     console.log("Form values on submit:", values); // Log form values
-    if (EmployeeID && enable == false && documentback == true || updatedata && enable == false) {
+    if (EmployeeID && enable == false && documentback == true || updatedata && empproffesionaldata.designation !=null && enable == false) {
       console.log("Existing EmployeeID, setting current page to 3");
       setCurrentpage(4);
     }
@@ -116,7 +132,8 @@ export default function AddProfessionalDetails({
       const data = await GetEmpProffesionalById(
         EmployeeID,
         setEmployeeID,
-        setEmpProffesionalData
+        setEmpProffesionalData,
+        setSpinning
       );
       setEmpProffesionalData(data);
       setCurrentRoleId(data.role_type_id)
@@ -130,6 +147,7 @@ export default function AddProfessionalDetails({
   useEffect(() => {
     if (EmployeeID != null || documentback) {
       fetchGetUser();
+      setSpinning(true)
     }
   }, [EmployeeID, documentback]);
 
@@ -151,7 +169,7 @@ export default function AddProfessionalDetails({
     value: '',
     label: (
       <div className="text-[1vw] px-[0.2vw] pb-[0.1vw] text-gray-400">
-        Select Role Type
+        Select Role
       </div>
     ),
     disabled: true,
@@ -180,8 +198,8 @@ export default function AddProfessionalDetails({
         <div className="h-[4vw] w-full flex items-center justify-between ">
           <label className="text-[1.5vw] font-semibold text-[#1f4b7f] ">
             Professional Details
-          </label>
-          {updatedata ||
+          </label> 
+          {updatedata && empproffesionaldata.designation !=null ||
           (documentback && empproffesionaldata != null) ||
           empproffesionaldata != "null" ? (
             <button
@@ -242,46 +260,15 @@ export default function AddProfessionalDetails({
               handleChange,
             }) => (
               <Form onSubmit={handleSubmit}>
+                 {spinning ? (
+                  <div className=" flex justify-center h-[22.8vw] items-center">
+                    <Spin size="large" />
+                  </div>
+                ) : (
                 <div className="gap-y-[1.5vw] flex-col flex">
                   <div className="overflow-y-scroll gap-y-[1.5vw] flex-col flex h-[18vw] pb-[1vw] ">
                   <div className="grid grid-cols-2 w-full gap-x-[2vw]">
-                    <div className="col-span-1 relative">
-                      <label className="text-[#1F4B7F] text-[1.1vw] ">
-                        Joining Date
-                        <span className="text-[1vw] text-red-600 pl-[0.2vw]">
-                          *
-                        </span>
-                      </label>
-                      <Field
-                        type="date"
-                        name="join_date"
-                        placeholder="Select Joining Date"
-                        value={values.join_date}
-                        onChange={(e) => {
-                          handleChange(e);
-                          sessionStorage.setItem("dob", e.target.value);
-                        }}
-                        disabled={
-                          updatedata || documentback
-                            ? enable
-                              ? false
-                              : true
-                            : false
-                        }
-                        className={`${
-                          updatedata || documentback
-                            ? enable == false
-                              ? " cursor-not-allowed"
-                              : ""
-                            : ""
-                        } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
-                      />
-                      <ErrorMessage
-                        name="join_date"
-                        component="div"
-                        className="text-red-500 text-[0.8vw] absolute bottom-[-1.5vw] left-[.2vw]"
-                      />
-                    </div>
+              
                     <div className="col-span-1 relative">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         Designation
@@ -292,17 +279,18 @@ export default function AddProfessionalDetails({
                       <Field
                         type="text"
                         name="designation"
+                        autoComplete="off"
                         placeholder="Enter Designation"
                         // value={values.firstname}
                         disabled={
-                          updatedata || documentback
+                          updatedata && empproffesionaldata.designation !=null || documentback
                             ? enable
                               ? false
                               : true
                             : false
                         }
                         className={`${
-                          updatedata || documentback
+                          updatedata && empproffesionaldata.designation !=null || documentback
                             ? enable == false
                               ? " cursor-not-allowed"
                               : ""
@@ -315,11 +303,9 @@ export default function AddProfessionalDetails({
                         className="text-red-500 text-[0.8vw] absolute bottom-[-1.5vw] left-[.2vw]"
                       />
                     </div>
-                  </div>
-                  <div className="grid grid-cols-2 w-full umselect gap-x-[2vw]">
                     <div className="col-span-1 relative">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
-                        Role Type
+                        Role
                         <span className="text-[1vw] text-red-600 pl-[0.2vw]">
                           *
                         </span>
@@ -386,6 +372,8 @@ export default function AddProfessionalDetails({
                         <Select
                           showSearch
                           value={values.role || ""}
+                          placement="topRight"
+                          listHeight={190}
                           onChange={(value,id) => {
                             handleChange({ target: { name: 'role', value } })
                             console.log(id.id,"idididisdfsdf");
@@ -393,14 +381,14 @@ export default function AddProfessionalDetails({
                             
                           }}
                           disabled={
-                            updatedata || documentback
+                            updatedata && empproffesionaldata.designation !=null || documentback
                               ? enable
                                 ? false
                                 : true
                               : false
                           }
                           name="role"
-                          className={`${updatedata || documentback
+                          className={`${updatedata && empproffesionaldata.designation !=null || documentback
                             ? enable == false
                               ? " cursor-not-allowed"
                               : ""
@@ -413,7 +401,7 @@ export default function AddProfessionalDetails({
                           }
                           optionFilterProp="value"
                           suffixIcon={<span style={{ fontSize: '1vw', color: '#1f487c' }}>
-                            <IoMdArrowDropdown size="2vw" />
+                            <IoMdArrowDropup size="2vw" />
                           </span>}
                           style={{ padding: 4 }}
                           options={RolesOptions}
@@ -422,6 +410,42 @@ export default function AddProfessionalDetails({
                       </ConfigProvider>
                       <ErrorMessage
                         name="role"
+                        component="div"
+                        className="text-red-500 text-[0.8vw] absolute bottom-[-1.5vw] left-[.2vw]"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 w-full umselect gap-x-[2vw]">
+                  <div className="col-span-1 relative">
+                      <label className="text-[#1F4B7F] text-[1.1vw] ">
+                        Department
+                        <span className="text-[1vw] text-red-600 pl-[0.2vw]">
+                          *
+                        </span>
+                      </label>
+                      <Field
+                        type="text"
+                        name="department"
+                        autoComplete="off"
+                        placeholder="Enter Department"
+                        value={values.department}
+                        disabled={
+                          updatedata && empproffesionaldata.designation !=null || documentback
+                            ? enable
+                              ? false
+                              : true
+                            : false
+                        }
+                        className={`${
+                          updatedata && empproffesionaldata.designation !=null || documentback
+                            ? enable == false
+                              ? " cursor-not-allowed"
+                              : ""
+                            : ""
+                        } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                      />
+                      <ErrorMessage
+                        name="department"
                         component="div"
                         className="text-red-500 text-[0.8vw] absolute bottom-[-1.5vw] left-[.2vw]"
                       />
@@ -472,17 +496,18 @@ export default function AddProfessionalDetails({
                       <Field
                         type="text"
                         name="branch"
+                        autoComplete="off"
                         placeholder="Enter Branch"
                         value={values.branch}
                         disabled={
-                          updatedata || documentback
+                          updatedata && empproffesionaldata.designation !=null || documentback
                             ? enable
                               ? false
                               : true
                             : false
                         }
                         className={`${
-                          updatedata || documentback
+                          updatedata && empproffesionaldata.designation !=null || documentback
                             ? enable == false
                               ? " cursor-not-allowed"
                               : ""
@@ -563,27 +588,32 @@ export default function AddProfessionalDetails({
                         className="text-red-500 text-[0.8vw]"
                       />
                     </div> */}
-                    <div className="col-span-1 relative">
+                       <div className="col-span-1 relative">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
-                        Department
+                        Joining Date
                         <span className="text-[1vw] text-red-600 pl-[0.2vw]">
                           *
                         </span>
                       </label>
                       <Field
-                        type="text"
-                        name="department"
-                        placeholder="Enter Department"
-                        value={values.department}
+                        type="date"
+                        name="join_date"
+                        autoComplete="off"
+                        placeholder="Select Joining Date"
+                        value={values.join_date}
+                        onChange={(e) => {
+                          handleChange(e);
+                          sessionStorage.setItem("dob", e.target.value);
+                        }}
                         disabled={
-                          updatedata || documentback
+                          updatedata && empproffesionaldata.designation !=null || documentback
                             ? enable
                               ? false
                               : true
                             : false
                         }
                         className={`${
-                          updatedata || documentback
+                          updatedata && empproffesionaldata.designation !=null || documentback
                             ? enable == false
                               ? " cursor-not-allowed"
                               : ""
@@ -591,7 +621,7 @@ export default function AddProfessionalDetails({
                         } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                       />
                       <ErrorMessage
-                        name="department"
+                        name="join_date"
                         component="div"
                         className="text-red-500 text-[0.8vw] absolute bottom-[-1.5vw] left-[.2vw]"
                       />
@@ -606,17 +636,18 @@ export default function AddProfessionalDetails({
                       <Field
                         type="text"
                         name="report_manager"
+                        autoComplete="off"
                         placeholder="Enter Manager Name"
                         value={values.report_manager}
                         disabled={
-                          updatedata || documentback
+                          updatedata && empproffesionaldata.designation !=null || documentback
                             ? enable
                               ? false
                               : true
                             : false
                         }
                         className={`${
-                          updatedata || documentback
+                          updatedata && empproffesionaldata.designation !=null || documentback
                             ? enable == false
                               ? " cursor-not-allowed"
                               : ""
@@ -641,17 +672,18 @@ export default function AddProfessionalDetails({
                       <Field
                         type="text"
                         name="qualification"
+                        autoComplete="off"
                         placeholder="Qualification"
                         value={values.qualification}
                         disabled={
-                          updatedata || documentback
+                          updatedata && empproffesionaldata.designation !=null || documentback
                             ? enable
                               ? false
                               : true
                             : false
                         }
                         className={`${
-                          updatedata || documentback
+                          updatedata && empproffesionaldata.designation !=null || documentback
                             ? enable == false
                               ? " cursor-not-allowed"
                               : ""
@@ -674,17 +706,18 @@ export default function AddProfessionalDetails({
                       <Field
                         type="text"
                         name="language"
+                        autoComplete="off"
                         placeholder="Language"
                         value={values.language}
                         disabled={
-                          updatedata || documentback
+                          updatedata && empproffesionaldata.designation !=null || documentback
                             ? enable
                               ? false
                               : true
                             : false
                         }
                         className={`${
-                          updatedata || documentback
+                          updatedata && empproffesionaldata.designation !=null || documentback
                             ? enable == false
                               ? " cursor-not-allowed"
                               : ""
@@ -720,7 +753,7 @@ export default function AddProfessionalDetails({
                         type="submit"
                         // onClick={() => setCurrentpage(4)}
                       >
-                        {updatedata || documentback
+                        {updatedata && empproffesionaldata.designation !=null || documentback
                           ? enable
                             ? "Update & Continue"
                             : "Continue"
@@ -728,7 +761,7 @@ export default function AddProfessionalDetails({
                       </button>
                     </div>
                   </div>
-                </div>
+                </div>)}
               </Form>
             )}
           </Formik>

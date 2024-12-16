@@ -153,6 +153,38 @@ export const SubmitCompanyData = async (
   }
 };
 
+ export const validateMobile = async(value,module) =>{
+  const apiString = module === "operator" ? "phone" :module === "partner" ? "phone-partner" : module === "client" ? "phone-client" : ""
+  try{
+   const response = await axios.post(`${apiUrl}/${apiString}`,{
+    phone:value
+   })
+   return response.data.exists
+  }
+  catch(err){
+    // handleError(err)
+    console.log(err,"eroihfdjf");
+    return err
+    
+  }
+ }
+
+ export const validateEmail = async(value,module) =>{
+   const apiString = module === "operator" ? "emailid" :module === "partner" ? "emailid-partner" : module === "client" ? "emailid-client" : ""
+  try{
+    const response = await axios.post(`${apiUrl}/${apiString}`,{
+      emailid:value
+    })
+    return response.data.exists
+  }
+  catch(err){
+    // handleError(err)
+    console.log(err,"eroihfdjf");
+  }
+ }
+
+
+
 export const SubmitAddressData = async (
   addressvalue,
   operatorID,
@@ -312,7 +344,8 @@ export const SubmitProfileData = async (
 export const GetSuperAdminGSTById = async (
   operatorID,
   setOperatorID,
-  setSuperAdminGSTData
+  setSuperAdminGSTData,
+  setSpinning
 ) => {
   console.log(operatorID, "ahsgxdahsjksaxbj");
   const getid = sessionStorage.getItem("OPERATE_ID")?sessionStorage.getItem("OPERATE_ID"):sessionStorage.getItem("SPA_ID");
@@ -327,6 +360,9 @@ export const GetSuperAdminGSTById = async (
   } catch (error) {
     handleError(error);
     return null;
+  }
+  finally{
+    setSpinning && setSpinning(false)
   }
 };
 
@@ -404,7 +440,8 @@ export const GetSuperAdminById = async (
 export const GetSuperAdminAddressById = async (
   OperatorID,
   setOperatorID,
-  setSuperAdminAddressData
+  setSuperAdminAddressData,
+  setSpinning
 ) => {
   try {
     const response = await api.get(
@@ -419,13 +456,17 @@ export const GetSuperAdminAddressById = async (
     handleError(error);
     return null;
   }
+  finally{
+    setSpinning && setSpinning(false)
+  }
 };
 
 
 export const GetSuperAdminBusinessById = async (
   OperatorID,
   SetUpdateData,
-  setOfferData
+  setOfferData,
+  setSpinning
 ) => {
   try {
     const response = await api.get(
@@ -440,13 +481,17 @@ export const GetSuperAdminBusinessById = async (
     handleError(error);
     return null;
   }
+  finally{
+    setSpinning && setSpinning(false)
+  }
 };
 
 
 export const GetSuperAdminDocumentById = async (
   updatedata,
   SetUpdateData,
-  setOfferData
+  setOfferData,
+  setSpinning
 ) => {
   console.log(updatedata, "ahsgxdahsjksaxbj");
   const getid = sessionStorage.getItem("SPA_ID");
@@ -462,6 +507,9 @@ export const GetSuperAdminDocumentById = async (
     handleError(error);
     return null;
   }
+  finally{
+    setSpinning && setSpinning(false)
+  }
 };
 
 
@@ -469,7 +517,7 @@ export const GetOperatorById = async (
   OperatorID,
   setOperatorID,
   setSuperAdminData,
-  dispatch
+  dispatch,setSpinning
 ) => {
   try {
     const response = await api.get(
@@ -484,6 +532,9 @@ export const GetOperatorById = async (
   } catch (error) {
     handleError(error);
     return null;
+  }
+  finally{
+    setSpinning(false)
   }
 };
 
@@ -574,7 +625,16 @@ export const OperatorProfile = async (image, operatorID) => {
     return null;
   }
 };
-
+export const GetOperatorByOPId = async (operatorId) =>{
+  console.log(operatorId, "operatorId")
+  try{
+   const response = await api.get(`${apiUrl}/operators/${operatorId}`);
+   return response.data[0];
+  }
+  catch(error){
+    handleError(error);
+  }
+}
 
 const handleError = (error) => {
   console.error("Error details:", error);

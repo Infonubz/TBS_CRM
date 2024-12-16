@@ -36,16 +36,16 @@ export default function AddOffer({
   offerlist,
   setOfferlist,
   setValue,
-  errorValue,
+  error,
+  setError,
   setPreviewUrl,
   draggerImage,
   setDraggerImage,
   fileName,
   setFileName,
+  errors,
 }) {
   const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
-
-  const [error, setError] = useState();
 
   const typeid = sessionStorage.getItem("type_id");
 
@@ -56,13 +56,11 @@ export default function AddOffer({
   const getStatusOptions = () => {
     if (typeid == "PRO101") {
       return [
-        { label: "Select Status", value: "" },
         { label: "Draft", value: "Draft" },
         { label: "Active", value: "Active" },
       ];
     } else if (typeid == "PROEMP101") {
       return [
-        { label: "Select Status", value: "" },
         { label: "Draft", value: "Draft" },
         { label: "Posted", value: "Posted" },
       ];
@@ -170,9 +168,9 @@ export default function AddOffer({
                 </div>
               </div>
               {bgimage === false ? ( */}
-      <div className=" ">
+      <div className=" umselect">
         <div className="grid grid-cols-2 gap-[1vw] pt-[1vw]">
-          <div className=" relative col-span-1">
+          <div className=" relative col-span-1 flex-col flex">
             <label className="text-[#1F4B7F] text-[1.1vw] font-semibold">
               Offer Name
               <span className="text-[1vw] text-red-600 pl-[0.2vw]">*</span>
@@ -183,12 +181,12 @@ export default function AddOffer({
               id="offer_name"
               placeholder="Enter Offer Name"
               value={values.offer_name}
+              autoComplete="off"
               onChange={(e) => {
                 handleChange(e);
                 sessionStorage.setItem("offer_name", e.target.value);
-             
               }}
-              className="border-r-[0.2vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+              className="border-r-[0.25vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw]  border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-full rounded-[0.5vw] outline-none px-[1vw] placeholder:text-[1vw] "
             />
             <ErrorMessage
               name="offer_name"
@@ -196,21 +194,22 @@ export default function AddOffer({
               className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]"
             />
           </div>
-          <div className="relative col-span-1">
+          <div className="relative col-span-1 flex-col flex">
             <label className="text-[#1F4B7F] text-[1.1vw] font-semibold">
               Offer Code
+              <span className="text-red-500 text-[1vw] pl-[0.2vw]">*</span>
             </label>
-            <span className="text-red-500 text-[1vw] pl-[0.2vw]">*</span>
+
             <Field
               type="text"
               name="code"
               placeholder="Enter Offer Code"
-              value={values.code}
+              autoComplete="off"
+              value={values.code.toUpperCase()}
               onChange={(e) => {
                 handleChange(e);
-             
               }}
-              className="border-r-[0.2vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+              className="border-r-[0.25vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw]  border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-full rounded-[0.5vw] outline-none px-[1vw] placeholder:text-[1vw]"
             />
             <ErrorMessage
               name="code"
@@ -251,7 +250,7 @@ export default function AddOffer({
                       //     start_date: e.target.value,
                       //   });
                       // }}
-                      className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                      className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.1vw] h-[3vw] w-full rounded-[0.5vw] outline-none px-[1vw]"
                     />
                     <ErrorMessage
                       name="start_date"
@@ -280,7 +279,7 @@ export default function AddOffer({
                           expiry_date: e.target.value,
                         });
                       }}
-                      className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                      className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.1vw] h-[3vw] w-full rounded-[0.5vw] outline-none px-[1vw]"
                     />
                     <ErrorMessage
                       name="expiry_date"
@@ -290,10 +289,97 @@ export default function AddOffer({
                   </div>
                 </div> */}
 
-        <div className="grid grid-cols-2 gap-[1vw] pt-[1vw]">
+        <div className="umselect grid grid-cols-2 gap-[1vw] pt-[1vw]">
           <div className="relative col-span-1 flex-col flex">
             <label className="text-[#1F4B7F] text-[1.1vw] font-semibold">
               Category
+              <span className="text-red-500 text-[1vw] pl-[0.2vw]">*</span>
+            </label>
+            <ConfigProvider
+              theme={{
+                components: {
+                  Select: {
+                    optionActiveBg: "#aebed1",
+                    optionSelectedColor: "#FFF",
+                    optionSelectedBg: "#aebed1",
+                    optionHeight: "2vw",
+                  },
+                },
+              }}
+            >
+              <Select
+                showSearch
+                className="umselect custom-select bg-white outline-none w-full mt-[0.5vw] h-[3vw] text-[1.1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw] border-r-[0.25vw] border-b-[0.25vw] placeholder:text-[1vw]"
+                placeholder="Select Categories"
+                optionFilterProp="label"
+                listHeight={190}
+                dropdownStyle={{
+                  // minHeight: "10vw",
+                  overflowY: "auto",
+                  scrollbarWidth: "0.1vw",
+                }}
+                optionRender={(item) => (
+                  <div>
+                    <p
+                      style={{
+                        color: "#1F487C",
+                        fontWeight: 600,
+                        margin: 0,
+                        padding: "0 1.2vw",
+                        fontSize: "1.1vw",
+                      }}
+                    >
+                      {item.label}
+                    </p>
+                  </div>
+                )}
+                value={values.occupation}
+                onChange={(value, option) => {
+                  setOfferlist({
+                    ...offerlist,
+                    occupation: value,
+                    occupation_name: option.label,
+                  });
+                  setFieldValue("occupation", value);
+                }}
+                suffixIcon={
+                  <span style={{ fontSize: "1vw", color: "#1f487c" }}>
+                    <IoMdArrowDropdown size="2vw" />
+                  </span>
+                }
+                style={{
+                  padding: 4,
+                }}
+                options={[
+                  {
+                    value: "",
+                    label: (
+                      <div className="text-[1vw] px-[0.2vw] pb-[0.1vw] text-[#A9A9A9]">
+                        Select Category
+                      </div>
+                    ),
+                    disabled: true,
+                  },
+                  { value: 1, label: "Business" },
+                  { value: 2, label: "General Public" },
+                  { value: 3, label: "Handicapped" },
+                  { value: 4, label: "Pilgrim" },
+                  { value: 5, label: "Senior Citizen" },
+                  { value: 6, label: "Student" },
+                  { value: 7, label: "Tourist" },
+                ]}
+              />
+            </ConfigProvider>
+            <ErrorMessage
+              name="occupation"
+              component="div"
+              className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]"
+            />
+          </div>
+
+          <div className="relative col-span-1 flex flex-col">
+            <label className="text-[#1F4B7F] text-[1.1vw] font-semibold">
+              Status
               <span className="text-red-500 text-[1vw] pl-[0.2vw]">*</span>
             </label>
             <ConfigProvider
@@ -310,17 +396,21 @@ export default function AddOffer({
             >
               <Select
                 showSearch
-                className="custom-select bg-white outline-none w-full mt-[0.5vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw] border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
-                placeholder="Select Categories"
+                className="custom-select mt-[0.5vw] bg-white outline-none w-full h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw] border-r-[0.25vw] border-b-[0.25vw] placeholder-[#1F487C]"
+                placeholder="Select Status"
                 optionFilterProp="label"
-                value={offerlist.occupation || 0} // Dynamically update the value based on selected occupation
+                value={values.status} // Update this line to reflect the current selection
                 onChange={(value, option) => {
-                  setOfferlist({
-                    ...offerlist,
-                    occupation: value,
-                    occupation_name: option.label, // Update both value and label
-                  });
+                  // const selectedOperator = getOperatorName?.find(
+                  //   (operator) => operator.company_name === value
+                  // );
+                  // // setOfferlist({
+                  // //   ...offerlist,
+                  // //   occupation: value,
+                  // //   occupation_name: option.label,
+                  // // });
                   setError("");
+                  setFieldValue("status", value);
                 }}
                 suffixIcon={
                   <span style={{ fontSize: "1vw", color: "#1f487c" }}>
@@ -332,105 +422,25 @@ export default function AddOffer({
                 }}
                 options={[
                   {
-                    value: 0,
+                    value: "",
                     label: (
-                      <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                        Select Occupation
+                      <div className="text-[1vw] px-[0.2vw] pb-[0.1vw] text-[#a9a9a9]">
+                        Select Status
                       </div>
                     ),
                     disabled: true,
                   },
-                  {
-                    value: 1,
+                  ...options?.map((item) => ({
+                    value: item.value,
                     label: (
-                      <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                        Business
+                      <div className="flex items-center text-[1vw] gap-x-[0.5vw] px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                        <span className="text-[1vw]">{item.label}</span>
                       </div>
                     ),
-                  },
-                  {
-                    value: 2,
-                    label: (
-                      <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                        General Public
-                      </div>
-                    ),
-                  },
-                  {
-                    value: 3,
-                    label: (
-                      <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                        Handicapped
-                      </div>
-                    ),
-                  },
-                  {
-                    value: 4,
-                    label: (
-                      <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                        Pilgrim
-                      </div>
-                    ),
-                  },
-                  {
-                    value: 5,
-                    label: (
-                      <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                        Senior Citizen
-                      </div>
-                    ),
-                  },
-                  {
-                    value: 6,
-                    label: (
-                      <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                        Student
-                      </div>
-                    ),
-                  },
-                  {
-                    value: 7,
-                    label: (
-                      <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                        Tourist
-                      </div>
-                    ),
-                  },
+                  })),
                 ]}
               />
             </ConfigProvider>
-            <div className="absolute bottom-[-1.2vw] text-[0.8vw] text-red-500">
-              {error}
-            </div>
-          </div>
-
-          <div className="relative col-span-1 flex flex-col">
-            <label className="text-[#1F4B7F] text-[1.1vw] font-semibold">
-              Status
-              <span className="text-red-500 text-[1vw] pl-[0.2vw]">*</span>
-            </label>
-            <Field
-              as="select"
-              name="status"
-              value={values.status}
-              onChange={(e) => {
-                handleChange(e);
-                sessionStorage.setItem("status", e.target.value);
-              }}
-              className="border-r-[0.2vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
-            >
-              {/* <option label="Select Status" value="" className="" />
-                      <option label="Draft" value="Draft" className="" />
-                      <option label="Paused" value="Paused" className="" />
-                      <option label="Active" value="Active" className="" /> */}
-              {options.map((option) => (
-                <option
-                  key={option.value}
-                  label={option.label}
-                  value={option.value}
-                />
-              ))}
-            </Field>
             <ErrorMessage
               name="status"
               component="div"
@@ -450,11 +460,15 @@ export default function AddOffer({
                 <ConfigProvider
                   theme={{
                     token: {
-                      fontSize: 13,
+                      fontSize: "1vw",
                       lineHeight: 0,
+                      colorPrimary: "#1F487C",
                     },
                     components: {
                       DatePicker: {
+                        activeBorderColor: "#1F487C",
+                        hoverBorderColor: "#1F487C",
+                        activeShadow: "#1F487C",
                         cellWidth: 21,
                         cellHeight: 20,
                       },
@@ -479,9 +493,14 @@ export default function AddOffer({
                       values.start_date ? dayjs(values.start_date) : null,
                       values.expiry_date ? dayjs(values.expiry_date) : null,
                     ]}
-                    className="ads-date border-r-[0.2vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-blue border-[#1F487C]
-text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw] placeholder-[#1F487C]"
-                    disabledDate={(current) => current < dayjs().startOf("day")}
+                    className="ads-date border-r-[0.25vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-full rounded-[0.5vw] outline-none px-[1vw] placeholder:text-[1vw]"
+                    disabledDate={(current) => {
+                      // Disable dates before today
+                      const maxDate = dayjs().add(3, "months"); // 3 months from today
+                      return (
+                        current < dayjs().startOf("day") || current > maxDate
+                      ); // Disable past dates and dates beyond 3 months
+                    }}
                   />
                 </ConfigProvider>
               )}
@@ -511,18 +530,20 @@ text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]
                     id="value"
                     placeholder="Enter Offer Value"
                     value={values.value}
+                    autoComplete="off"
                     onChange={(e) => {
                       handleChange(e);
                       console.log(e.target.value, "check_offersValue");
                       setValue(e.target.value);
+                      setError("");
                     }}
                     onBlur={handleBlur}
-                    className=" border-r-[0.2vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] h-[3vw] w-[100%] placeholder-[#1F487C]  text-[#1F487C] text-[1vw] outline-none px-[1vw] border-b-[0.2vw] border-[#1F487C] rounded-[0.5vw] rounded-r-none "
+                    className=" border-r-[0.1vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] h-[3vw] w-full   text-[#1F487C] text-[1vw] outline-none px-[1vw] border-b-[0.25vw] border-[#1F487C] rounded-[0.5vw] rounded-r-none placeholder:text-[1vw]"
                   />
 
-                  <div className="flex items-center justify-center border-b-[0.2vw] border-r-[0.2vw] mt-[0.5vw]  border-t-[0.1vw] rounded-l-none rounded-[0.5vw] border-[#1F487C] text-[1.2vw]">
+                  <div className="flex items-center justify-center border-b-[0.25vw] border-r-[0.25vw] mt-[0.5vw]  border-t-[0.1vw] rounded-l-none rounded-[0.5vw] border-[#1F487C] text-[1.2vw]">
                     <div
-                      className={` w-[3vw] h-full flex items-center justify-center ${
+                      className={` w-[3vw] h-full flex items-center justify-center cursor-pointer ${
                         valueSymbol === "₹"
                           ? "bg-[#1F487C] text-white font-semibold"
                           : "bg-white text-[#1F487C]"
@@ -535,9 +556,9 @@ text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]
                       ₹
                     </div>
                     <div
-                      className={` w-[3vw] h-full flex items-center justify-center ${
+                      className={` w-[3vw] h-full flex items-center justify-center cursor-pointer ${
                         valueSymbol === "%"
-                          ? "bg-[#1F487C] text-white font-semibold rounded-r-[0.3vw]"
+                          ? "bg-[#1F487C] text-white font-semibold rounded-r-[0.2vw]"
                           : "bg-white text-[#1F487C] rounded-r-[0.5vw]"
                       } `}
                       onClick={() => {
@@ -549,13 +570,18 @@ text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]
                     </div>
                   </div>
                 </div>
-                {offerType === "discount" &&
-                  errorValue &&
-                  errorValue.includes("Offer value") && (
-                    <p className="absolute bottom-[-1.2vw] text-[0.8vw] text-red-500">
-                      {errorValue}
-                    </p>
-                  )}
+
+                {error ? (
+                  <div className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]">
+                    {error}
+                  </div>
+                ) : (
+                  <ErrorMessage
+                    name="value"
+                    component="div"
+                    className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]"
+                  />
+                )}
               </div>
             </div>
           ) : (
@@ -575,14 +601,14 @@ text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]
               name="offer_desc"
               placeholder="Enter Description"
               value={values.offer_desc}
+              autoComplete="off"
               onChange={(e) => {
                 handleChange(e);
                 sessionStorage.setItem("offer_desc", e.target.value);
-         
               }}
               rows="4"
               cols="50"
-              className="border-r-[0.2vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[1vw] w-[100%] h-full rounded-[0.5vw] outline-none px-[1vw] pt-[0.75vw]"
+              className="border-r-[0.25vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw]  border-[#1F487C] text-[#1F487C] text-[1vw] w-full h-[7.5vw] rounded-[0.5vw] outline-none px-[1vw] pt-[0.75vw] placeholder:text-[1vw]"
             />
             <ErrorMessage
               name="offer_desc"
@@ -626,7 +652,7 @@ text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]
                       return false; // Prevent automatic upload
                     }}
                     showUploadList={false} // Disable the default upload list
-                    className="border-r-[0.2vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] border-[#1F487C] rounded-[0.5vw]"
+                    className="border-r-[0.25vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] border-[#1F487C] rounded-[0.5vw]"
                     style={{
                       backgroundSize: "cover",
                       backgroundPosition: "center",
@@ -708,7 +734,7 @@ text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]
                         </>
                       )}
                     </Field> */}
-            {fileName ? (
+            {fileName && !errors.file ? (
               <p className="text-[#1F4B7F] text-[0.8vw] mt-2 absolute bottom-[-1.3vw]">
                 {fileName}
               </p>
@@ -734,7 +760,7 @@ text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]
                         handleChange(e);
                         sessionStorage.setItem("status", e.target.value);
                       }}
-                      className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                      className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-full rounded-[0.5vw] outline-none px-[1vw]"
                     >
                       <option label="Select Occupation" value="" className="" />
                       <option label="Draft" value="Draft" className="" />
@@ -772,7 +798,7 @@ text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]
                       }}
                       rows="4"
                       cols="50"
-                      className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                      className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] w-full rounded-[0.5vw] outline-none px-[1vw]"
                     />
                     <ErrorMessage
                       name="promotion_description"

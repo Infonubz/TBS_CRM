@@ -38,8 +38,6 @@ const EditProfile = () => {
 
   const [isEdit, setIsEdit] = useState(false);
 
-
-
   const userType = sessionStorage.getItem("type_name");
   const typeId = sessionStorage.getItem("type_id")
     ? sessionStorage.getItem("type_id")
@@ -53,19 +51,19 @@ const EditProfile = () => {
 
   const dispatch = useDispatch();
   const loginMap = {
-    'PRO101': 'product_owner',
-    'OP101': 'operators',
-    'PROEMP101': 'pro-emp-personal-details',
-    'OPEMP101': 'emp-personal-details',
-    'PART101': 'partner_details'
+    PRO101: "product_owner",
+    OP101: "operators",
+    PROEMP101: "pro-emp-personal-details",
+    OPEMP101: "emp-personal-details",
+    PART101: "partner_details",
   };
-  
-  const Login = loginMap[typeId] || '';
+
+  const Login = loginMap[typeId] || "";
 
   useEffect(() => {
     const id = sessionStorage.getItem("USER_ID");
     console.log(id, "session id");
-    EditUserSettings(id, dispatch,Login);
+    EditUserSettings(id, dispatch, Login);
   }, []);
 
   // const owname = companysetting.owner_name;
@@ -136,7 +134,7 @@ const EditProfile = () => {
     <>
       {typeId === "PROEMP101" ? (
         <IndexEmployee />
-      ) : typeId === "EMP101" ? (
+      ) : typeId === "OPEMP101" ? (
         <IndexEmployee />
       ) : typeId === "PART101" ? (
         <IndexPartner />
@@ -180,6 +178,9 @@ const EditProfile = () => {
                       <label className="text-[#1F4B7F] font-bold text-[1.1vw]">
                         Name
                       </label>
+                      <span className="text-[1vw] text-red-600 pl-[0.2vw]">
+                        *
+                      </span>
                     </div>
 
                     <div className="">
@@ -206,6 +207,9 @@ const EditProfile = () => {
                       >
                         Email
                       </label>
+                      <span className="text-[1vw] text-red-600 pl-[0.2vw]">
+                        *
+                      </span>
                     </div>
                     <div className="">
                       <Field
@@ -215,7 +219,9 @@ const EditProfile = () => {
                         // value={getUserSettingsEdit.email_id}
                         readOnly
                         className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none ${
-                          isEdit === false ? "cursor-not-allowed" : ""
+                          isEdit === false
+                            ? "cursor-not-allowed"
+                            : "cursor-not-allowed"
                         }`}
                         disabled={isEdit === false}
                       />
@@ -311,6 +317,9 @@ const EditProfile = () => {
                       <label className="text-[#1F4B7F] font-bold text-[1.1vw]">
                         Phone
                       </label>
+                      <span className="text-[1vw] text-red-600 pl-[0.2vw]">
+                        *
+                      </span>
                     </div>
 
                     <div className="">
@@ -321,7 +330,9 @@ const EditProfile = () => {
                         // value={getUserSettingsEdit.phone}
                         readOnly
                         className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none ${
-                          isEdit === false ? "cursor-not-allowed" : ""
+                          isEdit === false
+                            ? "cursor-not-allowed"
+                            : "cursor-not-allowed"
                         }`}
                         disabled={isEdit === false}
                       />
@@ -338,6 +349,9 @@ const EditProfile = () => {
                       >
                         Password
                       </label>
+                      <span className="text-[1vw] text-red-600 pl-[0.2vw]">
+                        *
+                      </span>
                     </div>
                     {/* <div className="">
                 <Field
@@ -362,7 +376,9 @@ const EditProfile = () => {
                         placeholder="Enter your password"
                         readOnly
                         className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none ${
-                          isEdit === false ? "cursor-not-allowed" : ""
+                          isEdit === false
+                            ? "cursor-not-allowed"
+                            : "cursor-not-allowed"
                         }`}
                         disabled={isEdit === false}
                       />

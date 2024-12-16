@@ -59,8 +59,11 @@ export default function AddParner({
   const getprofile = async () => {
     try {
       const data = await GetPartnerProfile(PartnerID);
-      console.log(data, "data")
+      console.log(updatedata,data.profile_img == null, "datasddf")
       setSelectedFile(data.profile_img);
+      if(updatedata && data.profile_img == null){
+        setProfileImage(false)
+      }
     } catch (error) {
       console.error("Error fetching additional user data", error);
     }
@@ -79,15 +82,43 @@ export default function AddParner({
     );
   };
 
-  const handleChange = ({ fileList: newFileList }) => {
-    console.log(newFileList, "newFileList");
-    setFileList(newFileList);
-    if (newFileList?.length > 0) {
-      setProfileImage(true);
+  // const handleChange = ({ fileList: newFileList }) => {
+  //   console.log(newFileList, "newFileList");
+  //   setFileList(newFileList);
+  //   if (newFileList?.length > 0) {
+  //     setProfileImage(true);
+  //   } else {
+  //     setProfileImage(false);
+  //   }
+  //   // SubmitProfileData(newFileList[0], dispatch);
+  // };
+  const handleChange = async ({ fileList: newFileList }) => {
+    const file = newFileList[0]?.originFileObj;
+    
+    if (file) {
+      // Check file size (5MB = 5 * 1024 * 1024 bytes)
+      const fileSizeInMB = file.size / (1024 * 1024); // Convert bytes to MB
+      
+      if (fileSizeInMB > 5) {
+        // If the file size is greater than 5MB, alert the user
+        // alert('File size exceeds 5MB limit!');
+        setProfileImage(false)
+        // Remove the file from the list
+        newFileList.pop(); 
+      } else {
+        setFileList(newFileList);
+        setSelectedFile(newFileList)
+        if (newFileList?.length > 0) {
+          setProfileImage(true);
+        } else {
+          setProfileImage(false);
+        }
+      }
     } else {
-      setProfileImage(false);
+      // If no file, just update the file list
+      setFileList(newFileList);
+      setSelectedFile(newFileList)
     }
-    // SubmitProfileData(newFileList[0], dispatch);
   };
 
   const handleCancel = () => setPreviewOpen(false);
@@ -161,7 +192,7 @@ export default function AddParner({
             <div className="col-span-3 flex relative flex-col">
               <div className="flex flex-col px-[5vw]">
                 <label className="text-[1.5vw] font-bold text-[#1f4b7f]">
-                  Create Partner
+                 {updatedata ? "Update Partner" : "Create Partner"}
                 </label>
                 <label className="text-[1vw] text-[#1f4b7f]">
                   Company Setup
@@ -239,7 +270,15 @@ export default function AddParner({
                     </Upload>
                   </ImgCrop>
 
-                  {fileList.length === 0 &&
+                  {/* {fileList.length === 0 &&
+                    selectedFile && ( // Check if there are no files in the fileList and selectedFile is set
+                      <img
+                        src={`${apiImgUrl}${selectedFile}`}
+                        alt="Profile"
+                        className="w-[5.9vw] h-[5.9vw] object-cover rounded-[0.2vw] top-[0vw] left-[0vw] absolute opacity-25 z-[1] pointer-events-none"
+                      />
+                    )} */}
+                     {fileList.length === 0 &&
                     selectedFile && ( // Check if there are no files in the fileList and selectedFile is set
                       <img
                         src={`${apiImgUrl}${selectedFile}`}
@@ -262,13 +301,23 @@ export default function AddParner({
                     src={previewImage}
                   />
                 </Modal>
-                {updatedata
+                {updatedata && selectedFile != null 
                         ? " "
                         : profileImage === false && (
-                          <div className="text-red-700 text-[.7vw] bottom-[-1.2vw] absolute">
-                            * Profile Image is required
+                          <div className="text-red-500 text-[.7vw] bottom-[-1.2vw] absolute">
+                            * Profile Image is required - (Max Size : 5MB)
                           </div>
                         )}
+                          {/* {updatedata
+                        ? profileImage === false && (
+                          <div className="text-red-500 text-[.7vw] bottom-[-1.2vw] absolute">
+                            * Profile Image is required - (Max Size : 5MB)
+                          </div>)
+                        : profileImage === false && (
+                          <div className="text-red-500 text-[.7vw] bottom-[-1.2vw] absolute">
+                            * Profile Image is required - (Max Size : 5MB)
+                          </div>
+                        )} */}
               </div>
 
               <div className="flex gap-[3vw] pt-[2vw] px-[6.5vw]">
@@ -323,6 +372,8 @@ export default function AddParner({
                   setProfileImage={setProfileImage}
                   updatedata={updatedata}
                   setEnableUpload={setEnableUpload}
+                  selectedFile={selectedFile}
+                  enableUpload={enableUpload}
                 />
               ) : currentpage == 2 ? (
                 // <AddRegisterAddress

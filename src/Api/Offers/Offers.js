@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { GetEmployeeData } from "../UserManagement/Employee";
 import { GetOperatorData } from "../UserManagement/SuperAdmin";
 import { GetPartnerData } from "../UserManagement/Partner";
-import { GetAdsData, GetMobileAds } from "../Ads/Ads";
+import { GetAdsData } from "../Ads/Ads";
 import {
   GetPromotionData,
   GetPromotionDataByStatus,
@@ -92,8 +92,6 @@ export const Deleteall = async (
       setPermission(true);
       GetPermissionData(filter, dispatch);
       GetPermissionCount(filter, dispatch);
-    } else if (module === "mobads") {
-      GetMobileAds(dispatch);
     } else {
       console.log("testt");
     }
@@ -138,6 +136,7 @@ export const Deleteall = async (
 export const SubmitOfferExcel = async (file) => {
   const formData = new FormData();
   formData.append("xlsxFile", file);
+  formData.append("tbs_user_id", sessionStorage.getItem("USER_ID"));
   const excelEndpoint = `${apiUrl}/offers-deals-importExcel`;
   const method = "post";
   try {
@@ -180,9 +179,10 @@ export const SubmitOffersData = async (
   promotionvalues,
   updatedata,
   offerlist,
-  offerBackGround
+  offerBackGround,
+  OfferFilter
 ) => {
-  console.log(offerlist, "promotionvalues.file");
+  console.log(promotionvalues, "promotionvalues.file");
   const formData = new FormData();
   formData.append(
     "offer_name",
@@ -246,22 +246,22 @@ export const SubmitOffersData = async (
     "offer_img",
     promotionvalues.file ? promotionvalues.file : null
   );
-  formData.append("occupation_id", offerlist?.occupation);
+  formData.append("occupation_id", promotionvalues?.occupation);
   formData.append(
     "occupation",
-    offerlist?.occupation == 1
+    promotionvalues?.occupation == 1
       ? "Business"
-      : offerlist?.occupation == 2
+      : promotionvalues?.occupation == 2
       ? "General Public"
-      : offerlist?.occupation == 3
+      : promotionvalues?.occupation == 3
       ? "Handicapped"
-      : offerlist?.occupation == 4
+      : promotionvalues?.occupation == 4
       ? "Pilgrim"
-      : offerlist?.occupation == 5
+      : promotionvalues?.occupation == 5
       ? "Senior Citizen"
-      : offerlist?.occupation == 6
+      : promotionvalues?.occupation == 6
       ? "Student"
-      : offerlist?.occupation == 7
+      : promotionvalues?.occupation == 7
       ? "Tourist"
       : ""
   );
@@ -285,7 +285,7 @@ export const SubmitOffersData = async (
         "Content-Type": "multipart/form-data",
       },
     });
-    GetOffersData(dispatch);
+    GetOffersData(dispatch, OfferFilter);
     console.log(response, "responseresponse");
     return response.data;
   } catch (error) {
@@ -303,10 +303,10 @@ export const ChangeDisscountStatus = async (
 ) => {
   const payload = {
     req_status:
-      id === 2 ? "Approved" : id === 3 ? "On Hold" : id === 4 ? "Rejected" : "",
+      id === 2 ? "Approved" : id === 3 ? "Hold" : id === 4 ? "Rejected" : "",
     req_status_id: id,
     status:
-      id === 2 ? "Active" : id === 3 ? "On Hold" : id === 4 ? "Rejected" : "",
+      id === 2 ? "Active" : id === 3 ? "Hold" : id === 4 ? "Rejected" : "",
     status_id: id,
     comments: cmnt,
   };
@@ -373,7 +373,8 @@ export const SearchDiscountOffer = async (e, filter, dispatch) => {
 export const GetOffersById = async (
   updatedata,
   SetUpdateData,
-  setOfferData
+  setOfferData,
+  setLoading
 ) => {
   console.log(updatedata, "ahsgxdahsjksaxbj");
   try {
@@ -385,6 +386,8 @@ export const GetOffersById = async (
   } catch (error) {
     handleError(error);
     return null;
+  } finally {
+    setLoading(false);
   }
 };
 

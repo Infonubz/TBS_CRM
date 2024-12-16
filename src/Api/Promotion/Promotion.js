@@ -32,6 +32,40 @@ export const GetPromotionData = async (dispatch, CurrentTab) => {
   }
 };
 
+export const GetPromoDataByEmp = async (dispatch, CurrentTab) => {
+  let status;
+
+  if (CurrentTab === "All") {
+    status = 5;
+  } else if (CurrentTab === "Pending") {
+    status = 1;
+  } else if (CurrentTab === "Approved") {
+    status = 2;
+  } else if (CurrentTab === "OnHold") {
+    status = 3;
+  } else if (CurrentTab === "Rejected") {
+    status = 4;
+  } else if (CurrentTab === "Draft") {
+    status = 0;
+  }
+
+    try {
+      const response = await api.get(`${apiUrl}/promo-status-empuserid/${userID}/${status}`);
+      dispatch({ type: PROMOTION_DATA, payload: response.data });
+      return response.data;
+    } catch (error) {
+      if(error?.response?.data?.message){
+        toast.warning(error?.response?.data?.message);
+      }
+      else{
+        toast.error(error);
+      }
+     // handleError(error);
+      return null;
+    }
+};
+
+
 export const GetPromotionDataByStatus = async (dispatch, CurrentTab) => {
   let status;
 
@@ -69,9 +103,7 @@ else{
     return null;
   }
 }
- 
 };
-
 
 export const Deleteall = async (api, dispatch, CurrentTab) => {
   try {
@@ -85,9 +117,11 @@ export const Deleteall = async (api, dispatch, CurrentTab) => {
     return null;
   }
 };
+
 export const SubmitPromoExcel = async (file) => {
   const formData = new FormData();
   formData.append("xlsxFile", file);
+  formData.append("tbs_user_id", userID);
 
   const excelEndpoint = `${apiUrl}/promo/importxlsx`;
   const method = "post";
@@ -111,16 +145,99 @@ export const SubmitPromoExcel = async (file) => {
 };
 
 export const handlePromosearch = async (e, dispatch, CurrentTab) => {
-  try {
-    if (e.target.value) {
-      const response = await api.get(
-        `${apiUrl}/promo/search/${e.target.value}`
-      );
-      dispatch({ type: PROMOTION_DATA, payload: response.data });
-      return response.data[0];
-    } else {
-      GetPromotionDataByStatus(dispatch, CurrentTab);
+
+  let statusId;
+  if (CurrentTab === "Approved") {
+    statusId = 2;
+  } else if (CurrentTab === "On Hold") {
+    statusId = 3;
+  } else if (CurrentTab === "Rejected") {
+    statusId = 4;
+  } else if (CurrentTab === "Pending") {
+    statusId = 1;
+  } else if (CurrentTab === "Draft") {
+    statusId = 0;
+  }
+  else if (CurrentTab === "All") {
+    statusId = 5;
+  }
+
+  const payload =  {
+    searchTerm : e.target.value
+  }
+
+  const url = `${apiUrl}/promo/searchPromoById/${userID}/${statusId}`;
+  const method = "post";
+
+    try {
+       if (e.target.value) {
+        const response = await api({
+          method,
+          url,
+          data: payload,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        dispatch({ type: PROMOTION_DATA, payload: response.data });
+        return response.data[0];
+      }  else{
+        GetPromotionDataByStatus(dispatch, CurrentTab);
+      }
+    } catch (error) {
+      handleError(error);
+      return null;
     }
+};
+
+export const UpdateStatus = async ({ valueid, promotionId, dispatch, CurrentTab, inputValue }) => {
+  console.log(promotionId, "promotionId123");
+
+  let userstatus;
+  if (valueid === 2) {
+    userstatus = "Approved";
+  } else if (valueid === 3) {
+    userstatus = "On Hold";
+  } else if (valueid === 4) {
+    userstatus = "Rejected";
+  } else if (valueid === 5) {
+    userstatus = "Pending";
+  }
+
+  let status;
+  if (valueid === 2) {
+    status = "Active";
+  } else if (valueid === 3) {
+    status = "On Hold";
+  } else if (valueid === 4) {
+    status = "Rejected";
+  }else if (valueid === 5) {
+    status = "Pending";
+  }
+
+  const payload = {
+    promo_status_id: valueid,
+    promo_status: status,
+    user_status_id: valueid === 5 ? 1 : valueid,
+    user_status: userstatus,
+    comments: valueid === 2 ? "" : inputValue ? inputValue : "",
+  };
+  console.log(valueid, "in the api");
+
+  const url = `${apiUrl}/promo-statusId/${promotionId}`;
+  const method = "put";
+
+  try {
+    const response = await api({
+      method,
+      url,
+      data: payload,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    console.log(response, "responseresponse");
+    return response.data;
   } catch (error) {
     handleError(error);
     return null;
@@ -143,6 +260,7 @@ export const GetPromotionById = async (
     return null;
   }
 };
+
 export const GetOperatorName = async (dispatch) => {
   try {
     // const response = await axios.get(`${apiUrl}/promo-operatorDetails`);
@@ -164,10 +282,10 @@ export const SubmitPromotionData = async (
   promotionId,
   promo_background,
   valuesymbol,
-  promo_image
+  promodata
 ) => {
 
-  console.log(currentPromodata.file.uid,'current_promodata')
+  console.log(currentPromodata.status,'current_promodata')
   // const promo_background = useSelector((state) => state.crm.promo_bg);
   // console.log(promo_background, "promo_background852");
   // const storedFileData = sessionStorage.getItem("promo_bg");
@@ -181,11 +299,9 @@ export const SubmitPromotionData = async (
   // const [Bg_Promo, setBgPromo] = useState("");
   const operator_details =
     userType !== "PRODUCTOWNER"
-      ? // ? sessionStorage.getItem("user_name")
-        sessionStorage.getItem("user_name")
+      ? sessionStorage.getItem("user_name")
       : currentPromodata.operator_details;
-  console.log(promo_background, "updatedataupdatedata");
-  console.log(currentPromodata, "currentPromodata223");
+ 
   const formData = new FormData();
   formData.append("promo_name", currentPromodata.promotion_name);
   formData.append("operator_details", operator_details);
@@ -205,14 +321,14 @@ export const SubmitPromotionData = async (
       ? 1
       : 2
   );
-  formData.append("user_status_id", currentPromodata.status == "Draft" ? 0 : "Posted" ? 1 : 2);
-  formData.append( "user_status",currentPromodata.status == "Draft" ? "Draft" : "Posted" ? "Posted" : "Active");
+  formData.append("user_status_id", currentPromodata.status === "Draft" ? 0 : currentPromodata.status === "Posted" ? 1 : 2);
+  formData.append( "user_status",currentPromodata.status === "Draft" ? "Draft" : currentPromodata.status === "Active" ? "Active" : "Posted");
   formData.append("promo_status", currentPromodata.status);
-  formData.append("tbs_user_id", sessionStorage.getItem("USER_ID"));
+  formData.append("tbs_user_id", promotionId && typeID === "PRO101" ? promodata?.tbs_user_id : sessionStorage.getItem("USER_ID"));
   formData.append("background_image", promo_background);
   formData.append("promo_value", currentPromodata?.promo_value);
   formData.append("promo_code", currentPromodata?.promo_code);
-  formData.append("value_symbol", valuesymbol);
+  formData.append("value_symbol", currentPromodata?.value_symbol || valuesymbol);
 
   const url = promotionId
     ? `${apiUrl}/promo/${promotionId}`

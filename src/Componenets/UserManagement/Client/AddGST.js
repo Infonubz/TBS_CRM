@@ -27,13 +27,13 @@ const validationSchema = Yup.object().shape({
     /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[0-9]{1}[A-Z]{1}[0-9]{1}$/,
     "Format should be 22AAAAA0000A1Z5."
   )
-  .required("GST Number is required"),
+  .required("GST number is required"),
   // gst: Yup.string().required("GSTIN is required"),
-  state_code: Yup.string().matches(/^\d+$/, "State Code must be a number")  
-  .required("State Code is required")
+  state_code: Yup.string().matches(/^\d+$/, "State code must be a number")  
+  .required("State code is required")
   .max(2,"State code must be valid 2 digit number"),
   state: Yup.string().required("State is required"),
-  head_office: Yup.string().required("Head Offcie is required").max(40,"Maximum 40 characters only"),
+  head_office: Yup.string().required("Head offcie is required").max(40,"Maximum 40 characters only"),
   gst_file: Yup.mixed()
     .test("required", "A file is required", function (value) {
       const { isEdit } = this.options.context;
@@ -42,7 +42,7 @@ const validationSchema = Yup.object().shape({
       }
       return true;
     })
-    .test("fileSize", "File size is too large", function (value) {
+    .test("fileSize", "File size is too large max 5mb", function (value) {
       if (value && value.size > FILE_SIZE) {
         // 2MB
         return false;
@@ -253,6 +253,8 @@ export default function AddGST({
                         type="text"
                         name="gst"
                         placeholder="Enter GSTIN"
+                        autoComplete="off"
+                        onChange={(e) => setFieldValue("gst", e.target.value?.toUpperCase())}
                         value={values.gst}
                         className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                       />
@@ -272,6 +274,7 @@ export default function AddGST({
                       <Field
                         type="text"
                         name="state_code"
+                        autoComplete="off"
                         placeholder="Enter State Code"
                         value={values.state_code}
                         className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
@@ -319,6 +322,7 @@ export default function AddGST({
                         <Select
                           showSearch
                           value={values.state}
+                          listHeight={190}
                           onChange={(value) => {
                             handleChange({ target: { name: 'state', value } })
                           }}
@@ -403,6 +407,7 @@ export default function AddGST({
                       <Field
                         type="text"
                         name="head_office"
+                        autoComplete="off"
                         placeholder="Enter Head Office"
                         value={values.head_office}
                         className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
@@ -486,6 +491,7 @@ export default function AddGST({
                             id="gst_file"
                             name="gst_file"
                             type="file"
+                            accept=".jpg, .jpeg, .png" 
                             style={{ display: "none" }}
                             onChange={(event) => {
                               const file = event.currentTarget.files[0];
@@ -568,7 +574,7 @@ export default function AddGST({
                             name="gst_file"
                             component="div"
                             // style={{ color: "red" }}
-                            className="text-[0.8vw] text-red-600 absolute bottom-[-1.2vw] left-[.2vw]"
+                            className="text-[0.8vw] text-red-500 absolute bottom-[-1.2vw] left-[.2vw]"
                           />
                         </div>
                       </div>

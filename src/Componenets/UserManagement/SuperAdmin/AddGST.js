@@ -42,17 +42,15 @@ head_office: Yup.string()
   .max(40,"maximum 40 characters only"),
   gst_file: Yup.mixed()
     .required("GST Document is required")
-    // .test(
-    //   "fileSize",
-    //   "File too large",
-    //   (value) => value && value.size <= FILE_SIZE
-    // )
-    // .test(
-    //   "fileFormat",
-    //   "Unsupported Format",
-    //   (value) => value && SUPPORTED_FORMATS.includes(value.type)
-    // )
-    ,
+    .test("fileSize", "File too large max 5mb", (value) =>
+      typeof value === "string" ? true : value && value.size <= FILE_SIZE
+    )
+    .test("fileFormat", "Unsupported Format", (value) =>
+      typeof value === "string"
+        ? true
+        : value && SUPPORTED_FORMATS.includes(value.type)
+    ),
+    
   ctc: Yup.string().required("GST is required"),
 });
 
@@ -246,9 +244,18 @@ console.log(clientID,"ididididdhgfsudfgusfgb");
                           *
                         </span>
                       </label>
+                      <input
+                          type="text"
+                          name="gst"
+                          style={{ display: "none" }}
+                        />
                       <Field
                         type="text"
                         name="gst"
+                        id="gst"
+                        // autoComplete="gst-field" 
+                        onChange={(e) => setFieldValue("gst", e.target.value?.toUpperCase())}
+                        autoComplete="off"
                         placeholder="Enter GSTIN"
                         value={values.gst}
                         className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
@@ -266,9 +273,15 @@ console.log(clientID,"ididididdhgfsudfgusfgb");
                           *
                         </span>
                       </label>
+                      <input
+                          type="text"
+                          name="state_code"
+                          style={{ display: "none" }}
+                        />
                       <Field
                         type="text"
                         name="state_code"
+                        autoComplete="off"
                         placeholder="Enter State Code"
                         value={values.state_code}
                         className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
@@ -313,9 +326,16 @@ console.log(clientID,"ididididdhgfsudfgusfgb");
                           },
                         }}
                       >
+                         <input
+                          type="text"
+                          name="state"
+                          style={{ display: "none" }}
+                        />
                         <Select
                           showSearch
                           value={values.state}
+                          listHeight={190}
+                          autoComplete="state-field"
                           onChange={(value) => {
                             handleChange({ target: { name: 'state', value } })
                           }}
@@ -398,10 +418,16 @@ console.log(clientID,"ididididdhgfsudfgusfgb");
                           *
                         </span>
                       </label>
+                      <input
+                          type="text"
+                          name="head_office"
+                          style={{ display: "none" }}
+                        />
                       <Field
                         type="text"
                         name="head_office"
                         placeholder="Enter Head Office"
+                        autoComplete="off"
                         value={values.head_office}
                         className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                       />
@@ -484,6 +510,7 @@ console.log(clientID,"ididididdhgfsudfgusfgb");
                             id="gst_file"
                             name="gst_file"
                             type="file"
+                            accept=".jpg, .jpeg, .png" 
                             style={{ display: "none" }}
                             onChange={(event) => {
                               const file = event.currentTarget.files[0];
@@ -613,7 +640,7 @@ console.log(clientID,"ididididdhgfsudfgusfgb");
                         <ErrorMessage
                           name="ctc"
                           component="div"
-                          className="text-red-600 text-[0.8vw] absolute left-[.2vw] bottom-[-1.2vw]"
+                          className="text-red-500 text-[0.8vw] absolute left-[.2vw] bottom-[-1.2vw]"
                         />
                       </div>
                     </div>

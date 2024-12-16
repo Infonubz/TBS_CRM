@@ -1,12 +1,19 @@
 import React, { useEffect, useState } from "react";
 import Backdrop from "../../asserts/CRMbg.png";
-import { IoGrid, IoSearch } from "react-icons/io5";
+import { IoGrid } from "react-icons/io5";
+import { ConfigProvider, Popover, Select } from "antd";
 // import { GoDownload } from "react-icons/go";
 // import { MdOutlineFileDownload } from "react-icons/md";
 import { IoMdMenu } from "react-icons/io";
-import { 
-  //FaCloudUploadAlt, 
-  FaPlus } from "react-icons/fa";
+import { BsExclamationCircle } from "react-icons/bs";
+import { CiImageOff } from "react-icons/ci";
+import { CgImport } from "react-icons/cg";
+import {
+  //FaCloudUploadAlt,
+  FaPlus,
+} from "react-icons/fa";
+import { GetOperatorByOPId } from "../../Api/UserManagement/SuperAdmin";
+import { GetEmpPersonalById } from "../../Api/UserManagement/Employee";
 import ListView from "../Promotion/ListView";
 // import { Pagination } from "antd";
 import GridView from "../Promotion/GridView";
@@ -21,8 +28,10 @@ import {
   GetPromotionDataByStatus,
   handlePromosearch,
   SubmitPromoExcel,
+  GetPromoDataByEmp,
 } from "../../Api/Promotion/Promotion";
 import { useDispatch, useSelector } from "react-redux";
+import { LiaSearchSolid } from "react-icons/lia";
 // import * as XLSX from "xlsx";
 // import { toast } from "react-toastify";
 import ReactPaginate from "react-js-pagination";
@@ -38,16 +47,20 @@ import AddPromoIndex from "./AddPromoIndex";
 // import { CiImport } from "react-icons/ci";
 import { RiUpload2Fill } from "react-icons/ri";
 import { PROMO_BG_IMAGE } from "../../Store/Type";
+import StatusUpdateModal from "./StatusUpdateModal";
+import { GetPromotionById } from "../../Api/Promotion/Promotion";
+import { Tooltip } from "antd";
+import { TiThMenu } from "react-icons/ti";
 
 export default function Promotion() {
   const apiUrl = process.env.REACT_APP_API_URL;
-  
+
   console.log(apiUrl, "apiUrlapiUrl");
   const [view, setView] = useState("list");
   // const [currentPage, setCurrentPage] = useState(1);
   // const [pageSize, setPageSize] = useState(10);
   const [promodata, setPromoData] = useState("");
-  console.log(promodata,'promodata_promodata')
+  console.log(promodata, "promodata_promodata");
   const [updatedata, SetUpdateData] = useState(null);
   const getpromotionlist = useSelector((state) => state.crm.promotion_data);
   const dispatch = useDispatch();
@@ -57,9 +70,18 @@ export default function Promotion() {
   const [excelData, setExcelData] = useState(null);
   const [activePage, setActivePage] = useState(1);
   const [deletemodalIsOpen, setDeleteModalIsOpen] = useState(false);
+  const [statusUpdateModal, setStatusUpdateModal] = useState(false);
+  const [comments, setComments] = useState("");
+  const [listType, setListType] = useState("operator");
+  const [ownerName, setOwnerName] = useState("");
+  const [eyeModalIsOpen, setEyeModalIsOpen] = useState(false);
+  const [promoImage, setPromoImage] = useState("");
   const itemsPerPage = 10; // Number of items to display per page
   //const [promotionDataList, setpromotionDataList] = useState({});
   const type_Id = sessionStorage.getItem("type_id");
+  const opType_Id = sessionStorage.getItem("OP_ID");
+  const poType_Id = sessionStorage.getItem("PO_ID");
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   // const currentData =
   //   getpromotionlist?.length > 0 &&
   //   getpromotionlist?.slice(
@@ -73,7 +95,9 @@ export default function Promotion() {
 
   const closeModal = () => {
     setModalIsOpen(false);
+    setEyeModalIsOpen(false);
     SetUpdateData(null);
+    setStatusUpdateModal(false);
     setPromoData("");
     setPromotionId(null);
     dispatch({
@@ -82,6 +106,65 @@ export default function Promotion() {
     });
     sessionStorage.removeItem("upload");
     sessionStorage.removeItem("promotion_logo");
+  };
+
+  const filtered_List = getpromotionlist;
+
+  const infos = [
+    {
+      title: "Operator Name",
+    },
+    {
+      title: "Promo Title",
+    },
+    {
+      title: "Promo Code",
+    },
+    {
+      title: "Promo Value",
+    },
+    {
+      title: "Created Date",
+      description: "MMM DD (e.g. 01 Jan) - Format",
+    },
+    {
+      title: "Duration",
+      description: "MMM DD (e.g. 01 Jan) - Format",
+    },
+  ];
+
+  const ownerById = async () => {
+    if (poType_Id) {
+      try {
+        const response = await GetEmpPersonalById(poType_Id);
+        setOwnerName(response?.owner_name);
+        console.log(response, "operator id");
+      } catch (error) {
+        console.error(error);
+      }
+    } else if (opType_Id) {
+      try {
+        const response = await GetOperatorByOPId(opType_Id);
+        setOwnerName(response?.owner_name);
+        console.log(response, "operator id");
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
+
+  const fetchGetPromo = async () => {
+    try {
+      const data = await GetPromotionById(
+        promotionId,
+        setPromotionId,
+        setPromoData
+      );
+      console.log(data.promo_name, "datadata");
+      setPromoData(data);
+    } catch (error) {
+      console.error("Error fetching additional user data", error);
+    }
   };
 
   // const [excelData, setExcelData] = useState(null);
@@ -102,7 +185,7 @@ export default function Promotion() {
     try {
       const response = await SubmitPromoExcel(file, dispatch);
       // toast.success(response);
-      GetPromotionDataByStatus(dispatch);
+      GetPromotionDataByStatus(dispatch, CurrentTab);
       console.log("praveeen");
     } catch (error) {
       console.error("Error uploading file:", error);
@@ -110,13 +193,17 @@ export default function Promotion() {
     }
   };
 
-
   // Calculate pagination slice based on activePage
   const indexOfLastItem = activePage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+
   const currentItems =
     getpromotionlist?.length > 0 &&
     getpromotionlist?.slice(indexOfFirstItem, indexOfLastItem);
+
+  // const currentItems =
+  //   getpromotionlist?.length > 0 &&
+  //   getpromotionlist?.slice(indexOfFirstItem, indexOfLastItem);
 
   // Handle page change
   const handlePageChange = (pageNumber) => {
@@ -127,19 +214,30 @@ export default function Promotion() {
     setDeleteModalIsOpen(false);
   };
 
-
-  useEffect(() =>{
-    if(currentItems?.length === 0){
+  useEffect(() => {
+    if (currentItems?.length === 0) {
       setActivePage(activePage - 1);
     }
-  }, [currentItems, setActivePage, activePage])
- 
+  }, [currentItems, setActivePage, activePage]);
 
   useEffect(() => {
-    GetPromotionDataByStatus(dispatch, CurrentTab);
-  }, [CurrentTab]);
+    if (type_Id === "OP101" && listType === "employee") {
+      GetPromoDataByEmp(dispatch, CurrentTab);
+    } else {
+      GetPromotionDataByStatus(dispatch, CurrentTab);
+    }
+  }, [CurrentTab, dispatch, listType, type_Id]);
 
-  console.log(CurrentTab, "CurrentTab");
+  useEffect(() => {
+    ownerById();
+  }, [opType_Id, poType_Id]);
+
+  useEffect(() => {
+    if (promotionId) {
+      fetchGetPromo();
+    }
+  }, [promotionId]);
+  console.log(promodata, "promodata");
 
   return (
     <>
@@ -159,54 +257,123 @@ export default function Promotion() {
               </h1>
               <div className="pb-[0.5vw] flex justify-between h-full items-center">
                 <div className="flex items-center gap-x-[1vw]">
-                  <div className="flex border-[#1F4B7F] h-[2.5vw] border-l-[0.1vw] border-t-[0.1vw] rounded-l-[0.5vw] rounded-r-[0.5vw] border-r-[0.2vw] border-b-[0.2vw]">
-                    <button
-                      className={`${
-                        view === "list" ? "bg-[#1F4B7F]" : "bg-white"
-                      } flex px-[1vw] justify-center gap-[0.5vw] items-center rounded-tl-[0.4vw]   rounded-bl-[0.3vw] `}
-                      style={{
-                        transition: "all 1s",
+                  <div className="flex border-[#1F4B7F] h-[2.4vw]">
+                    <Tooltip
+                      placement="top"
+                      title={
+                        <div className="flex items-center gap-x-[0.5vw] justify-center">
+                          <TiThMenu color={"#1F487C"} size={"1vw"} />
+                          <label className="text-[1vw] font-semibold">
+                            List View
+                          </label>
+                        </div>
+                      }
+                      className="cursor-pointer"
+                      color="white"
+                      overlayInnerStyle={{
+                        color: "#1F487C",
                       }}
-                      onClick={() => setView("list")}
                     >
-                      <span>
-                        <IoMdMenu
-                          size={"1.2vw"}
-                          color={`${view === "list" ? "white" : "#1F4B7F"}`}
-                        />
-                      </span>
-                    </button>
-                    <button
-                      className={`${
-                        view === "grid" ? "bg-[#1F4B7F]" : "bg-white"
-                      } flex px-[1vw] justify-center gap-[0.5vw] items-center rounded-r-[0.3vw]`}
-                      style={{
-                        transition: "all 1s",
+                      <button
+                        className={`${
+                          view === "list" ? "bg-[#1F4B7F]" : "bg-white"
+                        } px-[0.75vw] rounded-l-[0.75vw] border-[0.1vw] border-b-[0.25vw] border-r-0  border-[#1F487C]`}
+                        style={{
+                          transition: "all 1s",
+                        }}
+                        onClick={() => setView("list")}
+                      >
+                        <span>
+                          <TiThMenu
+                            size={"0.9vw"}
+                            color={`${view === "list" ? "white" : "#1F4B7F"}`}
+                          />
+                        </span>
+                      </button>
+                    </Tooltip>
+                    <Tooltip
+                      placement="top"
+                      title={
+                        <div className="flex items-center gap-x-[0.5vw] justify-center">
+                          <IoGrid color={"#1F487C"} size={"1vw"} />
+                          <label className="text-[1vw] font-semibold">
+                            Grid View
+                          </label>
+                        </div>
+                      }
+                      className="cursor-pointer"
+                      color="white"
+                      overlayInnerStyle={{
+                        color: "#1F487C",
                       }}
-                      onClick={() => setView("grid")}
                     >
-                      <span>
-                        <IoGrid
-                          size={"1.2vw"}
-                          color={`${view === "grid" ? "white" : "#1F4B7F"}`}
-                        />
-                      </span>
-                    </button>
+                      <button
+                        className={`${
+                          view === "grid" ? "bg-[#1F4B7F]" : "bg-white"
+                        } px-[0.75vw] rounded-r-[0.75vw] border-[0.1vw] border-b-[0.25vw] border-r-[0.25vw] border-l-0  border-[#1F487C]`}
+                        style={{
+                          transition: "all 1s",
+                        }}
+                        onClick={() => setView("grid")}
+                      >
+                        <span>
+                          <IoGrid
+                            size={"0.9vw"}
+                            color={`${view === "grid" ? "white" : "#1F4B7F"}`}
+                          />
+                        </span>
+                      </button>
+                    </Tooltip>
                   </div>
-                  <div className="relative flex items-center">
+                  <div className="relative flex items-center w-[13.85vw]">
+                    <LiaSearchSolid
+                      className="absolute left-[0.8vw] top-[50%] transform -translate-y-1/2"
+                      size={"1vw"}
+                      color="#9CA3AF"
+                    />
+
                     <input
                       type="text"
-                      className="bg-white outline-none pl-[2vw] w-[15vw] h-[2.5vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw] border-r-[0.2vw] border-b-[0.2vw]"
+                      className="bg-white placeholder-[#9CA3AF] text-[#1F487C] outline-none pl-[3vw] pr-[3vw] w-full h-[5vh] text-[1vw] placeholder:text-[1vw] border-[#1F487C] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.75vw] border-r-[0.25vw] border-b-[0.25vw]"
                       placeholder="Search..."
-                      onChange={(e) => handlePromosearch(e, dispatch, CurrentTab)}
+                      onChange={(e) =>
+                        handlePromosearch(e, dispatch, CurrentTab)
+                      }
                     />
-                    <IoSearch
-                      className="absolute left-[0.5vw]"
-                      size={"1vw"}
-                      color="#1F4B7F"
-                    />
+
+                    <Popover
+                      color="white"
+                      title={
+                        <div className="text-[#1F4B7F] p-[1vw] max-h-[20vw] overflow-auto">
+                          <span className="font-bold">SEARCH BY...</span>
+                          {infos.map((info, index) => (
+                            <div key={index} className="flex flex-col">
+                              <ul
+                                className="pl-[1vw]"
+                                style={{ listStyleType: "disc" }}
+                              >
+                                <li className="text-[0.8vw]">
+                                  <p className="font-semibold">{info.title}</p>
+                                </li>
+                              </ul>
+                              <span className="text-[.7vw] pl-[1vw] text-[#9CA3AF]">
+                                {info.description}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      }
+                      placement="bottom"
+                    >
+                      <BsExclamationCircle
+                        className="absolute right-[0.8vw] top-[50%] transform -translate-y-1/2 cursor-pointer"
+                        size={"1vw"}
+                        color="#9CA3AF"
+                      />
+                    </Popover>
                   </div>
-                  <div className="flex items-center gap-x-[3vw] pl-[1vw]">
+
+                  <div className="flex items-center gap-x-[2.5vw] pl-[1vw]">
                     <div
                       className={` cursor-pointer ${
                         CurrentTab === "All"
@@ -231,7 +398,9 @@ export default function Promotion() {
                       onClick={() => SetCurrentTab("Pending")}
                     >
                       <div className="text-[1.3vw] text-[#1f487c] text-center">
-                       {type_Id === "PRO101" ? "Pending" : "Posted"}
+                        {type_Id === "PRO101" || listType === "employee"
+                          ? "Pending"
+                          : "Posted"}
                       </div>
                     </div>
                     <div
@@ -243,7 +412,7 @@ export default function Promotion() {
                       onClick={() => SetCurrentTab("Approved")}
                     >
                       <div className="text-[1.3vw] text-[#1f487c] text-center">
-                        Approved
+                        Active
                       </div>
                     </div>
                     <div
@@ -255,7 +424,7 @@ export default function Promotion() {
                       onClick={() => SetCurrentTab("OnHold")}
                     >
                       <div className="text-[1.3vw] text-[#1f487c] text-center">
-                       Hold
+                        Hold
                       </div>
                     </div>
                     <div
@@ -270,22 +439,57 @@ export default function Promotion() {
                         Rejected
                       </div>
                     </div>
-                    <div
-                      className={` cursor-pointer ${
-                        CurrentTab === "Draft"
-                          ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                          : ""
-                      } `}
-                      onClick={() => SetCurrentTab("Draft")}
-                    >
-                      <div className="text-[1.3vw] text-[#1f487c] text-center">
-                        Draft
+                    {listType !== "employee" && (
+                      <div
+                        className={` cursor-pointer ${
+                          CurrentTab === "Draft"
+                            ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                            : ""
+                        } `}
+                        onClick={() => SetCurrentTab("Draft")}
+                      >
+                        <div className="text-[1.3vw] text-[#1f487c] text-center">
+                          Draft
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
 
-                <div className="flex items-center gap-x-[1vw] h-full ">
+                <div className="flex items-center gap-x-[1vw] h-[2vw]">
+                  {type_Id === "OP101" && (
+                    <div className="flex relative items-center pl-[2vw]">
+                      <div
+                        className={`${
+                          listType === "operator"
+                            ? "bg-[#1F4B7F] text-white font-semibold "
+                            : "bg-white text-[#1F487C]"
+                        }  px-[0.5vw] items-center rounded-tl-xl rounded-bl-xl border-[0.1vw] border-b-[0.25vw] border-r-0 border-[#1F487C] cursor-pointer 
+                    w-[5.90vw] h-[2.6vw] flex item-center justify-center text-[1.1vw]`}
+                        style={{
+                          transition: "all 0.5s",
+                        }}
+                        onClick={() => setListType("operator")}
+                      >
+                        Operator
+                      </div>
+                      <div
+                        className={`${
+                          listType === "employee"
+                            ? "bg-[#1F4B7F] text-white font-semibold "
+                            : "bg-white  text-[#1F487C]"
+                        }  px-[0.5vw] items-center rounded-r-xl border-[0.1vw] border-r-[0.25vw] border-b-[0.25vw] border-l-0 border-[#1F487C] 
+                    cursor-pointer w-[5.90vw] h-[2.6vw] flex item-center justify-center text-[1.1vw]`}
+                        style={{
+                          transition: "all 0.5s",
+                        }}
+                        onClick={() => setListType("employee")}
+                      >
+                        Employee
+                      </div>
+                    </div>
+                  )}
+                  <ExportButton dataArray={currentItems} />
                   <div>
                     <input
                       id="xlsxFile"
@@ -300,18 +504,20 @@ export default function Promotion() {
                       }}
                     />
                     <button
-                      className="bg-[#1F4B7F] flex px-[0.75vw] h-[2.5vw] justify-center gap-[0.5vw] items-center rounded-[0.5vw]"
+                      className="bg-[#1F4B7F] shadow-sm shadow-black flex px-[0.75vw] h-[5vh] justify-center gap-[0.5vw] items-center rounded-[0.5vw]"
                       onClick={() =>
                         document.getElementById("xlsxFile").click()
                       }
                     >
                       {" "}
-                      <RiUpload2Fill
+                      <CgImport
                         color="white"
-                        size={"1.2vw"}
+                        size={"1.3vw"}
                         className=""
                       />
-                      <span className="text-white text-[1.1vw]">Import</span>
+                      <span className="text-white font-bold text-[1.1vw]">
+                        Import
+                      </span>
                       {/* <MdOutlineFileDownload
                         color="white"
                         size={"2vw"}
@@ -319,7 +525,7 @@ export default function Promotion() {
                       /> */}
                     </button>
                   </div>
-                  <ExportButton dataArray={currentItems} />
+                  
                   {/* 
                   <div className="flex border-[#1F4B7F] h-[2.5vw] border-l-[0.1vw] border-t-[0.1vw] rounded-l-[0.5vw] rounded-r-[0.5vw] border-r-[0.2vw] border-b-[0.2vw]">
                     <button
@@ -366,7 +572,7 @@ export default function Promotion() {
                     </button>
                   </div> */}
                   <button
-                    className="bg-[#1F4B7F] flex px-[1vw] h-[2.5vw] justify-center gap-[0.5vw] items-center rounded-[0.5vw]"
+                    className="bg-[#1F4B7F] shadow-sm shadow-black flex px-[1vw] h-[5vh] justify-center gap-[0.5vw] items-center rounded-[0.5vw]"
                     onClick={() => {
                       setPromoData("");
                       setModalIsOpen(true);
@@ -376,7 +582,9 @@ export default function Promotion() {
                     <span>
                       <FaPlus size={"1.2vw"} color="white" />
                     </span>
-                    <span className="text-white  text-[1.1vw]">Add</span>
+                    <span className="text-white font-bold text-[1.1vw]">
+                      Add
+                    </span>
                   </button>
                 </div>
               </div>
@@ -392,15 +600,33 @@ export default function Promotion() {
                   setPromotionId={setPromotionId}
                   activePage={activePage}
                   itemsPerPage={itemsPerPage}
+                  statusUpdateModal={statusUpdateModal}
+                  setStatusUpdateModal={setStatusUpdateModal}
+                  setComments={setComments}
+                  CurrentTab={CurrentTab}
+                  listType={listType}
+                  eyeModalIsOpen={eyeModalIsOpen}
+                  setEyeModalIsOpen={setEyeModalIsOpen}
+                  promoImage={promoImage}
+                  setPromoImage={setPromoImage}
                 />
               ) : (
                 <GridView
                   currentData={currentItems}
+                  setPromoData={setPromoData}
                   setModalIsOpen={setModalIsOpen}
                   SetUpdateData={SetUpdateData}
                   promotionId={promotionId}
                   setPromotionId={setPromotionId}
                   setDeleteModalIsOpen={setDeleteModalIsOpen}
+                  statusUpdateModal={statusUpdateModal}
+                  setStatusUpdateModal={setStatusUpdateModal}
+                  setComments={setComments}
+                  listType={listType}
+                  eyeModalIsOpen={eyeModalIsOpen}
+                  setEyeModalIsOpen={setEyeModalIsOpen}
+                  promoImage={promoImage}
+                  setPromoImage={setPromoImage}
                 />
               )}
             </div>
@@ -491,8 +717,9 @@ export default function Promotion() {
             promodata={promodata}
             setPromoData={setPromoData}
             promotionId={promotionId}
-            CurrentTab = {CurrentTab}
+            CurrentTab={CurrentTab}
             setPromotionId={setPromotionId}
+            ownerName={ownerName}
             // setPromolist={setPromolist}
             // promolist={promolist}
           />
@@ -507,11 +734,55 @@ export default function Promotion() {
         >
           <DeleteList
             setDeleteModalIsOpen={setDeleteModalIsOpen}
-            title={"Want to delete this Promotion"}
+            title={`Want to delete this ${promodata?.promo_name}`}
             api={`${apiUrl}/promo/${promotionId}`}
             module={"promotion"}
-            CurrentTab = {CurrentTab}
+            CurrentTab={CurrentTab}
           />
+        </ModalPopup>
+
+        <ModalPopup
+          className="border border-[#1f487c] border-b-8 border-r-8 border-b-[#1f487c] border-r-[#1f487c] rounded-md"
+          show={statusUpdateModal}
+          closeicon={false}
+          onClose={closeModal}
+          height="22vw"
+          width="auto"
+        >
+          <StatusUpdateModal
+            setStatusUpdateModal={setStatusUpdateModal}
+            promotionId={promotionId}
+            CurrentTab={CurrentTab}
+            comments={comments}
+            listType={listType}
+          />
+        </ModalPopup>
+
+        <ModalPopup
+          show={eyeModalIsOpen}
+          onClose={closeModal}
+          closeicon={false}
+          height="20vw"
+          width="30vw"
+        >
+          {
+            <div className="flex justify-center items-center mt-[1vw]">
+              {promoImage != null ? (
+                <img
+                  alt="prmoImage"
+                  src={`${apiImgUrl}${promoImage}`}
+                  className="w-full h-[15vw] rounded-[0.5vw]"
+                />
+              ) : (
+                <div className="flex flex-col justify-center items-center w-full h-full pb-[1vw]">
+                  <CiImageOff size={"6.5vw"} color="#1F487C" />
+                  <span className="text-[#1F487C] text-[1.3vw] font-semibold mt-[1vw]">
+                    Image not available
+                  </span>
+                </div>
+              )}
+            </div>
+          }
         </ModalPopup>
       </div>
     </>

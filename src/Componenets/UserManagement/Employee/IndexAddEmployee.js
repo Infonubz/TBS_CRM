@@ -67,26 +67,54 @@ export default function AddEmployee({
     );
   };
 
-  const handleChange = async ({ fileList: newFileList }) => {
-    console.log(newFileList[0]?.originFileObj,"helldjfhdjkfhdkjf",newFileList?.length, "ereffgdfqe");
-    setFileList(newFileList);
-    if(newFileList?.length > 0){
+  // const handleChange = async ({ fileList: newFileList }) => {
+  //   console.log(newFileList[0]?.originFileObj,"helldjfhdjkfhdkjf",newFileList?.length, "ereffgdfqe");
+  //   setFileList(newFileList);
+  //   if(newFileList?.length > 0){
 
-      setProfileImage(true)
-    }
-    else{
-      setProfileImage(false)
-    }
-    // SubmitProfileData(newFileList[0], dispatch);
+  //     setProfileImage(true)
+  //   }
+  //   else{
+  //     setProfileImage(false)
+  //   }
+  //   // SubmitProfileData(newFileList[0], dispatch);
 
-    // try {
-    //   const data = await OperatorProfile(newFileList[0]);
-    //   // setSuperAdminData(data);
-    //   console.log(data);
+  //   // try {
+  //   //   const data = await OperatorProfile(newFileList[0]);
+  //   //   // setSuperAdminData(data);
+  //   //   console.log(data);
       
-    // } catch (error) {
-    //   console.error("Error fetching additional user data", error);
-    // }
+  //   // } catch (error) {
+  //   //   console.error("Error fetching additional user data", error);
+  //   // }
+  // };
+  const handleChange = async ({ fileList: newFileList }) => {
+    const file = newFileList[0]?.originFileObj;
+    
+    if (file) {
+      // Check file size (5MB = 5 * 1024 * 1024 bytes)
+      const fileSizeInMB = file.size / (1024 * 1024); // Convert bytes to MB
+      
+      if (fileSizeInMB > 5) {
+        // If the file size is greater than 5MB, alert the user
+        // alert('File size exceeds 5MB limit!');
+        setProfileImage(false)
+        // Remove the file from the list
+        newFileList.pop(); 
+      } else {
+        setFileList(newFileList);
+        setSelectedFile(newFileList)
+        if (newFileList?.length > 0) {
+          setProfileImage(true);
+        } else {
+          setProfileImage(false);
+        }
+      }
+    } else {
+      // If no file, just update the file list
+      setFileList(newFileList);
+      setSelectedFile(newFileList)
+    }
   };
 
   const handleCancel = () => setPreviewOpen(false);
@@ -264,9 +292,9 @@ useEffect(()=>{
                   />
                 </Modal>
                 {
-                    updatedata ?  " " : (
-                    profileImage === false && <div className="text-red-700 text-[.7vw] absolute  bottom-[-1.2vw]">
-                     * Profile Image is required
+                    updatedata && selectedFile != null ?  " " : (
+                    profileImage === false && <div className="text-red-500 text-[.7vw] absolute  bottom-[-1.2vw]">
+                     * Profile Image is required - (Max Size : 5MB)
                     </div>)}
               </div>
 
@@ -319,6 +347,8 @@ useEffect(()=>{
                   setProfileImage={setProfileImage}
                   updatedata={updatedata}
                   setEnableUpload={setEnableUpload}
+                  selectedFile={selectedFile}
+                  enableUpload={enableUpload}
                 />
               ) : currentpage == 2 ? (
                 // <AddRegisterAddress

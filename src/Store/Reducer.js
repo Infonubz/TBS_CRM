@@ -51,6 +51,7 @@ import {
   PROMO_BG_IMAGE,
   GET_REQ_PARTNER,
   GET_ROLES_PERMISSION,
+  GET_REQ_MOB_ADS,
 } from "./Type";
 
 const initialState = {
@@ -96,12 +97,12 @@ const initialState = {
   operator_data: [],
   promo_bg: "",
   get_req_partner: [],
-  get_roles_permission:[]
+  get_roles_permission: [],
+  get_req_mob_ads: [],
 };
 
 export const crmreducer = (state = initialState, action) => {
   const { type, payload, payload_count } = action;
-
   switch (type) {
     case PROMOTION_DATA:
       console.log(payload, "PROMOTION_DATA");
@@ -402,6 +403,13 @@ export const crmreducer = (state = initialState, action) => {
         ...state,
         get_roles_permission: payload,
       };
+
+    case GET_REQ_MOB_ADS: {
+      return {
+        ...state,
+        get_req_mob_ads: payload,
+      };
+    }
     default:
       return state;
   }

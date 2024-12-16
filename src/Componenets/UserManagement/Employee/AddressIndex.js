@@ -2,7 +2,7 @@ import { ErrorMessage, Field, Form, Formik } from "formik";
 import { useEffect, useState } from "react";
 import TempAddress from "./TempAddress";
 import PerAddress from "./PerAddress";
-import { Checkbox } from "antd";
+import { Checkbox, Spin } from "antd";
 import { GetPatAddressById } from "../../../Api/UserManagement/Partner";
 import { GetEmpAddressById } from "../../../Api/UserManagement/Employee";
 import umbuslogo from "../../../asserts/umbuslogo.png"
@@ -20,6 +20,7 @@ const AddressIndex = ({
   const [selected, setSelected] = useState(1);
   const [toggle,setToggle] = useState(false)
   const [checkBox, setCheckBox] = useState(false);
+  const [spinning, setSpinning] = useState(false);
   const [enable, setEnable] = useState();
   const [currentValues, setCurrentValues] = useState({
     address: "",
@@ -49,7 +50,8 @@ const AddressIndex = ({
       const data = await GetEmpAddressById(
         EmployeeID,
         setEmployeeID,
-        setEmpAddressData
+        setEmpAddressData,
+        setSpinning
       );
       setEmpAddressData(data);
       console.log(data,"dfdkf");
@@ -78,6 +80,7 @@ const AddressIndex = ({
   useEffect(() => {
     if (EmployeeID != null || proffesionaback) {
       fetchGetUser();
+      setSpinning(true)
       setEnable(false)
     }
   }, [EmployeeID, setEmployeeID, setEmpAddressData, proffesionaback]);
@@ -104,7 +107,7 @@ const AddressIndex = ({
           ) : (
             ""
           )} */}
-           {updatedata || proffesionaback ? (
+           {updatedata && empaddressdata?.perm_add != null || proffesionaback ? (
             <button
               className={`${
                 enable
@@ -160,9 +163,15 @@ const AddressIndex = ({
   Permanent Address
 </button>
         </div>
+        {spinning ? (
+              <div className=" flex justify-center h-[22vw] items-center">
+                <Spin size="large" />
+              </div>
+            ) : (
+        <>
              <Checkbox className={`${selected === 1 ? "":"hidden"} text-[#1F4B7F] font-semibold text-[.9vw] mt-[.5vw]`}
           onChange={() => setCheckBox(!checkBox)}
-          disabled={EmployeeID || proffesionaback || updatedata ? (EmployeeID && enable == false && updatedata == "" ? false :  enable ? false : true) : false}
+          disabled={EmployeeID || proffesionaback || updatedata ? (EmployeeID && enable == false && updatedata == "" ? false :  enable ? false :empaddressdata.perm_add == null ? false : true) : false}
           // disabled={PartnerID || proffesionaback || updatedata ? (PartnerID &&  enable == false && updatedata == "" ? false : enable ? false : true) : false}
           // onChange={(e) => {
           //   if (e.target.checked) {
@@ -218,6 +227,8 @@ const AddressIndex = ({
             updatedata={updatedata} 
           />
         )}
+        </>
+            )}
       </div>
     </div>
   );

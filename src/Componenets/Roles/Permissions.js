@@ -44,6 +44,7 @@ export default function Permission({
   const [activePage, setActivePage] = useState(1);
   const itemsPerPage = 3; // Number of items to display per page
   const dispatch = useDispatch();
+  const [user, setUser] = useState();
   const userId = sessionStorage.getItem("USER_ID");
   const type_id = sessionStorage.getItem("type_id");
 
@@ -227,6 +228,7 @@ export default function Permission({
       title: <span className="text-[1.2vw] font-bold text-[#1F487C] pl-[2.5vw]">Actions</span>,
       render: (row) => {
         const handleDelete = () => {
+          setUser(row);
           setDeleteModalIsOpen(true);
           if(type_id === "PRO101"){
             setdelete(row.crud_permission_id);
@@ -363,7 +365,7 @@ if(currentItems?.length === 0){
         >
           <DeleteList
             setDeleteModalIsOpen={setDeleteModalIsOpen}
-            title={"want to delete this user permission"}
+            title={`want to delete this ${user?.role_type}`}
             api={`${apiUrl}/permissions/${userId}/${deleteid}`}
             module={"permissions"}
             filter = {filter}

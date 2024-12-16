@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from "react";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import * as Yup from "yup";
 import { MdOutlineModeEditOutline } from "react-icons/md";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 import { FaCloudUploadAlt } from "react-icons/fa";
-import { GetEmployeeDocumentData, SubmitEmpDocumentsData } from '../../../../Api/Settings/UserSettings/Employee';
+import {
+  GetEmployeeDocumentData,
+  SubmitEmpDocumentsData,
+} from "../../../../Api/Settings/UserSettings/Employee";
 import { Modal } from "antd";
-
-
 
 const FILE_SIZE = 1024 * 1024 * 5; // 5MB
 const SUPPORTED_FORMATS = [
@@ -93,15 +94,12 @@ const validationSchema = Yup.object().shape({
 });
 
 const Documents = () => {
-
-
   const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const apiurl = process.env.REACT_APP_API_URL;
 
+  const [empDocument, setEmpDocument] = useState();
 
-  const [empDocument, setEmpDocument] = useState()
-
-  console.log(empDocument, 'emp_Document')
+  console.log(empDocument, "emp_Document");
 
   const fetchempDocument = async () => {
     try {
@@ -121,8 +119,7 @@ const Documents = () => {
   const [previewTitle, setPreviewTitle] = useState("");
   const handleCancel = () => setPreviewOpen(false);
 
-
-  console.log(previewImage, 'previewimage')
+  console.log(previewImage, "previewimage");
 
   const handlePreview = (file) => {
     const reader = new FileReader();
@@ -133,18 +130,16 @@ const Documents = () => {
     reader?.readAsDataURL(file);
   };
 
-
   const handleSubmit = async (values) => {
     try {
       const data = await SubmitEmpDocumentsData(values);
       toast.success(data);
-      GetEmployeeDocumentData()
-    }
-    catch (error) {
+      GetEmployeeDocumentData();
+    } catch (error) {
       console.error("Error uploading data", error);
       toast.error("Failed to submit document. Please try again.");
     }
-  }
+  };
   const [inputPreview, setInputPreview] = useState({
     aadharfront: null,
     aadharback: null,
@@ -153,7 +148,7 @@ const Documents = () => {
     qualification: null,
     offerletter: null,
   });
-  console.log(inputPreview.gst, 'input_preview')
+  console.log(inputPreview.gst, "input_preview");
   useEffect(() => {
     setInputPreview({
       aadharfront: empDocument?.aadhar_card_front_doc,
@@ -161,11 +156,11 @@ const Documents = () => {
       panfront: empDocument?.pan_card_front_doc,
       panback: empDocument?.pan_card_back_doc,
       qualification: empDocument?.qualification_doc,
-      offerletter: empDocument?.offer_letter_doc
-    })
-  }, [empDocument])
+      offerletter: empDocument?.offer_letter_doc,
+    });
+  }, [empDocument]);
 
-  const [isEdit, setIsEdit] = useState(false)
+  const [isEdit, setIsEdit] = useState(false);
 
   const handleFileChange = (event, key) => {
     const file = event?.currentTarget?.files[0];
@@ -186,13 +181,12 @@ const Documents = () => {
     }
   };
 
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalImage, setModalImage] = useState(null);
 
   const openModal = (event) => {
     // Get the image source (src) using `getElementById`
-    const imageSrc = event.target.getAttribute('src');
+    const imageSrc = event.target.getAttribute("src");
 
     // Set the modal image source
     setModalImage(imageSrc);
@@ -203,7 +197,6 @@ const Documents = () => {
   const closeModal = () => {
     setIsModalOpen(false);
   };
-
 
   return (
     <div>
@@ -219,14 +212,20 @@ const Documents = () => {
           offerletter: empDocument ? empDocument.offer_letter_doc : null,
         }}
         validationSchema={validationSchema}
-        onSubmit={(values) => (
-          handleSubmit(values)
-        )}
+        onSubmit={(values) => handleSubmit(values)}
         enableReinitialize
       >
-        {({ isSubmitting, isValid, setFieldValue, values, handleChange, errors, touched, dirty }) => (
+        {({
+          isSubmitting,
+          isValid,
+          setFieldValue,
+          values,
+          handleChange,
+          errors,
+          touched,
+          dirty,
+        }) => (
           <Form>
-
             <div>
               <div className="gap-[1vw] grid grid-cols-2">
                 <div className="col-span-1 relative">
@@ -236,14 +235,16 @@ const Documents = () => {
                       *
                     </span>
                   </label>
-                  <div className='relative'>
+                  <div className="relative">
                     <Field
                       type="text"
                       name="aadhar_number"
                       placeholder="Enter Aadhar Number"
                       accept=".png, .jpg, .jpeg, .pdf, .doc, .docx"
                       value={values.aadhar_number}
-                      className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                      className={`border-r-[0.25vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none ${
+                        isEdit === false ? "cursor-not-allowed" : ""
+                      }`}
                       disabled={isEdit === false}
                     />
                     {/* <MdOutlineModeEditOutline
@@ -265,14 +266,16 @@ const Documents = () => {
                       *
                     </span>
                   </label>
-                  <div className='relative'>
+                  <div className="relative">
                     <Field
                       type="text"
                       name="pan_number"
                       placeholder="Enter Pan Number"
                       accept=".png, .jpg, .jpeg, .pdf, .doc, .docx"
                       value={values.pan_number}
-                      className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                      className={`border-r-[0.25vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none ${
+                        isEdit === false ? "cursor-not-allowed" : ""
+                      }`}
                       disabled={isEdit === false}
                     />
                     {/* <MdOutlineModeEditOutline
@@ -294,14 +297,13 @@ const Documents = () => {
                       *
                     </span>
                   </label>
-                  <div className='relative'>
+                  <div className="relative">
                     <input
                       id="aadhar_doc"
                       name="aadhar_doc"
                       type="file"
                       accept=".png, .jpg, .jpeg, .pdf, .doc, .docx"
                       style={{ display: "none" }}
-
                       onChange={(event) => {
                         const files = Array.from(event.target.files);
                         console.log(files, "filesfiles");
@@ -318,7 +320,9 @@ const Documents = () => {
                         event.preventDefault();
                         document.getElementById("aadhar_doc").click();
                       }}
-                      className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                      className={`border-r-[0.25vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none ${
+                        isEdit === false ? "cursor-not-allowed" : ""
+                      }`}
                       disabled={isEdit === false}
                     >
                       {values.aadhar_doc ? (
@@ -327,15 +331,19 @@ const Documents = () => {
                           //   setPreviewImage(empDocument?.aadhar_card_front_doc);
                           //   setPreviewOpen(true);
                           // }}
-                            className={`${isEdit === false ? 'cursor-not-allowed' : ''}  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
+                          className={`${
+                            isEdit === false ? "cursor-not-allowed" : ""
+                          }  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
                         >
                           {values.aadhar_doc.name
                             ? values.aadhar_doc.name
                             : values.aadhar_doc}
                         </div>
-                      ) : <span className="opacity-50">
-                        Upload Aadhar Front Doc
-                      </span>}
+                      ) : (
+                        <span className="opacity-50">
+                          Upload Aadhar Front Doc
+                        </span>
+                      )}
                       {/* <MdOutlineModeEditOutline
                         color='#1F487C'
                         className='absolute top-[0.75vw] right-[1vw]'
@@ -371,14 +379,13 @@ const Documents = () => {
                       *
                     </span>
                   </label>
-                  <div className='relative'>
+                  <div className="relative">
                     <input
                       id="aadhar_bk_doc"
                       name="aadhar_bk_doc"
                       type="file"
                       accept=".png, .jpg, .jpeg, .pdf, .doc, .docx"
                       style={{ display: "none" }}
-
                       onChange={(event) => {
                         const files = Array.from(event.target.files);
                         console.log(files, "filesfiles");
@@ -395,7 +402,9 @@ const Documents = () => {
                         event.preventDefault();
                         document.getElementById("aadhar_bk_doc").click();
                       }}
-                      className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                      className={`border-r-[0.25vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none ${
+                        isEdit === false ? "cursor-not-allowed" : ""
+                      }`}
                       disabled={isEdit === false}
                     >
                       {values.aadhar_bk_doc ? (
@@ -404,16 +413,19 @@ const Documents = () => {
                           //   setPreviewImage(empDocument?.aadhar_card_back_doc);
                           //   setPreviewOpen(true);
                           // }}
-                            className={`${isEdit === false ? 'cursor-not-allowed' : ''}  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
+                          className={`${
+                            isEdit === false ? "cursor-not-allowed" : ""
+                          }  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
                         >
                           {values.aadhar_bk_doc.name
                             ? values.aadhar_bk_doc.name
                             : values.aadhar_bk_doc}
                         </div>
-                      ) :
+                      ) : (
                         <span className="opacity-50">
                           Upload Aadhar Back Doc
-                        </span>}
+                        </span>
+                      )}
                       {/* <MdOutlineModeEditOutline
                         color='#1F487C'
                         className='absolute top-[0.75vw] right-[1vw]'
@@ -449,21 +461,17 @@ const Documents = () => {
                       *
                     </span>
                   </label>
-                  <div className='relative'>
+                  <div className="relative">
                     <input
                       id="pan_doc"
                       name="pan_doc"
                       type="file"
                       accept=".png, .jpg, .jpeg, .pdf, .doc, .docx"
                       style={{ display: "none" }}
-
                       onChange={(event) => {
                         const files = Array.from(event.target.files);
                         // setFieldValue("aadhar_back", files);
-                        setFieldValue(
-                          "pan_doc",
-                          event.currentTarget.files[0]
-                        );
+                        setFieldValue("pan_doc", event.currentTarget.files[0]);
                         // handlePreview(files[0]);
                       }}
                     />
@@ -473,7 +481,9 @@ const Documents = () => {
                         event.preventDefault();
                         document.getElementById("pan_doc").click();
                       }}
-                      className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                      className={`border-r-[0.25vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none ${
+                        isEdit === false ? "cursor-not-allowed" : ""
+                      }`}
                       disabled={isEdit === false}
                     >
                       {values.pan_doc ? (
@@ -482,13 +492,17 @@ const Documents = () => {
                           //   setPreviewImage(empDocument?.pan_card_front_doc);
                           //   setPreviewOpen(true);
                           // }}
-                            className={`${isEdit === false ? 'cursor-not-allowed' : ''}  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
+                          className={`${
+                            isEdit === false ? "cursor-not-allowed" : ""
+                          }  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
                         >
                           {values.pan_doc.name
                             ? values.pan_doc.name
                             : values.pan_doc}
                         </div>
-                      ) : <span className="opacity-50">Upload Pan Front Doc</span>}
+                      ) : (
+                        <span className="opacity-50">Upload Pan Front Doc</span>
+                      )}
                       {/* <MdOutlineModeEditOutline
                         color='#1F487C'
                         className='absolute top-[0.75vw] right-[1vw]'
@@ -524,14 +538,13 @@ const Documents = () => {
                       *
                     </span>
                   </label>
-                  <div className='relative'>
+                  <div className="relative">
                     <input
                       id="pan_bk_doc"
                       name="pan_doc"
                       type="file"
                       accept=".png, .jpg, .jpeg, .pdf, .doc, .docx"
                       style={{ display: "none" }}
-
                       onChange={(event) => {
                         const files = Array.from(event.target.files);
                         // setFieldValue("aadhar_back", files);
@@ -548,7 +561,9 @@ const Documents = () => {
                         event.preventDefault();
                         document.getElementById("pan_bk_doc").click();
                       }}
-                      className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                      className={`border-r-[0.25vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none ${
+                        isEdit === false ? "cursor-not-allowed" : ""
+                      }`}
                       disabled={isEdit === false}
                     >
                       {values.pan_bk_doc ? (
@@ -557,13 +572,17 @@ const Documents = () => {
                           //   setPreviewImage(empDocument?.pan_card_back_doc);
                           //   setPreviewOpen(true);
                           // }}
-                            className={`${isEdit === false ? 'cursor-not-allowed' : ''}  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
+                          className={`${
+                            isEdit === false ? "cursor-not-allowed" : ""
+                          }  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
                         >
                           {values.pan_bk_doc.name
                             ? values.pan_bk_doc.name
                             : values.pan_bk_doc}
                         </div>
-                      ) : <span className="opacity-50">Upload Pan Back Doc</span>}
+                      ) : (
+                        <span className="opacity-50">Upload Pan Back Doc</span>
+                      )}
                       {/* <MdOutlineModeEditOutline
                         color='#1F487C'
                         className='absolute top-[0.75vw] right-[1vw]'
@@ -599,14 +618,13 @@ const Documents = () => {
                       *
                     </span>
                   </label>
-                  <div className='relative'>
+                  <div className="relative">
                     <input
                       id="qualification"
                       name="qualification"
                       type="file"
                       accept=".png, .jpg, .jpeg, .pdf, .doc, .docx"
                       style={{ display: "none" }}
-
                       onChange={(event) => {
                         const files = Array.from(event.target.files);
                         console.log(files, "filesfiles");
@@ -624,7 +642,9 @@ const Documents = () => {
                         event.preventDefault();
                         document.getElementById("qualification").click();
                       }}
-                      className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                      className={`border-r-[0.25vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none ${
+                        isEdit === false ? "cursor-not-allowed" : ""
+                      }`}
                       disabled={isEdit === false}
                     >
                       {values.qualification ? (
@@ -635,17 +655,19 @@ const Documents = () => {
                           //   );
                           //   setPreviewOpen(true);
                           // }}
-                            className={`${isEdit === false ? 'cursor-not-allowed' : ''}  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
+                          className={`${
+                            isEdit === false ? "cursor-not-allowed" : ""
+                          }  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
                         >
                           {values.qualification.name
                             ? values.qualification.name
                             : values.qualification}
                         </div>
-                      ) :
+                      ) : (
                         <span className="opacity-50">
                           Upload Qualification Doc
                         </span>
-                      }
+                      )}
                       {/* <MdOutlineModeEditOutline
                         color='#1F487C'
                         className='absolute top-[0.75vw] right-[1vw]'
@@ -681,14 +703,13 @@ const Documents = () => {
                       *
                     </span>
                   </label>
-                  <div className='relative'>
+                  <div className="relative">
                     <input
                       id="offerletter"
                       name="offerletter"
                       type="file"
                       accept=".png, .jpg, .jpeg, .pdf, .doc, .docx"
                       style={{ display: "none" }}
-
                       onChange={(event) => {
                         const files = Array.from(event.target.files);
                         console.log(files, "filesfiles");
@@ -706,7 +727,9 @@ const Documents = () => {
                         event.preventDefault();
                         document.getElementById("offerletter").click();
                       }}
-                      className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-xl outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
+                      className={`border-r-[0.25vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none ${
+                        isEdit === false ? "cursor-not-allowed" : ""
+                      }`}
                       disabled={isEdit === false}
                     >
                       {values.offerletter ? (
@@ -715,16 +738,19 @@ const Documents = () => {
                             setPreviewImage(empDocument?.offer_letter_doc);
                             setPreviewOpen(true);
                           }}
-                            className={`${isEdit === false ? 'cursor-not-allowed' : ''}  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
+                          className={`${
+                            isEdit === false ? "cursor-not-allowed" : ""
+                          }  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
                         >
                           {values.offerletter.name
                             ? values.offerletter.name
                             : values.offerletter}
                         </div>
-                      ) :
+                      ) : (
                         <span className="opacity-50">
                           Upload Offer Letter Doc
-                        </span>}
+                        </span>
+                      )}
                       {/* <MdOutlineModeEditOutline
                         color='#1F487C'
                         className='absolute top-[0.75vw] right-[1vw]'
@@ -754,25 +780,25 @@ const Documents = () => {
                   </div>
                 </div>
               </div>
-              <div className='flex items-center justify-center pt-[2vw] pb-[0.5vw]'>
-                {isEdit === false ?
+              <div className="flex items-center justify-center pt-[2vw] pb-[0.5vw]">
+                {isEdit === false ? (
                   <div
                     onClick={() => setIsEdit(true)}
                     className="cursor-pointer text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[12vw] text-center"
                   >
                     Edit
                   </div>
-                  :
+                ) : (
                   <button
                     type="submit"
                     className="text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[12vw]"
                   >
-                    Submit
+                    Update
                   </button>
-                }
+                )}
               </div>
             </div>
-            {console.log(dirty, 'dirty_dirty')}
+            {console.log(dirty, "dirty_dirty")}
           </Form>
         )}
       </Formik>
@@ -795,7 +821,8 @@ const Documents = () => {
         )}
       </Modal>
     </div>
-  )
-}
+  );
+};
 
-export default Documents
+export default Documents;
+

@@ -31,8 +31,14 @@ export default function CreateActiveRole({
 }) {
   const validationSchema = Yup.object().shape({
     //user: Yup.string().required("User is required"),
-    role_type: Yup.string().required("Role type is required"),
-    description: Yup.string().required("Description is required"),
+    role_type: Yup.string()
+    .min(3, "Role Type must be greater than 1 character")
+    .max(25, "Role Type should not be greater than 50 characters")
+    .required("Role type is required"),
+    description: Yup.string()
+    .min(5, "Description must be greater than 1 character")
+    .max(15, "Description should not be greater than 50 characters")
+    .required("Description is required"),
   });
   //const [selectedPermissions, setSelectedPermissions] = useState([]);
   const dispatch = useDispatch();

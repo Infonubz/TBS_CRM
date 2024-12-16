@@ -111,6 +111,9 @@ export const GetOperatorDataById = async (
     return null;
   }
 };
+
+
+
 const handleError = (error) => {
   console.error("Error details:", error);
   let errorMessage = "An error occurred";

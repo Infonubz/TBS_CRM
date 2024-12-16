@@ -1,10 +1,11 @@
 import { ConfigProvider, DatePicker, Select, Upload } from "antd";
-import { ErrorMessage, Field, 
-  //Form, Formik 
+import {
+  ErrorMessage,
+  Field,
+  //Form, Formik
 } from "formik";
 import React, { useEffect, useState } from "react";
 //import { LiaSave } from "react-icons/lia";
-import * as Yup from "yup";
 import "../../App.css";
 import { useDispatch, useSelector } from "react-redux";
 //import { PROMOTION_DATA, GET_OPERATOR_NAME } from "../../Store/Type";
@@ -15,69 +16,15 @@ import {
   //SubmitPromotionData,
   GetOperatorName,
 } from "../../Api/Promotion/Promotion";
+//import { GetOperatorByOPId } from "../../Api/UserManagement/SuperAdmin";
 //import { submitUserData } from "../../Api/UserManagement/UserManagement";
 import dayjs from "dayjs";
-import { 
-  //FaBus, 
-  FaUpload } from "react-icons/fa";
+import {
+  //FaBus,
+  FaUpload,
+} from "react-icons/fa";
 //import Background_View from "./Background_View";
 import { IoMdArrowDropdown } from "react-icons/io";
-
-const validationSchema = Yup.object().shape({
-  promotion_name: Yup.string()
-    .required("Promotion Title is required")
-    .max(17, "Max 17 characters only")
-    .matches(/^[a-zA-Z0-9]+$/, "Only alphabets and numbers are allowed"),
-  promotion_description: Yup.string()
-    .required("Promotion Description is required")
-    .max(43, "Max 57 characters only")
-    .matches(/^[a-zA-Z0-9]+$/, "Only alphabets and numbers are allowed"),
-  usage: Yup.string()
-    .required("Enter Usage Value")
-    .min(1, "usage must be at least 1")
-    .max(100, "usage cannot exceed 100")
-    .matches(/^[0-9]+$/, "Only numbers are allowed"),
-    
-  promo_code: Yup.string()
-    .required("Enter Promo Code")
-    .min(5, "Promo Code must be at least 5 digit")
-    .max(100, "Promo code cannot exceed 20")
-    .matches(/^[a-zA-Z0-9]+$/, "Only alphabets and numbers are allowed"),
-  status: Yup.string().required("This field is required"),
-  file: Yup.mixed()
-    .test("required", "A file is required", function (value) {
-      const { isEdit } = this.options.context;
-      if (!isEdit && !value) {
-        return false;
-      }
-      return true;
-    })
-    .test("file_size", "File size is too large", function (value) {
-      if (value && value.size > 2000000) {
-        // 2MB
-        return false;
-      }
-      return true;
-    })
-    .test("file_type", "Unsupported File Format", function (value) {
-      if (typeof value === "string") {
-        // If value is a string (file path), skip file type validation
-        return true;
-      }
-      if (
-        value &&
-        ["image/jpeg", "image/png", "image/jpg"].includes(value.type)
-      ) {
-        return true;
-      }
-      return false;
-    }),
-  start_date: Yup.date().required("Start Date is required"),
-  // .min(new Date(), 'Start Date cannot be in the past'),
-  expiry_date: Yup.date()
-    .required("Expiry Date is required")
-    .min(Yup.ref("start_date"), "Expiry Date must be after Start Date"),
-});
 
 export default function AddPromotion({
   setModalIsOpen,
@@ -98,9 +45,11 @@ export default function AddPromotion({
   promolist,
   draggerImage,
   setDraggerImage,
-  currentPromo, 
+  currentPromo,
   setCurrentPromo,
-  CurrentTab
+  CurrentTab,
+  ownerName,
+  operatorName,
 }) {
   const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const { Dragger } = Upload;
@@ -116,7 +65,6 @@ export default function AddPromotion({
   //   background_image: "",
   // });
   const type_Id = sessionStorage.getItem("type_id");
-  //const [currentPromodata, setCurrentPromodata] = useState("");
 
   const openImageModal = () => {
     isImageModalOpen(true);
@@ -171,13 +119,11 @@ export default function AddPromotion({
         { label: "Draft", value: "Draft" },
         { label: "Active", value: "Active" },
       ];
-    } else if (type_Id == "OP101") {
+    } else {
       return [
         { label: "Draft", value: "Draft" },
         { label: "Posted", value: "Posted" },
       ];
-    } else {
-      return [{ label: "Select Status", value: "" }];
     }
   };
 
@@ -212,9 +158,7 @@ export default function AddPromotion({
   const [error, setError] = useState("");
 
   useEffect(() => {
-    // const userNameFromSessionStorage = sessionStorage.getItem("user_name");
     const userNameFromSessionStorage = sessionStorage.getItem("user_name");
-    // const UserType = sessionStorage.getItem("type_id");
     const UserType = sessionStorage.getItem("type_id");
     if (UserType) {
       setUserType(UserType);
@@ -226,7 +170,7 @@ export default function AddPromotion({
   }, []);
 
   return (
-    <>
+    <div className="umselect">
       {/* <Formik
         initialValues={{
           promotion_name: promodata ? promodata.promo_name : "",
@@ -306,7 +250,7 @@ export default function AddPromotion({
             Operator Detail
             <span className="text-[1vw] text-red-600 pl-[0.25vw]">*</span>
           </label>
-          {userType.startsWith("PRO") ? (
+          {type_Id === "PRO101" || type_Id === "PROEMP101" ? (
             // <Field
             //   as="select"
             //   id="operator_details"
@@ -357,17 +301,15 @@ export default function AddPromotion({
                 showSearch
                 className="custom-select bg-white outline-none w-full mt-[0.2vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw] border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
                 placeholder="Select Role"
-                optionFilterProp="label"
-                value={values.operator_details} 
+                filterOption={(input, option) =>
+                  option?.value?.toLowerCase()?.includes(input.toLowerCase())
+                }
+                optionFilterProp="value"
+                value={values.operator_details}
                 onChange={(value, option) => {
                   const selectedOperator = getOperatorName?.find(
                     (operator) => operator.company_name === value
                   );
-                  // setOfferlist({
-                  //   ...offerlist,
-                  //   occupation: value,
-                  //   occupation_name: option.label,
-                  // });
                   setError("");
                   setFieldValue("operator_details", value);
                 }}
@@ -392,10 +334,8 @@ export default function AddPromotion({
                   ...getOperatorName?.map((operatorName) => ({
                     value: operatorName.company_name,
                     label: (
-                      <div className="flex items-center text-[1vw] gap-x-[0.5vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                        <span className="text-[1vw]">
-                          {operatorName.company_name}
-                        </span>
+                      <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F4B7F]">
+                        {operatorName.company_name}
                       </div>
                     ),
                   })),
@@ -407,7 +347,8 @@ export default function AddPromotion({
               type="text"
               name="operator_details"
               placeholder="Operator Name"
-              value={userName}
+              value={operatorName}
+              //disabled
               className=" cursor-not-allowed border-r-[0.25vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-blue border-[#1F487C] 
              text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw] "
             />
@@ -419,7 +360,7 @@ export default function AddPromotion({
           />
         </div>
         <div className="col-span-1 flex-col flex relative">
-          <label className="text-[#1F4B7F] text-[1.1vw] font-bold relative ">
+          <label className="text-[#1F4B7F] text-[1.1vw] font-bold relative">
             Promo Title
             <span className="text-[1vw] text-red-600 pl-[0.25vw]">*</span>
           </label>
@@ -429,6 +370,7 @@ export default function AddPromotion({
             id="promo_name"
             placeholder="Promotion Title"
             value={values.promotion_name}
+            autoComplete="promotion_name"
             onChange={(e) => {
               handleChange(e);
               // setCurrentPromodata({
@@ -505,15 +447,6 @@ export default function AddPromotion({
                   format={"DD MMM, YYYY"}
                   onChange={(dates) => {
                     const [startDate, endDate] = dates || [null, null];
-                    // setFieldValue(
-                    //   "start_date",
-                    //   startDate ? startDate.format("YYYY-MM-DD") : ""
-                    // );
-                    // setCurrentPromodata({
-                    //   ...currentPromodata,
-                    //   start_date: startDate,
-
-                    // });
                     setFieldValue(
                       "start_date",
                       startDate ? startDate.format("YYYY-MM-DD") : ""
@@ -529,21 +462,34 @@ export default function AddPromotion({
                   ]}
                   className="ads-date border-r-[0.25vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-blue border-[#1F487C]
 text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw] placeholder-[#1F487C]"
-                  disabledDate={(current) => current < dayjs().startOf("day")}
+                  // disabledDate={(current) => {
+                  //   // Disable dates outside the current month to next 3 months
+                  //   const startOfCurrentMonth = dayjs().startOf("month");
+                  //   const endOfAllowedRange = dayjs()
+                  //     .add(2, "month")
+                  //     .endOf("month");
+                  //   return (
+                  //     current &&
+                  //     (current < startOfCurrentMonth ||
+                  //       current > endOfAllowedRange)
+                  //   );
+                  // }}
                 />
               </ConfigProvider>
             )}
           </Field>
-          <ErrorMessage
-            name="start_date"
-            component="div"
-            className="text-red-500 text-[0.8vw] absolute bottom-[-0.1vw]"
-          />
-          <ErrorMessage
-            name="expiry_date"
-            component="div"
-            className="text-red-500 text-[0.8vw] absolute bottom-[-0.1vw] left-[8vw]"
-          />
+          <div className="flex absolute mt-[5vw]">
+            <ErrorMessage
+              name="start_date"
+              component="div"
+              className="text-red-500 text-[0.8vw]"
+            />
+            <ErrorMessage
+              name="expiry_date"
+              component="div"
+              className="text-red-500 text-[0.8vw] ml-[1vw]"
+            />
+          </div>
         </div>
         {/* <div className="col-span-1 flex flex-col">
                   <label className="text-[#1F4B7F] text-[1.1vw] ">
@@ -575,7 +521,7 @@ text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1v
                     className="text-red-500 text-[0.8vw]"
                   />
                 </div> */}
-        <div className="col-span-1 flex-col flex relative">
+        {/* <div className="col-span-1 flex-col flex relative">
           <label className="text-[#1F4B7F] text-[1.1vw] font-bold ">
             Promo Value
             <span className="text-[1vw] text-red-600 pl-[0.25vw]">*</span>
@@ -583,12 +529,13 @@ text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1v
               {`(Discount price from ticket)`}
             </span>
           </label>
-          <Field
-            type="text"
-            name="promo_value"
-            id="promo_value"
-            placeholder="Enter Promo Value"
-            value={values.promo_value}
+          <div className="relative flex ">
+                            <Field
+                              type="text"
+                              name="promo_value"
+                              id="promo_value"
+                              placeholder="Enter Promo Value"
+                              value={values.promo_value}
             onChange={(e) => {
               handleChange(e);
               // sessionStorage.setItem("promo_value", e.target.value);
@@ -597,40 +544,104 @@ text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1v
               //   promo_name: e.target.value,
               // });
             }}
-            className="border-r-[0.25vw] mt-[0.2vw] border-l-[0.05vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
-          />
+                              //onBlur={handleBlur}
+                              className=" border-r-[0.2vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] h-[3vw] w-[100%] text-[#1F487C] text-[1vw] outline-none px-[1vw] border-b-[0.2vw] border-[#1F487C] rounded-[0.5vw] rounded-r-none "
+                            />
+
+                            <div className="flex items-center justify-center border-b-[0.2vw] border-r-[0.2vw] mt-[0.5vw]  border-t-[0.1vw] rounded-l-none rounded-[0.5vw] border-[#1F487C] text-[1.2vw]">
+                              <div
+                                className={` w-[3vw] h-full flex items-center justify-center ${
+                                  values.value_symbol === "₹"
+                                    ? "bg-[#1F487C] text-white font-semibold"
+                                    : "bg-white text-[#1F487C]"
+                                } `}
+                                onClick={() => {
+                                  //setValueSymbol("₹");
+                                  setFieldValue("value_symbol", "₹");
+                                }}
+                              >
+                                ₹
+                              </div>
+                              <div
+                                className={` w-[3vw] h-full flex items-center justify-center ${
+                                  values.value_symbol === "%"
+                                    ? "bg-[#1F487C] text-white font-semibold rounded-r-[0.3vw]"
+                                    : "bg-white text-[#1F487C] rounded-r-[0.5vw]"
+                                } `}
+                                onClick={() => {
+                                  //setValueSymbol("%");
+                                  setFieldValue("value_symbol", "%");
+                                }}
+                              >
+                                %
+                              </div>
+                            </div>
+                          </div>
           <ErrorMessage
             name="promo_value"
             component="div"
-            className="text-red-500 text-[0.8vw]"
+            className="text-red-500 absolute pt-[4.90vw] text-[0.8vw]"
           />
-          <div className="flex items-center justify-center absolute right-[0.1vw] top-[1.9vw]">
-          <button
-          type="button"
-          className={`h-[2.75vw] w-[3vw] text-[1.2vw] border-[#1F4B7F] border-[0.1vw] ${
-            values.value_symbol === "₹"
-              ? "bg-[#1F4B7F] text-white"
-              : "bg-white text-[#1F4B7F]"
-          }`}
-          onClick={() => setFieldValue("value_symbol", "₹")}
-        >
-          ₹
-        </button>
-        <button
-          type="button"
-          className={`h-[2.75vw] w-[3vw] text-[1.2vw] rounded-r-[0.4vw] border-[#1F4B7F] border-[0.1vw] ${
-            values.value_symbol === "%"
-              ? "bg-[#1F4B7F] text-white"
-              : "bg-white text-[#1F4B7F]"
-          }`}
-          onClick={() => setFieldValue("value_symbol", "%")}
-        >
-          %
-        </button>
+        </div> */}
+        <div>
+          <div className="relative col-span-1 flex flex-col">
+            <label className="text-[#1F4B7F] text-[1.1vw] font-bold ">
+              Promo Value
+              <span className="text-[1vw] text-red-600 pl-[0.25vw]">*</span>
+              <span className="text-[#909193] text-[0.8vw] pl-[0.25vw]">
+                {`(Discount price from ticket)`}
+              </span>
+            </label>
+            <div className="relative flex ">
+              <Field
+                type="text"
+                name="promo_value"
+                id="promo_value"
+                placeholder="Enter Promo Value"
+                autoComplete="promo_value"
+                value={values.promo_value}
+                onChange={(e) => {
+                  handleChange(e);
+                }}
+                className=" border-r-[0.2vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] h-[3vw] w-[100%] text-[#1F487C] text-[1vw] outline-none px-[1vw] border-b-[0.2vw] border-[#1F487C] rounded-[0.5vw] rounded-r-none "
+              />
+
+              <div className="flex items-center justify-center border-b-[0.2vw] border-r-[0.2vw] mt-[0.2vw]  border-t-[0.1vw] rounded-l-none rounded-[0.5vw] border-[#1F487C] text-[1.2vw]">
+                <div
+                  className={` w-[3vw] h-full flex items-center justify-center ${
+                    values.value_symbol === "₹"
+                      ? "bg-[#1F487C] text-white font-semibold"
+                      : "bg-white text-[#1F487C]"
+                  } `}
+                  onClick={() => {
+                    setFieldValue("value_symbol", "₹");
+                  }}
+                >
+                  ₹
+                </div>
+                <div
+                  className={` w-[3vw] h-full flex items-center justify-center ${
+                    values.value_symbol === "%"
+                      ? "bg-[#1F487C] text-white font-semibold rounded-r-[0.3vw]"
+                      : "bg-white text-[#1F487C] rounded-r-[0.5vw]"
+                  } `}
+                  onClick={() => {
+                    setFieldValue("value_symbol", "%");
+                  }}
+                >
+                  %
+                </div>
+              </div>
+            </div>
+            <ErrorMessage
+              name="promo_value"
+              component="div"
+              className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]"
+            />
           </div>
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-[1.5vw] pt-[0.3vw]">
+      <div className="grid grid-cols-2 gap-[1.5vw] pt-[1vw]">
         <div className="col-span-1 flex-col flex relative">
           <label className="text-[#1F4B7F] text-[1.1vw] font-semibold ">
             Promo Code
@@ -640,7 +651,7 @@ text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1v
             type="text"
             name="promo_code"
             placeholder="Enter Promo Code"
-            value={values.promo_code}
+            value={values.promo_code.toUpperCase()}
             onChange={(e) => {
               handleChange(e);
               // sessionStorage.setItem("promo_code", e.target.value);
@@ -697,7 +708,7 @@ text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1v
               showSearch
               className="custom-select bg-white outline-none w-full mt-[0.2vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw] border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
               placeholder="Select Status"
-              optionFilterProp="label"
+              optionFilterProp="value"
               value={values.status} // Update this line to reflect the current selection
               onChange={(value, option) => {
                 // const selectedOperator = getOperatorName?.find(
@@ -710,6 +721,7 @@ text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1v
                 // // });
                 setError("");
                 setFieldValue("status", value);
+                console.log(value, "vaue");
               }}
               suffixIcon={
                 <span style={{ fontSize: "1vw", color: "#1f487c" }}>
@@ -719,6 +731,9 @@ text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1v
               style={{
                 padding: 4,
               }}
+              filterOption={(input, option) => 
+                option?.value?.toLowerCase()?.includes(input.toLowerCase()) // Make it case-insensitive
+              }
               options={[
                 {
                   value: "",
@@ -774,7 +789,7 @@ text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1v
           <ErrorMessage
             name="promotion_description"
             component="div"
-            className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]"
+            className="text-red-500 text-[0.8vw] bottom-[-1.2vw]"
           />
         </div>
         <div className="col-span-1 flex flex-col relative">
@@ -786,6 +801,7 @@ text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1v
             {() => (
               <>
                 <Dragger
+                accept=".jpeg, .jpg, .png"
                   height={"7.2vw"}
                   onChange={() => {
                     setDraggerImage(true);
@@ -801,7 +817,7 @@ text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1v
                     setFileName(file.name);
                     setFieldValue("file_type", file.type);
                     setFieldValue("file_size", file.size);
-                   
+
                     const reader = new FileReader();
                     reader.onloadend = () => {
                       setPreviewUrl(reader.result); // Set the preview URL as a DataURL (base64)
@@ -828,7 +844,8 @@ text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1v
                     className="absolute top-0 left-0 w-full h-full"
                     style={{
                       backgroundImage: `url(${
-                        draggerImage ? previewUrl
+                        draggerImage
+                          ? previewUrl
                           : `${apiImgUrl}${promodata.promo_image}`
                       })`,
                       backgroundSize: "cover",
@@ -847,7 +864,7 @@ text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1v
             <ErrorMessage
               name="file"
               component="div"
-              className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]"
+              className="text-red-500 text-[0.8vw] bottom-[-1.2vw]"
             />
           )}
         </div>
@@ -889,6 +906,6 @@ text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1v
           setFieldValue={setFieldValue}
         /> */}
       </ModalPopup>
-    </>
+    </div>
   );
 }

@@ -92,10 +92,12 @@ export default function ReqAdvertisement({ currentData, showtable, adfilter }) {
                 <span>
                 {row?.ad_title?.length > 15 ? (
                   <Tooltip
-                    placement="bottom"
+                  color="white"
+                  overlayInnerStyle={{ color: "#1F4B7F" }}
+                    placement="top"
                     title={row?.ad_title}
                     className="cursor-pointer"
-                    color="#1F487C"
+                    // color="#1F487C"
                   >
                     {`${row?.ad_title?.slice(0, 15)}...`}
                   </Tooltip>
@@ -107,10 +109,12 @@ export default function ReqAdvertisement({ currentData, showtable, adfilter }) {
                 <span>
                 {row?.mobad_title?.length > 15 ? (
                   <Tooltip
-                    placement="bottom"
+                  color="white"
+                  overlayInnerStyle={{ color: "#1F4B7F" }}
+                    placement="top"
                     title={row?.mobad_title}
                     className="cursor-pointer"
-                    color="#1F487C"
+                    // color="#1F487C"
                   >
                     {`${row?.mobad_title?.slice(0, 15)}...`}
                   </Tooltip>
@@ -169,10 +173,12 @@ export default function ReqAdvertisement({ currentData, showtable, adfilter }) {
               {/* {row.promo_description} */}
               {row?.ad_description?.length > 25 ? (
                 <Tooltip
-                  placement="bottom"
+                color="white"
+                overlayInnerStyle={{ color: "#1F4B7F" }}
+                  placement="top"
                   title={row?.ad_description}
                   className="cursor-pointer"
-                  color="#1F487C"
+                  // color="#1F487C"
                 >
                   {`${row?.ad_description?.slice(0, 25)}...`}
                 </Tooltip>
@@ -184,10 +190,12 @@ export default function ReqAdvertisement({ currentData, showtable, adfilter }) {
               {/* {row.promo_description} */}
               {row?.mobad_description?.length > 25 ? (
                 <Tooltip
-                  placement="bottom"
+                color="white"
+                overlayInnerStyle={{ color: "#1F4B7F" }}
+                  placement="top"
                   title={row?.mobad_description}
                   className="cursor-pointer"
-                  color="#1F487C"
+                  // color="#1F487C"
                 >
                   {`${row?.mobad_description?.slice(0, 25)}...`}
                 </Tooltip>

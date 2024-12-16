@@ -6,9 +6,9 @@ import userimg from "../../asserts/userprofile.png";
 import { FaPhone } from "react-icons/fa";
 import { TbMailFilled } from "react-icons/tb";
 import ModalPopup from "../Common/Modal/Modal";
-import { Popover } from "antd";
+import { Modal, Popover } from "antd";
 import { Tooltip } from "antd";
-import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faEllipsisVertical, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import DeleteList from "../Offers/DeleteList";
 import { capitalizeFirstLetter } from "../Common/Captilization";
@@ -53,6 +53,23 @@ export default function PartnerGridView({
     setPartnerDeleteModalIsOpen(true);
   };
 
+   const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalImage, setModalImage] = useState(null);
+  
+    const openModal = (event) => {
+      // Get the image source (src) using `getElementById`
+      const imageSrc = event.target.getAttribute('src');
+  
+      // Set the modal image source
+      setModalImage(imageSrc);
+  
+      // Open the modal
+      setIsModalOpen(true);
+    };
+    const closeModal = () => {
+      setIsModalOpen(false);
+    };
+
   return (
     <>
       <div className="pt-[0.5vw]">
@@ -63,7 +80,7 @@ export default function PartnerGridView({
             )} ${item.partner_last_name}`;
             return (
               <div
-                className={` bg-white h-[33.5vh] border-[#1f4b7f] border-l-[0.1vw] cursor-pointer border-r-[0.3vw] border-b-[0.3vw] border-t-[0.1vw] rounded-[0.5vw]`}
+                className={` bg-white h-[33.5vh] border-[#1f4b7f] border-l-[0.1vw]  border-r-[0.3vw] border-b-[0.3vw] border-t-[0.1vw] rounded-[0.5vw]`}
                 onMouseEnter={() => setHoverId(item.tbs_partner_id)}
                 onMouseLeave={() => setHoverId("")}
                 style={{
@@ -75,21 +92,21 @@ export default function PartnerGridView({
                       : "none",
                 }}
               >
-                <div className="flex justify-center pl-[4vw] pt-[1vw]">
+                <div className="flex justify-center pl-[5vw] pt-[1vw]">
                   <img
-                    src={`${
-                      item?.profile_img
-                        ? `${apiImgUrl}${item?.profile_img}`
-                        : userimg
-                    } `}
+                    src={`${item?.profile_img
+                      ? `${apiImgUrl}${item?.profile_img}`
+                      : userimg
+                      } `}
                     alt="Profile"
-                    className="h-[10vh] w-[5vw] rounded-[0.5vw]"
+                    className="h-[10vh] cursor-pointer w-[5vw] rounded-[0.5vw]"
+                    onClick={openModal}
                   />
-                  <div className="text-right pl-[3vw]">
+                  <div className="text-right pl-[3.5vw]">
                     <Popover
                       placement="bottomRight"
                       content={
-                        <div className="flex flex-col">
+                        <div className="flex flex-col p-[.5vw]">
                           <div>
                             <a
                               onClick={() => {
@@ -99,20 +116,31 @@ export default function PartnerGridView({
                                   "----owner id"
                                 );
                                 setUserName(
-                                  `${item?.partner_first_name} ${" "} ${
-                                    item?.partner_last_name
+                                  `${item?.partner_first_name} ${" "} ${item?.partner_last_name
                                   }`
                                 );
                               }}
                               className="flex items-center cursor-pointer text-[1vw] text-[#1F4B7F] hover:text-[#1f487c]"
                             >
+                              <FontAwesomeIcon
+                                icon={faEdit}
+                                className="mr-1"
+                                color="#1f487c"
+                              />
                               Edit
                             </a>
+                          </div>
+                          <div className="">
+                            <hr class="border-t-2 border-[#1F4B7F] my-[.3vw]" />
                           </div>
                           <div>
                             <a
                               onClick={() => {
                                 handleDelete(item.tbs_partner_id);
+                                setUserName(
+                                  `${item?.partner_first_name} ${" "} ${item?.partner_last_name
+                                  }`
+                                );
                                 console.log(
                                   item.tbs_partner_id,
                                   "----owner id"
@@ -120,6 +148,11 @@ export default function PartnerGridView({
                               }}
                               className="flex pt-[0.1vw] items-center cursor-pointer text-[1vw] text-[#1F4B7F] hover:text-[#1f487c]"
                             >
+                              <FontAwesomeIcon
+                                icon={faTrash}
+                                className="mr-1"
+                                color="#1f487c"
+                              />
                               Delete
                             </a>
                           </div>
@@ -152,6 +185,8 @@ export default function PartnerGridView({
                       <h1 className="text-[1vw] font-semibold text-[#1F4B7F]">
                         {fullname?.length > 16 ? (
                           <Tooltip
+                            color="white"
+                            overlayInnerStyle={{ color: "#1F4B7F" }}
                             placement="top"
                             title={fullname}
                             className="cursor-pointer"
@@ -188,21 +223,23 @@ export default function PartnerGridView({
                         <TbMailFilled size="1vw" color={`${"#1f487c"}`} />
                       </div>
                       {/* <div className="text-[0.9vw]">{item.emailid}</div> */}
-                      {item?.emailid?.length > 15 ? (
+                      {item?.emailid?.length > 18 ? (
                         <Tooltip
-                          placement="right"
+                          color="white"
+                          overlayInnerStyle={{ color: "#1F4B7F" }}
+                          placement="top"
                           title={item?.emailid}
                           className="cursor-pointer"
-                          // color="#1F487C"
+                        // color="#1F487C"
                         >
                           <div className="text-[0.9vw] text-[#1f4b7f]">
                             {" "}
-                            {`${item?.emailid?.slice(0, 15)}...`}
+                            {`${item?.emailid?.slice(0, 18)}...`}
                           </div>
                         </Tooltip>
                       ) : (
                         <div className="text-[0.9vw] text-[#1f4b7f]">
-                          {item?.emailid?.slice(0, 15)}
+                          {item?.emailid?.slice(0, 18)}
                         </div>
                       )}
                     </div>
@@ -228,6 +265,29 @@ export default function PartnerGridView({
           module={"partner"}
         />
       </ModalPopup>
+      <Modal
+        className="flex justify-center"
+        visible={isModalOpen}
+        onCancel={closeModal}
+        footer={null}
+        centered
+        width="20vw"
+        height="20vw"
+        bodyStyle={{ padding: 0 }}
+        destroyOnClose={true} // Ensures modal is destroyed on close
+      >
+        {/* Display the image in the modal */}
+        <div className="flex justify-center">
+          {modalImage && (
+            <img
+              src={modalImage}
+              alt="Gst Preview"
+              // style={{ width: "20vw", height: "20vw" }}
+              className="object-cover"
+            />
+          )}
+        </div>
+      </Modal>
     </>
   );
 }

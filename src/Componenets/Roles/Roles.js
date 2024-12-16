@@ -79,6 +79,7 @@ export default function Roles() {
   const [isPermissionModalOpen, setIsPermissionModalOpen] = useState("");
   const [permissionData, SetPermissionData] = useState();
   const [activePage, setActivePage] = useState(1);
+  const [user, setUser] = useState();
   const dispatch = useDispatch();
   const [permission, setPermission] = useState(false);
   //const [showData, setShowData] = useState(1);
@@ -303,6 +304,7 @@ export default function Roles() {
       ),
       render: (row) => {
         const handleDelete = () => {
+          setUser(row);
           setDeleteModalIsOpen(true);
           SetRolesId(row.role_id);
         };
@@ -848,7 +850,7 @@ export default function Roles() {
                   >
                     <DeleteList
                       setDeleteModalIsOpen={setDeleteModalIsOpen}
-                      title={"Want to delete this User Role"}
+                      title={`Want to delete this ${user?.role_type}`}
                       api={`${apiUrl}/role/${rolesid}`}
                       module={"roles"}
                       filter={filter}

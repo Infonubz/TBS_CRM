@@ -31,7 +31,7 @@ import {
   faAngleDoubleLeft,
   faAngleDoubleRight,
 } from "@fortawesome/free-solid-svg-icons";
-import { ConfigProvider, Select } from "antd";
+import { ConfigProvider, Popover, Select } from "antd";
 import { LiaSearchSolid } from "react-icons/lia";
 import { IoMdArrowDropdown } from "react-icons/io";
 import * as XLSX from "xlsx";
@@ -46,6 +46,9 @@ import {
 } from "../../Api/Offers/RedeemOffers";
 import { Tooltip } from "antd";
 import IndexAddOffer from "./IndexAddOffer";
+import { BsExclamationCircle } from "react-icons/bs";
+import { TiThMenu } from "react-icons/ti";
+import { CgExport, CgImport } from "react-icons/cg";
 
 export default function Offers() {
   const userType = sessionStorage.getItem("type_name");
@@ -71,7 +74,9 @@ export default function Offers() {
   const [offerview, setOfferView] = useState(false);
   const [offerFilter, setOfferFilter] = useState("all");
   const [valueSymbol, setValueSymbol] = useState("₹");
- 
+
+  const [hoveredOption, setHoveredOption] = useState(null);
+
   console.log(valueSymbol, "value_symbol");
 
   console.log(offerdata, "Offers_datas");
@@ -79,6 +84,26 @@ export default function Offers() {
   const handleOccupationChange = (value) => {
     setSelectedOccupation(value);
   };
+
+  const infos = [
+    {
+      title: "Offers Title",
+    },
+    {
+      title: "Offer Code",
+    },
+    {
+      title: "Category",
+    },
+    {
+      title: "Created Date",
+      description: "DD MMM (e.g. 01 Jan) - Format",
+    },
+    {
+      title: " Duration",
+      description: "DD MMM (e.g. 01 Jan) - Format",
+    },
+  ];
 
   const filtered_Discount = Array.isArray(getofferlist)
     ? getofferlist.filter(
@@ -309,6 +334,12 @@ export default function Offers() {
     }
   };
 
+  useEffect(() => {
+    if (currentItems?.length === 0 && activePage > 1) {
+      setActivePage(activePage - 1);
+    }
+  }, [currentItems]);
+
   return (
     <>
       <div className="">
@@ -322,13 +353,13 @@ export default function Offers() {
         >
           <div className="px-[2.5vw] h-[92vh] relative w-full ">
             <div className="h-[12vh]  w-full flex flex-col ">
-              <h1 className="text-[#1F4B7F] pt-[0.5vw] text-[1.5vw] font-bold">
-                OFFERS
+              <h1 className="text-[#1F487C] pt-[0.5vw] text-[1.5vw] font-bold">
+                OFFERS & DEALS
               </h1>
               <div className="pb-[0.5vw] flex  items-center justify-between ">
-                {/* <div className="flex border-[#1F4B7F] h-[5vh] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw]">
+                {/* <div className="flex border-[#1F487C] h-[5vh] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw]">
                   <button
-                    className={`${view == "list" ? "bg-[#1F4B7F]" : "bg-white"
+                    className={`${view == "list" ? "bg-[#1F487C]" : "bg-white"
                       } flex px-[1vw] justify-center gap-[0.5vw] items-center rounded-tl-xl   rounded-bl-[0.3vw] `}
                     style={{
                       transition: "all 1s",
@@ -338,18 +369,18 @@ export default function Offers() {
                     <span>
                       <IoMdMenu
                         size={"1.2vw"}
-                        color={`${view == "list" ? "white" : "#1F4B7F"}`}
+                        color={`${view == "list" ? "white" : "#1F487C"}`}
                       />
                     </span>
                     <span
-                      className={`${view == "list" ? "text-white" : "text-[#1F4B7F]"
+                      className={`${view == "list" ? "text-white" : "text-[#1F487C]"
                         }  text-[1.1vw]`}
                     >
                       List View
                     </span>
                   </button>
                   <button
-                    className={`${view == "grid" ? "bg-[#1F4B7F]" : "bg-white"
+                    className={`${view == "grid" ? "bg-[#1F487C]" : "bg-white"
                       } flex px-[1vw] justify-center gap-[0.5vw] items-center rounded-r-[0.3vw]`}
                     style={{
                       transition: "all 1s",
@@ -359,48 +390,68 @@ export default function Offers() {
                     <span>
                       <IoGrid
                         size={"1.2vw"}
-                        color={`${view == "grid" ? "white" : "#1F4B7F"}`}
+                        color={`${view == "grid" ? "white" : "#1F487C"}`}
                       />
                     </span>
                     <span
-                      className={`${view == "grid" ? "text-white" : "text-[#1F4B7F]"
+                      className={`${view == "grid" ? "text-white" : "text-[#1F487C]"
                         }  text-[1.1vw]`}
                     >
                       Grid View
                     </span>
                   </button>
                 </div> */}
-                <div className="flex border-[#1F4B7F] h-[5vh] ">
+                <div className="flex border-[#1F487C] h-[5vh] ">
                   <Tooltip
                     placement="top"
-                    title="List"
+                    title={
+                      <div className="flex items-center gap-x-[0.5vw] justify-center">
+                        <TiThMenu color={"#1F487C"} size={"1vw"} />
+                        <label className="text-[1vw] font-semibold">
+                          List View
+                        </label>
+                      </div>
+                    }
                     className="cursor-pointer"
-                    color="black"
+                    color="white"
+                    overlayInnerStyle={{
+                      color: "#1F487C",
+                    }}
                   >
                     <button
                       className={`${
                         view === "list" ? "bg-[#1F487C]" : "bg-[white]"
-                      } px-[0.75vw] rounded-l-xl border-[0.1vw] border-b-[0.2vw] border-r-0  border-[#1F487C]`}
+                      } px-[0.75vw] rounded-l-[0.75vw] border-[0.1vw] border-b-[0.25vw] border-r-0  border-[#1F487C]`}
                       style={{
                         transition: "all 1s",
                       }}
                       onClick={() => setView("list")}
                     >
-                      <IoMdMenu
+                      <TiThMenu
                         color={`${view === "list" ? "white" : "#1F487C"}`}
                       />
                     </button>
                   </Tooltip>
                   <Tooltip
                     placement="top"
-                    title="Grid"
+                    title={
+                      <div className="flex items-center gap-x-[0.5vw] justify-center">
+                        <IoGrid color={"#1F487C"} size={"1vw"} />
+                        <label className="text-[1vw] font-semibold">
+                          Grid View
+                        </label>
+                      </div>
+                    }
                     className="cursor-pointer"
-                    color="black"
+                    color="white"
+                    overlayInnerStyle={{
+                      color: "#1F487C",
+                    }}
                   >
                     <button
                       className={`${
                         view === "Grid" ? "bg-[#1F487C]" : "bg-[white]"
-                      } px-[0.75vw] rounded-r-xl border-[0.1vw] border-b-[0.2vw] border-r-[0.2vw] border-l-0  border-[#1F487C]`}
+                      } px-[0.75vw] rounded-r-[0.75vw] border-[0.1vw] border-b-[0.25vw] border-r-[0.25vw] border-l-0  border-[#1F487C]`}
                       style={{
                         transition: "all 1s",
                       }}
@@ -416,7 +467,7 @@ export default function Offers() {
                 {/* <div className="relative flex items-center">
                     <input
                       type="text"
-                      className="bg-white outline-none pl-[2vw] w-[25vw] h-[5vh] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw] border-r-[0.2vw] border-b-[0.2vw]"
+                      className="bg-white outline-none pl-[2vw] w-[25vw] h-[5vh] text-[1vw] border-[#1F487C] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw] border-r-[0.2vw] border-b-[0.2vw]"
                       placeholder="Search Offers & Deal"
                       // onChange={(e) => handleSearch(e.target.value)}
                       onChange={(e) => handleoffersearch(e, dispatch)}
@@ -424,25 +475,56 @@ export default function Offers() {
                     <IoSearch
                       className="absolute left-[0.5vw]"
                       size={"1vw"}
-                      color="#1F4B7F"
+                      color="#1F487C"
                     />
                   </div> */}
 
                 {/* --------------------------------------searchBar------------------------------------- */}
 
                 <div className="relative flex items-center">
-                  <input
-                    type="text"
-                    className="bg-white placeholder-[#1f477c76] text-[#1F487C] outline-none pl-[3vw] w-[13.85vw] h-[5vh] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw]"
-                    placeholder="Search Offer"
-                    onChange={(e) => {
-                      SearchRequest(e);
-                    }}
-                  />
+                  <div className=" flex items-center bg-white placeholder-[#9CA3AF] text-[#1F487C] outline-none pl-[1.75vw] w-[13.85vw] h-[2.5vw] text-[1vw] placeholder:text-[1vw] border-[#1F487C] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.75vw] border-r-[0.25vw] border-b-[0.25vw] ">
+                    <input
+                      type="text"
+                      className="w-[10vw] outline-none mt-[0.3vw] placeholder:mt-[0.25vw]"
+                      placeholder="Search..."
+                      onChange={(e) => {
+                        SearchRequest(e);
+                      }}
+                    />
+                  </div>
+                  <span className="inline-block cursor-pointer text-[#1F4B7F] text-[1vw] align-text-bottom absolute right-[1vw]">
+                    {" "}
+                    <Popover
+                      color="white"
+                      title={
+                        <div className=" text-[#1F4B7F] p-[1vw] max-h-[20vw] overflow-auto ">
+                          <span className="font-bold">SEARCH BY...</span>
+                          {infos.map((info, index) => (
+                            <div key={index} className="flex flex-col">
+                              <ul
+                                className="pl-[1vw]"
+                                style={{ listStyleType: "disc" }}
+                              >
+                                <li className="text-[0.8vw] ">
+                                  <p className="">{info.title}</p>
+                                </li>
+                              </ul>
+                              <span className="text-[.7vw] pl-[1vw] text-[#9CA3AF]">
+                                {info.description}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      }
+                      placement="bottom"
+                    >
+                      <BsExclamationCircle size={"1vw"} color="#9CA3AF" />
+                    </Popover>
+                  </span>
                   <LiaSearchSolid
-                    className="absolute left-[0.5vw]"
+                    className="absolute left-[0.5vw] top-[0.8vw]"
                     size={"1vw"}
-                    color="#1F4B7F"
+                    color="#9CA3AF"
                   />
                 </div>
 
@@ -505,7 +587,7 @@ export default function Offers() {
                         }}
                       >
                         <p className="text-[1.3vw] text-[#1f487c] text-center">
-                          Approved
+                          Active
                         </p>
                       </div>
                     ) : (
@@ -573,9 +655,9 @@ export default function Offers() {
                   <div
                     className={`${
                       offerType === "redeem"
-                        ? "bg-[#1F4B7F] text-white font-semibold "
+                        ? "bg-[#1F487C] text-white font-semibold "
                         : "bg-white text-[#1F487C]"
-                    }  px-[0.5vw]  gap-[0.5vw] items-center rounded-tl-xl rounded-bl-xl border-[0.1vw] border-b-[0.25vw] border-r-0 border-[#1F487C] cursor-pointer w-[6vw] h-[5vh] flex item-center justify-center`}
+                    }  px-[0.5vw]  gap-[0.5vw] items-center rounded-tl-[0.75vw] rounded-bl-[0.75vw] border-[0.1vw] border-b-[0.25vw] border-r-0 border-[#1F487C] cursor-pointer w-[6vw] h-[5vh] flex item-center justify-center`}
                     style={{
                       transition: "all 0.5s",
                     }}
@@ -586,9 +668,9 @@ export default function Offers() {
                   <div
                     className={`${
                       offerType === "discount"
-                        ? "bg-[#1F4B7F] text-white font-semibold "
+                        ? "bg-[#1F487C] text-white font-semibold "
                         : "bg-white  text-[#1F487C]"
-                    }  px-[0.5vw]  gap-[0.5vw] items-center rounded-r-xl border-[0.1vw] border-r-[0.25vw] border-b-[0.25vw] border-l-0 border-[#1F487C] cursor-pointer w-[6vw] h-[5vh] flex item-center justify-center`}
+                    }  px-[0.5vw]  gap-[0.5vw] items-center rounded-r-[0.75vw] border-[0.1vw] border-r-[0.25vw] border-b-[0.25vw] border-l-0 border-[#1F487C] cursor-pointer w-[6vw] h-[5vh] flex item-center justify-center`}
                     style={{
                       transition: "all 0.5s",
                     }}
@@ -597,7 +679,7 @@ export default function Offers() {
                     Discount
                   </div>
                 </div>
-                <div>
+                <div className="umselect">
                   <ConfigProvider
                     theme={{
                       components: {
@@ -605,129 +687,78 @@ export default function Offers() {
                           optionActiveBg: "#aebed1",
                           optionSelectedColor: "#FFF",
                           optionSelectedBg: "#aebed1",
-                          optionHeight: "2",
                         },
                       },
                     }}
                   >
                     <Select
                       showSearch
-                      className=" custom-select bg-white outline-none w-[11vw] h-[5vh] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw]"
-                      placeholder="Select Categories"
+                      className="custom-select bg-white outline-none w-[11vw] h-[5vh] text-[1.1vw] border-[#1F487C] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.75vw] border-r-[0.25vw] border-b-[0.25vw]"
+                      placeholder="Select Category"
                       optionFilterProp="label"
+                      listHeight={200}
                       onChange={handleOccupationChange}
                       suffixIcon={
                         <span style={{ fontSize: "1vw", color: "#1f487c" }}>
                           <IoMdArrowDropdown size="2vw" />
                         </span>
                       }
-                      defaultValue={{
-                        value: "",
-                        label: (
-                          <div className="text-[1vw] px-[0.2vw] pb-[0.1vw] text-[#1F487C] opacity-50">
-                            Select Category
-                          </div>
-                        ),
-                        // value: 0,
-                        // // label: "All",
-                        // label: <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw]">All</div>,
-                      }}
                       style={{
                         padding: 4,
                       }}
                       options={[
-                        // {
-                        //   value: '',
-                        //   label: <div className="">Select the Category</div>
-                        // },
-                        {
-                          value: 0,
-                          // label: "All",
-                          label: (
-                            <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                              All
-                            </div>
-                          ),
-                        },
-                        {
-                          value: 1,
-                          // label: "Business",
-                          label: (
-                            <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                              Business
-                            </div>
-                          ),
-                        },
-                        {
-                          value: 2,
-                          // label: "General Public",
-                          label: (
-                            <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                              General Public
-                            </div>
-                          ),
-                        },
-                        {
-                          value: 3,
-                          // label: "Handicapped",
-                          label: (
-                            <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                              Handicapped
-                            </div>
-                          ),
-                        },
-                        {
-                          value: 4,
-                          // label: "Pilgrim",
-                          label: (
-                            <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                              Pilgrim
-                            </div>
-                          ),
-                        },
-                        {
-                          value: 5,
-                          // label: "Senior Citizen",
-                          label: (
-                            <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                              Senior Citizen
-                            </div>
-                          ),
-                        },
-                        {
-                          value: 6,
-                          // label: "Student",
-                          label: (
-                            <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                              Student
-                            </div>
-                          ),
-                        },
-                        {
-                          value: 7,
-                          // label: "Tourist",
-                          label: (
-                            <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                              Tourist
-                            </div>
-                          ),
-                        },
+                        { value: 0, label: "All" },
+                        { value: 1, label: "Business" },
+                        { value: 2, label: "General Public" },
+                        { value: 3, label: "Handicapped" },
+                        { value: 4, label: "Pilgrim" },
+                        { value: 5, label: "Senior Citizen" },
+                        { value: 6, label: "Student" },
+                        { value: 7, label: "Tourist" },
                       ]}
+                      // dropdownStyle={{
+                      //   overflowY: "auto",
+                      //   zIndex: 1000,
+                      // }}
+                      optionRender={(item) => (
+                        <div>
+                          <p
+                            style={{
+                              color: "#1F487C",
+                              fontWeight: 600,
+                              margin: 0,
+                            }}
+                          >
+                            {item.label}
+                          </p>
+                        </div>
+                      )}
                     />
                   </ConfigProvider>
                 </div>
                 <div className="flex items-center gap-[0.75vw]">
                   <Tooltip
-                    placement="top"
-                    title="Export"
+                    placement="bottom"
+                    // title="Export"
+                    title={
+                      <div className="flex items-center gap-x-[0.5vw] justify-center">
+                        <CgExport color={"#1F487C"} size={"1vw"} />
+                        <label className="text-[1vw] font-semibold">
+                          Export
+                        </label>
+                      </div>
+                    }
                     className="cursor-pointer"
-                    color="black"
+                    color="white"
+                    overlayInnerStyle={{
+                      color: "#1F487C",
+                    }}
                   >
                     <button
-                      className="bg-[#1F4B7F] flex px-[0.5vw] h-[5vh] justify-center gap-[0.5vw] items-center rounded-xl"
+                      className="bg-[#1F487C] flex px-[0.5vw] h-[5vh] justify-center gap-[0.5vw] items-center rounded-[0.5vw]"
                       onClick={handleExport}
                     >
-                      <TbUpload color="white" size={"1.5vw"} className="" />
+                      <CgExport color="white" size={"1.5vw"} className="" />
                       {/* <span className="text-white text-[1.1vw]">Export</span> */}
                     </button>
                   </Tooltip>
@@ -750,22 +781,32 @@ export default function Offers() {
                     }}
                   />
                   <button
-                    className="bg-[#1F4B7F] flex px-[0.5vw] h-[5vh] justify-center gap-[0.5vw] items-center rounded-xl"
+                    className="bg-[#1F487C] flex px-[0.5vw] h-[5vh] justify-center gap-[0.5vw] items-center rounded-[0.50vw]"
                     onClick={() => document.getElementById("xlsxFile").click()}
                   >
                     <Tooltip
-                      placement="top"
-                      title="Import"
+                      placement="bottom"
+                      // title="Import"
+                      title={
+                        <div className="flex items-center gap-x-[0.5vw] justify-center">
+                          <CgImport color={"#1F487C"} size={"1vw"} />
+                          <label className="text-[1vw] font-semibold">
+                            Import
+                          </label>
+                        </div>
+                      }
                       className="cursor-pointer"
-                      color="black"
+                      color="white"
+                      overlayInnerStyle={{
+                        color: "#1F487C",
+                      }}
                     >
-                      <GoDownload color="white" size={"1.5vw"} className="" />
+                      <CgImport color="white" size={"1.5vw"} className="" />
                     </Tooltip>
-
                     {/* <span className="text-white text-[1.1vw]">Import</span> */}
                   </button>
                   <button
-                    className="bg-[#1F4B7F] flex px-[0.75vw]  h-[5vh] gap-[0.25vw] items-center rounded-xl"
+                    className="bg-[#1F487C] flex px-[0.75vw] h-[5vh] gap-[0.25vw] items-center rounded-[0.50vw] "
                     onClick={() => {
                       setModalIsOpen(true);
                       SetUpdateData(null);
@@ -774,9 +815,11 @@ export default function Offers() {
                     }}
                   >
                     <span>
-                      <IoAdd size={"1.5vw"} color="white" />
+                      <FaPlus size={"1vw"} color="white" />
                     </span>
-                    <span className="text-white  text-[1vw]">Add</span>
+                    <span className="text-white font-bold mt-[0.25vw] text-[1vw]">
+                      Add
+                    </span>
                   </button>
                 </div>
               </div>
@@ -823,6 +866,7 @@ export default function Offers() {
                     offerview={offerview}
                     setOfferView={setOfferView}
                     offerFilter={offerFilter}
+                    
                   />
                 ) : (
                   <RedeemGridView
@@ -833,6 +877,7 @@ export default function Offers() {
                     setOfferImage={setOfferImage}
                     offerview={offerview}
                     setOfferView={setOfferView}
+                    offerFilter={offerFilter}
                   />
                 )
               ) : offerType === "discount" ? (
@@ -850,6 +895,7 @@ export default function Offers() {
                     offerFilter={offerFilter}
                     setValueSymbol={setValueSymbol}
                     valueSymbol={valueSymbol}
+         
                   />
                 ) : (
                   <GridView
@@ -862,6 +908,7 @@ export default function Offers() {
                     setOfferView={setOfferView}
                     setValueSymbol={setValueSymbol}
                     valueSymbol={valueSymbol}
+                    offerFilter={offerFilter}
                   />
                 )
               ) : null}
@@ -871,7 +918,7 @@ export default function Offers() {
               ? getofferlist?.length > 10
               : getredeemlist?.length > 10) && (
               <div className="w-full h-[8vh] flex justify-between items-center">
-                <div className="text-[#1f4b7f] flex text-[1.1vw] gap-[0.5vw]">
+                <div className="text-[#1F487C] flex text-[1.1vw] gap-[0.5vw]">
                   <span>Showing</span>
                   <span className="font-bold">
                     {currentItems && currentItems?.length > 0 ? (
@@ -932,7 +979,7 @@ export default function Offers() {
           show={modalIsOpen}
           onClose={closeModal}
           height="35vw"
-          width="55vw"
+          width="50vw"
           className=""
         >
           <IndexAddOffer
@@ -945,6 +992,7 @@ export default function Offers() {
             setOfferType={setOfferType}
             setValueSymbol={setValueSymbol}
             valueSymbol={valueSymbol}
+            offerFilter={offerFilter}
           />
         </ModalPopup>
       </div>

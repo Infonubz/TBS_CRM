@@ -40,6 +40,7 @@ export default function IndexAddOffer({
   setOfferType,
   setValueSymbol,
   valueSymbol,
+  offerFilter,
 }) {
   const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
 
@@ -47,18 +48,21 @@ export default function IndexAddOffer({
     .shape({
       offer_name: Yup.string()
         .required("Offer Name is required")
+        .min(5, "Min 5 characters required")
         .max(17, "Max 17 characters only"),
       offer_desc: Yup.string()
-        .required("Offer Description Name is required")
-        .max(57, "Max 57 characters only"),
-      status: Yup.string().required("This field is required"),
+        .required("Promotion Description is required")
+        .min(20, "Min 20 characters needed")
+        .max(53, "Max 53 characters only"),
+      status: Yup.string().required("Status field is required"),
+      occupation: Yup.string().required("Occupation field is required"),
       code: Yup.string()
-        .required("Code is required")
+        .required("Offer Code is required")
+        .min(5, "Min 5 characters required")
         .max(18, "Max 18 characters only"),
-      // value: Yup.number()
-      //   .typeError('Must be a number')
-      //   .max(9999, 'Must be at most 4 digits long')
-      //   .required('This field is required'),
+      value: Yup.number()
+        .typeError("Must be a number")
+        .required("Offer Value is required"),
       start_date: Yup.string(),
       expiry_date: Yup.string(),
       file: Yup.mixed()
@@ -70,8 +74,8 @@ export default function IndexAddOffer({
           }
           return true;
         })
-        .test("file_size", "File size is too large", function (value) {
-          if (value && value.size > 2000000) {
+        .test("file_size", "File size be below 5 MB", function (value) {
+          if (value && value.size > 5000000) {
             // 2MB
             return false;
           }
@@ -114,7 +118,7 @@ export default function IndexAddOffer({
   const [CurrentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [value, setValue] = useState();
- 
+
   console.log(value, "value_value");
   console.log(offerBackGround, "view_offer_type");
 
@@ -127,26 +131,45 @@ export default function IndexAddOffer({
   console.log(offerlist.usage, "many_usage");
   console.log(offerlist, "offers_list");
 
-  const [error, setError] = useState(""); // Track error message for both value and usage
+  const [error, setError] = useState("");
 
   const handleSubmit = async (values) => {
-    setError("");
+    console.log(values, "values_134");
 
-  
     if (offerType === "discount" && !values.value) {
       setError("Offer value is required for discount.");
-      return; 
+      return;
     }
 
-   
-    if (CurrentPage === 2 && !offerlist.usage) {
-      setError("Usage is required.");
-      return; 
+    if (offerType === "discount") {
+      if (values.value_symbol === "₹") {
+        if (values.value < 1 || values.value > 2000) {
+          setError("Value should be between ₹ 1 and ₹ 2000.");
+          return;
+        }
+      } else if (values.value_symbol === "%") {
+        if (values.value < 1 || values.value > 99) {
+          setError("Value should be between 1 % and 99 %.");
+          return;
+        }
+      }
+    }
+
+    if (CurrentPage === 2) {
+      if (!offerlist.usage) {
+        setError("Usage is required.");
+        return;
+      }
+
+      if (offerlist.usage < 1 || offerlist.usage > 100) {
+        setError("Usage must be between 1 and 100.");
+        return;
+      }
     }
 
     if (CurrentPage === 1) {
       setCurrentOfferdata(values);
-      setCurrentPage(2); 
+      setCurrentPage(2);
     } else {
       setLoading(true);
 
@@ -170,38 +193,42 @@ export default function IndexAddOffer({
                 values,
                 updatedata,
                 offerlist,
-                offerBackGround
+                offerBackGround,
+                offerFilter
               )
             : await SubmitRedeemOffersData(
                 dispatch,
                 values,
                 updatedata,
                 offerlist,
-                offerBackGround
+                offerBackGround,
+                offerFilter
               );
 
         if (data?.message) {
           toast.success(data?.message);
           offerType === "discount"
-            ? GetOffersData(dispatch)
-            : GetRedeemOffersData(dispatch);
-          setModalIsOpen(false); 
+            ? GetOffersData(dispatch, offerFilter)
+            : GetRedeemOffersData(dispatch, offerFilter);
+          setModalIsOpen(false);
+          console.log(offerFilter, "offer_filter_add");
         }
       } catch (error) {
         console.error("Error uploading data", error);
       }
     }
 
-    setLoading(false); 
+    setLoading(false);
   };
-
   const fetchGetOffers = async () => {
     if (offerType === "discount") {
+      setLoading(true);
       try {
         const data = await GetOffersById(
           updatedata,
           SetUpdateData,
-          setOfferData
+          setOfferData,
+          setLoading
         );
         console.log(data, "datadata");
         setOfferData(data);
@@ -216,11 +243,13 @@ export default function IndexAddOffer({
         console.error("Error fetching additional user data", error);
       }
     } else {
+      setLoading(true);
       try {
         const data = await GetRedeemOffersById(
           updatedata,
           SetUpdateData,
-          setOfferData
+          setOfferData,
+          setLoading
         );
         console.log(data, "datadata");
         setOfferData(data);
@@ -291,6 +320,7 @@ export default function IndexAddOffer({
     };
   };
   const [bgimage, setBgImage] = useState(false);
+
   const [currentoffers, setCurrentOffer] = useState([]);
 
   console.log(currentoffers, "current_offer_data");
@@ -319,12 +349,9 @@ export default function IndexAddOffer({
   // const typeid = sessionStorage.getItem("type_id");
   const typeid = sessionStorage.getItem("type_id");
 
-
   const [minExpiryDate, setMinExpiryDate] = useState(
     new Date().toISOString().split("T")[0]
   );
-
-
 
   return (
     <>
@@ -356,12 +383,18 @@ export default function IndexAddOffer({
               : offerdata
               ? offerdata.status
               : "",
-          value: offerdata ? offerdata.offer_value : "",
+          value:
+            offerType === "discount"
+              ? offerdata
+                ? offerdata.offer_value
+                : ""
+              : "0",
           offer_desc: offerdata ? offerdata.offer_desc : "",
           file: offerdata ? offerdata.offer_img : "",
           file_type: offerdata?.image_size || "",
           file_size: offerdata?.image_type || "",
           value_symbol: offerdata?.value_symbol || "₹",
+          occupation: offerdata?.occupation_id || "",
         }}
         validationSchema={validationSchema}
         validateOnChange={true}
@@ -399,7 +432,7 @@ export default function IndexAddOffer({
                   {CurrentPage === 2 && (
                     <button
                       type="submit"
-                      className="flex text-[#1F4B7F] text-[1vw] border-[0.1vw] border-[#1F4B7F] bg-white px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] items-center justify-center"
+                      className="flex text-[#1F4B7F] text-[1vw] border-[0.1vw] border-[#1F4B7F] bg-white px-[1vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] items-center justify-center"
                       //   onClick={() => setBgImage(true)}
                       onClick={() => setCurrentPage(1)}
                     >
@@ -408,7 +441,7 @@ export default function IndexAddOffer({
                   )}
                   <button
                     type="submit"
-                    className="flex text-white text-[1vw] bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] items-center justify-center"
+                    className="flex text-white text-[1vw] bg-[#1F4B7F] px-[1vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] items-center justify-center"
                     //   onClick={() => setBgImage(true)}
                     //   onClick={() => setCurrentPage(2)}
                     // onClick={handleSubmit}
@@ -433,13 +466,16 @@ export default function IndexAddOffer({
                   offerlist={offerlist}
                   setOfferlist={setOfferlist}
                   setValue={setValue}
-                  errorValue={error}
+                  error={error}
+                  setError={setError}
                   offerdata={offerdata}
                   setPreviewUrl={setPreviewUrl}
                   setDraggerImage={setDraggerImage}
                   draggerImage={draggerImage}
                   fileName={fileName}
                   setFileName={setFileName}
+                  errors={errors}
+                  offerFilter={offerFilter}
                 />
               ) : (
                 <BackgroundView

@@ -1,16 +1,16 @@
-import { ConfigProvider, Progress, Select } from "antd";
+import { ConfigProvider, Progress, Select, Spin } from "antd";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
-import umbuslogo from "../../../asserts/umbuslogo.png"
+import umbuslogo from "../../../asserts/umbuslogo.png";
 import * as Yup from "yup";
 import {
   GetSuperAdminAddressById,
   SubmitAddressData,
 } from "../../../Api/UserManagement/SuperAdmin";
 import { useDispatch } from "react-redux";
-import { IoMdArrowDropdown } from "react-icons/io";
+import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 
 const validationSchema = Yup.object().shape({
   country: Yup.string().required("Country is required"),
@@ -18,8 +18,9 @@ const validationSchema = Yup.object().shape({
   city: Yup.string().required("City is required"),
   region: Yup.string().required("Region is required"),
 
-  address: Yup.string().required("Address is required")
-  .max(100, "Maximum 100 characters only") ,
+  address: Yup.string()
+    .required("Address is required")
+    .max(100, "Maximum 100 characters only"),
   postal: Yup.string()
     // .matches(/^[0-9]+$/, "Postal Code must be a number")
     .matches(/^\d{6}$/, "Postal code must be a valid 6-digit code")
@@ -35,13 +36,17 @@ export default function AddRegisterAddress({
   setBusinessBack,
   businessback,
   setAddressBack,
-  updatedata
+  updatedata,
 }) {
   const [enable, setEnable] = useState(false);
+  const [spinning, setSpinning] = useState(false);
   const dispatch = useDispatch();
   const handleSubmit = async (values) => {
     console.log("hiihih");
-    if (operatorID && enable == false && businessback == true || updatedata && enable == false) {
+    if (
+      (operatorID && enable == false && businessback == true) ||
+      (updatedata && superadminaddressdata?.address != null && enable == false)
+    ) {
       setCurrentpage(3);
     } else {
       try {
@@ -67,7 +72,8 @@ export default function AddRegisterAddress({
       const data = await GetSuperAdminAddressById(
         operatorID,
         setOperatorID,
-        setSuperAdminAddressData
+        setSuperAdminAddressData,
+        setSpinning
       );
       setSuperAdminAddressData(data);
     } catch (error) {
@@ -78,12 +84,13 @@ export default function AddRegisterAddress({
   useEffect(() => {
     if (operatorID != null || enable || businessback) {
       fetchGetUser();
+      setSpinning(true)
     }
   }, [
     operatorID,
     setOperatorID,
     setSuperAdminAddressData,
-    enable,
+    // enable,
     businessback,
   ]);
   console.log(operatorID, "operatorID55555");
@@ -91,12 +98,14 @@ export default function AddRegisterAddress({
   return (
     <div>
       <div className="border-l-[0.1vw] umselect px-[2vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f] mt-[1vw] relative">
-      <div className="w-[5vw] h-[5vw] bg-white shadow-lg rounded-full absolute left-[16.6vw] top-[-2.5vw] flex justify-center items-center"><img className="" src={umbuslogo} alt="buslogo"/></div>
+        <div className="w-[5vw] h-[5vw] bg-white shadow-lg rounded-full absolute left-[16.6vw] top-[-2.5vw] flex justify-center items-center">
+          <img className="" src={umbuslogo} alt="buslogo" />
+        </div>
         <div className="h-[4vw] w-full flex items-center justify-between ">
           <label className="text-[1.5vw] font-semibold text-[#1f4b7f] ">
             Registered Address
           </label>
-          {updatedata || businessback ? (
+          {updatedata && superadminaddressdata?.address != null || businessback ? (
             <button
               className={`${
                 enable
@@ -139,6 +148,11 @@ export default function AddRegisterAddress({
               handleChange,
             }) => (
               <Form onSubmit={handleSubmit}>
+                  {spinning ? (
+              <div className=" flex justify-center h-[23vw] items-center">
+                <Spin size="large" />
+              </div>
+            ) : (
                 <div className="gap-y-[1.5vw] flex-col flex">
                   <div className="grid grid-cols-2 w-full gap-x-[2vw]">
                     <div className="col-span-1 relative">
@@ -148,11 +162,93 @@ export default function AddRegisterAddress({
                           *
                         </span>
                       </label>
+                      <input
+                          type="text"
+                          name="address"
+                          style={{ display: "none" }}
+                        />
                       <Field
                         type="text"
                         name="address"
+                        // autoComplete="address-field"
+                        autoComplete="off"
                         placeholder="Enter Address"
+                       
                         // value={values.firstname}
+                        disabled={
+                          updatedata && superadminaddressdata?.address != null || businessback
+                            ? enable
+                              ? false
+                              : true
+                            : false
+                        }
+                        className={`${
+                          updatedata && superadminaddressdata?.address != null || businessback
+                            ? enable == false
+                              ? " cursor-not-allowed"
+                              : ""
+                            : ""
+                        } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                      />
+                      <ErrorMessage
+                        name="address"
+                        component="div"
+                        className="text-red-500 text-[0.8vw] absolute left-[.2vw] bottom-[-1.2vw]"
+                      />
+                    </div>
+                    <div className="col-span-1 relative">
+                      <label className="text-[#1F4B7F] text-[1.1vw] ">
+                        Postal / Zip Code
+                        <span className="text-[1vw] text-red-600 pl-[0.2vw]">
+                          *
+                        </span>
+                      </label>
+                      <input
+                          type="text"
+                          name="postal"
+                          style={{ display: "none" }}
+                        />
+                      <Field
+                        type="text"
+                        name="postal"
+                        autoComplete="postal-field"
+                        placeholder="Enter Postal Code"
+                        // value={values.firstname}
+                        disabled={
+                          updatedata && superadminaddressdata?.address != null || businessback
+                            ? enable
+                              ? false
+                              : true
+                            : false
+                        }
+                        className={`${
+                          updatedata && superadminaddressdata?.address != null || businessback
+                            ? enable == false
+                              ? " cursor-not-allowed"
+                              : ""
+                            : ""
+                        } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                      />
+                      <ErrorMessage
+                        name="postal"
+                        component="div"
+                        className="text-red-500 text-[0.8vw] absolute left-[.2vw] bottom-[-1.2vw]"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 w-full gap-x-[2vw]">
+                    <div className="col-span-1 relative">
+                      <label className="text-[#1F4B7F] text-[1.1vw] ">
+                        City
+                        <span className="text-[1vw] text-red-600 pl-[0.2vw]">
+                          *
+                        </span>
+                      </label>
+                      {/* <Field
+                        as="select"
+                        name="city"
+                        id="city"
+                        value={values.city}
                         disabled={
                           updatedata || businessback
                             ? enable
@@ -167,9 +263,129 @@ export default function AddRegisterAddress({
                               : ""
                             : ""
                         } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
-                      />
+                      >
+                        <option label="Select City" value="" className="" />
+                        <option label="Tirupur" value="Tirupur" className="" />
+                        <option
+                          label="Coimbatore"
+                          value="Coimbatore"
+                          className=""
+                        />
+                        <option label="Chennai" value="Chennai" className="" />
+                        <option
+                          label="Pondicherry"
+                          value="Pondicherry"
+                          className=""
+                        />
+                      </Field> */}
+                      <ConfigProvider
+                        theme={{
+                          components: {
+                            Select: {
+                              optionActiveBg: "#aebed1",
+                              optionSelectedColor: "#FFF",
+                              optionSelectedBg: "#aebed1",
+                              optionHeight: "2",
+                             
+                            },
+                          },
+                        }}
+                      >
+                         <input
+                          type="text"
+                          name="city"
+                          style={{ display: "none" }}
+                        />
+                        <Select
+                          showSearch
+                          value={values.city}
+                          autoComplete="city-field"
+                          onChange={(value) => {
+                            handleChange({ target: { name: "city", value } });
+                          }}
+                          disabled={
+                            updatedata && superadminaddressdata?.address != null || businessback
+                              ? enable
+                                ? false
+                                : true
+                              : false
+                          }
+                          name="city"
+                          listHeight={190}
+                          // dropdownStyle={{
+                          //   maxHeight: "150px", // Adjust the maximum height here
+                          //   overflowY: "auto !important ",  // Make the dropdown scrollable if content exceeds maxHeight
+                          // }}
+                          
+                          className={`${
+                            updatedata && superadminaddressdata?.address != null || businessback
+                              ? enable == false
+                                ? " cursor-not-allowed"
+                                : ""
+                              : ""
+                          } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          // className="custom-select bg-white outline-none w-full mt-[0.5vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
+                          placeholder="Select city"
+                          filterOption={
+                            (input, option) =>
+                              option?.value
+                                ?.toLowerCase()
+                                ?.includes(input.toLowerCase()) // Make it case-insensitive
+                          }
+                          optionFilterProp="value"
+                          suffixIcon={
+                            <span style={{ fontSize: "1vw", color: "#1f487c" }}>
+                              <IoMdArrowDropdown size="2vw" />
+                            </span>
+                          }
+                          style={{ padding: 4 }}
+                          options={[
+                            {
+                              value: "",
+                              label: (
+                                <div className="text-[1vw] px-[0.2vw] pb-[0.1vw] text-gray-400">
+                                  Select City
+                                </div>
+                              ),
+                              disabled: true,
+                            },
+                            {
+                              value: "Tirupur",
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  Tirupur
+                                </div>
+                              ),
+                            },
+                            {
+                              value: "Coimbatore",
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  Coimbatore
+                                </div>
+                              ),
+                            },
+                            {
+                              value: "Chennai",
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  Chennai
+                                </div>
+                              ),
+                            },
+                            {
+                              value: "Pondicherry",
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  Pondicherry
+                                </div>
+                              ),
+                            },
+                          ]}
+                        />
+                      </ConfigProvider>
                       <ErrorMessage
-                        name="address"
+                        name="city"
                         component="div"
                         className="text-red-500 text-[0.8vw] absolute left-[.2vw] bottom-[-1.2vw]"
                       />
@@ -215,51 +431,64 @@ export default function AddRegisterAddress({
                         <option label="Andhra" value="Andhra" className="" />
                         <option label="Kerla" value="Kerla" className="" />
                       </Field> */}
-                          <ConfigProvider
+                      <ConfigProvider
                         theme={{
                           components: {
                             Select: {
-                              optionActiveBg: '#aebed1',
-                              optionSelectedColor: '#FFF',
-                              optionSelectedBg: '#aebed1',
-                              optionHeight: '2',
+                              optionActiveBg: "#aebed1",
+                              optionSelectedColor: "#FFF",
+                              optionSelectedBg: "#aebed1",
+                              optionHeight: "2",
                             },
                           },
                         }}
                       >
+                            <input
+                          type="text"
+                          name="state"
+                          style={{ display: "none" }}
+                        />
                         <Select
                           showSearch
                           value={values.state}
+                          autoComplete="state-field"
                           onChange={(value) => {
-                            handleChange({ target: { name: 'state', value } })
+                            handleChange({ target: { name: "state", value } });
                           }}
                           disabled={
-                            updatedata || businessback
+                            updatedata && superadminaddressdata?.address != null || businessback
                               ? enable
                                 ? false
                                 : true
                               : false
                           }
-                          name="temp_state"
-                          className={`${updatedata || businessback
-                            ? enable == false
-                              ? " cursor-not-allowed"
+                          name="state"
+                          listHeight={190}
+                          className={`${
+                            updatedata && superadminaddressdata?.address != null || businessback
+                              ? enable == false
+                                ? " cursor-not-allowed"
+                                : ""
                               : ""
-                            : ""
-                            } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                           // className="custom-select bg-white outline-none w-full mt-[0.5vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
                           placeholder="Select state"
-                          filterOption={(input, option) => 
-                            option?.value?.toLowerCase()?.includes(input.toLowerCase()) // Make it case-insensitive
+                          filterOption={
+                            (input, option) =>
+                              option?.value
+                                ?.toLowerCase()
+                                ?.includes(input.toLowerCase()) // Make it case-insensitive
                           }
                           optionFilterProp="value"
-                          suffixIcon={<span style={{ fontSize: '1vw', color: '#1f487c' }}>
-                            <IoMdArrowDropdown size="2vw" />
-                          </span>}
+                          suffixIcon={
+                            <span style={{ fontSize: "1vw", color: "#1f487c" }}>
+                              <IoMdArrowDropdown size="2vw" />
+                            </span>
+                          }
                           style={{ padding: 4 }}
                           options={[
                             {
-                              value: '',
+                              value: "",
                               label: (
                                 <div className="text-[1vw] px-[0.2vw] pb-[0.1vw] text-gray-400">
                                   Select State
@@ -268,7 +497,7 @@ export default function AddRegisterAddress({
                               disabled: true,
                             },
                             {
-                              value: 'Tamilnadu',
+                              value: "Tamilnadu",
                               label: (
                                 <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
                                   Tamilnadu
@@ -276,7 +505,7 @@ export default function AddRegisterAddress({
                               ),
                             },
                             {
-                              value: 'Karnataka',
+                              value: "Karnataka",
                               label: (
                                 <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
                                   Karnataka
@@ -284,7 +513,7 @@ export default function AddRegisterAddress({
                               ),
                             },
                             {
-                              value: 'Andhra',
+                              value: "Andhra",
                               label: (
                                 <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
                                   Andhra
@@ -292,15 +521,22 @@ export default function AddRegisterAddress({
                               ),
                             },
                             {
-                              value: 'Kerla',
+                              value: "Kerla",
                               label: (
                                 <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
                                   Kerla
                                 </div>
                               ),
                             },
+                            {
+                              value: "Telangana",
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  Telangana
+                                </div>
+                              ),
+                            },
                           ]}
-
                         />
                       </ConfigProvider>
                       <ErrorMessage
@@ -365,51 +601,65 @@ export default function AddRegisterAddress({
                           className=""
                         />
                       </Field> */}
-                            <ConfigProvider
+                      <ConfigProvider
                         theme={{
                           components: {
                             Select: {
-                              optionActiveBg: '#aebed1',
-                              optionSelectedColor: '#FFF',
-                              optionSelectedBg: '#aebed1',
-                              optionHeight: '2',
+                              optionActiveBg: "#aebed1",
+                              optionSelectedColor: "#FFF",
+                              optionSelectedBg: "#aebed1",
+                              optionHeight: "2",
                             },
                           },
                         }}
                       >
+                             <input
+                          type="text"
+                          name="region"
+                          style={{ display: "none" }}
+                        />
                         <Select
                           showSearch
                           value={values.region}
+                          autoComplete="region-field"
                           onChange={(value) => {
-                            handleChange({ target: { name: 'region', value } })
+                            handleChange({ target: { name: "region", value } });
                           }}
                           disabled={
-                            updatedata || businessback
+                            updatedata && superadminaddressdata?.address != null || businessback
                               ? enable
                                 ? false
                                 : true
                               : false
                           }
                           name="region"
-                          className={`${updatedata || businessback
-                            ? enable == false
-                              ? " cursor-not-allowed"
+                          listHeight={190}
+                          placement="topRight"
+                          className={`${
+                            updatedata && superadminaddressdata?.address != null || businessback
+                              ? enable == false
+                                ? " cursor-not-allowed"
+                                : ""
                               : ""
-                            : ""
-                            } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                           // className="custom-select bg-white outline-none w-full mt-[0.5vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
                           placeholder="Select region"
-                          filterOption={(input, option) => 
-                            option?.value?.toLowerCase()?.includes(input.toLowerCase()) // Make it case-insensitive
+                          filterOption={
+                            (input, option) =>
+                              option?.value
+                                ?.toLowerCase()
+                                ?.includes(input.toLowerCase()) // Make it case-insensitive
                           }
                           optionFilterProp="value"
-                          suffixIcon={<span style={{ fontSize: '1vw', color: '#1f487c' }}>
-                            <IoMdArrowDropdown size="2vw" />
-                          </span>}
+                          suffixIcon={
+                            <span style={{ fontSize: "1vw", color: "#1f487c" }}>
+                              <IoMdArrowDropup size="2vw" />
+                            </span>
+                          }
                           style={{ padding: 4 }}
                           options={[
                             {
-                              value: '',
+                              value: "",
                               label: (
                                 <div className="text-[1vw] px-[0.2vw] pb-[0.1vw] text-gray-400">
                                   Select Region
@@ -418,15 +668,15 @@ export default function AddRegisterAddress({
                               disabled: true,
                             },
                             {
-                              value: 'Souther Region',
+                              value: "Southernregion",
                               label: (
                                 <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                                  Souther Region
+                                  Southern Region
                                 </div>
                               ),
                             },
                             {
-                              value: 'Northern Region',
+                              value: "Northernregion",
                               label: (
                                 <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
                                   Northern Region
@@ -434,7 +684,7 @@ export default function AddRegisterAddress({
                               ),
                             },
                             {
-                              value: 'Western Region',
+                              value: "Westernregion",
                               label: (
                                 <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
                                   Western Region
@@ -442,7 +692,7 @@ export default function AddRegisterAddress({
                               ),
                             },
                             {
-                              value: 'Eastern Region',
+                              value: "Easternregion",
                               label: (
                                 <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
                                   Eastern Region
@@ -450,15 +700,14 @@ export default function AddRegisterAddress({
                               ),
                             },
                             {
-                              value: 'North-Eastern Region',
+                              value: "northeasternregion",
                               label: (
                                 <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                                  North-Eastern Region
+                                  North Eastern Region
                                 </div>
                               ),
                             },
-                          ]}                          
-                          
+                          ]}
                         />
                       </ConfigProvider>
                       <ErrorMessage
@@ -467,143 +716,6 @@ export default function AddRegisterAddress({
                         className="text-red-500 text-[0.8vw] absolute left-[.2vw] bottom-[-1.2vw]"
                       />
                     </div>
-                    <div className="col-span-1 relative">
-                      <label className="text-[#1F4B7F] text-[1.1vw] ">
-                        City
-                        <span className="text-[1vw] text-red-600 pl-[0.2vw]">
-                          *
-                        </span>
-                      </label>
-                      {/* <Field
-                        as="select"
-                        name="city"
-                        id="city"
-                        value={values.city}
-                        disabled={
-                          updatedata || businessback
-                            ? enable
-                              ? false
-                              : true
-                            : false
-                        }
-                        className={`${
-                          updatedata || businessback
-                            ? enable == false
-                              ? " cursor-not-allowed"
-                              : ""
-                            : ""
-                        } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
-                      >
-                        <option label="Select City" value="" className="" />
-                        <option label="Tirupur" value="Tirupur" className="" />
-                        <option
-                          label="Coimbatore"
-                          value="Coimbatore"
-                          className=""
-                        />
-                        <option label="Chennai" value="Chennai" className="" />
-                        <option
-                          label="Pondicherry"
-                          value="Pondicherry"
-                          className=""
-                        />
-                      </Field> */}
-                            <ConfigProvider
-                        theme={{
-                          components: {
-                            Select: {
-                              optionActiveBg: '#aebed1',
-                              optionSelectedColor: '#FFF',
-                              optionSelectedBg: '#aebed1',
-                              optionHeight: '2',
-                            },
-                          },
-                        }}
-                      >
-                        <Select
-                          showSearch
-                          value={values.city}
-                          onChange={(value) => {
-                            handleChange({ target: { name: 'city', value } })
-                          }}
-                          disabled={
-                            updatedata || businessback
-                              ? enable
-                                ? false
-                                : true
-                              : false
-                          }
-                          name="city"
-                          className={`${updatedata || businessback
-                            ? enable == false
-                              ? " cursor-not-allowed"
-                              : ""
-                            : ""
-                            } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
-                          // className="custom-select bg-white outline-none w-full mt-[0.5vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
-                          placeholder="Select city"
-                          filterOption={(input, option) => 
-                            option?.value?.toLowerCase()?.includes(input.toLowerCase()) // Make it case-insensitive
-                          }
-                          optionFilterProp="value"
-                          suffixIcon={<span style={{ fontSize: '1vw', color: '#1f487c' }}>
-                            <IoMdArrowDropdown size="2vw" />
-                          </span>}
-                          style={{ padding: 4 }}
-                          options={[
-                            {
-                              value: '',
-                              label: (
-                                <div className="text-[1vw] px-[0.2vw] pb-[0.1vw] text-gray-400">
-                                  Select City
-                                </div>
-                              ),
-                              disabled: true,
-                            },
-                            {
-                              value: 'Tirupur',
-                              label: (
-                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                                  Tirupur
-                                </div>
-                              ),
-                            },
-                            {
-                              value: 'Coimbatore',
-                              label: (
-                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                                  Coimbatore
-                                </div>
-                              ),
-                            },
-                            {
-                              value: 'Chennai',
-                              label: (
-                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                                  Chennai
-                                </div>
-                              ),
-                            },
-                            {
-                              value: 'Pondicherry',
-                              label: (
-                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                                  Pondicherry
-                                </div>
-                              ),
-                            },
-                          ]}
-                              
-                        />
-                      </ConfigProvider>
-                      <ErrorMessage
-                        name="city"
-                        component="div"
-                        className="text-red-500 text-[0.8vw] absolute left-[.2vw] bottom-[-1.2vw]"
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 w-full gap-x-[2vw]">
                     <div className="col-span-1 relative">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         Country
@@ -645,51 +757,67 @@ export default function AddRegisterAddress({
                           className=""
                         />
                       </Field> */}
-                         <ConfigProvider
+                      <ConfigProvider
                         theme={{
                           components: {
                             Select: {
-                              optionActiveBg: '#aebed1',
-                              optionSelectedColor: '#FFF',
-                              optionSelectedBg: '#aebed1',
-                              optionHeight: '2',
+                              optionActiveBg: "#aebed1",
+                              optionSelectedColor: "#FFF",
+                              optionSelectedBg: "#aebed1",
+                              optionHeight: "2",
                             },
                           },
                         }}
                       >
+                           <input
+                          type="text"
+                          name="country"
+                          style={{ display: "none" }}
+                        />
                         <Select
                           showSearch
                           value={values.country}
+                          utoComplete="country-field"
                           onChange={(value) => {
-                            handleChange({ target: { name: 'country', value } })
+                            handleChange({
+                              target: { name: "country", value },
+                            });
                           }}
                           disabled={
-                            updatedata || businessback
+                            updatedata && superadminaddressdata?.address != null || businessback
                               ? enable
                                 ? false
                                 : true
                               : false
                           }
                           name="country"
-                          className={`${updatedata || businessback
-                            ? enable == false
-                              ? " cursor-not-allowed"
+                          listHeight={190}
+                          placement="topRight"
+                          className={`${
+                            updatedata && superadminaddressdata?.address != null || businessback
+                              ? enable == false
+                                ? " cursor-not-allowed"
+                                : ""
                               : ""
-                            : ""
-                            } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                           // className="custom-select bg-white outline-none w-full mt-[0.5vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
                           placeholder="Select Country"
-                          filterOption={(input, option) => 
-                            option?.value?.toLowerCase()?.includes(input.toLowerCase()) // Make it case-insensitive
+                          filterOption={
+                            (input, option) =>
+                              option?.value
+                                ?.toLowerCase()
+                                ?.includes(input.toLowerCase()) // Make it case-insensitive
                           }
                           optionFilterProp="value"
-                          suffixIcon={<span style={{ fontSize: '1vw', color: '#1f487c' }}>
-                            <IoMdArrowDropdown size="2vw" />
-                          </span>}
+                          suffixIcon={
+                            <span style={{ fontSize: "1vw", color: "#1f487c" }}>
+                              <IoMdArrowDropup size="2vw" />
+                            </span>
+                          }
                           style={{ padding: 4 }}
                           options={[
                             {
-                              value: '',
+                              value: "",
                               label: (
                                 <div className="text-[1vw] px-[0.2vw] pb-[0.1vw] text-gray-400">
                                   Select Country
@@ -698,7 +826,7 @@ export default function AddRegisterAddress({
                               disabled: true,
                             },
                             {
-                              value: 'India',
+                              value: "India",
                               label: (
                                 <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
                                   India
@@ -706,7 +834,7 @@ export default function AddRegisterAddress({
                               ),
                             },
                             {
-                              value: 'America',
+                              value: "America",
                               label: (
                                 <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
                                   America
@@ -714,7 +842,7 @@ export default function AddRegisterAddress({
                               ),
                             },
                             {
-                              value: 'Australia',
+                              value: "Australia",
                               label: (
                                 <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
                                   Australia
@@ -722,7 +850,7 @@ export default function AddRegisterAddress({
                               ),
                             },
                             {
-                              value: 'Malasiya',
+                              value: "Malasiya",
                               label: (
                                 <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
                                   Malasiya
@@ -730,44 +858,10 @@ export default function AddRegisterAddress({
                               ),
                             },
                           ]}
-                             
                         />
                       </ConfigProvider>
                       <ErrorMessage
                         name="country"
-                        component="div"
-                        className="text-red-500 text-[0.8vw] absolute left-[.2vw] bottom-[-1.2vw]"
-                      />
-                    </div>
-                    <div className="col-span-1 relative">
-                      <label className="text-[#1F4B7F] text-[1.1vw] ">
-                        Postal / Zip Code
-                        <span className="text-[1vw] text-red-600 pl-[0.2vw]">
-                          *
-                        </span>
-                      </label>
-                      <Field
-                        type="text"
-                        name="postal"
-                        placeholder="Enter Postal Code"
-                        // value={values.firstname}
-                        disabled={
-                          updatedata || businessback
-                            ? enable
-                              ? false
-                              : true
-                            : false
-                        }
-                        className={`${
-                          updatedata || businessback
-                            ? enable == false
-                              ? " cursor-not-allowed"
-                              : ""
-                            : ""
-                        } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
-                      />
-                      <ErrorMessage
-                        name="postal"
                         component="div"
                         className="text-red-500 text-[0.8vw] absolute left-[.2vw] bottom-[-1.2vw]"
                       />
@@ -795,7 +889,7 @@ export default function AddRegisterAddress({
                         type="submit"
                         // onClick={() => setCurrentpage(3)}
                       >
-                        {updatedata || businessback
+                        {updatedata && superadminaddressdata?.address != null || businessback
                           ? enable
                             ? "Update & Continue"
                             : "Continue"
@@ -804,6 +898,7 @@ export default function AddRegisterAddress({
                     </div>
                   </div>
                 </div>
+            )}
               </Form>
             )}
           </Formik>

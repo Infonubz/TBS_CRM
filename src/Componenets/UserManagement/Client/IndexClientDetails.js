@@ -79,15 +79,44 @@ export default function ClientIndex({
     );
   };
 
-  const handleChange = ({ fileList: newFileList }) => {
-    console.log(newFileList, "newFileList");
-    setFileList(newFileList);
-    if (newFileList?.length > 0) {
-      setProfileImage(true);
+  // const handleChange = ({ fileList: newFileList }) => {
+  //   console.log(newFileList, "newFileList");
+  //   setFileList(newFileList);
+  //   setSelectedFile(newFileList)
+  //   if (newFileList?.length > 0) {
+  //     setProfileImage(true);
+  //   } else {
+  //     setProfileImage(false);
+  //   }
+  //   // SubmitProfileData(newFileList[0], dispatch);
+  // };
+  const handleChange = async ({ fileList: newFileList }) => {
+    const file = newFileList[0]?.originFileObj;
+    
+    if (file) {
+      // Check file size (5MB = 5 * 1024 * 1024 bytes)
+      const fileSizeInMB = file.size / (1024 * 1024); // Convert bytes to MB
+      
+      if (fileSizeInMB > 5) {
+        // If the file size is greater than 5MB, alert the user
+        // alert('File size exceeds 5MB limit!');
+        setProfileImage(false)
+        // Remove the file from the list
+        newFileList.pop(); 
+      } else {
+        setFileList(newFileList);
+        setSelectedFile(newFileList)
+        if (newFileList?.length > 0) {
+          setProfileImage(true);
+        } else {
+          setProfileImage(false);
+        }
+      }
     } else {
-      setProfileImage(false);
+      // If no file, just update the file list
+      setFileList(newFileList);
+      setSelectedFile(newFileList)
     }
-    // SubmitProfileData(newFileList[0], dispatch);
   };
 
   const handleCancel = () => setPreviewOpen(false);
@@ -300,11 +329,18 @@ console.log(process.env.REACT_SERVER_IMAGE_URL,"urlrurlrurlrurlrurlrurl");
                     src={previewImage}
                   />
                 </Modal>
-                {updatedata
+                {/* {updatedata
                       ? " "
                       : profileImage === false && (
-                          <div className="text-red-700 text-[.7vw] bottom-[-1.2vw] absolute">
+                          <div className="text-red-500 text-[.7vw] bottom-[-1.2vw] absolute">
                             * Profile Image is required
+                          </div>
+                        )} */}
+                         {updatedata && selectedFile != null 
+                        ? " "
+                        : profileImage === false && (
+                          <div className="text-red-500 text-[.7vw] bottom-[-1.2vw] absolute">
+                            * Profile Image is required - (Max Size : 5MB)
                           </div>
                         )}
               </div>
@@ -363,6 +399,8 @@ console.log(process.env.REACT_SERVER_IMAGE_URL,"urlrurlrurlrurlrurlrurl");
                   setProfileImage={setProfileImage}
                   updatedata={updatedata}
                   setEnableUpload={setEnableUpload}
+                  selectedFile={selectedFile}
+                  enableUpload={enableUpload}
                 />
               ) : currentpage == 2 ? (
                 <AddRegisterAddress
@@ -393,6 +431,7 @@ console.log(process.env.REACT_SERVER_IMAGE_URL,"urlrurlrurlrurlrurlrurl");
                     gstback={gstback}
                     client_id={client_id}
                     setGstback={setGstback}
+                    updatedata={updatedata}
                   />
                 )
               )}

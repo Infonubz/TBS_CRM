@@ -48,6 +48,7 @@ export default function SuperAdminIndex({
   const [operator_id, setOperator_Id] = useState(null);
   const [profileImage, setProfileImage] = useState(false)
   const [enableUpload, setEnableUpload] = useState(false)
+  const [selectedFile, setSelectedFile] = useState(null);
 
 
 
@@ -117,6 +118,7 @@ export default function SuperAdminIndex({
         newFileList.pop(); 
       } else {
         setFileList(newFileList);
+        setSelectedFile(newFileList)
         if (newFileList?.length > 0) {
           setProfileImage(true);
         } else {
@@ -126,6 +128,7 @@ export default function SuperAdminIndex({
     } else {
       // If no file, just update the file list
       setFileList(newFileList);
+      setSelectedFile(newFileList)
     }
   };
   
@@ -182,7 +185,7 @@ export default function SuperAdminIndex({
   const [documentback, setDocumentBack] = useState(false);
   const [gstback, setGstback] = useState(false);
   const location = useLocation();
-  const [selectedFile, setSelectedFile] = useState(null);
+
   console.log(selectedFile, 'selected_file')
 
   const getprofile = async () => {
@@ -212,7 +215,7 @@ export default function SuperAdminIndex({
     "locationlocationlocation"
   );
 
-  console.log(profileImage, "imagkjhdfkjdhfk");
+  console.log(enableUpload, "imagkjhdfkjdhfk");
 
 
   const handleFileChange = (event) => {
@@ -309,11 +312,11 @@ export default function SuperAdminIndex({
                   )}
                   
                 </div>
-                {updatedata
+                {updatedata && selectedFile != null
                       ? " "
                       : profileImage === false && (
-                          <span className="text-red-700 text-[.7vw] absolute bottom-[-1.2vw]">
-                            * Profile Image is required  - <span> Max Size : (5MB)</span>
+                          <span className="text-red-500 text-[.7vw] absolute bottom-[-1.2vw]">
+                            * Company Logo is required  -  (Max Size : 5MB)
                           </span>
                         )}
 
@@ -418,6 +421,8 @@ export default function SuperAdminIndex({
                   setProfileImage={setProfileImage}
                   updatedata={updatedata}
                   setEnableUpload={setEnableUpload}
+                  selectedFile={selectedFile}
+                  enableUpload={enableUpload}
                 />
               ) : currentpage == 2 ? (
                 <AddRegisterAddress

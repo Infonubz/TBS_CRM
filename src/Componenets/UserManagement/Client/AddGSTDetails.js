@@ -1,4 +1,4 @@
-import { Modal, Progress } from "antd";
+import { Modal, Progress, Spin } from "antd";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { FaCloudUploadAlt, FaPlus } from "react-icons/fa";
@@ -13,6 +13,7 @@ import {
 } from "../../../Api/UserManagement/Client";
 import { useDispatch } from "react-redux";
 import { GetClientGSTById } from "../../../Api/UserManagement/Client";
+import { capitalizeFirstLetter } from "../../Common/Captilization";
 
 const validationSchema = Yup.object().shape({
   gst: Yup.string().required("Please select a Gst"),
@@ -39,10 +40,12 @@ export default function AddGSTDetails({
   setmodalIsOpen,
   setModalIsOpen,
   setGstback,
+  updatedata
 }) {
   const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const [modalIsOpen1, setmodalIsOpen1] = useState(false);
   const [superadmingstdata, setSuperAdminGSTData] = useState("");
+  const [spinning, setSpinning] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -77,11 +80,13 @@ export default function AddGSTDetails({
   console.log(clientID, "clientididid");
 
   const fetchGetUser = async () => {
+    setSpinning(true)
     try {
       const data = await GetClientGSTById(
         clientID,
         setClientID,
-        setSuperAdminGSTData
+        setSuperAdminGSTData,
+        setSpinning
       );
       setSuperAdminGSTData(data);
     } catch (error) {
@@ -171,6 +176,11 @@ export default function AddGSTDetails({
               touched,
             }) => (
               <Form onSubmit={handleSubmit}>
+                     {spinning ? (
+              <div className=" flex justify-center h-[22.6vw] items-center">
+                <Spin size="large" />
+              </div>
+            ) : (
                 <div className="gap-y-[1.5vw] flex-col flex">
                   {/* <div className="grid grid-cols-2 w-full gap-x-[2vw] items-center">
                     <div className="col-span-1">
@@ -260,7 +270,7 @@ export default function AddGSTDetails({
                       <div className="gap-y-[1vw] text-[#1F4B7F] text-[1vw]">
                         <div className="grid grid-cols-2 ">
                           <div className="font-semibold">State:</div>
-                          <div>{superadmingstdata?.state_name}</div>
+                          <div>{capitalizeFirstLetter(superadmingstdata?.state_name)}</div>
                         </div>
                         <div className="grid grid-cols-2 mt-[1vw]">
                           <div className="font-semibold">
@@ -274,7 +284,7 @@ export default function AddGSTDetails({
                         </div>
                         <div className="grid grid-cols-2 mt-[1vw]">
                           <div className="font-semibold">Head Office:</div>
-                          <div>{superadmingstdata?.head_office}</div>
+                          <div>{capitalizeFirstLetter(superadmingstdata?.head_office)}</div>
                         </div>
                         <div className="grid grid-cols-2 mt-[1vw]">
                           <div className="font-semibold">Upload Documents:</div>
@@ -307,9 +317,9 @@ export default function AddGSTDetails({
                     </div> */}
                   </div>
 
-                  <div className="flex items-center absolute bottom-0 gap-[3vw] justify-between py-[1vw]">
+                  <div className="flex items-center absolute bottom-0 gap-[4vw] justify-between py-[1vw]">
                     <div>
-                      <h1 className="text-[#1F4B7F] text-[0.8vw] font-semibold">
+                      <h1 className="text-[#1F4B7F] text-[0.7vw] font-semibold">
                         *You must fill in all fields to be able to continue
                       </h1>
                     </div>
@@ -325,14 +335,23 @@ export default function AddGSTDetails({
                       </button>
                       <button
                         className="bg-[#1F487C] font-semibold rounded-full w-[7vw] h-[2vw] text-[1vw] text-white"
-                        type="submit"
-                        // onClick={() => setCurrentpage(4)}
+                        // type="submit"
+                        onClick={() => {
+                          setModalIsOpen(false);
+                          if(updatedata && superadmingstdata?.state_name){
+                            toast.success("Form Updated Successfully")
+                          }
+                          else{
+                            toast.success("Form Submitted Successfully")
+                          }}
+                        }
                       >
-                        {superadmingstdata?.state_name ? "Update" : "Submit"}
+                        {updatedata && superadmingstdata?.state_name ? "Update" : "Submit"}
                       </button>
                     </div>
                   </div>
                 </div>
+            )}
               </Form>
             )}
           </Formik>

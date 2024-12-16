@@ -19,6 +19,7 @@ import DeleteList from "../Offers/DeleteList";
 import { capitalizeFirstLetter } from "../Common/Captilization";
 import PartnerStatusUpdate from "./Partner/PartnerStatusUpdate";
 import { useSelector } from "react-redux";
+import moment from "moment/moment";
 
 // import { width } from "@fortawesome/free-solid-svg-icons/fa0";
 
@@ -55,11 +56,12 @@ const PartnerTableList = ({
   const columns = [
     {
       title: (
-        <div className="flex items-center justify-center font-bold text-[1.2vw]">Photo</div>
+        <div className="flex items-center justify-center font-bold text-[1.1vw]">Profile</div>
       ),
       // dataIndex: "photo",
       // key: "photo",
       align: "center",
+      width: "5vw",
       render: (row) => {
         console.log(row, "rowrowrow");
         const image = `${apiImgUrl}${row?.profile_img}`;
@@ -77,23 +79,23 @@ const PartnerTableList = ({
           </div>
         );
       },
-      width: "6vw",
+      width: "5vw",
     },
     {
-      title: <div className="flex items-center justify-center font-bold text-[1.2vw]">Partner Id</div>,
+      title: <div className="flex items-center justify-center font-bold text-[1.1vw]">Partner Id</div>,
       key: "id",
       ellipsis: true,
       width: "9vw",
       render: (text, row) => {
         return (
           <div className="flex items-center justify-center">
-            <p className="text-[1.1vw] text-[#1F4B7F]">{row.tbs_partner_id}</p>
+            <p className="text-[1vw] text-[#1F4B7F] font-bold">{row.tbs_partner_id}</p>
           </div>
         );
       },
     },
     {
-      title: <div className="flex items-center justify-center  font-bold text-[1.2vw]">Partner Name</div>, // dataIndex: "name",
+      title: <div className="flex items-center justify-center  font-bold text-[1.1vw]">Partner Name</div>, // dataIndex: "name",
       key: "name",
       sorter: (a, b) => {
         const nameA =
@@ -102,7 +104,7 @@ const PartnerTableList = ({
           `${b.partner_first_name} ${b.partner_last_name}`.toUpperCase();
         return nameA.localeCompare(nameB);
       },
-      width: "12vw",
+      width: "11vw",
       sortOrder: sortedInfo.columnKey === "name" && sortedInfo.order,
       // render: (row) => (
       //   <div className="flex items-center justify-center">
@@ -112,28 +114,93 @@ const PartnerTableList = ({
       render: (row) => {
         const fullname = `${capitalizeFirstLetter(row?.partner_first_name)} ${row.partner_last_name}`
         return (
-          <div className="flex items-center justify-center">
-            <p className="text-[1.1vw] text-[#1F4B7F]">{
-              fullname?.length > 16 ? <Tooltip placement="top"
+          <div className="flex items-center pl-[1vw]">
+            <p className="text-[1vw] text-[#1F4B7F] font-bold">{
+              fullname?.length > 18 ? <Tooltip placement="top" color="white"
+              overlayInnerStyle={{ color: "#1F4B7F" }}
                 title={`${capitalizeFirstLetter(row?.partner_first_name)} ${row.partner_last_name}`}
-                className="cursor-pointer">{fullname?.slice(0, 16) + ".."}</Tooltip> : fullname
+                className="cursor-pointer">{fullname?.slice(0, 18) + ".."}</Tooltip> : fullname
             }</p>
           </div>
         )
       }
     },
-
     {
-      title: <div className="flex items-center justify-center font-bold text-[1.2vw]">Mobile</div>,
-      key: "mobile",
-      sorter: (a, b) => a.mobilenumber?.length - b.mobilenumber?.length,
-      sortOrder: sortedInfo.columnKey === "mobile" ? sortedInfo.order : null,
+      title: <div className="flex items-center justify-center  font-bold text-[1.1vw]">Occupation</div>,
+      // dataIndex: "email",
+      key: "occupation",
+      // sorter: (a, b) => a.occupation?.length - b.occupation?.length,
+      sorter: (a, b) => a.occupation?.toLowerCase().localeCompare(b.occupation?.toLowerCase()),
+      sortOrder: sortedInfo.columnKey === "occupation" ? sortedInfo.order : null,
       ellipsis: true,
       width: "10vw",
+      render: (row) => {
+        return (
+          // <div className="flex items-center justify-center">
+          //   <p className="text-[1.1vw] text-[#1F4B7F]">{row.emailid}</p>
+          // </div>
+          <div>
+          {row?.occupation?.length > 18 ? (
+            <Tooltip
+              placement="top"
+              color="white"
+              overlayInnerStyle={{ color: "#1F4B7F" }}
+              title={row?.occupation}
+              className="cursor-pointer"
+            >
+              <div className="text-[1vw] pl-[1vw] font-bold  text-[#1f4b7f]">
+                {" "}
+                {`${capitalizeFirstLetter(row?.occupation?.slice(0, 18))}...`}
+              </div>
+            </Tooltip>
+          ) : (
+            <div className="text-[1vw] pl-[1vw] font-bold text-[#1f4b7f]">
+              {capitalizeFirstLetter(row?.occupation?.slice(0, 18))}
+            </div>
+          )}
+        </div>
+        );
+      },
+    },
+    {
+      title: <div className="flex items-center justify-center  font-bold text-[1.1vw]">Age / Gender</div>,
+      // dataIndex: "created",
+      // key: "created",
+      // sorter: (a, b) => a.gender?.length - b?.gender.length,
+      // sortOrder: sortedInfo.columnKey === "created" ? sortedInfo.order : null,
+      ellipsis: true,
+      width: "9vw",
+      render: (row) => {
+        return (
+          <div className="flex items-center pl-[2vw]">
+            <p className="text-[1vw] text-[#1F4B7F] flex justify-center ">
+            <div>{moment().diff(moment(row.date_of_birth), 'years')}</div>
+            <div className="px-[.3vw]">/</div>
+            <div>
+              {row?.gender === "Male" ? "M" : row?.gender === "Female" ? "F" :""}
+              </div>
+              {/* {dayjs(row.created_date).format("DD MMM, YY")} */}
+            </p>
+          </div>
+        );
+      },
+    },
+
+    {
+      title: <div className="flex items-center justify-center font-bold text-[1.1vw]">Mobile</div>,
+      key: "mobile",
+      sorter: (a, b) => {
+        const phoneA = a.phone ? a.phone.replace(/\D/g, "") : "";
+        const phoneB = b.phone ? b.phone.replace(/\D/g, "") : "";
+        return phoneA.localeCompare(phoneB);
+      },
+      sortOrder: sortedInfo.columnKey === "mobile" && sortedInfo.order,
+      ellipsis: true,
+      width: "9vw",
       render: (text, row) => {
         return (
-          <div className="flex items-center justify-center">
-            <p className="text-[1.1vw] text-[#1F4B7F]">{row.phone}</p>
+          <div className="flex items-center pl-[1.5vw]">
+            <p className="text-[1vw] text-[#1F4B7F]">{row.phone}</p>
           </div>
         );
       },
@@ -142,29 +209,33 @@ const PartnerTableList = ({
       title: <div className="flex items-center justify-center  font-bold text-[1.2vw]">Email</div>,
       // dataIndex: "email",
       key: "email",
-      sorter: (a, b) => a.emailid.length - b.emailid.length,
-      sortOrder: sortedInfo.columnKey === "email" ? sortedInfo.order : null,
+      // sorter: (a, b) => a.emailid.length - b.emailid.length,
+      // sortOrder: sortedInfo.columnKey === "email" ? sortedInfo.order : null,
+       sorter: (a, b) => (a.emailid || "").toLowerCase().localeCompare((b.emailid || "").toLowerCase()), // Sort alphabetically
+  sortOrder: sortedInfo.columnKey === "email" ? sortedInfo.order : null,
       ellipsis: true,
-      width: "15vw",
+      width: "13vw",
       render: (row) => {
         return (
           // <div className="flex items-center justify-center">
           //   <p className="text-[1.1vw] text-[#1F4B7F]">{row.emailid}</p>
           // </div>
-          <div flex items-center justify-center>
+          <div >
           {row?.emailid?.length > 20 ? (
             <Tooltip
               placement="top"
+              color="white"
+              overlayInnerStyle={{ color: "#1F4B7F" }}
               title={row?.emailid}
               className="cursor-pointer"
             >
-              <div className="text-[1.1vw] text-center text-[#1f4b7f]">
+              <div className="text-[1vw] pl-[1vw] text-[#1f4b7f]">
                 {" "}
                 {`${row?.emailid?.slice(0, 20)}...`}
               </div>
             </Tooltip>
           ) : (
-            <div className="text-[1.1vw] text-center text-[#1f4b7f]">
+            <div className="text-[1vw] pl-[1vw] text-[#1f4b7f]">
               {row?.emailid?.slice(0, 20)}
             </div>
           )}
@@ -173,18 +244,18 @@ const PartnerTableList = ({
       },
     },
     {
-      title: <div className="flex items-center justify-center  font-bold text-[1.2vw]">Created</div>,
+      title: <div className="flex items-center justify-center   font-bold text-[1.1vw]">Created</div>,
       // dataIndex: "created",
-      // key: "created",
-      sorter: (a, b) => a.created.length - b.created.length,
+      key: "created",
+      sorter: (a, b) => new Date(a.created_date) - new Date(b.created_date),
       sortOrder: sortedInfo.columnKey === "created" ? sortedInfo.order : null,
       ellipsis: true,
-      width: "10vw",
+      width: "8vw",
       render: (row) => {
         return (
           <div className="flex items-center justify-center">
-            <p className="text-[1.1vw] text-[#1F4B7F]">
-              {dayjs(row.created_date).format("MMM DD hh:mm a")}
+            <p className="text-[1vw] text-[#1F4B7F]">
+              {dayjs(row.created_date).format("DD MMM, YY")}
             </p>
           </div>
         );
@@ -192,7 +263,7 @@ const PartnerTableList = ({
     },
     {
       title: (
-        <div className="flex items-center justify-center font-bold text-[1.2vw]">Status</div>
+        <div className="flex items-center justify-center font-bold text-[1.1vw]">Status</div>
       ),
       // dataIndex: "status",
       // key: "status",
@@ -204,13 +275,13 @@ const PartnerTableList = ({
               className={`${row.partner_status_id == 0
                 ? "bg-[#646262] cursor-not-allowed" 
                  : row.partner_status_id == 1
-                  ? "bg-[#FF6B00] cursor-not-allowed"
+                  ? "bg-[#FF9900] cursor-not-allowed"
                 : row.partner_status_id == 2
                   ? "bg-[#38ac2c]"
                   : row.partner_status_id == 3
                     ? "bg-[#FD3434]"
                     : "bg-[#2A99FF] cursor-not-allowed"
-                }  h-[1.8vw] text-[1.1vw] text-white w-[8vw] rounded-[0.5vw]`}
+                }  h-[1.8vw] shadow-md shadow-black font-extrabold text-[1vw] text-white w-[7vw] rounded-[0.5vw]`}
               onClick={() => {
                 if (row.partner_status_id === 2 ||row.partner_status_id === 3 ) {
                   setViewModal(true);
@@ -227,11 +298,11 @@ const PartnerTableList = ({
     },
     {
       title: (
-        <div className="flex items-center justify-center font-bold text-[1.2vw]">Action</div>
+        <div className="flex items-center justify-center font-bold text-[1.1vw]">Action</div>
       ),
       // dataIndex: "action",
       // key: "action",
-      width: "10vw",
+      width: "5vw",
       render: (row) => {
         console.log(row?.tbs_partner_id, "rowrowrow");
         return (

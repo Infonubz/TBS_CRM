@@ -38,10 +38,9 @@ function App() {
   // const [authtoken, setAuthtoken] = useState(sessionStorage.getItem("token"));
   const [authtoken, setAuthtoken] = useState(sessionStorage.getItem("token"));
 
-
   useEffect(() => {
     // const token = sessionStorage.getItem("token");
-    const token = sessionStorage.getItem("token")
+    const token = sessionStorage.getItem("token");
     if (token) {
       setAuthtoken(token);
     }
@@ -50,8 +49,11 @@ function App() {
   // window.onbeforeunload = function () {
   //   localStorage.clear();
   // }
-console.log(authtoken,"authtoken852");
+  console.log(authtoken, "authtoken852");
+  const searchby = ["Operator name", "Phone", "Email"];
+  const [currentSearch, setCurrentSearch] = useState(searchby[0]);
 
+  
   return (
     <Router>
       <ToastContainer />
@@ -66,7 +68,10 @@ console.log(authtoken,"authtoken852");
               <Route path="/settings" element={<Settings />} />
               <Route path="/roles" element={<Roles />} />
               <Route path="/reports" element={<Reports />} />
-              <Route path="/requestmanagement" element={<RequestManagement />} />
+              <Route
+                path="/requestmanagement"
+                element={<RequestManagement />}
+              />
               <Route path="/promotion" element={<Promotion />} />
               <Route path="/recyclebin" element={<RecycleBin />} />
               <Route path="/support" element={<Support />} />
@@ -78,11 +83,23 @@ console.log(authtoken,"authtoken852");
         </>
       ) : (
         <Routes>
-          <Route path="/" element={<ProductOwnerLoginPage setAuthtoken={setAuthtoken} />} />
-          <Route path="/poemployee" element={<OwnerEmployeeLoginPage setAuthtoken={setAuthtoken} />} />
-          <Route path="/opemployee" element={<OperatorEmployeeLoginPage setAuthtoken={setAuthtoken} />} />
+          <Route
+            path="/"
+            element={<ProductOwnerLoginPage setAuthtoken={setAuthtoken} />}
+          />
+          <Route
+            path="/poemployee"
+            element={<OwnerEmployeeLoginPage setAuthtoken={setAuthtoken} />}
+          />
+          <Route
+            path="/opemployee"
+            element={<OperatorEmployeeLoginPage setAuthtoken={setAuthtoken} />}
+          />
           <Route path="/operator" element={<OperatorLoginPage />} />
-          <Route path="/partner" element={<PartnerLoginPage setAuthtoken={setAuthtoken} />} />
+          <Route
+            path="/partner"
+            element={<PartnerLoginPage setAuthtoken={setAuthtoken} />}
+          />
         </Routes>
       )}
     </Router>
@@ -90,4 +107,3 @@ console.log(authtoken,"authtoken852");
 }
 
 export default App;
-

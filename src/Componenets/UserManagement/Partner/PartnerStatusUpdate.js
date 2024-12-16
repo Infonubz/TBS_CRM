@@ -36,9 +36,9 @@ export default function PartnerStatusUpdate({
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <p className="text-[1.5vw] text-[]">Update the Client Status</p>
+      <p className="text-[1.5vw] font-bold">Update the Partner Status</p>
       <img src={image} className="h-[6vw] w-[6vw] my-[1vw]"></img>
-      <div className="flex gap-2 mt-[1vw]">
+      <div className="flex ">
         {/* <button
           className="items-center text-[0.9vw] text-white  space-x-[0.7vw] px-[0.8vw] w-[8vw] h-[2vw] bg-[#2A99FF] rounded-[0.5vw]"
           onClick={() => handlechange(3, "Under Review")}
@@ -46,7 +46,7 @@ export default function PartnerStatusUpdate({
           Under review
         </button> */}
         <button
-          className={`items-center text-[0.9vw] text-white  space-x-[0.7vw] px-[0.8vw] w-[10vw] h-[2vw] ${partnerStatusId == 2 ? "bg-[#FF1100]" :"bg-[#34AE2A]"} rounded-[0.5vw]`}
+          className={`items-center text-[1vw] shadow-md shadow-black font-extrabold text-white  space-x-[0.7vw] px-[0.8vw] w-[8vw] h-[2vw] ${partnerStatusId == 2 ? "bg-[#FF1100]" :"bg-[#34AE2A]"} rounded-[0.5vw]`}
           onClick={handlechange}
         >
           {partnerStatusId == 2 ? "Inactive" : "Active"}

@@ -6,7 +6,7 @@ import { MdOutlineFileDownload } from "react-icons/md";
 import { IoIosArrowBack, IoIosArrowForward, IoMdMenu } from "react-icons/io";
 import { FaPlus } from "react-icons/fa";
 // import ListView from "./ListView";
-import { Pagination } from "antd";
+import { Pagination, Popover, Tooltip } from "antd";
 // import GridView from "./GridView";
 import axios from "axios";
 import ModalPopup from "../Common/Modal/Modal";
@@ -72,6 +72,10 @@ import {
   SubmitClientExcel,
 } from "../../Api/UserManagement/Client";
 import { Flex, Spin } from "antd";
+import { CgImport } from "react-icons/cg";
+import { LiaSearchSolid } from "react-icons/lia";
+import { BsExclamationCircle } from "react-icons/bs";
+import { TiThMenu } from "react-icons/ti";
 
 export default function Discounts() {
   const [view, setView] = useState("list");
@@ -93,10 +97,10 @@ export default function Discounts() {
   const [deletemodalIsOpen, setDeleteModalIsOpen] = useState(false);
   const [deleteEmpmodalIsOpen, setDeleteEmpModalIsOpen] = useState(false);
   const [deleteOpmodalIsOpen, setDeleteOpModalIsOpen] = useState(false);
-  const [showPage,setShowPage] = useState(false)
+  const [showPage, setShowPage] = useState(false);
 
   // const user = sessionStorage.getItem("USER_ID");
-  const user = sessionStorage.getItem("USER_ID")
+  const user = sessionStorage.getItem("USER_ID");
 
   console.log(get_partner_list, user, "get_partner_list");
 
@@ -201,7 +205,7 @@ export default function Discounts() {
 
   const search = (e) => {
     if (adminUser == "super_admin") {
-      console.log(e.target.value, "superadminsearch")
+      console.log(e.target.value, "superadminsearch");
       handleOperatorSearch(e, dispatch);
     } else if (adminUser == "client") {
       handleClientSearch(e, dispatch);
@@ -330,8 +334,8 @@ export default function Discounts() {
       (currentPage + 1) * perPage
     );
   const [SPA_ID, SetSPAID] = useState(null);
-  const [operatorID, setOperatorID] = useState('');
-  console.log(operatorID, 'operator_id')
+  const [operatorID, setOperatorID] = useState("");
+  console.log(operatorID, "operator_id");
   const [EmployeeID, setEmployeeID] = useState(null);
   const [PartnerID, setPartnerID] = useState(null);
   const [clientID, setClientID] = useState(null);
@@ -348,14 +352,14 @@ export default function Discounts() {
   const handleOperatorPageChange = (pageNumber) => {
     setOperatorActivePage(pageNumber);
   };
-  console.log(currentOperatorItems?.length,"operatorpage");
-  
+  console.log(currentOperatorItems?.length, "operatorpage");
+
   // pagination for Employee
   const [EmployeeActivePage, setEmployeeActivePage] = useState(1);
   const employeeItemsPerPage = 10;
   const indexOfLastEmployeeItem = EmployeeActivePage * employeeItemsPerPage;
   const indexOfFirstEmployeeItem =
-  indexOfLastEmployeeItem - employeeItemsPerPage;
+    indexOfLastEmployeeItem - employeeItemsPerPage;
   const currentEmployeeItems =
     get_employee_list.length > 0 &&
     get_employee_list?.slice(indexOfFirstEmployeeItem, indexOfLastEmployeeItem);
@@ -409,6 +413,8 @@ export default function Discounts() {
       }
     } else if (adminUser == "client") {
       setLoading(true);
+      console.log("excelfiless", file);
+
       try {
         const response = await SubmitClientExcel(file, dispatch);
         toast.success(response);
@@ -454,15 +460,14 @@ export default function Discounts() {
   };
   console.log(adminUser, "ididididididididididididddddd");
 
-
   const handleAddButton = () => {
-    sessionStorage.removeItem('OperatorProfileImg');
-    sessionStorage.removeItem('ClientCompanyLogo');
-    sessionStorage.removeItem('PartnerProfileImg');
-    sessionStorage.removeItem("PARTNER_ID")
-    sessionStorage.removeItem('CLIENT_ID')
+    sessionStorage.removeItem("OperatorProfileImg");
+    sessionStorage.removeItem("ClientCompanyLogo");
+    sessionStorage.removeItem("PartnerProfileImg");
+    sessionStorage.removeItem("PARTNER_ID");
+    sessionStorage.removeItem("CLIENT_ID");
     // sessionStorage.removeItem('EmployeeProfileImg');
-    sessionStorage.removeItem("OPERATE_ID")
+    sessionStorage.removeItem("OPERATE_ID");
     setModalIsOpen(true);
     setOperatorID(null);
     setEmployeeID(null);
@@ -470,13 +475,12 @@ export default function Discounts() {
     setClientID(null);
   };
 
- 
   useEffect(() => {
     if (adminUser == "super_admin" && get_operator_list?.length > 10) {
-      // console.log(currentOperatorItems?.length,"jajajajajajajajajaj") 
+      // console.log(currentOperatorItems?.length,"jajajajajajajajajaj")
       setShowPage(true);
-      if(currentOperatorItems?.length == 0 ){
-        setOperatorActivePage(OperatorActivePage - 1)
+      if (currentOperatorItems?.length == 0) {
+        setOperatorActivePage(OperatorActivePage - 1);
       }
     } else if (adminUser == "partner" && get_partner_list?.length > 10) {
       setShowPage(true);
@@ -493,29 +497,79 @@ export default function Discounts() {
       // if(currentEmployeeItems?.length == 0){
       //   setEmployeeActivePage(EmployeeActivePage - 1)
       // }
-    } 
-    else{
-      setShowPage(false)
+    } else {
+      setShowPage(false);
     }
-  }, [adminUser, currentOperatorItems, currentPartnerItems, currentClientItems, currentEmployeeItems]); // Add these items to the dependencies
+  }, [
+    adminUser,
+    currentOperatorItems,
+    currentPartnerItems,
+    currentClientItems,
+    currentEmployeeItems,
+  ]); // Add these items to the dependencies
 
-  useEffect(()=>{
-    if(currentOperatorItems?.length == 0 ){
-      setOperatorActivePage(OperatorActivePage - 1)
+  useEffect(() => {
+    if (currentOperatorItems?.length == 0) {
+      setOperatorActivePage(OperatorActivePage - 1);
+    } else if (currentPartnerItems?.length == 0) {
+      setPartnerActivePage(PartnerActivePage - 1);
+    } else if (currentClientItems?.length == 0) {
+      setClientActivePage(ClientActivePage - 1);
+    } else if (currentEmployeeItems?.length == 0) {
+      setEmployeeActivePage(EmployeeActivePage - 1);
     }
-    else if(currentPartnerItems?.length == 0){
-      setPartnerActivePage(PartnerActivePage - 1)
-    }
-    else if(currentClientItems?.length == 0){
-      setClientActivePage(ClientActivePage - 1)
-    }
-   else if(currentEmployeeItems?.length == 0){
-      setEmployeeActivePage(EmployeeActivePage - 1)
-    }
-
-  },[currentOperatorItems,currentPartnerItems,currentClientItems,currentEmployeeItems])
-  // console.log(OperatorActivePage,"operatoractivepafe");
-  
+  }, [
+    currentOperatorItems,
+    currentPartnerItems,
+    currentClientItems,
+    currentEmployeeItems,
+  ]);
+  console.log(currentPartnerItems, "operatoractivepafe");
+  const infos = [
+    {
+      title:
+        adminUser == "super_admin"
+          ? "Operator ID"
+          : adminUser == "partner"
+          ? "Partner ID"
+          : adminUser == "client"
+          ? "Client ID"
+          : "Employee ID",
+    },
+    {
+      title:
+        adminUser == "super_admin"
+          ? "Company Name"
+          : adminUser == "partner"
+          ? "Partner Name"
+          : adminUser == "client"
+          ? "Company Name"
+          : "Employee Name",
+    },
+    {
+      title:    adminUser == "super_admin"
+      ? "Operator Name"
+      : adminUser == "partner"
+      ? "Occupation"
+      : adminUser == "client"
+      ? "Client Name"
+      : "Role Type",
+    },
+    {
+      title: "Mobile",
+    },
+    {
+      title: "Email",
+    },
+    {
+      title: "Created Date",
+      description: "MMM DD (e.g. 01 Jan) - Format",
+    },
+    // {
+    //   title: " Duration",
+    //   description: "MMM DD (e.g. Jan 01) - Format",
+    // },
+  ];
   return (
     <>
       <Spin size="large" spinning={loading} fullscreen />
@@ -535,25 +589,69 @@ export default function Discounts() {
               </h1>
               <div className="pb-[0.5vw] flex justify-between h-full items-center">
                 <div className="flex items-center gap-[.7vw]">
-                <div className="flex border-[#1F4B7F] h-[5vh] ">
-                  <button
-                    className={`${view == 'list' ? "bg-[#1F487C]" : "bg-[white]"} px-[0.75vw] rounded-l-xl border-[0.2vw] border-r-0  border-[#1F487C]`}
-                    style={{
-                      transition: "all 1s",
-                    }}
-                    onClick={() => setView('list')}>
-                    <IoMdMenu color={`${view === 'list' ? "white" : "#1F487C"}`} />
-                  </button>
-                  <button
-                    className={`${view == 'grid' ? "bg-[#1F487C]" : "bg-[white]"} px-[0.75vw] rounded-r-xl border-[0.2vw] border-l-0  border-[#1F487C]`}
-                    style={{
-                      transition: "all 1s",
-                    }}
-                    onClick={() => setView('grid')}>
-                    <IoGrid color={`${view == 'grid' ? "white" : "#1F487C"}`} />
-                  </button>
-                </div>
-                {/* <div className="flex border-[#1F4B7F] h-[5vh] border-l-[0.2vw] border-t-[0.2vw] rounded-l-[0.7vw] rounded-r-[0.7vw] border-r-[0.2vw] border-b-[0.2vw]">
+                  <div className="flex border-[#1F4B7F] h-[5vh] ">
+                    <Tooltip
+                      placement="bottom"
+                      title={
+                        <div className="flex items-center gap-x-[0.5vw] justify-center">
+                          <TiThMenu color={"#1F487C"} size={"1vw"} />
+                          <label className="text-[1vw] font-semibold">
+                            List View
+                          </label>
+                        </div>
+                      }
+                      className="cursor-pointer"
+                      color="white"
+                      overlayInnerStyle={{
+                        color: "#1F487C",
+                      }}
+                    >
+                      <button
+                        className={`${
+                          view == "list" ? "bg-[#1F487C]" : "bg-[white]"
+                        } px-[0.75vw] rounded-l-[0.75vw]  border-t-[.1vw] border-l-[.1vw] border-b-[.2vw] border-r-0  border-[#1F487C]`}
+                        style={{
+                          transition: "all 1s",
+                        }}
+                        onClick={() => setView("list")}
+                      >
+                        <TiThMenu
+                          color={`${view === "list" ? "white" : "#1F487C"}`}
+                        />
+                      </button>
+                    </Tooltip>
+                    <Tooltip
+                      placement="bottom"
+                      title={
+                        <div className="flex items-center gap-x-[0.5vw] justify-center">
+                          <IoGrid color={"#1F487C"} size={"1vw"} />
+                          <label className="text-[1vw] font-semibold">
+                            Grid View
+                          </label>
+                        </div>
+                      }
+                      className="cursor-pointer"
+                      color="white"
+                      overlayInnerStyle={{
+                        color: "#1F487C",
+                      }}
+                    >
+                      <button
+                        className={`${
+                          view == "grid" ? "bg-[#1F487C]" : "bg-[white]"
+                        } px-[0.75vw] rounded-r-[0.75vw] border-[0.2vw] border-t-[.1vw] border-l-0  border-[#1F487C]`}
+                        style={{
+                          transition: "all 1s",
+                        }}
+                        onClick={() => setView("grid")}
+                      >
+                        <IoGrid
+                          color={`${view == "grid" ? "white" : "#1F487C"}`}
+                        />
+                      </button>
+                    </Tooltip>
+                  </div>
+                  {/* <div className="flex border-[#1F4B7F] h-[5vh] border-l-[0.2vw] border-t-[0.2vw] rounded-l-[0.7vw] rounded-r-[0.7vw] border-r-[0.2vw] border-b-[0.2vw]">
                     <button
                       className={`${view == "list" ? "bg-[#1F4B7F]" : "bg-white"
                         } flex px-[.5vw] justify-center gap-[0.3vw] items-center rounded-tl-[0.4vw]   rounded-bl-[0.4vw] `}
@@ -600,23 +698,57 @@ export default function Discounts() {
                   <div className="relative flex items-center ">
                     <input
                       type="text"
-                      className="bg-white outline-none pl-[2vw] w-[17vw] text-[#1f487c] h-[5vh] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw] border-r-[0.2vw] border-b-[0.2vw]"
-                      placeholder="Search.."
+                      className="bg-white outline-none px-[2vw] w-[17vw] text-[#1f487c] h-[5vh] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.75vw] border-r-[0.25vw] border-b-[0.25vw]"
+                      placeholder="Search..."
                       onChange={(e) => search(e)}
                     />
-                    <IoSearch
-                      className="absolute left-[0.5vw]"
+                    <LiaSearchSolid
+                      className="absolute left-[0.5vw] top-[0.6vw]"
                       size={"1vw"}
-                      color="#1F4B7F"
+                      color="#9CA3AF"
                     />
+                    <span className="inline-block cursor-pointer text-[#1F4B7F] text-[1vw] align-text-bottom absolute right-[1vw] top-[0.6vw]">
+                      {" "}
+                      <Popover
+                        color="white"
+                        title={
+                          <div className=" text-[#1F4B7F] p-[1vw] max-h-[20vw] overflow-auto ">
+                            <span className="font-bold text-[1vw]">
+                              SEARCH BY...
+                            </span>
+                            {infos.map((info, index) => (
+                              <div key={index} className="flex flex-col">
+                                <ul
+                                  className="pl-[1vw]"
+                                  style={{ listStyleType: "disc" }}
+                                >
+                                  <li className="text-[0.8vw] ">
+                                    <p className="text-[0.8vw] font-semibold">
+                                      {info.title}
+                                    </p>
+                                  </li>
+                                </ul>
+                                <span className="text-[.7vw] pl-[1vw] text-[#9CA3AF]">
+                                  {info.description}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        }
+                        placement="bottom"
+                      >
+                        <BsExclamationCircle size={"1vw"} color="#9CA3AF" />
+                      </Popover>
+                    </span>
                   </div>
-                  <div className="flex items-center gap-x-[2vw] ">
+                  <div className="flex items-center pl-[2vw] gap-x-[3vw] ">
                     {user?.startsWith("tbs-pro") && (
                       <div
-                        className={` cursor-pointer ${adminUser == "super_admin"
-                          ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                          : ""
-                          } `}
+                        className={` cursor-pointer ${
+                          adminUser == "super_admin"
+                            ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                            : ""
+                        } `}
                         onClick={() => {
                           setAdminUser("super_admin");
                         }}
@@ -626,24 +758,28 @@ export default function Discounts() {
                         </p>
                       </div>
                     )}
-                    {user?.startsWith("tbs-pro") && (  <div
-                      className={` cursor-pointer ${adminUser == "partner"
-                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                        : ""
-                        } `}
-                      onClick={() => setAdminUser("partner")}
-                    >
-                      <div className="text-[1.3vw] text-[#1f487c] text-center">
-                        Partner
-                      </div>
-                    </div>)}
-                  
                     {user?.startsWith("tbs-pro") && (
                       <div
-                        className={` cursor-pointer ${adminUser == "client"
-                          ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                          : ""
-                          } `}
+                        className={` cursor-pointer ${
+                          adminUser == "partner"
+                            ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                            : ""
+                        } `}
+                        onClick={() => setAdminUser("partner")}
+                      >
+                        <div className="text-[1.3vw] text-[#1f487c] text-center">
+                          Partner
+                        </div>
+                      </div>
+                    )}
+
+                    {user?.startsWith("tbs-pro") && (
+                      <div
+                        className={` cursor-pointer ${
+                          adminUser == "client"
+                            ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                            : ""
+                        } `}
                         onClick={() => setAdminUser("client")}
                       >
                         <div className="text-[1.3vw] text-[#1f487c] text-center">
@@ -652,10 +788,11 @@ export default function Discounts() {
                       </div>
                     )}
                     <div
-                      className={` cursor-pointer ${adminUser == "employee"
-                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                        : ""
-                        } `}
+                      className={` cursor-pointer ${
+                        adminUser == "employee"
+                          ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                          : ""
+                      } `}
                       onClick={() => setAdminUser("employee")}
                     >
                       <div className="text-[1.3vw] text-[#1f487c] text-center">
@@ -670,10 +807,10 @@ export default function Discounts() {
                       adminUser == "employee"
                         ? currentEmployeeItems
                         : adminUser == "client"
-                          ? currentClientItems
-                          : adminUser == "super_admin"
-                            ? currentOperatorItems
-                            : currentPartnerItems
+                        ? currentClientItems
+                        : adminUser == "super_admin"
+                        ? currentOperatorItems
+                        : currentPartnerItems
                     }
                   />
                   <div>
@@ -690,15 +827,17 @@ export default function Discounts() {
                       }}
                     />
                     <button
-                      className="bg-[#1F4B7F] flex px-[1vw]  justify-center h-[5vh] gap-[0.5vw] items-center rounded-[0.5vw]"
+                      className="bg-[#1F4B7F] shadow-sm shadow-black flex px-[1vw]  justify-center h-[5vh] gap-[0.5vw] items-center rounded-[0.5vw]"
                       onClick={() =>
                         document.getElementById("xlsxFile").click()
                       }
                     >
                       <span>
-                        <CiImport size={"1.05vw"} color="white" />
+                        <CgImport size={"1.2vw"} color="white" />
                       </span>
-                      <span className="text-white text-[1.1vw]">Import</span>
+                      <span className="text-white font-bold text-[1.1vw]">
+                        Import
+                      </span>
                     </button>
                   </div>
                   {/* <div className="flex border-[#1F4B7F] h-[5vh] border-l-[0.1vw] border-t-[0.1vw] rounded-l-[0.5vw] rounded-r-[0.5vw] border-r-[0.2vw] border-b-[0.2vw]">
@@ -746,7 +885,7 @@ export default function Discounts() {
                     </button>
                   </div> */}
                   <button
-                    className="bg-[#1F4B7F] flex w-[10vw] h-[5vh] justify-center gap-[0.5vw] items-center rounded-[0.5vw]"
+                    className="bg-[#1F4B7F] shadow-sm shadow-black flex w-[10vw] h-[5vh] justify-center gap-[0.5vw] items-center rounded-[0.5vw]"
                     // onClick={() => handleAdd()}
                     onClick={() => {
                       // setModalIsOpen(true);
@@ -754,21 +893,22 @@ export default function Discounts() {
                       // setEmployeeID(null);
                       // setPartnerID(null);
                       // setClientID(null);
-                      handleAddButton()
+                      handleAddButton();
                     }}
                   >
                     <span>
                       <FaPlus size={"1.2vw"} color="white" />
                     </span>
-                    <span className="text-white text-[1.1vw]">
-                      {`Add ${adminUser == "super_admin"
-                        ? "Operator"
-                        : adminUser == "partner"
+                    <span className="text-white font-bold text-[1vw] ">
+                      {`Add ${
+                        adminUser == "super_admin"
+                          ? "Operator"
+                          : adminUser == "partner"
                           ? "Partner"
                           : adminUser == "client"
-                            ? "Client"
-                            : "Employee"
-                        }`}
+                          ? "Client"
+                          : "Employee"
+                      }`}
                     </span>
                   </button>
                 </div>
@@ -923,72 +1063,78 @@ export default function Discounts() {
                 <TableList currentData={currentData} />
               )} */}
             </div>
-            {
-             ( currentOperatorItems?.length > 10 || currentPartnerItems?.length > 10 || currentClientItems?.length > 10 || currentEmployeeItems?.length > 10 ) ? ""
-             
-             :""
-            }
+            {currentOperatorItems?.length > 10 ||
+            currentPartnerItems?.length > 10 ||
+            currentClientItems?.length > 10 ||
+            currentEmployeeItems?.length > 10
+              ? ""
+              : ""}
 
-            {
-
-            }
-            { showPage === true  && 
-
-            (<div className="w-full h-[8vh] flex justify-between items-center">
-              <div className="text-[#1f4b7f] flex text-[1.1vw] gap-[0.5vw] ">
-                <span>Showing</span>
-                <span className="font-bold">
-                  {/* 1 -{" "} */}
-                  {adminUser == "super_admin"
-                    ?
-                    //  get_operator_list?.length
-                    // `${indexOfFirstOperatorItem + 1} - ${indexOfFirstOperatorItem + currentOperatorItems.length}`
-                    (currentOperatorItems && currentOperatorItems?.length > 0
-                      ? `${indexOfFirstOperatorItem + 1} - ${indexOfFirstOperatorItem + currentOperatorItems?.length}`
-                      : "0"
-                    )
-                    : adminUser == "partner"
-                      ?
-                      //  get_partner_list?.length 
-                      // `${indexOfFirstPartnerItem + 1} - ${indexOfFirstPartnerItem + currentPartnerItems.length}`
-                      (currentPartnerItems && currentOperatorItems?.length > 0
-                        ? `${indexOfFirstPartnerItem + 1} - ${indexOfFirstPartnerItem + currentPartnerItems?.length}`
+            {}
+            {showPage === true && (
+              <div className="w-full h-[8vh] flex justify-between items-center">
+                <div className="text-[#1f4b7f] flex text-[1.1vw] gap-[0.5vw] ">
+                  <span>Showing</span>
+                  <span className="font-bold">
+                    {/* 1 -{" "} */}
+                    {adminUser == "super_admin"
+                      ? //  get_operator_list?.length
+                        // `${indexOfFirstOperatorItem + 1} - ${indexOfFirstOperatorItem + currentOperatorItems.length}`
+                        currentOperatorItems && currentOperatorItems?.length > 0
+                        ? `${indexOfFirstOperatorItem + 1} - ${
+                            indexOfFirstOperatorItem +
+                            currentOperatorItems?.length
+                          }`
                         : "0"
-                      )
+                      : adminUser == "partner"
+                      ? //  get_partner_list?.length
+                        // `${indexOfFirstPartnerItem + 1} - ${indexOfFirstPartnerItem + currentPartnerItems.length}`
+                        currentPartnerItems && currentOperatorItems?.length > 0
+                        ? `${indexOfFirstPartnerItem + 1} - ${
+                            indexOfFirstPartnerItem +
+                            currentPartnerItems?.length
+                          }`
+                        : "0"
                       : adminUser == "client"
-                        ?
-                        //  get_all_client?.length
+                      ? //  get_all_client?.length
                         // `${indexOfFirstClientItem + 1} - ${indexOfFirstClientItem + currentClientItems.length}`
-                        (currentClientItems && currentClientItems?.length > 0
-                          ? `${indexOfFirstClientItem + 1} - ${indexOfFirstClientItem + currentClientItems?.length}`
-                          : "0"
-                        )
-                        :
-                        // get_employee_list?.length
-                        // `${indexOfFirstEmployeeItem + 1} - ${indexOfFirstEmployeeItem + currentEmployeeItems.length}`
-                        (currentEmployeeItems && currentEmployeeItems?.length > 0
-                          ? `${indexOfFirstEmployeeItem + 1} - ${indexOfFirstEmployeeItem + currentEmployeeItems?.length}`
-                          : "0"
-                        )
-                  }
-
-                </span>
-                <span>from</span>
-                <span className="font-bold">
-                  {" "}
-                  {adminUser == "super_admin"
-                    ? get_operator_list?.length > 0 ? get_operator_list?.length : 0
-                    : adminUser == "partner"
-                      ? get_partner_list?.length > 0 ? get_partner_list?.length : 0
+                        currentClientItems && currentClientItems?.length > 0
+                        ? `${indexOfFirstClientItem + 1} - ${
+                            indexOfFirstClientItem + currentClientItems?.length
+                          }`
+                        : "0"
+                      : // get_employee_list?.length
+                      // `${indexOfFirstEmployeeItem + 1} - ${indexOfFirstEmployeeItem + currentEmployeeItems.length}`
+                      currentEmployeeItems && currentEmployeeItems?.length > 0
+                      ? `${indexOfFirstEmployeeItem + 1} - ${
+                          indexOfFirstEmployeeItem +
+                          currentEmployeeItems?.length
+                        }`
+                      : "0"}
+                  </span>
+                  <span>from</span>
+                  <span className="font-bold">
+                    {" "}
+                    {adminUser == "super_admin"
+                      ? get_operator_list?.length > 0
+                        ? get_operator_list?.length
+                        : 0
+                      : adminUser == "partner"
+                      ? get_partner_list?.length > 0
+                        ? get_partner_list?.length
+                        : 0
                       : adminUser == "client"
-                        ? get_all_client?.length > 0 ? get_all_client?.length : 0
-                        : get_employee_list?.length > 0 ? get_employee_list?.length : 0
-                  }
-                </span>
-                <span>data</span>
-              </div>
-              <div>
-                {/* <Pagination
+                      ? get_all_client?.length > 0
+                        ? get_all_client?.length
+                        : 0
+                      : get_employee_list?.length > 0
+                      ? get_employee_list?.length
+                      : 0}
+                  </span>
+                  <span>data</span>
+                </div>
+                <div>
+                  {/* <Pagination
                   // current={adminUser ? employeecurrentPage : currentPage}
                   // pageSize={adminUser ? employeepagesize : pageSize}
                   // total={adminUser ? admindata?.length : get_user_list?.length}
@@ -1032,63 +1178,62 @@ export default function Discounts() {
                   // showSizeChanger
                 /> */}
 
-
-                <ReactPaginate
-                  activePage={
-                    adminUser === "super_admin"
-                      ? OperatorActivePage
-                      : adminUser === "partner"
+                  <ReactPaginate
+                    activePage={
+                      adminUser === "super_admin"
+                        ? OperatorActivePage
+                        : adminUser === "partner"
                         ? PartnerActivePage
                         : adminUser === "client"
-                          ? ClientActivePage
-                          : EmployeeActivePage
-                  }
-                  itemsCountPerPage={
-                    adminUser === "super_admin"
-                      ? operatorItemsPerPage
-                      : adminUser === "partner"
+                        ? ClientActivePage
+                        : EmployeeActivePage
+                    }
+                    itemsCountPerPage={
+                      adminUser === "super_admin"
+                        ? operatorItemsPerPage
+                        : adminUser === "partner"
                         ? partnerItemsPerPage
                         : adminUser === "client"
-                          ? clientItemsPerPage
-                          : employeeItemsPerPage
-                  }
-                  totalItemsCount={
-                    adminUser === "super_admin"
-                      ? get_operator_list?.length
-                      : adminUser === "partner"
+                        ? clientItemsPerPage
+                        : employeeItemsPerPage
+                    }
+                    totalItemsCount={
+                      adminUser === "super_admin"
+                        ? get_operator_list?.length
+                        : adminUser === "partner"
                         ? get_partner_list?.length
                         : adminUser === "client"
-                          ? get_all_client?.length
-                          : get_employee_list?.length
-                  }
-                  pageRangeDisplayed={3}
-                  onChange={
-                    adminUser == "super_admin"
-                      ? handleOperatorPageChange
-                      : adminUser == "partner"
+                        ? get_all_client?.length
+                        : get_employee_list?.length
+                    }
+                    pageRangeDisplayed={3}
+                    onChange={
+                      adminUser == "super_admin"
+                        ? handleOperatorPageChange
+                        : adminUser == "partner"
                         ? handlePartnerPageChange
                         : adminUser == "client"
-                          ? handleClientPageChange
-                          : handleEmployeePageChange
-                  }
-                  itemClass="page-item"
-                  linkClass="page-link"
-                  activeClass="active"
-                  prevPageText={
-                    <FontAwesomeIcon icon={faChevronLeft} size="1vw" />
-                  }
-                  nextPageText={
-                    <FontAwesomeIcon icon={faChevronRight} size="1vw" />
-                  }
-                  firstPageText={
-                    <FontAwesomeIcon icon={faAngleDoubleLeft} size="1vw" />
-                  }
-                  lastPageText={
-                    <FontAwesomeIcon icon={faAngleDoubleRight} size="1vw" />
-                  }
-                />
+                        ? handleClientPageChange
+                        : handleEmployeePageChange
+                    }
+                    itemClass="page-item"
+                    linkClass="page-link"
+                    activeClass="active"
+                    prevPageText={
+                      <FontAwesomeIcon icon={faChevronLeft} size="1vw" />
+                    }
+                    nextPageText={
+                      <FontAwesomeIcon icon={faChevronRight} size="1vw" />
+                    }
+                    firstPageText={
+                      <FontAwesomeIcon icon={faAngleDoubleLeft} size="1vw" />
+                    }
+                    lastPageText={
+                      <FontAwesomeIcon icon={faAngleDoubleRight} size="1vw" />
+                    }
+                  />
 
-                {/* <ReactPaginate
+                  {/* <ReactPaginate
                   pageCount={Math.ceil(get_operator_list.length / perPage)} // Total number of pages
                   pageRangeDisplayed={5} // Number of pages to display in pagination
                   marginPagesDisplayed={2} // Number of pages to display for margins
@@ -1107,15 +1252,14 @@ export default function Discounts() {
                   pageClassName="page-item"
                   pageLinkClassName="page-link"
                 /> */}
-                {/* <input
+                  {/* <input
                 type="file"
                 // onChange={(e) => console.log(e.target.value, "datatatat")}
                 onChange={(e) => handleSubmit(e)}
               /> */}
+                </div>
               </div>
-            </div>
-  )
-            }
+            )}
           </div>
         </div>
         <ModalPopup

@@ -856,7 +856,14 @@ html {
 .ant-select-outlined:not(.ant-select-customize-input) .ant-select-selector {
   border-radius: 0.1vw;
 }
-:where(.css-dev-only-do-not-override-m4timi).ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload.ant-upload-select, :where(.css-dev-only-do-not-override-m4timi).ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload.ant-upload-select {
+:where(
+    .css-dev-only-do-not-override-m4timi
+  ).ant-upload-wrapper.ant-upload-picture-card-wrapper
+  .ant-upload.ant-upload-select,
+:where(
+    .css-dev-only-do-not-override-m4timi
+  ).ant-upload-wrapper.ant-upload-picture-circle-wrapper
+  .ant-upload.ant-upload-select {
   width: 6vw !important;
   height: 6vw !important;
   text-align: center;
@@ -868,14 +875,42 @@ html {
   transition: border-color 0.3s;
 }
 
-:where(.css-dev-only-do-not-override-m4timi).ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload-list.ant-upload-list-picture-card .ant-upload-list-item-container, :where(.css-dev-only-do-not-override-m4timi).ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload-list.ant-upload-list-picture-card .ant-upload-list-item-container, :where(.css-dev-only-do-not-override-m4timi).ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload-list.ant-upload-list-picture-circle .ant-upload-list-item-container, :where(.css-dev-only-do-not-override-m4timi).ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload-list.ant-upload-list-picture-circle .ant-upload-list-item-container {
+:where(
+    .css-dev-only-do-not-override-m4timi
+  ).ant-upload-wrapper.ant-upload-picture-card-wrapper
+  .ant-upload-list.ant-upload-list-picture-card
+  .ant-upload-list-item-container,
+:where(
+    .css-dev-only-do-not-override-m4timi
+  ).ant-upload-wrapper.ant-upload-picture-circle-wrapper
+  .ant-upload-list.ant-upload-list-picture-card
+  .ant-upload-list-item-container,
+:where(
+    .css-dev-only-do-not-override-m4timi
+  ).ant-upload-wrapper.ant-upload-picture-card-wrapper
+  .ant-upload-list.ant-upload-list-picture-circle
+  .ant-upload-list-item-container,
+:where(
+    .css-dev-only-do-not-override-m4timi
+  ).ant-upload-wrapper.ant-upload-picture-circle-wrapper
+  .ant-upload-list.ant-upload-list-picture-circle
+  .ant-upload-list-item-container {
   display: inline-block;
   width: 7vw;
   height: 7vw;
   vertical-align: top;
 }
 
-:where(.css-dev-only-do-not-override-m4timi).ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload.ant-upload-select >.ant-upload, :where(.css-dev-only-do-not-override-m4timi).ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload.ant-upload-select >.ant-upload {
+:where(
+    .css-dev-only-do-not-override-m4timi
+  ).ant-upload-wrapper.ant-upload-picture-card-wrapper
+  .ant-upload.ant-upload-select
+  > .ant-upload,
+:where(
+    .css-dev-only-do-not-override-m4timi
+  ).ant-upload-wrapper.ant-upload-picture-circle-wrapper
+  .ant-upload.ant-upload-select
+  > .ant-upload {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -884,8 +919,8 @@ html {
   font-size: 1vw;
 }
 .checkbox-custom {
-  width: 1.30vw; /* Adjust size as needed */
-  height: 1.30vw; /* Adjust size as needed */
+  width: 1.3vw; /* Adjust size as needed */
+  height: 1.3vw; /* Adjust size as needed */
   appearance: none; /* Removes default styling */
   border: 0.15vw solid #1f4b7f; /* Border color and size */
   border-radius: 0.2vw; /* Rounded corners */
@@ -913,20 +948,20 @@ html {
   left: 0;
   width: 100%;
   height: 100vh;
- 
+
   display: flex;
   justify-content: end;
   align-items: center;
-    justify-items: center;
-   z-index: 1000;
+  justify-items: center;
+  z-index: 1000;
 }
- 
+
 .modal-contentn {
   /* background: white;
   padding: 1.5vw; */
   border-radius: 1.5vw;
   box-shadow: 0 0.1vw 0.5vw rgba(0, 0, 0, 0.1);
- 
+
   position: absolute;
   border-top: 0.2vw solid #1f4b7f;
   border-left: 0.2vw solid #1f4b7f;
@@ -936,7 +971,7 @@ html {
   bottom: 8.5vh;
   right: 2vw;
 }
- 
+
 .modal-closen {
   position: absolute;
   top: 1vw;
@@ -951,17 +986,413 @@ html {
   display: flex;
   justify-content: center;
   align-items: center;
- 
 }
- 
-.umselect{
+
+.umselect {
   .custom-select .ant-select-selection-search-input {
     color: #1f4b7f !important;
     font-size: 1vw;
   }
   .custom-select .ant-select-selection-placeholder {
-    color: #9CA3AF !important;
+    color: #9ca3af !important;
     font-size: 1vw;
+  }
 }
+.business-inp {
+  .custom-select .ant-select-selection-item {
+    color: #1f4b7f !important ;
+    font-size: 1vw;
+  }
 }
- 
+.excel-dragger .ant-upload-wrapper .ant-upload-drag {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.02);
+  border: 3px dashed #1f4b7f;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+:where(.excel-dragger).ant-upload-wrapper .ant-upload-drag .ant-upload-btn {
+  display: table;
+  width: 100%;
+  height: 100%;
+  outline: none;
+  border-radius: 8px;
+}
+:where(.excel-dragger).ant-upload-wrapper .ant-upload-drag .ant-upload {
+  padding: 2px;
+}
+:where(.excel-dragger).ant-upload-wrapper .ant-upload {
+  outline: 0;
+}
+:where(.excel-dragger).ant-upload-wrapper [class^="ant-upload"],
+:where(.excel-dragger).ant-upload-wrapper [class*=" ant-upload"] {
+  box-sizing: border-box;
+}
+
+:where(.excel-dragger).ant-upload-wrapper .ant-upload-drag {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.02);
+  border: 0.15vw dashed #1f487c !important;
+  border-radius: 8px 8px 0px 0px !important;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+:where(.excel-dragger).ant-upload-wrapper {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  color: rgba(0, 0, 0, 0.88);
+  font-size: 14px;
+  line-height: 1.5714285714285714;
+  list-style: none;
+  height: auto !important;
+  display: block !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+.scrollbar-custom::-webkit-scrollbar {
+  height: 0.5vw; 
+  margin-bottom: 1vw;
+}
+.modal-contentn {
+  /* background: white;
+  padding: 1.5vw; */
+  border-radius: 1.5vw;
+  box-shadow: 0 0.1vw 0.5vw rgba(0, 0, 0, 0.1);
+
+  position: absolute;
+  border-top: 0.2vw solid #1f4b7f;
+  border-left: 0.2vw solid #1f4b7f;
+  border-bottom: 0.2vw solid #1f4b7f;
+  border-right: 0.2vw solid #1f4b7f;
+  width: 25vw;
+  bottom: 8.5vh;
+  right: 2vw;
+}
+
+.modal-closen {
+  position: absolute;
+  top: 1vw;
+  right: 0.8vw;
+  background: none;
+  border-radius: 50%;
+  font-size: 1.3vw;
+  cursor: pointer;
+  background-color: #1f4b7f;
+  height: 30px;
+  width: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.umselect {
+  .custom-select .ant-select-selection-search-input {
+    color: #1f4b7f !important;
+    font-size: 1vw;
+  }
+  .custom-select .ant-select-selection-placeholder {
+    color: #9ca3af !important;
+    font-size: 1vw;
+  }
+}
+
+.excel-dragger .ant-upload-wrapper .ant-upload-drag {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.02);
+  border: 3px dashed #1f4b7f;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+:where(.excel-dragger).ant-upload-wrapper .ant-upload-drag .ant-upload-btn {
+  display: table;
+  width: 100%;
+  height: 100%;
+  outline: none;
+  border-radius: 8px;
+}
+:where(.excel-dragger).ant-upload-wrapper .ant-upload-drag .ant-upload {
+  padding: 2px;
+}
+:where(.excel-dragger).ant-upload-wrapper .ant-upload {
+  outline: 0;
+}
+:where(.excel-dragger).ant-upload-wrapper [class^="ant-upload"],
+:where(.excel-dragger).ant-upload-wrapper [class*=" ant-upload"] {
+  box-sizing: border-box;
+}
+
+:where(.excel-dragger).ant-upload-wrapper .ant-upload-drag {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.02);
+  border: 0.15vw dashed #1f487c !important;
+  border-radius: 8px 8px 0px 0px !important;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+:where(.excel-dragger).ant-upload-wrapper {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  color: rgba(0, 0, 0, 0.88);
+  font-size: 14px;
+  line-height: 1.5714285714285714;
+  list-style: none;
+  height: auto !important;
+  display: block !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+.scrollbar-custom::-webkit-scrollbar {
+  height: 0.5vw;
+  margin-bottom: 1vw;
+}
+
+/* Ant Design Selection Styles */
+
+/* Styling for the selector in outlined select */
+.ant-select-outlined:not(.ant-select-customize-input) .ant-select-selector {
+  border: 1px solid #1f4b7f;
+  background: white;
+  border-radius: 0.5vw;
+}
+
+/* Placeholder text color and font size */
+.custom-select .ant-select-selection-placeholder {
+  color: #1f487c !important;
+  font-size: 1vw;
+}
+
+/* Selected value text color */
+.custom-select .ant-select-selector {
+  color: #1f487c !important;
+}
+
+/* Overriding inline styles for selected item */
+.custom-select .ant-select-selection-item {
+  color: #1f487c !important;
+  font-size: 1vw;
+}
+
+/* Ensure the input text is the same color */
+.custom-select .ant-select-selection-search-input {
+  color: #1f487c !important;
+}
+
+/* Custom dropdown arrow size and margin */
+.custom-select .ant-select-arrow {
+  font-size: 1vw;
+  width: 1vw;
+  height: 1vw;
+  margin-right: 0.5vw;
+}
+
+/* Color for non-selected options */
+.custom-dropdown .ant-select-item-option-content {
+  color: #1f4b7f;
+}
+
+/* Selected option text color */
+.custom-dropdown
+  .ant-select-item-option-selected:not(.ant-select-item-option-active) {
+  color: #1f487c !important;
+}
+
+/* Custom styles for the dropdown arrow */
+.custom-dropdown .ant-select-arrow {
+  color: #1f487c;
+}
+
+/* Custom styles for the dropdown option label */
+.custom-option {
+  display: flex;
+  align-items: center;
+}
+
+.custom-option .icon {
+  margin-left: 0.5vw;
+}
+
+/* Remove border and box shadow for the selector */
+.custom-select .ant-select-selector {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Ensure outer container has no border and box shadow */
+.custom-select .ant-select {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Remove border and box shadow when focused */
+.custom-select .ant-select-focused .ant-select-selector {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Customize the scrollbar inside the Select dropdown */
+.ant-select-dropdown {
+  /* Customize scrollbar width and color */
+  scrollbar-width: thin; /* This works for Firefox */
+}
+
+/* For Webkit browsers (Chrome, Safari, Edge) */
+.ant-select-dropdown::-webkit-scrollbar {
+  width: 8px; /* Set width of scrollbar */
+}
+
+.ant-select-dropdown::-webkit-scrollbar-thumb {
+  background-color: #1F487C; /* Color of the scrollbar thumb */
+  border-radius: 10px; /* Round the corners of the thumb */
+}
+
+.ant-select-dropdown::-webkit-scrollbar-track {
+  background-color: #f0f0f0; /* Track color (background of scrollbar) */
+  border-radius: 10px; /* Round the corners of the track */
+}
+
+
+/* ads-date class for the RangePicker */
+.ads-date {
+  border-radius: 0.5vw;  /* Rounded corners */
+  border-width: 0.1vw 0.25vw 0.25vw 0.1vw;  /* Border widths (top, right, bottom, left) */
+  border-style: solid;  /* Solid borders */
+  border-color: #1F487C;  /* Blue border color */
+  color: #1F487C;  /* Text color blue */
+  font-size: 1vw;  /* Text size */
+  height: 3vw;  /* Height of the picker */
+  width: 100%;  /* Full width */
+  outline: none;  /* Remove default outline */
+  padding-left: 1vw;  /* Padding inside the left side */
+  padding-right: 1vw;  /* Padding inside the right side */
+  padding-top: 0.5vw;  /* Padding on top */
+  padding-bottom: 0.5vw;  /* Padding on bottom */
+}
+.ads-date1 {
+  border-radius: 0.5vw;  /* Rounded corners */
+  border-width: 0.1vw 0.25vw 0.25vw 0.1vw;  /* Border widths (top, right, bottom, left) */
+  border-style: solid;  /* Solid borders */
+  border-color: #1F487C;  /* Blue border color */
+  color: #1F487C;  /* Text color blue */
+  font-size: 1vw;  /* Text size */
+  height: 5vh;  /* Height of the picker */
+  width: 100%;  /* Full width */
+  outline: none;  /* Remove default outline */
+  padding-left: 1vw;  /* Padding inside the left side */
+  padding-right: 1vw;  /* Padding inside the right side */
+  padding-top: 0.5vw;  /* Padding on top */
+  padding-bottom: 0.5vw;  /* Padding on bottom */
+}
+.ads-date .ant-picker-input > input {
+  color: #1F487C;  /* Input text color */
+  font-size: 1vw;  /* Font size for the input */
+  outline: none;  /* Remove input outline */
+}
+
+.ads-date .ant-picker-panel {
+  border-radius: 0.5vw;  /* Round the calendar panel corners */
+  border: 0.25vw solid #1F487C;  /* Blue border around the calendar */
+}
+
+.ads-date .ant-picker-header {
+  background-color: #1F487C;  /* Header background color */
+  color: white;  /* Header text color */
+}
+
+.ads-date .ant-picker-footer {
+  border-top: 1px solid #1F487C;  /* Border on the footer */
+}
+
+.ads-date .ant-picker-today-btn {
+  color: #1F487C;  /* Today's button text color */
+  background-color: transparent;  /* Transparent background */
+  border: 1px solid #1F487C;  /* Blue border around today button */
+  border-radius: 4px;  /* Rounded corners for button */
+}
+
+.ads-date .ant-picker-today-btn:hover {
+  background-color: #1F487C;  /* Hover effect for today's button */
+  color: white;  /* Text color when hovering */
+}
+
+.ads-date .ant-picker-cell {
+  font-size: 1vw;  /* Font size for each day cell */
+}
+
+.ads-date .ant-picker-cell-selected {
+  background-color: #1F487C;  /* Background color for selected dates */
+  color: white;  /* Text color for selected dates */
+}
+
+.ads-date .ant-picker-cell-disabled {
+  color: #d9d9d9;  /* Disabled date color */
+  background-color: transparent;  /* No background for disabled dates */
+}
+
+.ads-date .ant-picker-cell-in-range {
+  background-color: #e6f7ff;  /* Background color for dates in range */
+}
+
+.ads-date .ant-picker-range .ant-picker-date-input {
+  background-color: transparent;  /* Transparent background for date inputs */
+}
+
+.ads-date .ant-picker-input input {
+  color: #1F487C;  /* Input text color */
+}
+.ql-editor {
+  border: 1px solid #1f4b7f;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  border-bottom-width: 3px;
+  border-right-width: 3px;
+  height: 15vw !important;
+}
+
+.ql-container .ql-snow {
+  border: 1px solid #1f4b7f;
+}
+
+.ql-toolbar.ql-snow {
+  border: 1px solid #1f4b7f !important;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  border-right-width: 3px !important;
+}
+
+.ql-container.ql-snow {
+  border: 0px solid #1f4b7f !important;
+}
+
+/* .ql-snow .ql-editor {
+  color: #1f4b7f;
+} */
+
+.ql-snow.ql-toolbar button svg,
+.ql-snow .ql-toolbar button svg {
+  float: left;
+  height: 1.5vw !important;
+}

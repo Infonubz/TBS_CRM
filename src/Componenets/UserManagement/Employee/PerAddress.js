@@ -4,7 +4,7 @@ import { submitPartnerAddressData } from "../../../Api/UserManagement/Partner";
 import { toast } from "react-toastify";
 import { submitEmployeeAddressData } from "../../../Api/UserManagement/Employee";
 import { useDispatch } from "react-redux";
-import { IoMdArrowDropdown } from "react-icons/io";
+import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 import { ConfigProvider, Select } from "antd";
 
 const validationSchema = Yup.object().shape({
@@ -19,8 +19,8 @@ const validationSchema = Yup.object().shape({
   per_country: Yup.string().required("Country is required"),
 
   per_postal: Yup.string()
-    .matches(/^[0-9]{6}$/, "Postal Code must be a 6-digit number")
-    .required("Postal Code is required"),
+    .matches(/^[0-9]{6}$/, "Postal code must be a 6-digit number")
+    .required("Postal code is required"),
 });
 const PerAddress = ({
   enable,
@@ -31,7 +31,8 @@ const PerAddress = ({
   currentValues,
   proffesionaback,
   EmployeeID,
-  updatedata
+  updatedata,
+  empaddressdata
 }) => {
   console.log(enable, "addresssssssss");
 
@@ -40,7 +41,7 @@ const PerAddress = ({
   const handleSubmit = async (values) => {
 
     console.log(values, currentValues, "vjvjvjfhsdjfddjhfdjhfsd");
-    if (EmployeeID && enable == false && proffesionaback == true || updatedata && enable == false) {
+    if (EmployeeID && enable == false && proffesionaback == true || updatedata && empaddressdata?.perm_add != null && enable == false) {
         setCurrentpage(3);
       }else {
     const response = await submitEmployeeAddressData(
@@ -79,11 +80,92 @@ const PerAddress = ({
                   Address
                   <span className="text-[1vw] text-red-600 pl-[0.2vw]">*</span>
                 </label>
+                <input
+                          type="text"
+                          name="per_address"
+                          style={{ display: "none" }}
+                        />
                 <Field
                   type="text"
                   name="per_address"
+                   autoComplete="per_address-field"
                   placeholder="Enter Temperory Address"
                   value={values.per_address}
+                  disabled={
+                    updatedata && empaddressdata?.perm_add != null || proffesionaback
+                      ? enable
+                        ? false
+                        : true
+                      : false
+                  }
+                  className={`${
+                    updatedata && empaddressdata?.perm_add != null || proffesionaback
+                      ? enable == false
+                        ? "cursor-not-allowed"
+                        : ""
+                      : ""
+                  } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                />
+                <ErrorMessage
+                  name="per_address"
+                  component="div"
+                  className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[.3vw]"
+                />
+              </div>
+              <div className="col-span-1 relative">
+                <label className="text-[#1F4B7F] text-[1.1vw] ">
+                  Postal Code
+                  <span className="text-[1vw] text-red-600 pl-[0.2vw]">*</span>
+                </label>
+                <input
+                          type="text"
+                          name="per_postal"
+                          style={{ display: "none" }}
+                        />
+                <Field
+                  type="text"
+                  name="per_postal"
+                    autoComplete="per_postal-field"
+                  placeholder="Enter Postal Code"
+                  value={values.per_postal}
+                  disabled={
+                    updatedata && empaddressdata?.perm_add != null || proffesionaback
+                      ? enable
+                        ? false
+                        : true
+                      : false
+                  }
+                  className={`${
+                    updatedata && empaddressdata?.perm_add != null || proffesionaback
+                      ? enable == false
+                        ? " cursor-not-allowed"
+                        : ""
+                      : ""
+                  } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                />
+                <ErrorMessage
+                  name="per_postal"
+                  component="div"
+                  className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[.3vw]"
+                />
+              </div>
+              
+            </div>
+            <div className="grid grid-cols-2 w-full gap-x-[2vw] pt-[1vw]">
+            
+              <div className="col-span-1 relative">
+                <label className="text-[#1F4B7F] text-[1.1vw] ">
+                  City
+                  <span className="text-[1vw] text-red-600 pl-[0.2vw]">*</span>
+                </label>
+                {/* <Field
+                  as="select"
+                  name="per_city"
+                  value={values.per_city}
+                  //   onChange={(e) => {
+                  //     handleChange(e);
+                  //     localStorage.setItem("status", e.target.value);
+                  //   }}
                   disabled={
                     updatedata || proffesionaback
                       ? enable
@@ -98,9 +180,111 @@ const PerAddress = ({
                         : ""
                       : ""
                   } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
-                />
+                >
+                  <option label="Select City" value="" className="" />
+                  <option label="Tiruppur" value="Tiruppur" className="" />
+                  <option label="Coimbatore" value="Coimbatore" className="" />
+                  <option label="Chennai" value="Chennai" className="" />
+                </Field> */}
+                 <ConfigProvider
+                        theme={{
+                          components: {
+                            Select: {
+                              optionActiveBg: '#aebed1',
+                              optionSelectedColor: '#FFF',
+                              optionSelectedBg: '#aebed1',
+                              optionHeight: '2',
+                            },
+                          },
+                        }}
+                      >
+                        <Select
+                          showSearch
+                          value={values.per_city}
+                          placement="topRight"
+                          listHeight={190}
+                          onChange={(value) => {
+                            handleChange({ target: { name: 'per_city', value } })
+                          }}
+                          disabled={
+                            updatedata && empaddressdata?.perm_add != null || proffesionaback
+                              ? enable
+                                ? false
+                                : true
+                              : false
+                          }
+                          name="per_city"
+                          className={`${updatedata && empaddressdata?.perm_add != null || proffesionaback
+                            ? enable == false
+                              ? " cursor-not-allowed"
+                              : ""
+                            : ""
+                            } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          // className="custom-select bg-white outline-none w-full mt-[0.5vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
+                          placeholder="Select city"
+                          filterOption={(input, option) => 
+                            option?.value?.toLowerCase()?.includes(input.toLowerCase()) // Make it case-insensitive
+                          }
+                          optionFilterProp="value"
+                          suffixIcon={<span style={{ fontSize: '1vw', color: '#1f487c' }}>
+                            <IoMdArrowDropup size="2vw" />
+                          </span>}
+                          style={{ padding: 4 }}
+                          options={[
+                            {
+                              value: '',
+                              label: (
+                                <div className="text-[1vw] px-[0.2vw] pb-[0.1vw] text-gray-400">
+                                  Select City
+                                </div>
+                              ),
+                              disabled: true,
+                            },
+                            {
+                              value: 'Tiruppur',
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  Tiruppur
+                                </div>
+                              ),
+                            },
+                            {
+                              value: 'Coimbatore',
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  Coimbatore
+                                </div>
+                              ),
+                            },
+                            {
+                              value: 'Chennai',
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  Chennai
+                                </div>
+                              ),
+                            },
+                            { 
+                              value: 'Bengaluru',
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  Bengaluru
+                                </div>
+                              ),
+                            },
+                            {
+                              value: 'Hydrabad',
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  'Hydrabad',
+                                </div>
+                              ),
+                            },
+                          ]}     
+                        />
+                      </ConfigProvider>
                 <ErrorMessage
-                  name="per_address"
+                  name="per_city"
                   component="div"
                   className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[.3vw]"
                 />
@@ -153,18 +337,20 @@ const PerAddress = ({
                         <Select
                           showSearch
                           value={values.per_state}
+                          placement="topRight"
+                          listHeight={190}
                           onChange={(value) => {
                             handleChange({ target: { name: 'per_state', value } })
                           }}
                           disabled={
-                            updatedata || proffesionaback
+                            updatedata && empaddressdata?.perm_add != null || proffesionaback
                               ? enable
                                 ? false
                                 : true
                               : false
                           }
                           name="per_state"
-                          className={`${updatedata || proffesionaback
+                          className={`${updatedata && empaddressdata?.perm_add != null || proffesionaback
                             ? enable == false
                               ? " cursor-not-allowed"
                               : ""
@@ -177,7 +363,7 @@ const PerAddress = ({
                           }
                           optionFilterProp="value"
                           suffixIcon={<span style={{ fontSize: '1vw', color: '#1f487c' }}>
-                            <IoMdArrowDropdown size="2vw" />
+                            <IoMdArrowDropup size="2vw" />
                           </span>}
                           style={{ padding: 4 }}
                           options={[
@@ -214,6 +400,22 @@ const PerAddress = ({
                                 </div>
                               ),
                             },
+                            {
+                              value: 'Karnataka',
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  Karnataka
+                                </div>
+                              ),
+                            },
+                            {
+                              value: 'Telangana',
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  Telangana
+                                </div>
+                              ),
+                            },
                           ]}
                         />
                       </ConfigProvider>
@@ -225,7 +427,7 @@ const PerAddress = ({
               </div>
             </div>
             <div className="grid grid-cols-2 w-full gap-x-[2vw] pt-[1vw]">
-              <div className="col-span-1 relative">
+            <div className="col-span-1 relative">
                 <label className="text-[#1F4B7F] text-[1.1vw] ">
                   Region
                   <span className="text-[1vw] text-red-600 pl-[0.2vw]">*</span>
@@ -295,18 +497,20 @@ const PerAddress = ({
                         <Select
                           showSearch
                           value={values.per_region}
+                          placement="topRight"
+                          listHeight={190}
                           onChange={(value) => {
                             handleChange({ target: { name: 'per_region', value } })
                           }}
                           disabled={
-                            updatedata || proffesionaback
+                            updatedata && empaddressdata?.perm_add != null || proffesionaback
                               ? enable
                                 ? false
                                 : true
                               : false
                           }
                           name="per_region"
-                          className={`${updatedata || proffesionaback
+                          className={`${updatedata && empaddressdata?.perm_add != null || proffesionaback
                             ? enable == false
                               ? " cursor-not-allowed"
                               : ""
@@ -319,7 +523,7 @@ const PerAddress = ({
                           }
                           optionFilterProp="value"
                           suffixIcon={<span style={{ fontSize: '1vw', color: '#1f487c' }}>
-                            <IoMdArrowDropdown size="2vw" />
+                            <IoMdArrowDropup size="2vw" />
                           </span>}
                           style={{ padding: 4 }}
                           options={[
@@ -333,7 +537,7 @@ const PerAddress = ({
                               disabled: true,
                             },
                             {
-                              value: 'southerregion',
+                              value: 'southernregion',
                               label: (
                                 <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
                                   Southern Region
@@ -385,126 +589,6 @@ const PerAddress = ({
               </div>
               <div className="col-span-1 relative">
                 <label className="text-[#1F4B7F] text-[1.1vw] ">
-                  City
-                  <span className="text-[1vw] text-red-600 pl-[0.2vw]">*</span>
-                </label>
-                {/* <Field
-                  as="select"
-                  name="per_city"
-                  value={values.per_city}
-                  //   onChange={(e) => {
-                  //     handleChange(e);
-                  //     localStorage.setItem("status", e.target.value);
-                  //   }}
-                  disabled={
-                    updatedata || proffesionaback
-                      ? enable
-                        ? false
-                        : true
-                      : false
-                  }
-                  className={`${
-                    updatedata || proffesionaback
-                      ? enable == false
-                        ? "cursor-not-allowed"
-                        : ""
-                      : ""
-                  } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
-                >
-                  <option label="Select City" value="" className="" />
-                  <option label="Tiruppur" value="Tiruppur" className="" />
-                  <option label="Coimbatore" value="Coimbatore" className="" />
-                  <option label="Chennai" value="Chennai" className="" />
-                </Field> */}
-                 <ConfigProvider
-                        theme={{
-                          components: {
-                            Select: {
-                              optionActiveBg: '#aebed1',
-                              optionSelectedColor: '#FFF',
-                              optionSelectedBg: '#aebed1',
-                              optionHeight: '2',
-                            },
-                          },
-                        }}
-                      >
-                        <Select
-                          showSearch
-                          value={values.per_city}
-                          onChange={(value) => {
-                            handleChange({ target: { name: 'per_city', value } })
-                          }}
-                          disabled={
-                            updatedata || proffesionaback
-                              ? enable
-                                ? false
-                                : true
-                              : false
-                          }
-                          name="per_city"
-                          className={`${updatedata || proffesionaback
-                            ? enable == false
-                              ? " cursor-not-allowed"
-                              : ""
-                            : ""
-                            } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
-                          // className="custom-select bg-white outline-none w-full mt-[0.5vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
-                          placeholder="Select city"
-                          filterOption={(input, option) => 
-                            option?.value?.toLowerCase()?.includes(input.toLowerCase()) // Make it case-insensitive
-                          }
-                          optionFilterProp="value"
-                          suffixIcon={<span style={{ fontSize: '1vw', color: '#1f487c' }}>
-                            <IoMdArrowDropdown size="2vw" />
-                          </span>}
-                          style={{ padding: 4 }}
-                          options={[
-                            {
-                              value: '',
-                              label: (
-                                <div className="text-[1vw] px-[0.2vw] pb-[0.1vw] text-gray-400">
-                                  Select City
-                                </div>
-                              ),
-                              disabled: true,
-                            },
-                            {
-                              value: 'Tiruppur',
-                              label: (
-                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                                  Tiruppur
-                                </div>
-                              ),
-                            },
-                            {
-                              value: 'Coimbatore',
-                              label: (
-                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                                  Coimbatore
-                                </div>
-                              ),
-                            },
-                            {
-                              value: 'Chennai',
-                              label: (
-                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                                  Chennai
-                                </div>
-                              ),
-                            },
-                          ]}     
-                        />
-                      </ConfigProvider>
-                <ErrorMessage
-                  name="per_city"
-                  component="div"
-                  className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[.3vw]"
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 w-full gap-x-[2vw] pt-[1vw]">
-              <div className="col-span-1 relative">
-                <label className="text-[#1F4B7F] text-[1.1vw] ">
                   Country
                   <span className="text-[1vw] text-red-600 pl-[0.2vw]">*</span>
                 </label>
@@ -551,18 +635,20 @@ const PerAddress = ({
                         <Select
                           showSearch
                           value={values.per_country}
+                          placement="topRight"
+                          listHeight={190}
                           onChange={(value) => {
                             handleChange({ target: { name: 'per_country', value } })
                           }}
                           disabled={
-                            updatedata || proffesionaback
+                            updatedata && empaddressdata?.perm_add != null || proffesionaback
                               ? enable
                                 ? false
                                 : true
                               : false
                           }
                           name="per_country"
-                          className={`${updatedata || proffesionaback
+                          className={`${updatedata && empaddressdata?.perm_add != null || proffesionaback
                             ? enable == false
                               ? " cursor-not-allowed"
                               : ""
@@ -575,7 +661,7 @@ const PerAddress = ({
                           }
                           optionFilterProp="value"
                           suffixIcon={<span style={{ fontSize: '1vw', color: '#1f487c' }}>
-                            <IoMdArrowDropdown size="2vw" />
+                            <IoMdArrowDropup size="2vw" />
                           </span>}
                           style={{ padding: 4 }}
                           options={[
@@ -621,39 +707,9 @@ const PerAddress = ({
                   className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[.3vw]"
                 />
               </div>
-              <div className="col-span-1 relative">
-                <label className="text-[#1F4B7F] text-[1.1vw] ">
-                  Postal Code
-                  <span className="text-[1vw] text-red-600 pl-[0.2vw]">*</span>
-                </label>
-                <Field
-                  type="text"
-                  name="per_postal"
-                  placeholder="Enter Postal Code"
-                  value={values.per_postal}
-                  disabled={
-                    updatedata || proffesionaback
-                      ? enable
-                        ? false
-                        : true
-                      : false
-                  }
-                  className={`${
-                    updatedata || proffesionaback
-                      ? enable == false
-                        ? " cursor-not-allowed"
-                        : ""
-                      : ""
-                  } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
-                />
-                <ErrorMessage
-                  name="per_postal"
-                  component="div"
-                  className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[.3vw]"
-                />
-              </div>
+           
             </div>
-            <div className="flex items-center justify-between  pb-[.5vw] pt-[1.5vw]">
+            <div className="flex items-center justify-between  pb-[1vw] pt-[1.5vw]">
               <div>
                 <h1 className="text-[#1F4B7F] text-[0.7vw] font-semibold">
                   *You must fill in all fields to be able to continue
@@ -674,7 +730,7 @@ const PerAddress = ({
                   type="submit"
                   // onClick={() => setCurrentpage(3)}
                 >
-                  {updatedata || proffesionaback
+                  {updatedata && empaddressdata?.perm_add != null || proffesionaback
                     ? enable
                       ? "Update & Continue"
                       : "Continue"

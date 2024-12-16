@@ -36,7 +36,7 @@ export const handleClientSearch = async (e, dispatch) => {
 
 export const SubmitClientExcel = async (file) => {
   const formData = new FormData();
-  formData.append("xlsxFile", file);
+  formData.append("file", file);
 
   const excelEndpoint = `${apiUrl}/upload`;
   const method = "post";
@@ -227,7 +227,8 @@ export const SubmitClientGSTData = async (documentsdata, clientID, setSuperAdmin
 export const GetClientGSTById = async (
   clientID,
   setClientID,
-  setSuperAdminGSTData
+  setSuperAdminGSTData,
+  setSpinning
 ) => {
   console.log(clientID, "ahsgxdahsjksaxbj");
   const getid = sessionStorage.getItem("CLIENT_ID") ? sessionStorage.getItem("CLIENT_ID") : sessionStorage.getItem("CLI_ID");
@@ -243,13 +244,17 @@ export const GetClientGSTById = async (
     handleError(error);
     return null;
   }
+  finally{
+    setSpinning && setSpinning(false)
+  }
 };
 
 
 export const GetCompanyDetailsById = async (
   clientID,
   setClientID,
-  setClientData
+  setClientData,
+  setSpinning,
 ) => {
   console.log(clientID, "ahsgxdahsjksaxbj");
   try {
@@ -263,12 +268,16 @@ export const GetCompanyDetailsById = async (
     handleError(error);
     return null;
   }
+  finally{
+    setSpinning && setSpinning(false)
+  }
 };
 
 export const GetClientAddressById = async (
   clientID,
   setClientID,
-  setClientAddress
+  setClientAddress,
+  setSpinning
 ) => {
   console.log(clientID, "ahsgxdahsjksaxbj");
   try {
@@ -280,6 +289,9 @@ export const GetClientAddressById = async (
   } catch (error) {
     handleError(error);
     return null;
+  }
+  finally{
+    setSpinning && setSpinning(false)
   }
 };
 

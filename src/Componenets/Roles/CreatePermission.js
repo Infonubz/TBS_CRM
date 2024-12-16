@@ -6,7 +6,7 @@ import * as Yup from "yup";
 import { toast } from "react-toastify";
 import { LiaSave } from "react-icons/lia";
 import "../../App.css";
-import { capitalizeFirstLetter } from "../Common/Captilization"
+import { capitalizeFirstLetter } from "../Common/Captilization";
 import { GET_PERMISSIONS } from "../../Store/Type";
 import {
   GetPermissionById,
@@ -30,18 +30,28 @@ export default function CreatePermission({
   setPermission,
 }) {
   const validationSchema = Yup.object().shape({
-    role_type: Yup.string()
-      .min(1, "Role Type must be greater than 1 character")
-      .max(50, "Role Type should not be greater than 50 characters")
-      .required("Role Type is required"),
+    role_type: Yup.string().required("Role Type is required"),
+    crud_permissions: Yup.array().min(1, "CRUD permission is required"),
+    module_permissions: Yup.array()
+      .of(
+        Yup.object({
+          module_id: Yup.string().required("Module ID is required"),
+          module_name: Yup.string().required("Module name is required"),
+        })
+      )
+      .min(1, "Module permissions are required"),
   });
 
   const [selectedCrudPermissions, setSelectedCrudPermissions] = useState([]);
   const [selectedModulePermissions, setSelectedModulePermissions] = useState(
     []
   );
+  const [selectedActivePermissions, setSelectedActivePermissions] = useState(
+    []
+  );
   const [roleNames, setRoleNames] = useState([]);
-  console.log(roleNames, "roles_names_");
+  const [moduleError, setModuleError] = useState();
+  const [crudError, setCrudError] = useState();
   const [role_type_id, setRoleId] = useState("");
   const [viewMode, setViewMode] = useState("Product Owner");
   //const [viewMode, setViewMode] = useState("Operator");
@@ -63,9 +73,8 @@ export default function CreatePermission({
     { module_id: 4, module_name: "Offers & Deals" },
     { module_id: 5, module_name: "Advertisement" },
     { module_id: 6, module_name: "Promotions" },
-    { module_id: 7, module_name: "Roles" }
   ];
-  
+
   // Apply the condition based on the type_id
   if (type_id === "OP101") {
     modulePermissionsData = modulePermissionsData.filter((module) =>
@@ -87,10 +96,9 @@ export default function CreatePermission({
       ].includes(module.module_name)
     );
   } else if (type_id !== "PRO101") {
-    modulePermissionsData = []; 
+    modulePermissionsData = [];
   }
 
-  
   const modulePermissionOptions = modulePermissionsData.map((module) => ({
     label: module.module_name,
     value: module.module_name,
@@ -110,7 +118,6 @@ export default function CreatePermission({
     "Offers & Deals": 4,
     Advertisement: 5,
     Promotions: 6,
-    Roles: 7
   };
 
   const fetchRolesPermission = async (roleId) => {
@@ -125,18 +132,29 @@ export default function CreatePermission({
   };
 
   const handleSubmit = async (values) => {
-    console.log(permissionupdate, "permissionupdate");
+    console.log(values, "permissionupdate");
     try {
       const modulePermissions = values.module_permissions.map((permission) => ({
         module_id: permissionIdMap[permission.module_name],
         module_name: permission.module_name,
       }));
+      const activePermissions = values.active_module_permissions.map(
+        (permission) => ({
+          module_id: permissionIdMap[permission.module_name],
+          module_name: permission.module_name,
+        })
+      );
       if (type_id === "PRO101" || type_id === "PROEMP101") {
         const data = await SubmitPermissionData(
-          { ...values, module_permissions: modulePermissions },
+          {
+            ...values,
+            module_permissions: modulePermissions,
+            active_module_permissions: activePermissions,
+          },
           permissionupdate,
           dispatch,
           filter,
+          showModulePermissions,
           rolesPermisionData
         );
         toast.success(data?.message);
@@ -183,17 +201,27 @@ export default function CreatePermission({
         //   ...prevState,
         //   user: data.user,
         // }));
-        const mappedModulePermissions = data.module_permissions.map(
+        const mappedModulePermissions = (data.module_permissions || []).map(
           (permission) => ({
-            module_id: permissionIdMap[permission.module_name],
-            module_name: permission.module_name,
+            module_id: permissionIdMap[permission.module_name] || null,
+            module_name: permission.module_name || "Unknown",
           })
         );
 
+        const mappedActivePermissions = (
+          data.active_module_permissions || []
+        ).map((permission) => ({
+          module_id: permissionIdMap[permission.module_name] || null,
+          module_name: permission.module_name || "Unknown",
+        }));
+
+        console.log(mappedModulePermissions, "mappedModulePermissions");
+
         setSelectedModulePermissions(mappedModulePermissions);
+        setSelectedActivePermissions(mappedActivePermissions);
         setRoleId(data?.role_id);
-        if (data.user !== "employee") {
-          setShowModulePermissions(true);
+        if (filter !== "PO" && type_id === "PRO101") {
+          setShowModulePermissions(false);
         } else {
           setShowModulePermissions(true);
         }
@@ -206,6 +234,19 @@ export default function CreatePermission({
       console.error("Error fetching additional user data", error);
     }
   };
+
+  const processedPermissions =
+    rolesPermisionData?.crud_permissions?.map((item) => {
+      try {
+        const parsedItem = JSON.parse(item);
+        return { label: parsedItem.label, value: parsedItem.value };
+      } catch (error) {
+        return {
+          label: item.charAt(0).toUpperCase() + item.slice(1),
+          value: item.toLowerCase(),
+        };
+      }
+    }) || []; // Fallback to an empty array if crud_permissions is undefined
 
   const fetchRoleTypes = async (selectedUser) => {
     console.log(selectedUser, "selectedUser");
@@ -261,15 +302,27 @@ export default function CreatePermission({
       fetchGetPermission();
     }
   }, [permissionupdate, SetPermissionUpdate, SetPermissionData]);
+  console.log(permissionupdate, "showModulePermissions");
 
   return (
     <Formik
       initialValues={{
-        //user: permissionData?.user || user,
         role_type: permissionData?.role_type || "",
         crud_permissions:
-          permissionData?.crud_permissions || selectedCrudPermissions,
-        module_permissions: selectedModulePermissions || [],
+          showModulePermissions && type_id === "PRO101"
+            ? permissionData?.crud_permissions || selectedCrudPermissions
+            : showModulePermissions === false
+            ? permissionData?.crud_permissions || selectedCrudPermissions
+            : crudPermissionOptions,
+        module_permissions: showModulePermissions
+          ? selectedModulePermissions
+          : showModulePermissions === "false"
+          ? modulePermissionsData
+          : modulePermissionsData,
+        active_permissions: permissionData?.active_permissions || false,
+        active_module_permissions: showModulePermissions
+          ? selectedActivePermissions || []
+          : modulePermissionsData,
       }}
       onSubmit={(values, { setSubmitting }) => {
         dispatch({
@@ -277,7 +330,7 @@ export default function CreatePermission({
           payload: values,
         });
         handleSubmit(values);
-        setSubmitting(false);
+        // setSubmitting(false);
         fetchRoleTypes(values?.user);
       }}
       validationSchema={validationSchema}
@@ -319,7 +372,7 @@ export default function CreatePermission({
               </button>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-[1vw] pt-[2vw]">
+          <div className="grid grid-cols-2 gap-[1vw] pt-[1vw]">
             {/* {viewMode !== "Operator" && (
               <div>
                 <label
@@ -497,30 +550,8 @@ export default function CreatePermission({
                 className="text-[#1F4B7F] text-[1.1vw] font-semibold"
               >
                 Role Type
+                <span className="text-[1vw] text-red-600 pl-[0.25vw]">*</span>
               </label>
-              {/* <Field
-                  as="select"
-                  id="role_type"
-                  name="role_type"
-                  value={values.role_type}
-                  onChange={(e) => {
-                    handleChange(e);
-                    const selectedRole = roleNames.find(
-                      (role) => role.role_type === e.target.value
-                    );
-                    setRoleId(selectedRole?.role_id || "");
-                    sessionStorage.setItem("role_type", e.target.value);
-                  }}
-                  className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
-                >
-                  <option value="">Select Role</option>
-                  {roleNames.map((roleName) => (
-                    <option key={roleName.role_id} value={roleName.role_type}>
-                      {roleName.role_type}
-                    </option>
-                  ))}
-                </Field> */}
-
               {((type_id === "OP101" || type_id === "OPEMP101") &&
                 permissionupdate != null) ||
               ((type_id === "PRO101" || type_id === "PROEMP101") &&
@@ -559,7 +590,6 @@ export default function CreatePermission({
                       );
                       fetchRolesPermission(selectedRole?.role_id);
                       sessionStorage.setItem("role_type", value);
-                      console.log(selectedRole?.role_id, "Role Type");
                     }}
                     suffixIcon={
                       <span style={{ fontSize: "1vw", color: "#1f487c" }}>
@@ -598,9 +628,9 @@ export default function CreatePermission({
               />
             </div>
             <div>
-                <label className="text-[#1F4B7F] text-[1.1vw] font-semibold">
-                  Description
-                </label>
+              <label className="text-[#1F4B7F] text-[1.1vw] font-semibold">
+                Description
+              </label>
               <Field
                 as="textarea"
                 placeholder="Enter Description"
@@ -621,80 +651,77 @@ export default function CreatePermission({
                 className="text-[#1F4B7F] text-[1.1vw] font-semibold"
               >
                 Permission
+                <span className="text-[1vw] text-red-600 pl-[0.25vw]">*</span>
               </label>
               {type_id === "PRO101" ? (
                 <Field name="crud_permissions">
-                  {({ field, form }) => (
-                    <div className="rmsc mt-[0.5vw] ml-[0.5vw]">
-                      <div className="grid grid-cols-4 gap-[0.5vw]">
-                        {crudPermissionOptions.map((option) => (
-                          <div key={option.value} className="flex items-center">
-                            <input
-                              type="checkbox"
-                              id={option.value}
-                              name="crud_permissions"
-                              value={option.value}
-                              disabled={type_id === "OP101"}
-                              className="checkbox-custom mr-[0.5vw] cursor-pointer"
-                              checked={field.value?.includes(option.value)}
-                              onChange={(e) => {
-                                const selectedValues = field.value
-                                  ? [...field.value]
-                                  : [];
-                                if (e.target.checked) {
-                                  selectedValues.push(option.value);
-                                } else {
-                                  const index = selectedValues.indexOf(
-                                    option.value
-                                  );
-                                  if (index > -1) {
-                                    selectedValues.splice(index, 1);
-                                  }
-                                }
-                                form.setFieldValue(
-                                  "crud_permissions",
-                                  selectedValues
-                                );
-                              }}
-                            />
-                            <label
-                              htmlFor={option.value}
-                              className="text-[1vw] text-[#1F4B7F]"
+                  {({ field, form }) => {
+                    console.log("Field value:", field.value); // Debug to ensure field value is populated
+                    console.log(
+                      "Permission data:",
+                      permissionData?.crud_permissions
+                    ); // Debug to confirm data
+                    return (
+                      <div className="rmsc mt-[0.5vw] ml-[0.5vw]">
+                        <div className="grid grid-cols-4 gap-[0.5vw]">
+                          {crudPermissionOptions.map((option) => (
+                            <div
+                              key={option.value}
+                              className="flex items-center"
                             >
-                              {option.label}
-                            </label>
-                          </div>
-                        ))}
+                              <input
+                                type="checkbox"
+                                id={option.value}
+                                name="crud_permissions"
+                                value={option.value}
+                                disabled={type_id === "OP101"}
+                                className="checkbox-custom mr-[0.5vw] cursor-pointer"
+                                checked={field.value?.includes(option.value)} // Check if field.value contains the option
+                                onChange={(e) => {
+                                  const selectedValues = field.value
+                                    ? [...field.value]
+                                    : [];
+                                  if (e.target.checked) {
+                                    selectedValues.push(option.value);
+                                  } else {
+                                    const index = selectedValues.indexOf(
+                                      option.value
+                                    );
+                                    if (index > -1) {
+                                      selectedValues.splice(index, 1);
+                                    }
+                                  }
+                                  form.setFieldValue(
+                                    "crud_permissions",
+                                    selectedValues
+                                  );
+                                }}
+                              />
+                              <label
+                                htmlFor={option.value}
+                                className="text-[1vw] text-[#1F4B7F]"
+                              >
+                                {option.label}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    );
+                  }}
                 </Field>
               ) : (
                 <>
-                  <div className="text-[1.1vw] font-medium px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                    {Array.isArray(rolesPermisionData?.crud_permissions) &&
-                    rolesPermisionData.crud_permissions.length > 0 ? (
+                  <div className="text-[1.1vw] font-medium px-[0.2vw] pb-[0.1vw] text-[#1F487C] relative">
+                    {rolesPermisionData?.crud_permissions?.length > 0 ? (
                       <div className="flex flex-wrap gap-[1vw]">
-                        {rolesPermisionData.crud_permissions.map(
-                          (permission, index) => (
-                            <span key={index}>
-                              {index + 1}. {permission}
-                              {index <
-                                rolesPermisionData.crud_permissions.length - 1}
-                            </span>
-                          )
-                        )}
+                        {processedPermissions.map((permission, index) => (
+                          <span key={index}>
+                            {index + 1}. {permission.label}
+                          </span>
+                        ))}
                       </div>
                     ) : (
-                      //   <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                      //   {Array.isArray(rolesPermisionData?.crud_permissions) &&
-                      //     rolesPermisionData.crud_permissions.map((permission, index) => (
-                      //      <div className="grid grid-cols-4" key={index}>
-                      //         {index + 1}. {permission}
-                      //       </div>
-                      //     ))}
-                      // </div>
-
                       <div className="text-[1vw] text-[#FF0000] flex text-center justify-center font-medium">
                         No permissions.
                       </div>
@@ -702,25 +729,6 @@ export default function CreatePermission({
                   </div>
                 </>
               )}
-
-              {/* <Field name="crud_permissions">
-                  {({ field, form }) => (
-                    <MultiSelect
-                      options={crudPermissionOptions}
-                      value={values.crud_permissions}
-                      className="rmsc mt-[0.5vw]"
-                      onChange={(value) => {
-                        setFieldValue("crud_permissions", value);
-                      }}
-                      placeholder={
-                        <span style={{ fontSize: "14px", color: "#999" }}>
-                          Select Permissions
-                        </span>
-                      }
-                      labelledBy="Select"
-                    />
-                  )}
-                </Field> */}
               <ErrorMessage
                 name="crud_permissions"
                 component="div"
@@ -735,50 +743,61 @@ export default function CreatePermission({
                 className="text-[#1F4B7F] text-[1.1vw] font-semibold"
               >
                 Module Permission
+                <span className="text-[1vw] text-red-600 pl-[0.25vw]">*</span>
               </label>
               <Field name="module_permissions">
-  {({ field, form }) => (
-    <div className="grid grid-cols-4 ml-[0.5vw] pt-[0.5vw] gap-3">
-      {modulePermissionOptions.map((option) => (
-        <div key={option.value} className="flex items-center">
-          <input
-            type="checkbox"
-            id={option.value}
-            name="module_permissions"
-            value={option.value}
-            checked={field.value.some(
-              (item) => item.module_name === option.value
-            )}
-            onChange={(e) => {
-              const selectedValues = [...field.value];
-              if (e.target.checked) {
-                selectedValues.push({
-                  module_id: permissionIdMap[option.value],
-                  module_name: option.value,
-                });
-              } else {
-                const index = selectedValues.findIndex(
-                  (item) => item.module_name === option.value
-                );
-                if (index > -1) selectedValues.splice(index, 1);
-              }
-              setFieldValue("module_permissions", selectedValues);
-            }}
-            className="checkbox-custom cursor-pointer"
-          />
-          <label
-            htmlFor={option.value}
-            className="text-[1vw] text-[#1F4B7F] pl-[0.5vw]"
-          >
-            {option.label}
-          </label>
-        </div>
-      ))}
-    </div>
-  )}
-</Field>
+                {({ field, form }) => {
+                  // Ensure field.value is always an array
+                  const selectedValues = Array.isArray(field.value)
+                    ? field.value
+                    : [];
 
+                  return (
+                    <div className="grid grid-cols-4 ml-[0.5vw] pt-[0.5vw] gap-3">
+                      {modulePermissionOptions?.map((option) => (
+                        <div key={option.value} className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id={option.value}
+                            name="module_permissions"
+                            value={option?.value}
+                            checked={selectedValues.some(
+                              (item) => item.module_name === option.value
+                            )}
+                            onChange={(e) => {
+                              // Make sure selectedValues is treated as an array
+                              const updatedValues = [...selectedValues];
+                              if (e.target.checked) {
+                                updatedValues.push({
+                                  module_id: permissionIdMap[option.value],
+                                  module_name: option.value,
+                                });
+                              } else {
+                                const index = updatedValues.findIndex(
+                                  (item) => item.module_name === option.value
+                                );
+                                if (index > -1) updatedValues.splice(index, 1);
+                              }
 
+                              form.setFieldValue(
+                                "module_permissions",
+                                updatedValues
+                              );
+                            }}
+                            className="checkbox-custom cursor-pointer"
+                          />
+                          <label
+                            htmlFor={option.value}
+                            className="text-[1vw] text-[#1F4B7F] pl-[0.5vw]"
+                          >
+                            {option.label}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                }}
+              </Field>
               <ErrorMessage
                 name="module_permissions"
                 component="div"
@@ -786,6 +805,127 @@ export default function CreatePermission({
               />
             </div>
           )}
+          {/* Render Active Permission */}
+          {showModulePermissions !== false &&
+            filter !== "OP" &&
+            type_id === "PRO101" && (
+              <div className="flex flex-row mt-[2vw]">
+                <label className="text-[#1F4B7F] text-[1.1vw] font-semibold">
+                  Active Permission :
+                </label>
+                <div className="pl-[2vw]">
+                  <label>
+                    <Field
+                      type="radio"
+                      name="active_permissions"
+                      value="true"
+                      checked={values.active_permissions === true} // Check Boolean value
+                      onChange={(e) =>
+                        setFieldValue(
+                          "active_permissions",
+                          e.target.value === "true"
+                        )
+                      }
+                      className="w-[1vw] h-[1vw] accent-[#1F4B7F]"
+                    />
+                    <span className="text-[#1F4B7F] text-[1.1vw] font-medium pl-[0.5vw]">
+                      Yes
+                    </span>
+                  </label>
+                  <label className="pl-[2vw]">
+                    <Field
+                      type="radio"
+                      name="active_permissions"
+                      value="false"
+                      checked={values.active_permissions === false} // Check Boolean value
+                      onChange={(e) =>
+                        setFieldValue(
+                          "active_permissions",
+                          e.target.value === "true"
+                        )
+                      }
+                      className="w-[1vw] h-[1vw] accent-[#1F4B7F]"
+                    />
+                    <span className="text-[#1F4B7F] text-[1.1vw] font-medium pl-[0.5vw]">
+                      No
+                    </span>
+                  </label>
+                </div>
+              </div>
+            )}
+
+          <Field name="active_permissions">
+            {({ field }) =>
+              field.value === true &&
+              showModulePermissions !== false &&
+              filter !== "OP" && (
+                <div className="mt-[1.75vw]">
+                  <label
+                    htmlFor="active_module_permissions"
+                    className="text-[#1F4B7F] text-[1.1vw] font-semibold"
+                  >
+                    Active Module Permissions
+                  </label>
+                  <Field name="active_module_permissions">
+                    {({ field: activeField, form }) => (
+                      <div className="grid grid-cols-4 ml-[0.5vw] pt-[0.5vw] gap-3">
+                        {form.values.module_permissions.map((permission) => (
+                          <div
+                            key={permission.module_name}
+                            className="flex items-center"
+                          >
+                            <input
+                              type="checkbox"
+                              id={`active_${permission.module_name}`}
+                              name="active_module_permissions"
+                              value={permission.module_name}
+                              checked={activeField.value.some(
+                                (item) =>
+                                  item.module_name === permission.module_name
+                              )}
+                              onChange={(e) => {
+                                const selectedValues = [...activeField.value];
+                                if (e.target.checked) {
+                                  selectedValues.push({
+                                    module_id: permission.module_id,
+                                    module_name: permission.module_name,
+                                  });
+                                } else {
+                                  const index = selectedValues.findIndex(
+                                    (item) =>
+                                      item.module_name ===
+                                      permission.module_name
+                                  );
+                                  if (index > -1)
+                                    selectedValues.splice(index, 1);
+                                }
+                                form.setFieldValue(
+                                  "active_module_permissions",
+                                  selectedValues
+                                );
+                              }}
+                              className="checkbox-custom cursor-pointer"
+                            />
+                            <label
+                              htmlFor={`active_${permission.module_name}`}
+                              className="text-[1vw] text-[#1F4B7F] pl-[0.5vw]"
+                            >
+                              {permission.module_name}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="active_module_permissions"
+                    component="div"
+                    className="text-red-500 text-[0.8vw]"
+                  />
+                </div>
+              )
+            }
+          </Field>
         </Form>
       )}
     </Formik>

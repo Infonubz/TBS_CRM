@@ -1,13 +1,15 @@
 //import { render } from "@testing-library/react";
-import { Table, 
-  //Pagination, 
-  Tooltip } from "antd";
-import React, { useState } from "react";
+import {
+  Table,
+  //Pagination,
+  Tooltip,
+} from "antd";
+import React from "react";
 //import { IoMdEye } from "react-icons/io";
 import { MdDelete, MdEdit } from "react-icons/md";
 import "../../App.css";
 import dayjs from "dayjs";
-import ModalPopup from "../Common/Modal/Modal";
+//import ModalPopup from "../Common/Modal/Modal";
 //import DeleteList from "../Offers/DeleteList";
 import { capitalizeFirstLetter } from "../Common/Captilization";
 import { FaEye } from "react-icons/fa";
@@ -20,14 +22,29 @@ export default function ListView({
   setPromotionId,
   setDeleteModalIsOpen,
   activePage,
+  CurrentTab,
   itemsPerPage,
+  statusUpdateModal,
+  setStatusUpdateModal,
+  setComments,
+  listType,
+  setEyeModalIsOpen,
+  eyeModalIsOpen,
+  setPromoImage,
 }) {
   //const apiUrl = process.env.REACT_APP_API_URL;
-  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
-  const [eyeModalIsOpen, setEyeModalIsOpen] = useState(false);
-  const [promoImage, setPromoImage] = useState("");
-  const closeModal = () => {
-    setEyeModalIsOpen(false);
+  const type_Id = sessionStorage.getItem("type_id");
+
+  const handleStatus = (row) => {
+    if (
+      type_Id.startsWith("PRO") ||
+      (type_Id === "OP101" && listType === "employee")
+    ) {
+      setStatusUpdateModal(true);
+      setPromotionId(row.promo_id);
+      SetUpdateData(row.promo_id);
+      setComments(row.comments);
+    }
   };
 
   const handleDelete = (promo_id) => {
@@ -35,11 +52,20 @@ export default function ListView({
     setDeleteModalIsOpen(true);
   };
 
+
+  const showComment =
+  type_Id === "PRO101"
+      ? CurrentTab === "Rejected" ||
+        CurrentTab === "OnHold" ||
+        CurrentTab === "Approved" ||
+        CurrentTab === "All"
+      : false;
+
   // const [promotionId, setPromotionId] = useState(null);
   const columns = [
     {
       title: (
-        <h1 className="text-[1.1vw] font-semibold  flex items-center justify-center">
+        <h1 className="text-[1.1vw] font-bold flex items-center justify-center">
           S.No
         </h1>
       ),
@@ -47,36 +73,44 @@ export default function ListView({
       render: (row, rowdta, index) => {
         const serialNumber = (activePage - 1) * itemsPerPage + (index + 1);
         return (
-          <div className="flex items-center justify-center">
-            <h1 className="pl-[1vw] text-[#1F487C]">{serialNumber}</h1>
+          <div className="flex ">
+            <h1 className="pl-[1.1vw] text-[#1F487C]">{serialNumber}</h1>
           </div>
         );
       },
     },
     {
       title: (
-        <h1 className="text-[1.1vw] font-semibold  flex items-center justify-center">
+        <h1 className="text-[1.1vw] font-bold flex items-center justify-center">
           Operator Name
         </h1>
       ),
-      sorter: (a, b) => a.operator_details.localeCompare(b.operator_details),
+      sorter: (a, b) => a.operator_details?.localeCompare(b.operator_details),
       render: (row, rowdta, index) => {
         console.log(row, "rowqwertyuiop");
 
         return (
-          <div className="flex items-center justify-center text-[#1F487C] text-[1.1vw]">
+          <div className="flex pl-[1vw] font-bold text-[#1F487C] text-[1vw]">
             {row?.operator_details?.length > 15 ? (
               <Tooltip
-                placement="bottom"
+                placement="top"
                 title={row?.operator_details}
                 className="cursor-pointer"
-                color="#1F487C"
+                color="#FFFFFF"
+                overlayInnerStyle={{
+                  color: "#1F487C",
+                  fontSize: "0.85vw",
+                }}
               >
                 {`${row?.operator_details?.slice(0, 15)}...`}
               </Tooltip>
+             ) : row?.operator_details ? (
+              <span className="text-[#1F487C] text-[1vw]">
+                {capitalizeFirstLetter(row?.operator_details?.slice(0, 15))}
+              </span>
             ) : (
-              row?.operator_details?.slice(0, 15)
-            )}{" "}
+              <span className="text-[#1F487C] pl-[2vw] text-[1.5vw]">-</span>
+            )}
           </div>
         );
       },
@@ -84,20 +118,24 @@ export default function ListView({
     },
     {
       title: (
-        <h1 className="text-[1.1vw] font-semibold  flex items-center justify-center">
+        <h1 className="text-[1.1vw] font-bold flex items-center justify-center">
           Promo Title
         </h1>
       ),
-      sorter: (a, b) => a.promo_name.localeCompare(b.promo_name),
+      sorter: (a, b) => a.promo_name?.localeCompare(b.promo_name),
       render: (row, rowdta, index) => {
         return (
-          <div className="flex items-center text-[#1F487C] justify-center text-[1.1vw]">
+          <div className="flex pl-[1.5vw] font-bold text-[#1F487C] text-[1vw]">
             {row?.promo_name?.length > 15 ? (
               <Tooltip
-                placement="bottom"
+                placement="top"
                 title={row?.promo_name}
                 className="cursor-pointer"
-                color="#1F487C"
+                color="#FFFFFF"
+                overlayInnerStyle={{
+                  color: "#1F487C",
+                  fontSize: "0.85vw",
+                }}
               >
                 {`${row?.promo_name?.slice(0, 15)}...`}
               </Tooltip>
@@ -111,35 +149,76 @@ export default function ListView({
     },
     {
       title: (
-        <h1 className="text-[1.1vw] font-semibold  flex items-center justify-center">
+        <h1 className="text-[1.1vw] font-bold  flex items-center justify-center">
           Promo Code
         </h1>
       ),
       sorter: (a, b) => a.promo_code.localeCompare(b.promo_code),
       render: (row, rowdta, index) => {
         return (
-          <div className="flex items-center text-[#1F487C] justify-center">
           <div className="flex items-center justify-center">
-          <p className="text-[1.1vw] text-[#1F487C]">{row?.promo_code}</p>
-        </div>
-        </div>
+            {row?.promo_code?.length > 15 ? (
+              <Tooltip
+                placement="right"
+                title={row?.promo_code}
+                className="cursor-pointer"
+                color="#FFFFFF"
+                overlayInnerStyle={{
+                  color: "#1F487C",
+                  fontSize: "0.85vw",
+                }}
+              >
+                <div className="border-[0.1vw] border-[#1F487C] rounded-[0.5vw]">
+                <div className="border-dashed text-[1.1vw] bg-[#1F4B7F] border-white border-[0.2vw] rounded-[0.5vw] text-white w-[10vw] flex items-center justify-center">
+                  {`${row?.promo_code?.slice(0, 15)}...`}{" "}
+                </div>
+                </div>
+              </Tooltip>
+            ) : (
+              <div className="border-[0.1vw] border-[#1F487C] rounded-[0.5vw]">
+              <div className="border-dashed text-[1.1vw] font-bold bg-[#1F4B7F] border-white border-[0.2vw] rounded-[0.5vw] text-white w-[10vw] flex items-center justify-center">
+                {row?.promo_code?.slice(0, 15)}
+              </div>
+              </div>
+            )}
+          </div>
+          //   <div className="flex items-center text-[#1F487C] justify-center">
+          //   <div className="flex items-center justify-center">
+          //   <p className="text-[1.1vw] text-[#1F487C]">{row?.promo_code}</p>
+          // </div>
+          // </div>
         );
       },
       // width: "15vw",
     },
     {
       title: (
-        <h1 className="text-[1.1vw] font-semibold  flex items-center justify-center">
+        <h1 className="text-[1.1vw] font-bold  flex items-center justify-center">
           Promo Value
         </h1>
       ),
-      sorter: (a, b) => a.promo_value.localeCompare(b.promo_value),
+      sorter: (a, b) => {
+        if (
+          typeof a?.promo_value === "number" &&
+          typeof b?.promo_value === "number"
+        ) {
+          return a?.promo_value - b?.promo_value;
+        }
+        const valueA = String(a?.promo_value || "");
+        const valueB = String(b?.promo_value || "");
+        return valueA.localeCompare(valueB);
+      },
+      //sorter: (a, b) => a.promo_value.localeCompare(b.promo_value),
       render: (row, rowdta, index) => {
         return (
-          <div className="flex items-center text-[#1F487C] justify-center">
+          <div className="flex pl-[3vw] text-[#1F487C]">
             <div className="flex items-center justify-center">
-            <p className="text-[1.1vw] text-[#1F487C]">{row?.promo_value}{row?.value_symbol}</p>
-          </div>
+              <p className="text-[1.1vw] text-[#1F487C] font-bold">
+                {row?.value_symbol === "₹"
+                  ? ` ${row?.value_symbol} ${row?.promo_value}`
+                  : `${row?.promo_value}${row?.value_symbol}`}
+              </p>
+            </div>
           </div>
         );
       },
@@ -147,8 +226,8 @@ export default function ListView({
     },
     {
       title: (
-        <h1 className="text-[1.1vw] font-semibold  flex items-center justify-center">
-          Created Date
+        <h1 className="text-[1.1vw] font-bold  flex items-center justify-center">
+          Created
         </h1>
       ),
       sorter: (a, b) =>
@@ -156,19 +235,17 @@ export default function ListView({
       // width: "15vw",
       render: (row) => {
         return (
-          <div className="flex items-center justify-center">
-            <p className="text-[1.1vw] text-[#1F487C]">{`${dayjs(
+          <div className="flex pl-[1vw] ">
+            <p className="text-[1vw] text-[#1F487C]">{`${dayjs(
               row?.start_date
-            ).format("MMM DD")} - ${dayjs(row?.expiry_date).format(
-              "MMM DD"
-            )}`}</p>
+            ).format("DD MMM YY")}`}</p>
           </div>
         );
       },
     },
     {
       title: (
-        <h1 className="text-[1.1vw] font-semibold  flex items-center justify-center">
+        <h1 className="text-[1.1vw] font-bold  flex items-center justify-center">
           Duration
         </h1>
       ),
@@ -177,9 +254,9 @@ export default function ListView({
       // width: "15vw",
       render: (row) => {
         return (
-          <div className="flex items-center justify-center">
-            <p className="text-[1.1vw] text-[#1F487C]">{`${dayjs(
-              row?.start_date
+          <div className="flex pl-[1.8vw]">
+            <p className="text-[1vw] text-[#1F487C]">{`${dayjs(
+              row?.start_date                                                                                                                                                                    
             ).format("MMM DD")} - ${dayjs(row?.expiry_date).format(
               "MMM DD"
             )}`}</p>
@@ -189,7 +266,7 @@ export default function ListView({
     },
     {
       title: (
-        <h1 className="text-[1.1vw] font-semibold  flex items-center justify-center">
+        <h1 className="text-[1.1vw] font-bold  flex items-center justify-center">
           Usage
         </h1>
       ),
@@ -197,16 +274,54 @@ export default function ListView({
       // width: "11vw",
       render: (row) => {
         return (
-          <div className="flex items-center justify-center">
-            <p className="text-[1.1vw] text-[#1F487C]">{row.usage}</p>
+          <div className="flex pl-[1.1vw]">
+            <p className="text-[1vw] text-[#1F487C]">0/{row.usage}</p>
           </div>
         );
       },
     },
-
+    ...(showComment
+      ? [
+          {
+      title: (
+        <h1 className="text-[1.1vw] font-bold flex items-center justify-center">
+          Comments
+        </h1>
+      ),
+      //sorter: (a, b) => a.usage - b.usage,
+      // width: "11vw",
+      render: (row) => {
+        return (
+          <div className="flex pl-[1.1vw] text-[#1F487C]">
+            {row?.comments && row?.comments?.length > 15 ? (
+              <Tooltip
+                placement="top"
+                title={row?.comments}
+                className="cursor-pointer"
+                color="#FFFFFF"
+                overlayInnerStyle={{
+                  color: "#1F487C",
+                  fontSize: "0.85vw",
+                }}
+              >
+                <span className="text-[#1F487C] text-[1vw]">{`${row?.comments?.slice(0,15)}...`}</span>
+              </Tooltip>
+            ) : row?.comments ? (
+              <span className="text-[#1F487C] text-[1vw]">
+                {capitalizeFirstLetter(row?.comments)}
+              </span>
+            ) : (
+              <span className="text-[#1F487C] pl-[2vw] text-[1.5vw]">-</span>
+            )}
+          </div>
+        );
+      },
+    },
+  ]
+: ""),
     {
       title: (
-        <h1 className="text-[1.1vw] font-semibold  flex items-center justify-center">
+        <h1 className="text-[1.1vw] font-bold  flex items-center justify-center">
           Status
         </h1>
       ),
@@ -219,17 +334,22 @@ export default function ListView({
               <button
                 className={`${
                   row.promo_status_id === 0
-                    ? "bg-[#777575]"
+                    ? "bg-[#646262]"
                     : row.promo_status_id === 1
                     ? "bg-[#FF9900]"
                     : row.promo_status_id === 2
-                    ? "bg-[#34AE2A]"
+                    ? "bg-[#38ac2c]"
                     : row.promo_status_id === 3
-                    ? "bg-[#FD3434]"
-                    : row.promo_status_id === 4
                     ? "bg-[#2A99FF]"
+                    : row.promo_status_id === 4
+                    ? "bg-[#FD3434]"
+                    : row.promo_status_id === 5
+                    ? "bg-[#FF9900]"
                     : "bg-[#646262]"
-                } rounded-[0.5vw] text-[1.1vw]  font-bold text-white w-[9vw] py-[0.2vw]`}
+                } rounded-[0.5vw] shadow-md shadow-black font-extrabold text-[1vw]  text-white w-[7vw] py-[0.2vw]`}
+                onClick={() => {
+                  handleStatus(row);
+                }}
               >
                 {capitalizeFirstLetter(row.promo_status)}
               </button>
@@ -242,7 +362,7 @@ export default function ListView({
     },
     {
       title: (
-        <h1 className="text-[1.1vw] font-semibold  flex items-center justify-center">
+        <h1 className="text-[1.1vw] font-bold  flex items-center justify-center">
           Actions
         </h1>
       ),
@@ -300,30 +420,8 @@ export default function ListView({
         pagination={false}
         className="custom-table"
       />
-
-      <ModalPopup
-        show={eyeModalIsOpen}
-        onClose={closeModal}
-        closeicon={false}
-        height="20vw"
-        width="30vw"
-      >
-        {
-          <div className="flex justofy-center mt-[1vw]">
-            <img
-            alt="prmoImage"
-              src={`${apiImgUrl}${promoImage}`}
-              className="w-full h-[15vw] rounded-[0.5vw]"
-            />
-          </div>
-        }
-      </ModalPopup>
     </>
     // </div>
     // ;{/* <Pagination itemsPerPage={itemsPerPage} items={dataSource} /> */}
   );
 }
-
-// :where(.custom-table).ant-table-wrapper .ant-table-thead th.ant-table-column-sort {
-//   background: #1f4b7f;
-// }

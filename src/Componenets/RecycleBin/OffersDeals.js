@@ -6,6 +6,7 @@ import dayjs from "dayjs";
 import ModalPopup from "../Common/Modal/Modal";
 import BinDelete from "./BinDelete";
 import BinRestore from "./BinRestore";
+import { capitalizeFirstLetter } from "../Common/Captilization";
 
 export default function OffersDeals({
   currentItems,
@@ -26,14 +27,14 @@ export default function OffersDeals({
   const columns = [
     {
       title: (
-        <div className="flex font-bold  justify-center text-[1.2vw]">S.No</div>
+        <div className="flex font-bold  justify-center text-[1.1vw]">S.No</div>
       ),
       width: "5vw",
       render: (row, rowdta, index) => {
         const pageNo = (activePage - 1) * itemsPerPage + index + 1;
         return (
           <div className="">
-            <h1 className="pl-[1vw] text-[#1F4B7F] text-[1.1vw] text-center">
+            <h1 className="pl-[.5vw] text-[#1F4B7F] text-[1vw] text-center">
               {pageNo}
             </h1>
           </div>
@@ -42,7 +43,7 @@ export default function OffersDeals({
     },
     {
       title: (
-        <h1 className="text-[1.2vw] font-semibold  flex items-center justify-center  ">
+        <h1 className="text-[1.1vw] font-bold  flex items-center justify-center  ">
           Name
         </h1>
       ),
@@ -50,7 +51,7 @@ export default function OffersDeals({
         a.deleted_data.offer_name.localeCompare(b.deleted_data.offer_name),
       render: (row, rowdta, index) => {
         return (
-          <div className="flex items-center justify-center font-semibold  text-[#1F4B7F] ">
+          <div className="flex items-center pl-[1vw] font-bold  text-[#1F4B7F] ">
             {row?.deleted_data.offer_name?.length > 15 ? (
               <Tooltip
                 placement="bottom"
@@ -58,14 +59,14 @@ export default function OffersDeals({
                 className="cursor-pointer"
                 color="#1F487C"
               >
-                <p className="text-[1.1vw]">
+                <p className="text-[1vw]">
                   {" "}
-                  {`${row?.deleted_data.offer_name?.slice(0, 15)}...`}
+                  {`${capitalizeFirstLetter(row?.deleted_data.offer_name?.slice(0, 15))}...`}
                 </p>
               </Tooltip>
             ) : (
-              <h1 className="text-[1.1vw] font-semibold">
-                {row?.deleted_data.offer_name?.slice(0, 15)}
+              <h1 className="text-[1vw] font-bold">
+                {capitalizeFirstLetter(row?.deleted_data.offer_name?.slice(0, 15))}
               </h1>
             )}
           </div>
@@ -75,38 +76,66 @@ export default function OffersDeals({
     },
     {
       title: (
-        <h1 className="text-[1.2vw] font-semibold justify-center  flex items-center ">
+        <h1 className="text-[1.1vw] font-bold justify-center  flex items-center ">
           Code
         </h1>
       ),
       width: "18vw",
       render: (row) => {
         return (
-          <div className="flex items-center justify-center ">
-            {row?.deleted_data.code?.length > 15 ? (
-              <Tooltip
-                placement="right"
-                title={row?.deleted_data.code}
-                className="cursor-pointer"
-                color="#1F487C"
-              >
-                <button className="border-dashed text-[1.1vw] bg-[#1F4B7F] border-white border-[0.2vw] rounded-[0.5vw] text-white w-[14vw] ">
-                  {`${row?.deleted_data.code?.slice(0, 15)}...`}{" "}
-                </button>
-              </Tooltip>
-            ) : (
-              <button className="border-dashed text-[1.1vw] bg-[#1F4B7F] border-white border-[0.2vw] rounded-[0.5vw] text-white w-[14vw] ">
-                {row?.deleted_data.code?.slice(0, 15)}
-              </button>
-            )}
-          </div>
+          // <div className="flex items-center justify-center ">
+          //   {row?.deleted_data.code?.length > 15 ? (
+          //     <Tooltip
+          //       placement="right"
+          //       title={row?.deleted_data.code}
+          //       className="cursor-pointer"
+          //       color="#1F487C"
+          //     >
+          //       <button className="border-dashed text-[1vw] bg-[#1F4B7F] border-white border-[0.2vw] rounded-[0.5vw] text-white w-[14vw] ">
+          //         {`${row?.deleted_data.code?.slice(0, 15)}...`}{" "}
+          //       </button>
+          //     </Tooltip>
+          //   ) : (
+          //     <button className="border-dashed text-[1vw] bg-[#1F4B7F] border-white border-[0.2vw] rounded-[0.5vw] text-white w-[14vw] ">
+          //       {row?.deleted_data.code?.slice(0, 15)}
+          //     </button>
+          //   )}
+          // </div>
+             <div className="flex items-center justify-center">
+                      {row?.deleted_data?.code?.length > 15 ? (
+                        <Tooltip
+                          placement="right"
+                          title={row?.deleted_data?.code}
+                          className="cursor-pointer"
+                          color="white"
+                          overlayInnerStyle={{
+                            color: "#1F487C",
+                          }}
+                        >
+                          <div className="border-[0.1vw] border-[#1F487C] rounded-[0.5vw]">
+                            <div className="border-dashed text-[1vw] bg-[#1F4B7F] border-white border-[0.2vw] rounded-[0.5vw] text-white w-[10vw] flex items-center justify-center">
+                              {`${row?.deleted_data?.code?.slice(0, 15)}...`}{" "}
+                            </div>
+                          </div>
+                        </Tooltip>
+                      ) : (
+                        <div className="border-[0.1vw] border-[#1F487C] rounded-[0.5vw]">
+                          <div className="border-dashed text-[1.1vw] bg-[#1F4B7F] border-white border-[0.2vw] rounded-[0.5vw] text-white w-[10vw] flex items-center justify-center ">
+                            {row?.deleted_data?.code?.slice(0, 15)}
+                          </div>
+                        </div>
+                      )}
+                      {/* <button className="border-dashed text-[1.1vw] bg-[#1F4B7F] border-white border-[0.2vw] rounded-[0.5vw] text-white w-[14vw] ">
+                        {row.code}
+                      </button> */}
+                    </div>
         );
       },
     },
 
     {
       title: (
-        <div className="flex font-bold justify-center text-[1.2vw]">
+        <div className="flex font-bold justify-center text-[1.1vw]">
           Duration
         </div>
       ),
@@ -114,7 +143,7 @@ export default function OffersDeals({
       render: (row) => {
         return (
           <div className="flex justify-center text-[#1F4B7F] ">
-            <p className="text-[1.1vw]">{`${dayjs(
+            <p className="text-[1vw]">{`${dayjs(
               row?.deleted_data.start_date
             ).format("MMM DD")} - ${dayjs(row?.deleted_data.expiry_date).format(
               "MMM DD"
@@ -125,30 +154,30 @@ export default function OffersDeals({
     },
     {
       title: (
-        <div className="flex  justify-center font-bold text-[1.2vw]">Usage</div>
+        <div className="flex  justify-center font-bold text-[1.1vw]">Usage</div>
       ),
-      width: "7vw",
+      width: "8vw",
       render: (row) => {
         return (
-          <div className="flex justify-center text-[#1F4B7F] ">
-            <p className="text-[1.1vw]">{row.deleted_data.usage}</p>
+          <div className="flex items-center pl-[1.2vw] text-[#1F4B7F] ">
+            <p className="text-[1vw]">{row.deleted_data.usage}</p>
           </div>
         );
       },
     },
     {
       title: (
-        <h1 className="text-[1.2vw] font-semibold justify-center  flex items-center">
+        <h1 className="text-[1.1vw] font-bold justify-center  flex items-center">
           Deleted Date
         </h1>
       ),
       sorter: (a, b) =>
         dayjs(a.deleted_date).valueOf() - dayjs(b.deleted_date).valueOf(),
-      width: "15vw",
+      width: "12vw",
       render: (row) => {
         return (
-          <div className="flex items-center justify-center  text-[#1F4B7F] ">
-            <p className="text-[1.1vw]">{`${dayjs(row?.deleted_date).format(
+          <div className="flex items-center pl-[3vw]  text-[#1F4B7F] ">
+            <p className="text-[1vw]">{`${dayjs(row?.deleted_date).format(
               "DD MMM, YY"
             )}`}</p>
           </div>
@@ -157,7 +186,7 @@ export default function OffersDeals({
     },
     {
       title: (
-        <div className="flex justify-center font-bold text-[1.2vw]">Status</div>
+        <div className="flex justify-center font-bold text-[1.1vw]">Status</div>
       ),
       width: "10vw",
       render: (row) => {
@@ -168,13 +197,13 @@ export default function OffersDeals({
                 row.deleted_data.status_id === 0
                   ? "bg-[#646262]"
                   : row.deleted_data.status_id === 1
-                  ? "bg-[#FF6B00]"
+                  ? "bg-[#FF9900]"
                   : row.deleted_data.status_id === 2
-                  ? "bg-[#34AE2A]"
+                  ? "bg-[#38ac2c]"
                   : row.deleted_data.status_id === 3
                   ? "bg-[#2A99FF]"
-                  : "bg-[#FF0000]"
-              } rounded-[0.5vw] text-[1.1vw]  font-semibold text-white w-[7vw] cursor-not-allowed py-[0.2vw]`}
+                  : "bg-[#FD3434]"
+              } h-[1.8vw] shadow-md shadow-[black] font-extrabold text-[1vw] cursor-not-allowed text-white w-[7vw] rounded-[0.5vw]`}
             >
               {row.deleted_data.status}
             </button>
@@ -184,7 +213,7 @@ export default function OffersDeals({
     },
     {
       title: (
-        <div className="flex justify-center font-bold text-[1.2vw]">
+        <div className="flex justify-center font-bold text-[1.1vw]">
           Actions
         </div>
       ),
@@ -202,7 +231,7 @@ export default function OffersDeals({
                   console.log(selectedTab, "heifhjbdfh");
                 }}
               >
-                <TbRestore size={"1.6vw"} color="#1F4B7F" />
+                <TbRestore size={"1.3vw"} color="#1F4B7F" />
               </span>
               <span>
                 <MdDelete

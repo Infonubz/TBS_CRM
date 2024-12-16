@@ -9,13 +9,33 @@ const api = axios.create({
   },
 });
 
-export const SendOTP = async (otpMail) => {
+const userType = sessionStorage.getItem("type_name");
+const typeId = sessionStorage.getItem("type_id")
+  ? sessionStorage.getItem("type_id")
+  : localStorage.getItem("type_id");
+const userID = sessionStorage.getItem("USER_ID");
+
+export const SendOTP = async (otpMail, setSpinning) => {
+  const key =
+    typeId === "PRO101" || typeId === "PROEMP101" || typeId === "OPEMP101"
+      ? "email_id"
+      : "emailid";
+
   const payload = {
-    email_id: otpMail,
+    [key]: otpMail,
   };
 
+  const loginMap = {
+    PRO101: "proforgot-password",
+    OP101: "opforgot-password",
+    PROEMP101: "proemp-forgot-password",
+    OPEMP101: "opemp-forgot-password",
+    PART101: "partner-forgot-password",
+  };
+
+  const Login = loginMap[typeId] || "";
   console.log(payload, "---new otp");
-  const url = `${apiUrl}/proforgot-password`;
+  const url = `${apiUrl}/${Login}`;
   const method = "post";
 
   try {
@@ -31,17 +51,34 @@ export const SendOTP = async (otpMail) => {
     return response;
   } catch (error) {
     throw error;
+  } finally {
+    setSpinning(false);
   }
 };
 
-export const ResetPassword = async (newValues) => {
+export const ResetPassword = async (newValues, setSpinning) => {
+  const key =
+    typeId === "PRO101" || typeId === "PROEMP101" || typeId === "OPEMP101"
+      ? "email_id"
+      : "emailid";
+
+  const loginMap = {
+    PRO101: "proreset-password",
+    OP101: "opreset-password",
+    PROEMP101: "proemp-reset-password",
+    OPEMP101: "opemp-reset-password",
+    PART101: "partner-reset-password",
+  };
+
+  const Login = loginMap[typeId] || "";
+
   const payload = {
-    email_id: newValues.email_id,
+    [key]: newValues.email_id,
     otp: newValues.otp,
     newPassword: newValues.newPassword,
   };
   console.log(payload, "---new Password");
-  const url = `${apiUrl}/proreset-password`;
+  const url = `${apiUrl}/${Login}`;
   const method = "post";
 
   try {
@@ -57,6 +94,7 @@ export const ResetPassword = async (newValues) => {
     return response;
   } catch (error) {
     throw error;
-    
+  } finally {
+    setSpinning(false);
   }
 };

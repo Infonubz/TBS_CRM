@@ -43,7 +43,8 @@ export const GetRedeemOffersData = async (dispatch, filter) => {
 export const SubmitRedeemExcel = async (file) => {
   const formData = new FormData();
   formData.append("xlsxFile", file);
-  const excelEndpoint = `${apiUrl} /redeem-offers-deals-importExcel`;
+  formData.append("tbs_user_id", sessionStorage.getItem("USER_ID"));
+  const excelEndpoint = `${apiUrl}/redeem-offers-deals-importExcel`;
   const method = "post";
   try {
     const response = await api({
@@ -81,7 +82,8 @@ export const SubmitRedeemOffersData = async (
   promotionvalues,
   updatedata,
   offerlist,
-  offerBackGround
+  offerBackGround,
+  offerFilter
 ) => {
   console.log(promotionvalues, "promotionvalues");
   const formData = new FormData();
@@ -139,22 +141,22 @@ export const SubmitRedeemOffersData = async (
     "offer_img",
     promotionvalues.file ? promotionvalues.file : null
   );
-  formData.append("occupation_id", offerlist?.occupation);
+  formData.append("occupation_id", promotionvalues?.occupation);
   formData.append(
     "occupation",
-    offerlist?.occupation == 1
+    promotionvalues?.occupation == 1
       ? "Business"
-      : offerlist?.occupation == 2
+      : promotionvalues?.occupation == 2
       ? "General Public"
-      : offerlist?.occupation == 3
+      : promotionvalues?.occupation == 3
       ? "Handicapped"
-      : offerlist?.occupation == 4
+      : promotionvalues?.occupation == 4
       ? "Pilgrim"
-      : offerlist?.occupation == 5
+      : promotionvalues?.occupation == 5
       ? "Senior Citizen"
-      : offerlist?.occupation == 6
+      : promotionvalues?.occupation == 6
       ? "Student"
-      : offerlist?.occupation == 7
+      : promotionvalues?.occupation == 7
       ? "Tourist"
       : ""
   );
@@ -176,7 +178,8 @@ export const SubmitRedeemOffersData = async (
         "Content-Type": "multipart/form-data",
       },
     });
-    GetRedeemOffersData(dispatch);
+    GetRedeemOffersData(dispatch, offerFilter);
+    console.log(offerFilter, "offers_filter_api");
     console.log(response, "responseresponse");
     return response.data;
   } catch (error) {
@@ -194,10 +197,10 @@ export const ChangeRedeemStatus = async (
 ) => {
   const payload = {
     req_status:
-      id === 2 ? "Approved" : id === 3 ? "On Hold" : id === 4 ? "Rejected" : "",
+      id === 2 ? "Approved" : id === 3 ? "Hold" : id === 4 ? "Rejected" : "",
     req_status_id: id,
     status:
-      id === 2 ? "Active" : id === 3 ? "On Hold" : id === 4 ? "Rejected" : "",
+      id === 2 ? "Active" : id === 3 ? "Hold" : id === 4 ? "Rejected" : "",
     status_id: id,
     comments: cmnt,
   };
@@ -265,7 +268,8 @@ export const SearchRedeemOffer = async (e, filter, dispatch) => {
 export const GetRedeemOffersById = async (
   updatedata,
   SetUpdateData,
-  setOfferData
+  setOfferData,
+  setLoading
 ) => {
   console.log(updatedata, "ahsgxdahsjksaxbj");
   try {
@@ -278,6 +282,8 @@ export const GetRedeemOffersById = async (
   } catch (error) {
     handleError(error);
     return null;
+  } finally {
+    setLoading(false);
   }
 };
 

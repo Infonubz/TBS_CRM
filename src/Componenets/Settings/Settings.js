@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Backdrop from "../../asserts/CRMbg.png";
 import "../../App.css";
 //import { Input } from "antd";
-//import { LiaSearchSolid } from "react-icons/lia";
+import { LiaSearchSolid } from "react-icons/lia";
 import { IoSearch } from "react-icons/io5";
 import DataSettingList from "./DataSetting/DataSetting";
 import SystemSettingList from "./SystemSetting/SystemSetting";
@@ -41,43 +41,45 @@ export default function Settings() {
               <div className="relative flex items-center">
                 <input
                   type="text"
-                  className="bg-white outline-none pl-[2vw] w-[25vw] h-[2.5vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw]"
+                  className="bg-white outline-none pl-[2vw] w-[25vw] h-[2.5vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw] border-r-[0.25vw] border-b-[0.25vw] text-[#1F487C]"
                   placeholder="Search Settings"
                 />
-                <IoSearch
-                  className="absolute left-[0.5vw]"
+                <LiaSearchSolid
+                  className="absolute left-[0.5vw] top-[0.8vw]"
                   size={"1vw"}
-                  color="#1F4B7F"
+                  color="#9CA3AF"
                 />
               </div>
               {type_id === "PRO101" && (
                 <div
                   onClick={() => setSelectedSetting("system")}
-                  className={` ${selectedSetting === "system" ? "border-b-[0.1vw] border-[#1F487C]" : ""
-                    } cursor-pointer`}
+                  className={` ${
+                    selectedSetting === "system"
+                      ? "border-b-[0.25vw] border-[#1F487C]"
+                      : ""
+                  } cursor-pointer`}
                 >
-                  <p
-                    className={`text-[#1F487C] text-[1.4vw] px-[0.5vw] `}
-                  >
+                  <p className={`text-[#1F487C] text-[1.4vw] px-[0.5vw] `}>
                     Company settings
                   </p>
                 </div>
               )}
               <div
                 onClick={() => setSelectedSetting("user")}
-                className={` ${selectedSetting === "user" ? "border-b-[0.1vw] border-[#1F487C]" : ""
-                  } cursor-pointer`}
+                className={` ${
+                  selectedSetting === "user"
+                    ? "border-b-[0.25vw] border-[#1F487C]"
+                    : ""
+                } cursor-pointer`}
               >
-                <p
-                  className={`text-[#1F487C] text-[1.4vw] px-[0.5vw]`}
-                >
+                <p className={`text-[#1F487C] text-[1.4vw] px-[0.5vw]`}>
                   User settings
                 </p>
               </div>
-              {type_id === "PRO101" && (
+              {/* {type_id === "PRO101" && (
                 <div
                   onClick={() => setSelectedSetting("data")}
-                  className={` ${selectedSetting === "data" ? "border-b-[0.1vw] border-[#1F487C]" : ""
+                  className={` ${selectedSetting === "data" ? "border-b-[0.25vw] border-[#1F487C]" : ""
                     } cursor-pointer`}
                 >
                   <p
@@ -86,16 +88,17 @@ export default function Settings() {
                     Data settings
                   </p>
                 </div>
-              )}
+              )} */}
               {type_id === "PRO101" && (
                 <div
                   onClick={() => setSelectedSetting("configuration")}
-                  className={` ${selectedSetting === "configuration" ? "border-b-[0.1vw] border-[#1F487C]" : ""
-                    } cursor-pointer`}
+                  className={` ${
+                    selectedSetting === "configuration"
+                      ? "border-b-[0.25vw] border-[#1F487C]"
+                      : ""
+                  } cursor-pointer`}
                 >
-                  <p
-                    className={`text-[#1F487C] text-[1.4vw] px-[0.5vw]`}
-                  >
+                  <p className={`text-[#1F487C] text-[1.4vw] px-[0.5vw]`}>
                     Configuration
                   </p>
                 </div>
@@ -103,12 +106,13 @@ export default function Settings() {
               {type_id === "PRO101" && (
                 <div
                   onClick={() => setSelectedSetting("integrations")}
-                  className={` ${selectedSetting === "integrations" ? "border-b-[0.1vw] border-[#1F487C]" : ""
-                    } cursor-pointer`}
+                  className={` ${
+                    selectedSetting === "integrations"
+                      ? "border-b-[0.25vw] border-[#1F487C]"
+                      : ""
+                  } cursor-pointer`}
                 >
-                  <p
-                    className={`text-[#1F487C] text-[1.4vw] px-[0.5vw]`}
-                  >
+                  <p className={`text-[#1F487C] text-[1.4vw] px-[0.5vw]`}>
                     Product Integrations
                   </p>
                 </div>

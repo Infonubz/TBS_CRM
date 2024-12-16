@@ -14,8 +14,9 @@ import dayjs from "dayjs";
 //import { Upload } from "antd";
 //import { useDispatch } from "react-redux";
 import { FaCloudDownloadAlt } from "react-icons/fa";
-import { toPng, 
-  //toJpeg 
+import {
+  toPng,
+  //toJpeg
 } from "html-to-image";
 // import { ErrorMessage, Field } from "formik";
 //import html2canvas from "html2canvas";
@@ -61,10 +62,9 @@ const Background_View = ({
   usageError,
   setUsageError,
   handleChange,
-  setFieldValue
+  setFieldValue,
 }) => {
-
- // const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
+  // const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
 
   // const [currentIndex, setCurrentIndex] = useState(0);
   //const [fileName, setFileName] = useState("");
@@ -99,7 +99,7 @@ const Background_View = ({
   };
 
   //const [currentIndex, setCurrentIndex] = useState(2); // Start at 3rd slide (middle)
- // const visibleSlides = 5; // Number of slides visible at once
+  // const visibleSlides = 5; // Number of slides visible at once
 
   // const getSlideClass = (index) => {
   //   const position = (index - currentIndex + promo.length) % promo.length;
@@ -132,22 +132,19 @@ const Background_View = ({
 
   const waitForImagesToLoad = (container) => {
     const images = Array.from(container.querySelectorAll("img"));
-    const promises = images.map((img) => {
-      if (!img.crossOrigin) {
-        img.crossOrigin = "anonymous";
-      }
-      return new Promise((resolve) => {
-        if (img.complete) {
-          resolve();
-        } else {
-          img.onload = resolve;
-          img.onerror = resolve;
-        }
-      });
-    });
+    const promises = images.map(
+      (img) =>
+        new Promise((resolve) => {
+          if (img.complete) {
+            resolve();
+          } else {
+            img.onload = resolve;
+            img.onerror = resolve;
+          }
+        })
+    );
     return Promise.all(promises);
   };
-  
 
   const convertImage = async () => {
     try {
@@ -219,7 +216,7 @@ const Background_View = ({
       // Create a link and trigger download
       const link = document.createElement("a");
       link.href = dataUrl;
-      link.download = "PromotionImage.png";
+      link.download = "OffersImage.png";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -230,23 +227,6 @@ const Background_View = ({
       setIsCapturing(false);
     }
   };
-
-  // // Function to move to the previous slide
-  // const prevSlide = () => {
-  //   if (startIndex > 0) setStartIndex((prev) => prev - 1);
-  // };
-
-  // // Function to move to the next slide
-  // const nextSlide = () => {
-  //   if (startIndex + 1 < promoData.length) setStartIndex((prev) => prev + 1);
-  // };
-
-  useEffect(() => {
-    convertImage();
-    // downloadImage();
-  }, [startIndex]);
-  const tempUrl = promo?.file && URL.createObjectURL(promo?.file); // Create temporary URL for the image
-  console.log(tempUrl, "tempUrltempUrl");
 
   const ComponentToPrint = React.forwardRef((props, ref) => (
     <div className="flex items-center justify-between mt-[1vw]">
@@ -308,42 +288,42 @@ const Background_View = ({
             />
           ) : (
             <img
-             alt="promoimage"
+              alt="promoimage"
               src={URL.createObjectURL(currentPromodata?.file)}
-              className="w-[7.7vw] h-[13vw] bg-white object-cover  opacity-50 blur-[0.1vw] rounded-tl-[1vw] rounded-bl-[1vw] rounded-tr-[2.2vw] rounded-br-[1.5vw]"
+              className="w-[7.7vw] h-[13vw] bg-white object-cover opacity-50 blur-[0.1vw] rounded-tl-[1vw] rounded-bl-[1vw] rounded-tr-[2.2vw] rounded-br-[1.5vw]"
             />
           )}
         </div>
         {updatedata && draggerImage === false ? (
           <img
-           alt="promoimage"
+            alt="promoimage"
             src={`http://192.168.90.47:4000${currentPromodata?.file}`}
             className="absolute top-[4vw] bg-white left-[1vw] w-[5.5vw] h-[5.5vw] rounded-[50%]"
           />
         ) : (
           <img
-           alt="promoimage"
+            alt="promoimage"
             src={URL.createObjectURL(currentPromodata?.file)}
             // src={`http://192.168.90.47:4000${promodata.promo_image}`}
             className="absolute top-[4vw] bg-white left-[1vw] w-[5.5vw] h-[5.5vw] rounded-[50%]"
           />
         )}
 
-        <div className="bg-white bg-opacity-30 rounded-[2vw] px-[1vw] mr-[0.4vw] py-[0.2vw] absolute top-[1.5vw] left-[9vw]">
-          <h1 className="text-white text-[1.2vw]">
+        <div className="bg-white bg-opacity-30 rounded-[2vw] px-[1vw] mr-[0.4vw] py-[0.2vw] absolute top-[1vw] left-[9.3vw]">
+          <h1 className="text-white text-[1.2vw] font-extrabold">
             {currentPromodata?.promotion_name}
           </h1>
         </div>
-        <p className="text-white font-extrabold flex flex-wrap text-[1vw] pr-[0.5vw] absolute top-[4.5vw] left-[9vw]">
+        <p className="text-white font-semibold flex flex-wrap text-[1vw] pr-[0.5vw] absolute top-[4.2vw] left-[9.5vw]">
           {currentPromodata?.promotion_description}
         </p>
-        <p className="text-white text-[1vw] absolute top-[8vw] left-[9vw]">
+        <p className="text-white text-[1vw] absolute top-[8vw] left-[9.5vw]">
           {`Valid till ${dayjs(new Date(currentPromodata?.expiry_date)).format(
             "DD MMM"
           )}`}
         </p>
-        <div className="bg-white bg-opacity-30 border-dashed border-[0.1vw] border-white px-[1vw] py-[0.2vw] absolute top-[10vw] left-[9vw]">
-          <p className="text-white font-bold text-[1vw]">
+        <div className="bg-white bg-opacity-30 border-dashed border-[0.1vw] border-white px-[1vw] py-[0.2vw] absolute top-[10vw] left-[9.5vw]">
+          <p className="text-white text-[1vw] font-extrabold">
             {currentPromodata.promo_code}
           </p>
         </div>
@@ -363,6 +343,9 @@ const Background_View = ({
     </div>
   ));
 
+  useEffect(() => {
+    convertImage();
+  }, [startIndex]);
 
   return (
     <>
@@ -379,28 +362,45 @@ const Background_View = ({
         <input
           placeholder="Enter Usage Count"
           className="border-r-[0.25vw] mt-[0.2vw] border-l-[0.05vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
-          onChange={(e) =>{
+          onChange={(e) => {
             const value = e.target.value;
-            setFieldValue("usage", e.target.value);
+            // Check if the value is a number and between 1 and 100
             if (/^\d*$/.test(value)) {
-              setPromolist({
-                ...promolist,
-                usage: value, 
-              });
-              setUsageError(""); 
+              if (
+                value === "" ||
+                (Number(value) >= 1 && Number(value) <= 100)
+              ) {
+                setPromolist({
+                  ...promolist,
+                  usage: value,
+                });
+                setFieldValue("usage", value);
+                setUsageError(""); // Clear the error if valid
+              } else {
+                setUsageError("Usage must be between 1 and 100");
+              }
             } else {
-              setUsageError("Only numbers are allowed"); 
+              setUsageError("Only numbers are allowed");
             }
           }}
           value={promolist.usage}
         />
-        {usageError && <p className="text-[0.8vw]" style={{ color: "red" }}>{usageError}</p>}
+        {usageError && (
+          <p className="text-[0.8vw]" style={{ color: "red" }}>
+            {usageError}
+          </p>
+        )}
         <div className="mt-[4vw]">
           <ComponentToPrint ref={containerRef} />
         </div>
-       {/* <button type="button" onClick={downloadImage}>Donload</button>  */}
+        {/* <button type="button" onClick={downloadImage}>Donload</button>  */}
         <div className="flex absolute top-[-3.65vw] cursor-pointer left-[24.75vw]">
-        <FaCloudDownloadAlt onClick={downloadImage} className="pt-[0.1vw]" size={"2.5vw"} color="#1F4B7F" />
+          <FaCloudDownloadAlt
+            onClick={downloadImage}
+            className="pt-[0.1vw]"
+            size={"2.5vw"}
+            color="#1F4B7F"
+          />
         </div>
       </div>
     </>

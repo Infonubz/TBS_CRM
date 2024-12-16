@@ -368,7 +368,8 @@ export const SubmitEmpDocumentsData = async (
 export const GetEmpAddressById = async (
   EmployeeID,
   setEmployeeID,
-  setEmpAddressData
+  setEmpAddressData,
+  setSpinning
 ) => {
   const endpoint = user.startsWith("tbs-pro")
     ? `${apiUrl}/pro-emp-registered-address/${
@@ -388,12 +389,16 @@ export const GetEmpAddressById = async (
     handleError(error);
     return null;
   }
+  finally{
+    setSpinning && setSpinning(false)
+  }
 };
 
 export const GetEmpProffesionalById = async (
   EmployeeID,
   setEmployeeID,
-  setEmpProffesionalData
+  setEmpProffesionalData,
+  setSpinning
 ) => {
   const endpoint = user.startsWith("tbs-pro")
     ? `${apiUrl}/pro-emp-professional-details/${EmployeeID}`
@@ -409,12 +414,16 @@ export const GetEmpProffesionalById = async (
     handleError(error);
     return null;
   }
+  finally{
+    setSpinning && setSpinning(false)
+  }
 };
 
 export const GetEmpPersonalById = async (
   EmployeeID,
   setEmployeeID,
-  setEmpPersonalData
+  setEmpPersonalData,
+  setSpinning
 ) => {
   const endpoint = user?.startsWith("tbs-pro")
     ? `${apiUrl}/pro-emp-personal-details/${
@@ -438,12 +447,16 @@ export const GetEmpPersonalById = async (
     handleError(error);
     return null;
   }
+  finally{
+    setSpinning && setSpinning(false)
+  }
 };
 
 export const GetEmpDocumentById = async (
   EmployeeID,
   setEmployeeID,
-  setEmpDocumentlData
+  setEmpDocumentlData,
+  setSpinning
 ) => {
   
   const endpoint = user.startsWith("tbs-pro")
@@ -461,6 +474,9 @@ export const GetEmpDocumentById = async (
   } catch (error) {
     handleError(error);
     return null;
+  }
+  finally{
+    setSpinning && setSpinning(false)
   }
 };
 
@@ -559,6 +575,37 @@ export const OwnerEmployeeProfile = async (image, EmployeeID) => {
     return null;
   }
 };
+
+export const ValidateEmployeeMobile = async(value) =>{
+  const apiString = user.startsWith("tbs-pro") ? "phone-poEmp" :"phone-opEmp"
+  try{
+   const response = await axios.post(`${apiUrl}/${apiString}`,{
+    phone:value
+   })
+   return response.data.exists
+  }
+  catch(err){
+    // handleError(err)
+    console.log(err,"eroihfdjf");
+    return err
+    
+  }
+}
+export const ValidateEmployeeEmail = async(value) =>{
+  const apiString = user.startsWith("tbs-pro") ? "emailid-poEmp" :"emailid-opEmp"
+  try{
+   const response = await axios.post(`${apiUrl}/${apiString}`,{
+    emailid:value
+   })
+   return response.data.exists
+  }
+  catch(err){
+    // handleError(err)
+    console.log(err,"eroihfdjf");
+    return err
+    
+  }
+}
 
 const handleError = (error) => {
   console.error("Error details:", error);

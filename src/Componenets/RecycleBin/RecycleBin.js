@@ -7,7 +7,7 @@ import Promotion from "./Promotion";
 import Subscription from "./Subscription";
 // import Roles_Response from "./RoleResponse";
 // import User_Management from "./UserManagement";
-import { Select, Spin } from "antd";
+import { ConfigProvider, Popover, Select, Spin } from "antd";
 import { IoMdArrowDropdown } from "react-icons/io";
 import ReactPaginate from "react-js-pagination";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -22,6 +22,8 @@ import { GetBinData, SearchBindData } from "../../Api/RecycleBin/RecycleBin";
 import UserManagement from "./UserManagement";
 import OffersDeals from "./OffersDeals";
 import RolesResponse from "./RoleResponse";
+import { BsExclamationCircle } from "react-icons/bs";
+import { LiaSearchSolid } from "react-icons/lia";
 
 export default function RecycleBin() {
   const [spinning, setSpinning] = useState(false);
@@ -83,7 +85,6 @@ export default function RecycleBin() {
     8: "(ProductOwner - Employee)",
     9: "(Partner)",
   };
-
 
   const selectedTitle = tabTitles[selectedTab] || "Offers & Deals";
 
@@ -163,7 +164,7 @@ export default function RecycleBin() {
         </div>
       ),
     },
-  ]
+  ];
   const operatorOptions = [
     {
       value: 2,
@@ -181,18 +182,16 @@ export default function RecycleBin() {
         </div>
       ),
     },
+  ];
 
-  ]
-
-  const defaultvalues =
-  {
+  const defaultvalues = {
     value: 1,
     label: (
       <div className="text-[1vw] text-[#1F4B7F] font-semibold pl-[0.7vw] pb-[0.1vw]">
         Offers & Deals
       </div>
     ),
-  }
+  };
   const operatorDefaultvalues = {
     value: 2,
     label: (
@@ -200,19 +199,70 @@ export default function RecycleBin() {
         Promotions
       </div>
     ),
-  }
+  };
 
   // useEffect(()=>{
-    // if(currentItems?.length == 0){
-    //   setActivePage(activePage - 1)
-    // }
+  // if(currentItems?.length == 0){
+  //   setActivePage(activePage - 1)
+  // }
 
   // },[currentItems])
-  useEffect(()=>{
-  if(currentItems?.length === 0 && activePage > 1){
-    setActivePage(activePage - 1)
-  }
-  },[currentItems])
+  useEffect(() => {
+    if (currentItems?.length === 0 && activePage > 1) {
+      setActivePage(activePage - 1);
+    }
+  }, [currentItems]);
+
+  const data = {
+    1: [{ title: "Name" }, { title: "Code" }, { title: "status" }],
+    2: [
+      { title: "Name" },
+      { title: "Operator name" },
+      { title: "Description" },
+      { title: "status" },
+    ],
+    3: [{ title: "Title" }, { title: "Description" }, { title: "status" }],
+    4: [{ title: "Title" }, { title: "Description" }, { title: "status" }],
+    5: [
+      { title: "Name" },
+      { title: "Mobile" },
+      { title: "Email" },
+      { title: "Deleted Date" },
+      { title: "status" },
+    ],
+    7: [
+      { title: "Name" },
+      { title: "Mobile" },
+      { title: "Email" },
+      { title: "Deleted Date" },
+      { title: "status" },
+    ],
+    8: [
+      { title: "Name" },
+      { title: "Mobile" },
+      { title: "Email" },
+      { title: "Deleted Date" },
+      { title: "status" },
+    ],
+    9: [
+      { title: "Name" },
+      { title: "Mobile" },
+      { title: "Email" },
+      { title: "Deleted Date" },
+      { title: "status" },
+    ],
+    7: [
+      { title: "Name" },
+      { title: "Mobile" },
+      { title: "Email" },
+      { title: "Deleted Date" },
+      { title: "status" },
+    ],
+  };
+
+  const currentArray = data[selectedTab];
+
+  console.log(selectedTab, "currenttabs");
 
   return (
     <div
@@ -224,26 +274,56 @@ export default function RecycleBin() {
       }}
     >
       <>
-        <div className="px-[2.5vw] h-[92vh]">
+        <div className="px-[2.5vw] h-[92vh] ">
           <div className=" ">
             <div className="h-[12vh] mb-[.2vw] w-full items-center">
               <div className="flex items-center">
                 <h1 className="text-[#1F4B7F] text-[1.8vw] font-bold flex items-center justify-center">
-                  <span className="pr-[.3vw]">RecycleBin</span> <span className="text-[1vw]">-</span><span className="text-[1vw] pl-[.5vw]">{selectedTitle}</span>
+                  <span className="pr-[.3vw]">RecycleBin</span>{" "}
+                  <span className="text-[1vw]">-</span>
+                  <span className="text-[1vw] pl-[.5vw]">{selectedTitle}</span>
                 </h1>
               </div>
               <div className="flex  items-center h-[8vh]  justify-between gap-[2vw] pb-[1vw]">
                 <div className="relative flex items-center ">
                   <input
                     type="text"
-                    className="bg-white outline-none text-[#1F4B7F] pl-[2vw] w-[17vw] h-[5vh] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw] border-r-[0.2vw] border-b-[0.2vw]"
+                    className="bg-white outline-none text-[#1F4B7F] pl-[2vw] w-[17vw] h-[5vh] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.75vw] border-r-[0.25vw] border-b-[0.25vw]"
                     placeholder="Search.."
                     onChange={(e) => handleSearch(e.target.value)}
                   />
-                  <IoSearch
-                    className="absolute left-[0.5vw]"
+                  <div className="absolute right-[1vw] ">
+                    <Popover
+                      color="white"
+                      title={
+                        <div className=" text-[#1F4B7F]  p-[1vw] max-h-[20vw] overflow-auto ">
+                          <span className="font-bold">SEARCH BY ...</span>
+                          {currentArray?.map((info, index) => (
+                            <div key={index} className="flex flex-col">
+                              <ul
+                                className="pl-[1vw]"
+                                style={{ listStyleType: "disc" }}
+                              >
+                                <li className="text-[0.8vw] ">
+                                  <p className="">{info.title}</p>
+                                </li>
+                              </ul>
+                              <span className="text-[.7vw] pl-[1vw] ">
+                                {info.description}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      }
+                      placement="bottom"
+                    >
+                      <BsExclamationCircle size={"1vw"} color="#9CA3AF" />
+                    </Popover>
+                  </div>
+                  <LiaSearchSolid
+                    className="absolute left-[0.5vw] top-[0.6vw]"
                     size={"1vw"}
-                    color="#1F4B7F"
+                    color="#9CA3AF"
                   />
                 </div>
                 <div className="text-[#1F4B7F] font-bold text-[2vw]">
@@ -328,7 +408,7 @@ export default function RecycleBin() {
               </div>
             </div>
           </div> */}
-                <Select
+                {/* <Select
                   showSearch
                   placeholder="Select one"
                   suffixIcon={
@@ -353,12 +433,54 @@ export default function RecycleBin() {
                   //   ),
                   // }}
                   defaultValue={typeId === "PRO101" ? defaultvalues : operatorDefaultvalues}
-                  className="text-[#1F4B7F] h-[5vh] text-[1vw]  outline-none text border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.7vw] border-r-[0.2vw] border-b-[0.2vw]"
+                  className="text-[#1F4B7F] h-[5vh] text-[1vw]  outline-none text border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.75vw] border-r-[0.2vw] border-b-[0.2vw]"
 
                   options={
                     typeId === "PRO101" ? options : operatorOptions
                   }
-                />
+                /> */}
+                <ConfigProvider
+                  theme={{
+                    components: {
+                      Select: {
+                        optionActiveBg: "#aebed1",
+                        optionSelectedColor: "#FFF",
+                        optionSelectedBg: "#aebed1",
+                        optionHeight: "2",
+                      },
+                    },
+                  }}
+                >
+                  <Select
+                    showSearch
+                    // value={values.per_city}
+                    // placement="topRight"
+                    // listHeight={190}
+                    onChange={onChange}
+                    className={` custom-select bg-white border-r-[0.25vw] w-[20vw] text-[2vw]  border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-blue border-[#1F487C] text-[#1F487C] h-[5vh]  rounded-[0.75vw] outline-none  px-[1vw]`}
+                    // className="custom-select bg-white outline-none w-full mt-[0.5vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
+                    placeholder="Select"
+                    filterOption={(input, option) => {
+                      const labelText = option?.label?.props.children || "";
+                      return labelText
+                        .toLowerCase()
+                        .includes(input.toLowerCase());
+                    }}
+                    optionFilterProp="value"
+                    suffixIcon={
+                      <span style={{ fontSize: "1vw", color: "#1f487c" }}>
+                        <IoMdArrowDropdown size="2vw" />
+                      </span>
+                    }
+                    style={{ padding: 1 }}
+                    defaultValue={
+                      typeId === "PRO101"
+                        ? defaultvalues
+                        : operatorDefaultvalues
+                    }
+                    options={typeId === "PRO101" ? options : operatorOptions}
+                  />
+                </ConfigProvider>
               </div>
             </div>
 
@@ -491,7 +613,9 @@ export default function RecycleBin() {
                 />
               </div>
             </div>
-          ) : ""}
+          ) : (
+            ""
+          )}
         </div>
       </>
     </div>

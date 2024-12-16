@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Space, Spin, Table } from "antd";
+import { Space, Spin, Table, Tooltip } from "antd";
 import { TbRestore } from "react-icons/tb";
 import { MdDelete } from "react-icons/md";
 import dayjs from "dayjs";
@@ -25,13 +25,13 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
   const columns = [
     {
       title: (
-        <div className="flex font-bold justify-center text-[1.2vw]">S.No</div>
+        <div className="flex font-bold justify-center text-[1.1vw]">S.No</div>
       ),
-      width: "5vw",
+      width: "4vw",
       render: (row, rowdta, index) => {
         const pageNo = (activePage - 1) * itemsPerPage + index + 1
         return (
-          <div className="text-[#1F4B7F] flex justify-center text-[1.1vw] ">
+          <div className="text-[#1F4B7F] flex pl-[1vw] text-[1vw] ">
             <h1 className="pl-[1vw]">{pageNo}</h1>
           </div>
         );
@@ -39,7 +39,7 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
     },
     {
       title: (
-        <div className="flex justify-center  items-center font-bold text-[1.2vw]">
+        <div className="flex justify-center  items-center font-bold text-[1.1vw]">
           Photo
         </div>
       ),
@@ -79,11 +79,11 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
           </div>
         );
       },
-      width: "6vw",
+      width: "5vw",
     },
     {
       title: (
-        <div className="flex items-center justify-center  font-bold text-[1.2vw]">
+        <div className="flex items-center justify-center  font-bold text-[1.1vw]">
           {" "}
           Name
         </div>
@@ -116,37 +116,106 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
                     : "";
         return nameA.localeCompare(nameB);
       },
-      width: "12vw",
+      width: "13vw",
       render: (row) => (
-        <div className="flex justify-center items-center">
-          <p className="text-[1.1vw] text-[#1F4B7F] font-semibold ">{`${selectedTab === 5
-              ? row?.deleted_data?.operator?.company_name
-              : selectedTab === 7
-                ? row?.deleted_data?.clientCompanyDetails?.company_name
-                : selectedTab === 9
-                  ? row?.deleted_data?.partnerDetails?.partner_first_name
-                  : selectedTab === 8
-                    ? row.deleted_data?.empPersonal?.emp_first_name
-                    : selectedTab === 6
-                      ? row.deleted_data?.empPersonal?.emp_first_name
-                      : ""
-            }`}</p>
-          <p className="text-[1.1vw] text-[#1F4B7F] pl-[.4vw] font-semibold ">{`${
-            // selectedTab === 5
-            //   ? row?.deleted_data?.partnerDetails?.partner_first_name 
-            selectedTab === 8
-              ? row.deleted_data?.empPersonal?.emp_last_name
-              : selectedTab === 6
-                ? row.deleted_data?.empPersonal?.emp_last_name
-                : ""
-            }`}</p>
-        </div>
+        // <div className="flex pl-[1vw] items-center">
+        //   <p className="text-[1vw] text-[#1F4B7F] font-semibold ">{`${selectedTab === 5
+        //       ? row?.deleted_data?.operator?.company_name
+        //       : selectedTab === 7
+        //         ? row?.deleted_data?.clientCompanyDetails?.company_name
+        //         : selectedTab === 9
+        //           ? row?.deleted_data?.partnerDetails?.partner_first_name
+        //           : selectedTab === 8
+        //             ? row.deleted_data?.empPersonal?.emp_first_name
+        //             : selectedTab === 6
+        //               ? row.deleted_data?.empPersonal?.emp_first_name
+        //               : ""
+        //     }`}</p>
+        //   <p className="text-[1.1vw] text-[#1F4B7F] pl-[.4vw] font-semibold ">{`${
+        //     // selectedTab === 5
+        //     //   ? row?.deleted_data?.partnerDetails?.partner_first_name 
+        //     selectedTab === 8
+        //       ? row.deleted_data?.empPersonal?.emp_last_name
+        //       : selectedTab === 6
+        //         ? row.deleted_data?.empPersonal?.emp_last_name
+        //         : ""
+        //     }`}</p>
+        // </div>
+        <div className="flex pl-[1vw] items-center">
+  <p className="text-[1vw] text-[#1F4B7F] font-bold">
+    {selectedTab === 5 ? (
+      row?.deleted_data?.operator?.company_name?.length > 25 ? (
+        <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={row?.deleted_data?.operator?.company_name}>
+          <span>{`${row?.deleted_data?.operator?.company_name.slice(0, 25)}...`}</span>
+        </Tooltip>
+      ) : (
+        <span>{row?.deleted_data?.operator?.company_name}</span>
+      )
+    ) : selectedTab === 7 ? (
+      row?.deleted_data?.clientCompanyDetails?.company_name?.length > 25 ? (
+        <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={row?.deleted_data?.clientCompanyDetails?.company_name}>
+          <span>{`${row?.deleted_data?.clientCompanyDetails?.company_name.slice(0, 25)}...`}</span>
+        </Tooltip>
+      ) : (
+        <span>{row?.deleted_data?.clientCompanyDetails?.company_name}</span>
+      )
+    ) : selectedTab === 9 ? (
+      row?.deleted_data?.partnerDetails?.partner_first_name?.length > 25 ? (
+        <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={row?.deleted_data?.partnerDetails?.partner_first_name}>
+          <span>{`${row?.deleted_data?.partnerDetails?.partner_first_name.slice(0, 25)}...`}</span>
+        </Tooltip>
+      ) : (
+        <span>{row?.deleted_data?.partnerDetails?.partner_first_name}</span>
+      )
+    ) : selectedTab === 8 ? (
+      row?.deleted_data?.empPersonal?.emp_first_name?.length > 25 ? (
+        <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={row?.deleted_data?.empPersonal?.emp_first_name}>
+          <span>{`${row?.deleted_data?.empPersonal?.emp_first_name.slice(0, 25)}...`}</span>
+        </Tooltip>
+      ) : (
+        <span>{row?.deleted_data?.empPersonal?.emp_first_name}</span>
+      )
+    ) : selectedTab === 6 ? (
+      row?.deleted_data?.empPersonal?.emp_first_name?.length > 25 ? (
+        <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={row?.deleted_data?.empPersonal?.emp_first_name}>
+          <span>{`${row?.deleted_data?.empPersonal?.emp_first_name.slice(0, 25)}...`}</span>
+        </Tooltip>
+      ) : (
+        <span>{row?.deleted_data?.empPersonal?.emp_first_name}</span>
+      )
+    ) : (
+      ""
+    )}
+  </p>
+  {/* <p className="text-[1.1vw] text-[#1F4B7F] pl-[.4vw] font-semibold">
+    {selectedTab === 8 ? (
+      row?.deleted_data?.empPersonal?.emp_last_name?.length > 25 ? (
+        <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={row?.deleted_data?.empPersonal?.emp_last_name}>
+          <span>{`${row?.deleted_data?.empPersonal?.emp_last_name.slice(0, 25)}...`}</span>
+        </Tooltip>
+      ) : (
+        <span>{row?.deleted_data?.empPersonal?.emp_last_name}</span>
+      )
+    ) : selectedTab === 6 ? (
+      row?.deleted_data?.empPersonal?.emp_last_name?.length > 25 ? (
+        <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={row?.deleted_data?.empPersonal?.emp_last_name}>
+          <span>{`${row?.deleted_data?.empPersonal?.emp_last_name.slice(0, 25)}...`}</span>
+        </Tooltip>
+      ) : (
+        <span>{row?.deleted_data?.empPersonal?.emp_last_name}</span>
+      )
+    ) : (
+      ""
+    )}
+  </p> */}
+</div>
+
       ),
     },
 
     {
       title: (
-        <div className="flex items-center justify-center  font-bold text-[1.2vw]">
+        <div className="flex items-center justify-center  font-bold text-[1.1vw]">
           Mobile
         </div>
       ),
@@ -187,7 +256,7 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
       render: (text, row) => {
         return (
           <div className="flex items-center justify-center text-[#1F4B7F] ">
-            <p className="text-[1.1vw]">
+            <p className="text-[1vw]">
               {selectedTab === 5
                 ? row?.deleted_data?.operator?.phone
                 : selectedTab === 7
@@ -207,7 +276,7 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
 
     {
       title: (
-        <div className="flex items-center justify-center font-bold text-[1.2vw]">
+        <div className="flex items-center justify-center font-bold text-[1.1vw]">
           Email
         </div>
       ),
@@ -261,31 +330,79 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
         }
       },
       ellipsis: true,
-      width: "15vw",
+      width: "14vw",
       render: (row) => {
         return (
-          <div className="flex items-center justify-center text-[#1F4B7F] ">
-            <p className="text-[1.1vw]">
-              {selectedTab === 5
-                ? row.deleted_data?.operator?.emailid
-                : selectedTab === 7
-                  ? row?.deleted_data?.clientCompanyDetails?.emailid
-                  : selectedTab === 9
-                    ? row?.deleted_data?.partnerDetails?.emailid
-                    : selectedTab === 8
-                      ? row?.deleted_data?.empPersonal?.email_id
-                      : selectedTab === 6
-                        ? row?.deleted_data?.empPersonal?.email_id
-                        : ""}
-            </p>
-          </div>
+          // <div className="flex items-center pl-[1vw] text-[#1F4B7F] ">
+          //   <p className="text-[1vw]">
+          //     {selectedTab === 5
+          //       ? row.deleted_data?.operator?.emailid
+          //       : selectedTab === 7
+          //         ? row?.deleted_data?.clientCompanyDetails?.emailid
+          //         : selectedTab === 9
+          //           ? row?.deleted_data?.partnerDetails?.emailid
+          //           : selectedTab === 8
+          //             ? row?.deleted_data?.empPersonal?.email_id
+          //             : selectedTab === 6
+          //               ? row?.deleted_data?.empPersonal?.email_id
+          //               : ""}
+          //   </p>
+          // </div>
+          <div className="flex items-center pl-[1.5vw] text-[#1F4B7F]">
+  <p className="text-[1vw]">
+    {selectedTab === 5 ? (
+      row.deleted_data?.operator?.emailid?.length > 25 ? (
+        <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={row.deleted_data?.operator?.emailid}>
+          <span>{`${row.deleted_data?.operator?.emailid.slice(0, 25)}...`}</span>
+        </Tooltip>
+      ) : (
+        <span>{row.deleted_data?.operator?.emailid}</span>
+      )
+    ) : selectedTab === 7 ? (
+      row?.deleted_data?.clientCompanyDetails?.emailid?.length > 25 ? (
+        <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={row?.deleted_data?.clientCompanyDetails?.emailid}>
+          <span>{`${row?.deleted_data?.clientCompanyDetails?.emailid.slice(0, 25)}...`}</span>
+        </Tooltip>
+      ) : (
+        <span>{row?.deleted_data?.clientCompanyDetails?.emailid}</span>
+      )
+    ) : selectedTab === 9 ? (
+      row?.deleted_data?.partnerDetails?.emailid?.length > 25 ? (
+        <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={row?.deleted_data?.partnerDetails?.emailid}>
+          <span>{`${row?.deleted_data?.partnerDetails?.emailid.slice(0, 25)}...`}</span>
+        </Tooltip>
+      ) : (
+        <span>{row?.deleted_data?.partnerDetails?.emailid}</span>
+      )
+    ) : selectedTab === 8 ? (
+      row?.deleted_data?.empPersonal?.email_id?.length > 25 ? (
+        <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={row?.deleted_data?.empPersonal?.email_id}>
+          <span>{`${row?.deleted_data?.empPersonal?.email_id.slice(0, 25)}...`}</span>
+        </Tooltip>
+      ) : (
+        <span>{row?.deleted_data?.empPersonal?.email_id}</span>
+      )
+    ) : selectedTab === 6 ? (
+      row?.deleted_data?.empPersonal?.email_id?.length > 25 ? (
+        <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={row?.deleted_data?.empPersonal?.email_id}>
+          <span>{`${row?.deleted_data?.empPersonal?.email_id.slice(0, 25)}...`}</span>
+        </Tooltip>
+      ) : (
+        <span>{row?.deleted_data?.empPersonal?.email_id}</span>
+      )
+    ) : (
+      ""
+    )}
+  </p>
+</div>
+
         );
       },
     },
 
     {
       title: (
-        <div className="flex items-center justify-center font-bold text-[1.2vw]">
+        <div className="flex items-center justify-center font-bold text-[1.1vw]">
           Deleted Date
         </div>
       ),
@@ -296,7 +413,7 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
       render: (row) => {
         return (
           <div className="flex justify-center items-center text-[#1F4B7F] ">
-            <p className="text-[1.1vw]">
+            <p className="text-[1vw]">
               {dayjs(row.deleted_date).format("DD MMM, YY")}
             </p>
           </div>
@@ -319,7 +436,7 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
                   return row.deleted_data?.operator?.user_status_id == 0
                     ? "bg-[#646262]"
                     : row.deleted_data?.operator?.user_status_id == 1
-                      ? "bg-[#FF6B00]"
+                      ? "bg-[#FF9900]"
                        : row.deleted_data?.operator?.user_status_id == 2
                       ? "bg-[#38ac2c]"
                          : row.deleted_data?.operator?.user_status_id == 3
@@ -338,7 +455,7 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
                     0
                     ? "bg-[#646262]"
                     : row.deleted_data?.partnerDetails?.partner_status_id == 1
-                      ? "bg-[#FF6B00]"
+                      ? "bg-[#FF9900]"
                        : row.deleted_data?.partnerDetails?.partner_status_id == 2
                       ? "bg-[#38ac2c]"
                        : row.deleted_data?.partnerDetails?.partner_status_id == 3
@@ -361,9 +478,9 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
                       ? "bg-[#FD3434]"
                       : "bg-[#2A99FF] cursor-not-allowed";
                 } else {
-                  return "bg-[#FF6B00] cursor-not-allowed";
+                  return "bg-[#FF9900] cursor-not-allowed";
                 }
-              })()} h-[1.8vw] text-[1.1vw] text-white w-[7vw] rounded-[0.5vw]`}
+              })()} h-[1.8vw] shadow-md shadow-[black] font-extrabold text-[1vw] cursor-not-allowed text-white w-[7vw] rounded-[0.5vw]`}
             >
               {capitalizeFirstLetter(
                 selectedTab === 5
@@ -386,7 +503,7 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
 
     {
       title: (
-        <div className="flex justify-center font-bold text-[1.2vw]">
+        <div className="flex justify-center font-bold text-[1.1vw]">
           Actions
         </div>
       ),
@@ -416,7 +533,7 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
                 });
               }}
             >
-              <TbRestore size={"1.6vw"} color="#1F4B7F" />
+              <TbRestore size={"1.3vw"} color="#1F4B7F" />
             </span>
             <span>
               <MdDelete

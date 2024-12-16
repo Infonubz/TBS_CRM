@@ -376,6 +376,8 @@ export const SearchReqPartner = async(e, filter, dispatch) => {
           search_term: e,
         }
       );
+      console.log(response.data,"response.data741");
+      
       dispatch({ type: GET_REQ_PARTNER, payload: response.data });
     } else {
       GetReqPartnerData(dispatch, filter);
@@ -690,6 +692,8 @@ export const GetReqPartnerData = async (dispatch, partnerFilter) => {
     const response = await axios.get(
       `${apiUrl}/request-partnerStatus/${reqFilter}`
     );
+    console.log(response.data,"response.data");
+    
     dispatch({ type: GET_REQ_PARTNER, payload: response.data });
   } catch (err) {
     handleError(err);

@@ -366,7 +366,8 @@ export const SubmitPatDocumentsData = async (
 export const GetPatAddressById = async (
   PartnerID,
   setPartnerID,
-  setEmpAddressData
+  setEmpAddressData,
+  setSpinning
 ) => {
   try {
     const response = await api.get(
@@ -379,6 +380,9 @@ export const GetPatAddressById = async (
   } catch (error) {
     handleError(error);
     return null;
+  }
+  finally{
+    setSpinning && setSpinning(false)
   }
 };
 
@@ -406,7 +410,10 @@ export const GetPatProffesionalById = async (
 export const GetPatPersonalById = async (
   PartnerID,
   setPartnerID,
-  setEmpPersonalData
+  setEmpPersonalData,
+  dispatch,
+ setSpinning
+
 ) => {
   try {
     const response = await api.get(`${apiUrl}/partner_details/${PartnerID ? PartnerID : sessionStorage.getItem("PAT_ID")}`);
@@ -419,13 +426,17 @@ export const GetPatPersonalById = async (
     handleError(error);
     return null;
   }
+  finally{
+    setSpinning && setSpinning(false)
+  }
 };
 
 export const GetPatDocumentById = async (
   PartnerID,
   setPartnerID,
   setEmpDocumentlData,
-  updatedata
+  updatedata,
+  setSpinning
 ) => {
   try {
     const response = await api.get(
@@ -438,6 +449,9 @@ export const GetPatDocumentById = async (
   } catch (error) {
     handleError(error);
     return null;
+  }
+  finally{
+    setSpinning && setSpinning(false)
   }
 };
 

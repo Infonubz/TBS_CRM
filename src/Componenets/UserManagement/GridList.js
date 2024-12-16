@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 import userimg from "../../asserts/userprofile.png";
 import { FaPhone } from "react-icons/fa";
 import { TbMailFilled } from "react-icons/tb";
-import { Tooltip } from "antd";
+import { Modal, Tooltip } from "antd";
 import { Popover } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ModalPopup from "../Common/Modal/Modal";
@@ -35,6 +35,7 @@ export default function GridList({
   const [openPopovers, setOpenPopovers] = useState({});
   const [userName, setUserName] = useState()
 
+
   const handleEdit = (tbs_operator_id) => {
     SetUpdateData(tbs_operator_id);
     setOperatorID(tbs_operator_id);
@@ -60,7 +61,24 @@ export default function GridList({
     setDeleteOpModalIsOpen(false);
   };
 
-  
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalImage, setModalImage] = useState(null);
+
+  const openModal = (event) => {
+    // Get the image source (src) using `getElementById`
+    const imageSrc = event.target.getAttribute('src');
+
+    // Set the modal image source
+    setModalImage(imageSrc);
+
+    // Open the modal
+    setIsModalOpen(true);
+  };
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+
 
   return (
     <>
@@ -71,7 +89,7 @@ export default function GridList({
               <div
                 className={`
              
-                 bg-white h-[33.5vh] border-[#1f4b7f] border-l-[0.1vw] cursor-pointer border-r-[0.3vw] border-b-[0.3vw] border-t-[0.1vw] rounded-[0.5vw]`}
+                 bg-white h-[33.5vh] border-[#1f4b7f] border-l-[0.1vw]  border-r-[0.3vw] border-b-[0.3vw] border-t-[0.1vw] rounded-[0.5vw]`}
                 onMouseEnter={() => setHoverId(item.tbs_operator_id)}
                 onMouseLeave={() => setHoverId("")}
                 // style={{
@@ -86,7 +104,7 @@ export default function GridList({
                       : "none",
                 }}
               >
-                <div className="flex justify-center pl-[4vw] pt-[1vw]">
+                <div className="flex justify-center pl-[5vw] pt-[1vw]">
                   <img
                     // src={`${
                     //   item?.profile_img == null || "null"
@@ -94,36 +112,51 @@ export default function GridList({
                     //     : `http://192.168.90.47:4000${item?.profile_img}`
                     // } `}
                     src={`${item?.profileimg
-                        ? `${apiImgUrl}${item?.profileimg}`
-                        : userimg
+                      ? `${apiImgUrl}${item?.profileimg}`
+                      : userimg
                       } `}
-                      alt="Profile"
-                    className="h-[10vh] w-[5vw] rounded-[0.5vw]"
+                    alt="Profile"
+                    className="h-[10vh] cursor-pointer w-[5vw] rounded-[0.5vw]"
+                    onClick={openModal}
                   />
-                  <div className="text-right pl-[3vw]">
+                  <div className="text-right pl-[3.5vw]">
                     <Popover
                       placement="bottomRight"
                       content={
-                        <div className="flex flex-col">
-                          {(item?.user_status_id === 1 ||
-                            item?.user_status_id === 0) && (
-                              <div>
-                                <a
-                                  onClick={() => {
-                                    handleEdit(item.tbs_operator_id)
-                                    setUserName(item?.owner_name)
-                                  }}
-                                  className="flex items-center cursor-pointer text-[1vw] text-[#1F4B7F] hover:text-[#1f487c]"
-                                >
-                                  Edit
-                                </a>
-                              </div>
-                            )}
+                        <div className="flex flex-col p-[.5vw]">
+
                           <div>
                             <a
-                              onClick={() => handleDelete(item.tbs_operator_id)}
+                              onClick={() => {
+                                handleEdit(item.tbs_operator_id)
+                                setUserName(item?.owner_name)
+                              }}
+                              className="flex items-center cursor-pointer text-[1vw] text-[#1F4B7F] hover:text-[#1f487c]"
+                            >
+                              <FontAwesomeIcon
+                                icon={faEdit}
+                                className="mr-1"
+                                color="#1f487c"
+                              />
+                              Edit
+                            </a>
+                          </div>
+                          <div className="">
+                            <hr class="border-t-2 border-[#1F4B7F] my-[.3vw]" />
+                          </div>
+                          <div>
+                            <a
+                              onClick={() => {
+                                handleDelete(item.tbs_operator_id)
+                                setUserName(item?.owner_name)
+                              }}
                               className="flex pt-[0.1vw] items-center cursor-pointer text-[1vw] text-[#1F4B7F] hover:text-[#1f487c]"
                             >
+                              <FontAwesomeIcon
+                                icon={faTrash}
+                                className="mr-1"
+                                color="#1f487c"
+                              />
                               Delete
                             </a>
                           </div>
@@ -153,7 +186,9 @@ export default function GridList({
                     {/* {capitalizeFirstLetter(item.owner_name)} */}
                     {
                       item?.company_name?.length > 17 ? (
-                        <Tooltip title={capitalizeFirstLetter(item?.company_name)}>
+                        <Tooltip color="white"
+                          placement="top"
+                          overlayInnerStyle={{ color: "#1F4B7F" }} title={capitalizeFirstLetter(item?.company_name)}>
                           <span>{`${capitalizeFirstLetter(item?.company_name).slice(0, 17)}...`}</span>
                         </Tooltip>
                       ) : (
@@ -192,21 +227,23 @@ export default function GridList({
                         />
                       </div>
                       {/* <div className="text-[0.9vw]">{item.emailid}</div> */}
-                      {item?.emailid?.length > 15 ? (
+                      {item?.emailid?.length > 18 ? (
                         <Tooltip
-                          placement="right"
+                          color="white"
+                          overlayInnerStyle={{ color: "#1F4B7F" }}
+                          placement="top"
                           title={item?.emailid}
                           className="cursor-pointer"
                         // color="#1F487C"
                         >
                           <div className="text-[0.9vw] text-[#1f4b7f]">
                             {" "}
-                            {`${item?.emailid?.slice(0, 15)}...`}
+                            {`${item?.emailid?.slice(0, 18)}...`}
                           </div>
                         </Tooltip>
                       ) : (
                         <div className="text-[0.9vw] text-[#1f4b7f]">
-                          {item?.emailid?.slice(0, 15)}
+                          {item?.emailid?.slice(0, 18)}
                         </div>
                       )}
                     </div>
@@ -231,6 +268,29 @@ export default function GridList({
           module={"operator"}
         />
       </ModalPopup>
+      <Modal
+        className="flex justify-center"
+        visible={isModalOpen}
+        onCancel={closeModal}
+        footer={null}
+        centered
+        width="20vw"
+        height="20vw"
+        bodyStyle={{ padding: 0 }}
+        destroyOnClose={true} // Ensures modal is destroyed on close
+      >
+        {/* Display the image in the modal */}
+        <div className="flex justify-center">
+          {modalImage && (
+            <img
+              src={modalImage}
+              alt="Gst Preview"
+              // style={{ width: "20vw", height: "20vw" }}
+              className="object-cover"
+            />
+          )}
+        </div>
+      </Modal>
     </>
   );
 }

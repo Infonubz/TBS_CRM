@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-import { LiaSave } from "react-icons/lia";
+import React, { useEffect, useState } from "react";
+//import { LiaSave } from "react-icons/lia";
 import AddPromotion from "./AddPromotion";
 import Background_View from "./Background_View";
 import { Form, Formik } from "formik";
@@ -10,42 +10,51 @@ import {
   GetPromotionDataByStatus,
   SubmitPromotionData,
 } from "../../Api/Promotion/Promotion";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import { Spin } from "antd";
+
+const FILE_SIZE = 1024 * 1024 * 5; // 5MB
+const SUPPORTED_FORMATS = [
+  "application/pdf",
+  "image/jpg",
+  "image/jpeg",
+  "image/png",
+];
 
 const validationSchema = Yup.object().shape({
   promotion_name: Yup.string()
     .required("Promotion Title is required")
-    .max(23, "Max 23 characters only"),
+    .min(5, "Min 5 characters only")
+    .max(15, "Max 15 characters only"),
   operator_details: Yup.string().required("Operator Detail is required"),
   promo_value: Yup.string()
     .required("Promo Value is required")
     .matches(/^\d+$/, "Promo Value must contain only numbers")
-    .test(
-      "range-check",
-      "The value you entered is out of range",
-      function (value) {
-        const { value_symbol } = this.parent; // Access value_symbol
-        const numValue = Number(value);
+    .test("range-check", function (value) {
+      const { value_symbol } = this.parent;
+      const numValue = Number(value);
 
-        if (value_symbol === "₹") {
-          return numValue >= 1 && numValue <= 1000;
-        } else if (value_symbol === "%") {
-          return numValue >= 1 && numValue <= 100;
+      if (value_symbol === "₹") {
+        if (numValue < 1 || numValue > 1000) {
+          return this.createError({
+            message: "The value must be between 1 and 1000 for ₹.",
+          });
         }
-        return false;
+      } else if (value_symbol === "%") {
+        if (numValue < 1 || numValue > 100) {
+          return this.createError({
+            message: "The value must be between 1 and 100 for %.",
+          });
+        }
       }
-    ),
+      return true; // Validation passes
+    }),
   value_symbol: Yup.string().required(),
   promotion_description: Yup.string()
     .required("Promotion Description is required")
-    .max(53, "Max 53 characters only"),
-  // usage: Yup.string()
-  //   .required("Enter Usage Value")
-  //   .min(1, "usage must be at least 1")
-  //   .max(100, "usage cannot exceed 100")
-  //   .matches(/^[0-9]+$/, "Only numbers are allowed"),
+    .min(20, "Min 20 characters")
+    .max(45, "Max 45 characters only"),
   promo_code: Yup.string()
     .required("Enter Promo Code")
     .min(5, "Promo Code must be at least 5 digit")
@@ -60,26 +69,14 @@ const validationSchema = Yup.object().shape({
       }
       return true;
     })
-    .test("file_size", "File size is too large", function (value) {
-      if (value && value.size > 2000000) {
-        // 2MB
-        return false;
-      }
-      return true;
-    })
-    .test("file_type", "Unsupported File Format", function (value) {
-      if (typeof value === "string") {
-        // If value is a string (file path), skip file type validation
-        return true;
-      }
-      if (
-        value &&
-        ["image/jpeg", "image/png", "image/jpg"].includes(value.type)
-      ) {
-        return true;
-      }
-      return false;
-    }),
+    .test("fileSize", "File too large max 5mb", (value) =>
+      typeof value === "string" ? true : value && value.size <= FILE_SIZE
+    )
+    .test("fileFormat", "Unsupported format", (value) =>
+      typeof value === "string"
+        ? true
+        : value && SUPPORTED_FORMATS.includes(value.type)
+    ),
   start_date: Yup.date().required("Start Date is required"),
   // .min(new Date(), 'Start Date cannot be in the past'),
   expiry_date: Yup.date()
@@ -94,7 +91,8 @@ export default function AddPromoIndex({
   promodata,
   promotionId,
   setPromotionId,
-  CurrentTab
+  CurrentTab,
+  ownerName,
   // setPromolist,
   // promolist,
 }) {
@@ -107,6 +105,7 @@ export default function AddPromoIndex({
   console.log(currentPromodata, "currentPromotion_data");
   const [currentPromo, setCurrentPromo] = useState([]);
   const [bgimage, setBgImage] = useState(false);
+  const [spinning, setSpinning] = useState(false);
   const [promolist, setPromolist] = useState({
     background_image: "",
     usage: null,
@@ -126,8 +125,11 @@ export default function AddPromoIndex({
   // const [promolist, setPromolist] = useState({ background_image: "", usage: null });
   const [promo_background, setPromoBackground] = useState("");
   const type_Id = sessionStorage.getItem("type_id");
-  const user_name = sessionStorage.getItem("user_name");
+ // const user_name = sessionStorage.getItem("user_name");
   const [isImageConverted, setIsImageConverted] = useState(false);
+  const user = sessionStorage.getItem("user_name");
+
+  const operatorName = type_Id === "OP101" ? user : ownerName;
   // const [loading, setLoading] = useState(false);
   // const handleSubmit = async (values) => {
   //   // const promo_background = useSelector((state) => state.crm.promo_bg);
@@ -234,9 +236,7 @@ export default function AddPromoIndex({
       setCurrentPromodata(values);
       setCurrentPage(2);
     } else {
-      setLoading(true); // Show spinner while submitting
-
-      // Check if the image conversion is complete
+      //setLoading(true);
       if (!isImageConverted) {
         toast.warning("Please wait, image is still processing.");
         return;
@@ -248,8 +248,8 @@ export default function AddPromoIndex({
             currentPromodata,
             promotionId,
             promo_background,
-            valuesymbol
-            //promo_image
+            valuesymbol,
+            promodata
           );
           if (data?.message) {
             toast.success(data?.message);
@@ -261,9 +261,10 @@ export default function AddPromoIndex({
         }
       } catch (error) {
         console.error("Error uploading data", error);
-      } finally {
-        setLoading(false); // Hide spinner
       }
+      //  finally {
+      //   setLoading(false);
+      // }
     }
   };
 
@@ -272,7 +273,8 @@ export default function AddPromoIndex({
       const data = await GetPromotionById(
         promotionId,
         setPromotionId,
-        setPromoData
+        setPromoData,
+        setLoading
       );
       console.log(data.promo_name, "datadata");
       setPromoData(data);
@@ -299,9 +301,9 @@ export default function AddPromoIndex({
   useEffect(() => {
     if (updatedata) {
       fetchGetPromo();
+      setLoading(true)
     }
   }, [promotionId, setPromotionId, setPromoData]);
-
 
   return (
     <>
@@ -309,7 +311,11 @@ export default function AddPromoIndex({
         initialValues={{
           promotion_name: promodata ? promodata.promo_name : "",
           operator_details:
-          type_Id === "PRO101" ? promodata ? promodata.operator_details : "" : user_name,        
+            type_Id === "PRO101" || type_Id === "PROEMP101"
+              ? promodata
+                ? promodata.operator_details
+                : ""
+              : operatorName,
           start_date: promodata
             ? dayjs(promodata.start_date).format("YYYY-MM-DD")
             : "",
@@ -409,7 +415,9 @@ export default function AddPromoIndex({
                   promolist={promolist}
                   setDraggerImage={setDraggerImage}
                   draggerImage={draggerImage}
-                  CurrentTab = {CurrentTab}
+                  CurrentTab={CurrentTab}
+                  ownerName={ownerName}
+                  operatorName={operatorName}
                 />
               ) : (
                 <Background_View

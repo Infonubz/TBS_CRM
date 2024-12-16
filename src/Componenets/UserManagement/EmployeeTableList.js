@@ -57,7 +57,7 @@ const EmployeeTableList = ({
   const columns = [
     {
       title: (
-        <div className="flex items-center justify-center font-bold text-[1.2vw]">Photo</div>
+        <div className="flex items-center justify-center font-bold text-[1.1vw]">Profile</div>
       ),
       // dataIndex: "photo",
       // key: "photo",
@@ -79,23 +79,23 @@ const EmployeeTableList = ({
           </div>
         );
       },
-      width: "6vw",
+      width: "5vw",
     },
     {
-      title: <div className="flex items-center justify-center font-bold text-[1.2vw]">Employee Id</div>,
+      title: <div className="flex items-center justify-center font-bold text-[1.1vw]">Employee Id</div>,
       key: "id",
       ellipsis: true,
       width: "11vw",
       render: (text, row) => {
         return (
           <div className="flex items-center justify-center">
-            <p className="text-[1.1vw] text-[#1F4B7F]">{user?.startsWith("tbs-pro") ? row.tbs_pro_emp_id : row.tbs_op_emp_id}</p>
+            <p className="text-[1vw] text-[#1F4B7F] font-bold">{user?.startsWith("tbs-pro") ? row.tbs_pro_emp_id : row.tbs_op_emp_id}</p>
           </div>
         );
       },
     },
     {
-      title: <div className="flex items-center justify-center  font-bold text-[1.2vw]">Employee Name</div>, // dataIndex: "name",
+      title: <div className="flex items-center justify-center  font-bold text-[1.1vw]">Employee Name</div>, // dataIndex: "name",
       key: "name",
       sorter: (a, b) => {
         const nameA = `${a.emp_first_name} ${a.emp_last_name}`.toUpperCase();
@@ -110,18 +110,19 @@ const EmployeeTableList = ({
           // <div className="flex items-center justify-center">
           //   <p className="text-[1.1vw] text-[#1F4B7F]">{`${capitalizeFirstLetter(row?.emp_first_name)} ${row.emp_last_name}`}</p>
           // </div>
-          <div className="flex items-center justify-center">
-            <p className="text-[1.1vw] text-[#1F4B7F]">{
-              fullname?.length > 17 ? <Tooltip placement="top"
+          <div className="flex items-center pl-[1vw]">
+            <p className="text-[1vw] text-[#1F4B7F] font-bold">{
+              fullname?.length > 20 ? <Tooltip placement="top" color="white"
+              overlayInnerStyle={{ color: "#1F4B7F" }}
                 title={`${capitalizeFirstLetter(row?.emp_first_name)} ${row.emp_last_name}`}
-                className="cursor-pointer">{fullname?.slice(0, 17) + ".."}</Tooltip> : fullname
+                className="cursor-pointer">{fullname?.slice(0, 20) + ".."}</Tooltip> : fullname
             }</p>
           </div>
         )
       }
     },
     {
-      title: <div className="flex items-center justify-center  font-bold text-[1.2vw]">Role Type</div>, // dataIndex: "name",
+      title: <div className="flex items-center justify-center  font-bold text-[1.1vw]">Role Type</div>, // dataIndex: "name",
       key: "role_type",
       sorter: (a, b) => {
         const nameA = `${a.role_type} ${a.role_type}`.toUpperCase();
@@ -129,57 +130,102 @@ const EmployeeTableList = ({
         return nameA.localeCompare(nameB);
       },
       width: "8vw",
-      sortOrder: sortedInfo.columnKey === "name" && sortedInfo.order,
+      sortOrder: sortedInfo.columnKey === "role_type" && sortedInfo.order,
       render: (row) => (
-        <div className="flex items-center justify-center">
-          <p className="text-[1.1vw] text-[#1F4B7F]">{`${capitalizeFirstLetter(row?.role_type)}`}</p>
+        // <div className="flex items-center pl-[1vw]">
+        //   <p className="text-[1vw] text-[#1F4B7F]">{`${capitalizeFirstLetter(row?.role_type)}`}</p>
+        // </div>
+        <div className="flex items-center pl-[1vw]">
+        <p className="text-[1vw] text-[#1F4B7F] font-bold">{
+          row?.role_type?.length > 10 ? <Tooltip placement="top" color="white"
+          overlayInnerStyle={{ color: "#1F4B7F" }}
+            title={`${capitalizeFirstLetter(row?.role_type)}`}
+            className="cursor-pointer">{row?.role_type?.slice(0, 10) + ".."}</Tooltip> : row?.role_type ? row?.role_type : " - " 
+        }</p>
+      </div>
+      ),
+    },
+    {
+      title: <div className="flex items-center justify-center  font-bold text-[1.1vw]">Designation</div>, // dataIndex: "name",
+      key: "Designation",
+      sorter: (a, b) => {
+        const nameA = `${a.designation} ${a.designation}`.toUpperCase();
+        const nameB = `${b.designation} ${b.designation}`.toUpperCase();
+        return nameA.localeCompare(nameB);
+      },
+      width: "11vw",
+      sortOrder: sortedInfo.columnKey === "Designation" && sortedInfo.order,
+      render: (row) => (
+        // <div className="flex items-center pl-[1vw]">
+        //   <p className="text-[1vw] text-[#1F4B7F]">{`${capitalizeFirstLetter(row?.designation)}`}</p>
+        // </div>
+          <div className="flex items-center pl-[1vw]">
+          <p className="text-[1vw] text-[#1F4B7F] font-bold">{
+            row?.designation?.length > 17 ? <Tooltip placement="top" color="white"
+            overlayInnerStyle={{ color: "#1F4B7F" }}
+              title={`${capitalizeFirstLetter(row?.designation)}`}
+              className="cursor-pointer">{row?.designation?.slice(0, 17) + ".."}</Tooltip> : row?.designation ? row?.designation  : " - "
+          }</p>
         </div>
       ),
     },
 
     {
-      title: <div className="flex items-center justify-center font-bold text-[1.2vw]">Mobile</div>,
+      title: <div className="flex items-center justify-center font-bold text-[1.1vw]">Mobile</div>,
       key: "mobile",
-      sorter: (a, b) => a.phone?.length - b.phone?.length,
+      // sorter: (a, b) => a.phone?.length - b.phone?.length,
+      sorter: (a, b) => {
+        const phoneA = a.phone ? a.phone.replace(/\D/g, '') : '';
+        const phoneB = b.phone ? b.phone.replace(/\D/g, '') : '';
+        return phoneA.localeCompare(phoneB);
+      },
       sortOrder: sortedInfo.columnKey === "mobile" ? sortedInfo.order : null,
       ellipsis: true,
-      width: "10vw",
+      width: "8vw",
       render: (text, row) => {
         return (
           <div className="flex items-center justify-center">
-            <p className="text-[1.1vw] text-[#1F4B7F]">{row.phone}</p>
+            <p className="text-[1vw] text-[#1F4B7F]">{row.phone}</p>
           </div>
         );
       },
     },
     {
-      title: <div className="flex items-center justify-center  font-bold text-[1.2vw]">Email</div>,
+      title: <div className="flex items-center justify-center  font-bold text-[1.1vw]">Email</div>,
       // dataIndex: "email",
       key: "email",
-      sorter: (a, b) => a.email_id?.length - b.email_id?.length,
+      // sorter: (a, b) => a.email_id?.length - b.email_id?.length,
+      // sortOrder: sortedInfo.columnKey === "email" ? sortedInfo.order : null,
+      sorter: (a, b) => {
+        const emailA = (a.email_id || "").toLowerCase(); // Ensure it's always a string, even if null/undefined
+        const emailB = (b.email_id || "").toLowerCase(); // Ensure it's always a string, even if null/undefined
+        return emailA.localeCompare(emailB);  // Sort alphabetically
+      },
       sortOrder: sortedInfo.columnKey === "email" ? sortedInfo.order : null,
       ellipsis: true,
-      width: "15vw",
+      width: "13vw",
       render: (row) => {
         return (
           // <div className="flex items-center justify-center">
           //   <p className="text-[1.1vw] text-[#1F4B7F]">{row.email_id}</p>
           // </div>
           <div flex items-center justify-center>
-            {row?.email_id?.length > 18 ? (
+            {row?.email_id?.length > 20 ? (
               <Tooltip
+              color="white"
+              overlayInnerStyle={{ color: "#1F4B7F" }}
                 placement="top"
                 title={row?.email_id}
                 className="cursor-pointer"
               >
-                <div className="text-[1.1vw] text-center text-[#1f4b7f]">
+                <div className="text-[1vw] pl-[1vw] text-[#1f4b7f]">
                   {" "}
-                  {`${row?.email_id?.slice(0, 18)}...`}
+                  {`${row?.email_id?.slice(0, 20)}...`}
                 </div>
               </Tooltip>
             ) : (
-              <div className="text-[1.1vw] text-center text-[#1f4b7f]">
-                {row?.email_id?.slice(0, 18)}
+              <div className="text-[1vw] pl-[1vw] text-[#1f4b7f]">
+                {row?.email_id?.slice(0, 20)}
               </div>
             )}
           </div>
@@ -187,7 +233,7 @@ const EmployeeTableList = ({
       },
     },
     {
-      title: <div className="flex items-center justify-center  font-bold text-[1.2vw]">Created</div>,
+      title: <div className="flex items-center justify-center  font-bold text-[1.1vw]">Created</div>,
       // dataIndex: "created",
       key: "created_date",
       sorter: (a, b) => new Date(a.created_date) - new Date(b.created_date),
@@ -197,8 +243,9 @@ const EmployeeTableList = ({
       render: (row) => {
         return (
           <div className="flex items-center justify-center">
-            <p className="text-[1.1vw] text-[#1F4B7F]">
-              {dayjs(row.created_date).format("MMM DD hh:mm a")}
+            <p className="text-[1vw] text-[#1F4B7F]">
+              {/* {dayjs(row.created_date).format("MMM DD hh:mm a")} */}
+              {dayjs(row.created_date).format("DD MMM, YY")}
             </p>
           </div>
         );
@@ -206,7 +253,7 @@ const EmployeeTableList = ({
     },
     {
       title: (
-        <div className="flex items-center justify-center font-bold text-[1.2vw]">Status</div>
+        <div className="flex items-center justify-center font-bold text-[1.1vw]">Status</div>
       ),
       // dataIndex: "status",
       // key: "status",
@@ -223,7 +270,7 @@ const EmployeeTableList = ({
                       ? "bg-[#FD3434]"
                       : "bg-[#2A99FF]"
                 } ${row.emp_status_id == 0 ? "cursor-not-allowed" : "cursor-pointer"
-                } h-[1.8vw] text-[1.1vw] text-white w-[8vw] rounded-[0.5vw]`}
+                } h-[1.8vw] text-[1vw] shadow-md shadow-black font-extrabold text-white w-[7vw] rounded-[0.5vw]`}
                 onClick={() => {
                   if (row.emp_status_id !== 0) {
                     setViewModal(true);
@@ -243,11 +290,11 @@ const EmployeeTableList = ({
     },
     {
       title: (
-        <div className="flex items-center justify-center font-bold text-[1.2vw]">Action</div>
+        <div className="flex items-center justify-center font-bold text-[1.1vw]">Action</div>
       ),
       // dataIndex: "action",
       // key: "action",
-      width: "7vw",
+      width: "6vw",
       render: (row) => {
         console.log(
           user?.startsWith("tbs-pro") ? row.tbs_pro_emp_id : row.tbs_op_emp_id,
@@ -367,8 +414,8 @@ const EmployeeTableList = ({
         show={viewmodal}
         closeicon={false}
         onClose={closeModal}
-        height="16vw"
-        width="30vw"
+        height="17vw"
+        width="28vw"
       >
         <EmployeeStatusUpdate
           employeeid={employee_id}

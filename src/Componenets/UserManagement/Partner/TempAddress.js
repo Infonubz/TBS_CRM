@@ -1,7 +1,7 @@
 import { Checkbox, ConfigProvider, Select } from "antd";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { useState } from "react";
-import { IoMdArrowDropdown } from "react-icons/io";
+import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 import { useSelector } from "react-redux";
 import * as Yup from "yup";
 
@@ -18,8 +18,8 @@ const validationSchema = Yup.object().shape({
   temp_country: Yup.string().required("Country is required"),
 
   temp_postal: Yup.string()
-    .matches(/^[0-9]{6}$/, "Postal Code must be a 6-digit number")
-    .required("Postal Code is required"),
+    .matches(/^[0-9]{6}$/, "Postal code must be a 6-digit number")
+    .required("Postal code is required"),
 });
 
 const TempAddress = ({
@@ -190,7 +190,7 @@ const TempAddress = ({
 
           return (
             <Form onSubmit={handleSubmit}>
-              <div className="overflow-y-auto h-[16vw] pb-[1vw]">
+              <div className="overflow-y-auto h-[15.6vw] pb-[1vw]">
               <div className="grid grid-cols-2 w-full gap-x-[2vw] pt-[1vw]">
                 <div className="col-span-1 relative">
                   <label className="text-[#1F4B7F] text-[1.1vw] ">
@@ -199,11 +199,96 @@ const TempAddress = ({
                       *
                     </span>
                   </label>
+                  <input
+                          type="text"
+                          name="temp_address"
+                          style={{ display: "none" }}
+                        />
                   <Field
                     type="text"
                     name="temp_address"
                     placeholder="Enter Temperory Address"
+                    autoComplete="temp_address-field"
                     value={values.temp_address}
+                    disabled={
+                      updatedata && empaddressdata?.perm_add != null || documentback
+                        ? enable
+                          ? false
+                          : true
+                        : false
+                    }
+                    className={`${
+                      updatedata && empaddressdata?.perm_add != null || documentback
+                        ? enable == false
+                          ? " cursor-not-allowed"
+                          : ""
+                        : ""
+                    } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                  />
+                  <ErrorMessage
+                    name="temp_address"
+                    component="div"
+                    className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[.3vw]"
+                  />
+                </div>
+                <div className="col-span-1 relative">
+                  <label className="text-[#1F4B7F] text-[1.1vw] ">
+                    Postal Code
+                    <span className="text-[1vw] text-red-600 pl-[0.2vw]">
+                      *
+                    </span>
+                  </label>
+                  <input
+                          type="text"
+                          name="temp_postal"
+                          style={{ display: "none" }}
+                        />
+                  <Field
+                    type="text"
+                    name="temp_postal"
+                    placeholder="Enter Postal Code"
+                    autoComplete="temp_postal-field"
+                    value={values.temp_postal}
+                    disabled={
+                      updatedata && empaddressdata?.perm_add != null || documentback
+                        ? enable
+                          ? false
+                          : true
+                        : false
+                    }
+                    className={`${
+                      updatedata && empaddressdata?.perm_add != null || documentback
+                        ? enable == false
+                          ? " cursor-not-allowed"
+                          : ""
+                        : ""
+                    } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                  />
+                  <ErrorMessage
+                    name="temp_postal"
+                    component="div"
+                    className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[.3vw]"
+                  />
+                </div>
+              
+              </div>
+              <div className="grid grid-cols-2 w-full gap-x-[2vw] pt-[1vw]">
+              
+                <div className="col-span-1 relative">
+                  <label className="text-[#1F4B7F] text-[1.1vw] ">
+                    City
+                    <span className="text-[1vw] text-red-600 pl-[0.2vw]">
+                      *
+                    </span>
+                  </label>
+                  {/* <Field
+                    as="select"
+                    name="temp_city"
+                    value={values.temp_city}
+                    //   onChange={(e) => {
+                    //     handleChange(e);
+                    //     localStorage.setItem("status", e.target.value);
+                    //   }}
                     disabled={
                       updatedata || documentback
                         ? enable
@@ -218,9 +303,116 @@ const TempAddress = ({
                           : ""
                         : ""
                     } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
-                  />
+                  >
+                    <option label="Select City" value="" className="" />
+                    <option label="Tiruppur" value="Tiruppur" className="" />
+                    <option
+                      label="Coimbatore"
+                      value="Coimbatore"
+                      className=""
+                    />
+                    <option label="Chennai" value="Chennai" className="" />
+                  </Field> */}
+                     <ConfigProvider
+                        theme={{
+                          components: {
+                            Select: {
+                              optionActiveBg: '#aebed1',
+                              optionSelectedColor: '#FFF',
+                              optionSelectedBg: '#aebed1',
+                              optionHeight: '2',
+                            },
+                          },
+                        }}
+                      >
+                        <Select
+                          showSearch
+                          value={values.temp_city}
+                          placement="topRight"
+                          listHeight={190}
+                          onChange={(value) => {
+                            handleChange({ target: { name: 'temp_city', value } })
+                          }}
+                          disabled={
+                            updatedata && empaddressdata?.perm_add != null || documentback
+                              ? enable
+                                ? false
+                                : true
+                              : false
+                          }
+                          name="temp_city"
+                          className={`${updatedata && empaddressdata?.perm_add != null || documentback
+                            ? enable == false
+                              ? " cursor-not-allowed"
+                              : ""
+                            : ""
+                            } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          // className="custom-select bg-white outline-none w-full mt-[0.5vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
+                          placeholder="Select city"
+                          filterOption={(input, option) => 
+                            option?.value?.toLowerCase()?.includes(input.toLowerCase()) // Make it case-insensitive
+                          }
+                          optionFilterProp="value"
+                          suffixIcon={<span style={{ fontSize: '1vw', color: '#1f487c' }}>
+                               <IoMdArrowDropup size="2vw" />
+                          </span>}
+                          style={{ padding: 4 }}
+                          options={[
+                            {
+                              value: '',
+                              label: (
+                                <div className="text-[1vw] px-[0.2vw] pb-[0.1vw] text-gray-400">
+                                  Select City
+                                </div>
+                              ),
+                              disabled: true,
+                            },
+                            {
+                              value: 'Tiruppur',
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  Tiruppur
+                                </div>
+                              ),
+                            },
+                            {
+                              value: 'Coimbatore',
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  Coimbatore
+                                </div>
+                              ),
+                            },
+                            {
+                              value: 'Chennai',
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  Chennai
+                                </div>
+                              ),
+                            },
+                            { 
+                              value: 'Bengaluru',
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  Bengaluru
+                                </div>
+                              ),
+                            },
+                            {
+                              value: 'Hydrabad',
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  'Hydrabad',
+                                </div>
+                              ),
+                            },
+
+                          ]}     
+                        />
+                      </ConfigProvider>
                   <ErrorMessage
-                    name="temp_address"
+                    name="temp_city"
                     component="div"
                     className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[.3vw]"
                   />
@@ -275,18 +467,20 @@ const TempAddress = ({
                         <Select
                           showSearch
                           value={values.temp_state}
+                          placement="topRight"
+                          listHeight={190}
                           onChange={(value) => {
                             handleChange({ target: { name: 'temp_state', value } })
                           }}
                           disabled={
-                            updatedata || documentback
+                            updatedata && empaddressdata?.perm_add != null || documentback
                               ? enable
                                 ? false
                                 : true
                               : false
                           }
                           name="temp_state"
-                          className={`${updatedata || documentback
+                          className={`${updatedata && empaddressdata?.perm_add != null || documentback
                             ? enable == false
                               ? " cursor-not-allowed"
                               : ""
@@ -299,7 +493,7 @@ const TempAddress = ({
                           }
                           optionFilterProp="value"
                           suffixIcon={<span style={{ fontSize: '1vw', color: '#1f487c' }}>
-                            <IoMdArrowDropdown size="2vw" />
+                               <IoMdArrowDropup size="2vw" />
                           </span>}
                           style={{ padding: 4 }}
                           options={[
@@ -336,7 +530,24 @@ const TempAddress = ({
                                 </div>
                               ),
                             },
+                            {
+                              value: 'Telangana',
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  Telangana
+                                </div>
+                              ),
+                            },
+                            {
+                              value: 'Karnataka',
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  Karnataka
+                                </div>
+                              ),
+                            },
                           ]}
+                          
                         />
                       </ConfigProvider>
                   <ErrorMessage
@@ -345,9 +556,11 @@ const TempAddress = ({
                     className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[.3vw]"
                   />
                 </div>
+               
+            
               </div>
               <div className="grid grid-cols-2 w-full gap-x-[2vw] pt-[1vw]">
-                <div className="col-span-1 relative">
+              <div className="col-span-1 relative">
                   <label className="text-[#1F4B7F] text-[1.1vw] ">
                     Region
                     <span className="text-[1vw] text-red-600 pl-[0.2vw]">
@@ -419,18 +632,20 @@ const TempAddress = ({
                         <Select
                           showSearch
                           value={values.temp_region}
+                          placement="topRight"
+                          listHeight={190}
                           onChange={(value) => {
                             handleChange({ target: { name: 'temp_region', value } })
                           }}
                           disabled={
-                            updatedata || documentback
+                            updatedata && empaddressdata?.perm_add != null || documentback
                               ? enable
                                 ? false
                                 : true
                               : false
                           }
                           name="temp_region"
-                          className={`${updatedata || documentback
+                          className={`${updatedata && empaddressdata?.perm_add != null || documentback
                             ? enable == false
                               ? " cursor-not-allowed"
                               : ""
@@ -443,7 +658,7 @@ const TempAddress = ({
                           }
                           optionFilterProp="value"
                           suffixIcon={<span style={{ fontSize: '1vw', color: '#1f487c' }}>
-                            <IoMdArrowDropdown size="2vw" />
+                                <IoMdArrowDropup size="2vw" />
                           </span>}
                           style={{ padding: 4 }}
                           options={[
@@ -508,132 +723,6 @@ const TempAddress = ({
                 </div>
                 <div className="col-span-1 relative">
                   <label className="text-[#1F4B7F] text-[1.1vw] ">
-                    City
-                    <span className="text-[1vw] text-red-600 pl-[0.2vw]">
-                      *
-                    </span>
-                  </label>
-                  {/* <Field
-                    as="select"
-                    name="temp_city"
-                    value={values.temp_city}
-                    //   onChange={(e) => {
-                    //     handleChange(e);
-                    //     localStorage.setItem("status", e.target.value);
-                    //   }}
-                    disabled={
-                      updatedata || documentback
-                        ? enable
-                          ? false
-                          : true
-                        : false
-                    }
-                    className={`${
-                      updatedata || documentback
-                        ? enable == false
-                          ? " cursor-not-allowed"
-                          : ""
-                        : ""
-                    } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
-                  >
-                    <option label="Select City" value="" className="" />
-                    <option label="Tiruppur" value="Tiruppur" className="" />
-                    <option
-                      label="Coimbatore"
-                      value="Coimbatore"
-                      className=""
-                    />
-                    <option label="Chennai" value="Chennai" className="" />
-                  </Field> */}
-                     <ConfigProvider
-                        theme={{
-                          components: {
-                            Select: {
-                              optionActiveBg: '#aebed1',
-                              optionSelectedColor: '#FFF',
-                              optionSelectedBg: '#aebed1',
-                              optionHeight: '2',
-                            },
-                          },
-                        }}
-                      >
-                        <Select
-                          showSearch
-                          value={values.temp_city}
-                          onChange={(value) => {
-                            handleChange({ target: { name: 'temp_city', value } })
-                          }}
-                          disabled={
-                            updatedata || documentback
-                              ? enable
-                                ? false
-                                : true
-                              : false
-                          }
-                          name="temp_city"
-                          className={`${updatedata || documentback
-                            ? enable == false
-                              ? " cursor-not-allowed"
-                              : ""
-                            : ""
-                            } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
-                          // className="custom-select bg-white outline-none w-full mt-[0.5vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
-                          placeholder="Select city"
-                          filterOption={(input, option) => 
-                            option?.value?.toLowerCase()?.includes(input.toLowerCase()) // Make it case-insensitive
-                          }
-                          optionFilterProp="value"
-                          suffixIcon={<span style={{ fontSize: '1vw', color: '#1f487c' }}>
-                            <IoMdArrowDropdown size="2vw" />
-                          </span>}
-                          style={{ padding: 4 }}
-                          options={[
-                            {
-                              value: '',
-                              label: (
-                                <div className="text-[1vw] px-[0.2vw] pb-[0.1vw] text-gray-400">
-                                  Select City
-                                </div>
-                              ),
-                              disabled: true,
-                            },
-                            {
-                              value: 'Tiruppur',
-                              label: (
-                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                                  Tiruppur
-                                </div>
-                              ),
-                            },
-                            {
-                              value: 'Coimbatore',
-                              label: (
-                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                                  Coimbatore
-                                </div>
-                              ),
-                            },
-                            {
-                              value: 'Chennai',
-                              label: (
-                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-                                  Chennai
-                                </div>
-                              ),
-                            },
-                          ]}     
-                        />
-                      </ConfigProvider>
-                  <ErrorMessage
-                    name="temp_city"
-                    component="div"
-                    className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[.3vw]"
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 w-full gap-x-[2vw] pt-[1vw]">
-                <div className="col-span-1 relative">
-                  <label className="text-[#1F4B7F] text-[1.1vw] ">
                     Country
                     <span className="text-[1vw] text-red-600 pl-[0.2vw]">
                       *
@@ -682,18 +771,20 @@ const TempAddress = ({
                         <Select
                           showSearch
                           value={values.temp_country}
+                          placement="topRight"
+                          listHeight={190}
                           onChange={(value) => {
                             handleChange({ target: { name: 'temp_country', value } })
                           }}
                           disabled={
-                            updatedata || documentback
+                            updatedata && empaddressdata?.perm_add != null || documentback
                               ? enable
                                 ? false
                                 : true
                               : false
                           }
                           name="temp_country"
-                          className={`${updatedata || documentback
+                          className={`${updatedata && empaddressdata?.perm_add != null || documentback
                             ? enable == false
                               ? " cursor-not-allowed"
                               : ""
@@ -706,7 +797,7 @@ const TempAddress = ({
                           }
                           optionFilterProp="value"
                           suffixIcon={<span style={{ fontSize: '1vw', color: '#1f487c' }}>
-                            <IoMdArrowDropdown size="2vw" />
+                            <IoMdArrowDropup size="2vw" />
                           </span>}
                           style={{ padding: 4 }}
                           options={[
@@ -743,6 +834,22 @@ const TempAddress = ({
                                 </div>
                               ),
                             },
+                            {
+                              value: 'England',
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  England
+                                </div>
+                              ),
+                            },
+                            {
+                              value: 'Canada',
+                              label: (
+                                <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+                                  Canada
+                                </div>
+                              ),
+                            },
                           ]}     
                         />
                       </ConfigProvider>
@@ -752,39 +859,7 @@ const TempAddress = ({
                     className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[.3vw]"
                   />
                 </div>
-                <div className="col-span-1 relative">
-                  <label className="text-[#1F4B7F] text-[1.1vw] ">
-                    Postal Code
-                    <span className="text-[1vw] text-red-600 pl-[0.2vw]">
-                      *
-                    </span>
-                  </label>
-                  <Field
-                    type="text"
-                    name="temp_postal"
-                    placeholder="Enter Postal Code"
-                    value={values.temp_postal}
-                    disabled={
-                      updatedata || documentback
-                        ? enable
-                          ? false
-                          : true
-                        : false
-                    }
-                    className={`${
-                      updatedata || documentback
-                        ? enable == false
-                          ? " cursor-not-allowed"
-                          : ""
-                        : ""
-                    } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
-                  />
-                  <ErrorMessage
-                    name="temp_postal"
-                    component="div"
-                    className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[.3vw]"
-                  />
-                </div>
+             
               </div>
               </div> 
               <div className="flex items-center justify-between  pb-[.5vw] pt-[1.5vw]">
@@ -793,7 +868,7 @@ const TempAddress = ({
                     *You must fill in all fields to be able to continue
                   </h1>
                 </div>
-                <div className="flex items-center gap-x-[0.7vw]">
+                <div className="flex items-center pb-[.6vw] gap-x-[0.7vw]">
                   <button
                     className="border-[#1F487C] w-[5vw] font-semibold text-[1vw] h-[2vw] rounded-full border-r-[0.2vw]  border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw]"
                     onClick={() => {
@@ -808,7 +883,7 @@ const TempAddress = ({
                     type="submit"
                     //   onClick={() => setCurrentpage(3)}
                   >
-                    {updatedata || documentback
+                    {updatedata && empaddressdata?.perm_add != null || documentback
                       ? enable
                         ? "Update & Continue"
                         : " Continue"

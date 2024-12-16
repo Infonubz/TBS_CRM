@@ -161,10 +161,10 @@ export default function BackgroundView({
   ];
   const handicapped = [
     handicapped1,
-    handicapped2,
-    handicapped3,
-    handicapped4,
-    handicapped5,
+    // handicapped2,
+    // handicapped3,
+    // handicapped4,
+    // handicapped5,
     handicapped6,
     handicapped7,
     handicapped8,
@@ -175,10 +175,10 @@ export default function BackgroundView({
     pilgrim1,
     pilgrim2,
     pilgrim3,
-    pilgrim4,
-    pilgrim5,
-    pilgrim6,
-    pilgrim7,
+    // pilgrim4,
+    // pilgrim5,
+    // pilgrim6,
+    // pilgrim7,
     pilgrim8,
     pilgrim9,
     pilgrim10,
@@ -211,13 +211,13 @@ export default function BackgroundView({
     tourist1,
     tourist2,
     tourist3,
-    tourist4,
-    tourist5,
-    tourist6,
-    tourist7,
-    tourist8,
-    tourist9,
-    tourist10,
+    // tourist4,
+    // tourist5,
+    // tourist6,
+    // tourist7,
+    // tourist8,
+    // tourist9,
+    // tourist10,
   ];
 
   const nextSlide = () => {
@@ -483,6 +483,7 @@ export default function BackgroundView({
               ...offerlist,
               usage: e.target.value,
             });
+            setError("");
           }}
           value={offerlist.usage || ""}
         />
@@ -495,8 +496,11 @@ export default function BackgroundView({
       <div className="mt-[4vw] ">
         <ComponentToPrint ref={containerRef} />
       </div>
-      <div className="cursor-pointer absolute top-[-4.1vw] right-[20vw] z-10" onClick={downloadImage}>
-        <FaCloudDownloadAlt size="3.5vw" color="#1F487C" />
+      <div
+        className="cursor-pointer absolute top-[-3.75vw] right-[15.5vw] z-10"
+        onClick={downloadImage}
+      >
+        <FaCloudDownloadAlt size="3vw" color="#1F487C" />
       </div>
     </div>
   );

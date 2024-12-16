@@ -48,7 +48,7 @@ const ClientTableView = ({
   const columns = [
     {
       title: (
-        <div className="flex justify-center font-bold text-[1.2vw]">Photo</div>
+        <div className="flex justify-center font-bold text-[1.1vw]">Profile</div>
       ),
       // dataIndex: "photo",
       // key: "photo",
@@ -70,37 +70,63 @@ const ClientTableView = ({
           </div>
         );
       },
-      width: "6vw",
+      width: "4vw",
     },
     {
-      title: <div className="flex items-center justify-center font-bold text-[1.2vw]">Client Id</div>,
+      title: <div className="flex items-center justify-center font-bold text-[1.1vw]">Client Id</div>,
       key: "id",
       ellipsis: true,
-      width: "9vw",
+      width: "7vw",
       render: (text, row) => {
         return (
-          <div className="flex items-center justify-center">
-            <p className="text-[1.1vw] text-[#1F4B7F]">{row.tbs_client_id}</p>
+          <div className="flex items-center pl-[1vw]">
+            <p className="text-[1vw] text-[#1F4B7F] font-bold">{row.tbs_client_id}</p>
           </div>
         );
       },
     },
     {
-      title: <div className="flex items-center justify-center  font-bold text-[1.2vw]">Client Name</div>, // dataIndex: "name",
+      title: <div className="flex items-center justify-center  font-bold text-[1.1vw]">Company Name</div>, // dataIndex: "name",
+      key: "name",
+      sorter: (a, b) => {
+        const nameA = a.company_name.toUpperCase();
+        const nameB = b.company_name.toUpperCase();
+        return nameA.localeCompare(nameB);
+      },
+      width: "9vw",
+      sortOrder: sortedInfo.columnKey === "name" && sortedInfo.order,
+      render: (row) => (
+        <div className="flex items-center text-[1vw] font-bold text-[#1F4B7F] pl-[1vw]">
+          {
+            row?.company_name?.length > 18 ? (
+              <Tooltip color="white"
+              overlayInnerStyle={{ color: "#1F4B7F" }} title={capitalizeFirstLetter(row?.company_name)}>
+                <span>{`${capitalizeFirstLetter(row?.company_name).slice(0, 18)}...`}</span>
+              </Tooltip>
+            ) : (
+              <span>{capitalizeFirstLetter(row?.company_name)}</span>
+            )
+          }
+        </div>
+      )
+    },
+    {
+      title: <div className="flex items-center justify-center  font-bold text-[1.1vw]">Client Name</div>, // dataIndex: "name",
       key: "name",
       sorter: (a, b) => {
         const nameA = a.owner_name.toUpperCase();
         const nameB = b.owner_name.toUpperCase();
         return nameA.localeCompare(nameB);
       },
-      width: "12vw",
+      width: "9vw",
       sortOrder: sortedInfo.columnKey === "name" && sortedInfo.order,
       render: (row) => (
-        <div className="flex items-center text-[1.1vw] text-[#1F4B7F] justify-center">
+        <div className="flex items-center text-[1vw] font-bold text-[#1F4B7F] pl-[1vw]">
           {
-            row?.owner_name?.length > 15 ? (
-              <Tooltip title={capitalizeFirstLetter(row?.owner_name)}>
-                <span>{`${capitalizeFirstLetter(row?.owner_name).slice(0, 15)}...`}</span>
+            row?.owner_name?.length > 18 ? (
+              <Tooltip color="white"
+              overlayInnerStyle={{ color: "#1F4B7F" }} title={capitalizeFirstLetter(row?.owner_name)}>
+                <span>{`${capitalizeFirstLetter(row?.owner_name).slice(0, 18)}...`}</span>
               </Tooltip>
             ) : (
               <span>{capitalizeFirstLetter(row?.owner_name)}</span>
@@ -109,9 +135,40 @@ const ClientTableView = ({
         </div>
       )
     },
+    {
+      title: <div className="flex items-center justify-center  font-bold text-[1.1vw]">Business Type</div>, // dataIndex: "name",
+      key: "name",
+      // sorter: (a, b) => {
+      //   const nameA = a.business_background.toUpperCase();
+      //   const nameB = b.business_background.toUpperCase();
+      //   return nameA.localeCompare(nameB);
+      // },
+      // sortOrder: sortedInfo.columnKey === "name" && sortedInfo.order,
+      sorter: (a, b) => {
+        const nameA = (a.business_background || "").toUpperCase();  // Handle null or undefined
+        const nameB = (b.business_background || "").toUpperCase();
+        return nameA.localeCompare(nameB);  // Compare lexicographically
+      },
+      sortOrder: sortedInfo.columnKey === "business_background" ? sortedInfo.order : null,
+      width: "11vw",
+      render: (row) => (
+        <div className="flex items-center text-[1vw] text-[#1F4B7F] pl-[1vw]">
+          {
+            row?.business_background?.length > 22 ? (
+              <Tooltip color="white"
+              overlayInnerStyle={{ color: "#1F4B7F" }} title={capitalizeFirstLetter(row?.business_background)}>
+                <span>{`${capitalizeFirstLetter(row?.business_background).slice(0, 22)}...`}</span>
+              </Tooltip>
+            ) : (
+              <span>{capitalizeFirstLetter(row?.business_background)}</span>
+            )
+          }
+        </div>
+      )
+    },
 
     {
-      title: <div className="flex items-center justify-center font-bold text-[1.2vw]">Mobile</div>,
+      title: <div className="flex items-center justify-center font-bold text-[1.1vw]">Mobile</div>,
       key: "mobile",
       sorter: (a, b) => {
         const phoneA = a.phone ? a.phone.replace(/\D/g, '') : '';
@@ -120,11 +177,11 @@ const ClientTableView = ({
       },
       sortOrder: sortedInfo.columnKey === "mobile" ? sortedInfo.order : null,
       ellipsis: true,
-      width: "10vw",
+      width: "7vw",
       render: (text, row) => {
         return (
           <div className="flex items-center justify-center">
-            <p className="text-[1.1vw] text-[#1F4B7F]">{row.phone}</p>
+            <p className="text-[1vw] text-[#1F4B7F]">{row.phone}</p>
           </div>
         );
       },
@@ -133,29 +190,37 @@ const ClientTableView = ({
       title: <div className="flex  font-bold text-[1.2vw] justify-center">Email</div>,
       // dataIndex: "email",
       key: "email",
-      sorter: (a, b) => a.emailid?.length - b.emailid?.length,
+      // sorter: (a, b) => a.emailid?.length - b.emailid?.length,
+      // sortOrder: sortedInfo.columnKey === "email" ? sortedInfo.order : null,
+      sorter: (a, b) => {
+        const emailA = (a.emailid || "").toLowerCase(); // Handle null or undefined safely
+        const emailB = (b.emailid || "").toLowerCase(); // Handle null or undefined safely
+        return emailA.localeCompare(emailB);  // Sort alphabetically
+      },
       sortOrder: sortedInfo.columnKey === "email" ? sortedInfo.order : null,
       ellipsis: true,
-      width: "15vw",
+      width: "12vw",
       render: (row) => {
         return (
           // <div className="flex items-center justify-center">
           //   <p className="text-[1.1vw] text-[#1F4B7F]">{row.emailid}</p>
           // </div>
-          <div flex items-center justify-center>
+          <div >
           {row?.emailid?.length > 20 ? (
             <Tooltip
+            color="white"
+              overlayInnerStyle={{ color: "#1F4B7F" }}
               placement="top"
               title={row?.emailid}
               className="cursor-pointer"
             >
-              <div className="text-[1.1vw] text-center text-[#1f4b7f]">
+              <div className="text-[1vw] pl-[1vw]  text-[#1f4b7f]">
                 {" "}
                 {`${row?.emailid?.slice(0, 20)}...`}
               </div>
             </Tooltip>
           ) : (
-            <div className="text-[1.1vw] text-center text-[#1f4b7f]">
+            <div className="text-[1vw] pl-[1vw] text-[#1f4b7f]">
               {row?.emailid?.slice(0, 20)}
             </div>
           )}
@@ -164,17 +229,17 @@ const ClientTableView = ({
       },
     },
     {
-      title: <div className="flex items-center justify-center  font-bold text-[1.2vw]">Created</div>,
+      title: <div className="flex items-center justify-center  font-bold text-[1.1vw]">Created</div>,
       // dataIndex: "created",
       key: "created_date",
       sorter: (a, b) => new Date(a.created_date) - new Date(b.created_date),
       sortOrder: sortedInfo.columnKey === "created_date" && sortedInfo.order,
       ellipsis: true,
-      width: "10vw",
+      width: "6vw",
       render: (row) => {
         return (
           <div className="flex items-center justify-center">
-            <p className="text-[1.1vw] text-[#1F4B7F]">
+            <p className="text-[1vw] text-[#1F4B7F]">
               {dayjs(row.created_date).format("DD MMM, YY")}
             </p>
           </div>
@@ -183,11 +248,11 @@ const ClientTableView = ({
     },
     {
       title: (
-        <div className="flex items-center justify-center font-bold text-[1.2vw]">Status</div>
+        <div className="flex items-center justify-center font-bold text-[1.1vw]">Status</div>
       ),
       // dataIndex: "status",
       // key: "status",
-      width: "10vw",
+      width: "8vw",
       render: (row) => {
         return (
           <div className="flex items-center justify-center">
@@ -201,7 +266,7 @@ const ClientTableView = ({
                       ? "bg-[#FD3434]"
                       : "bg-[#2A99FF]"
                   } ${row.status_id == 0 ? "cursor-not-allowed" : "cursor-pointer"
-                  } h-[1.8vw] text-[1.1vw] text-white w-[8vw] rounded-[0.5vw]`}
+                  } h-[1.8vw] shadow-md shadow-[black] font-extrabold text-[1vw] text-white w-[7vw] rounded-[0.5vw]`}
                 onClick={() => {
                   setViewModal(true);
                   setStatusClientId(row.tbs_client_id);
@@ -219,11 +284,11 @@ const ClientTableView = ({
     },
     {
       title: (
-        <div className="flex items-center justify-center font-bold text-[1.2vw]">Action</div>
+        <div className="flex items-center justify-center font-bold text-[1.1vw]">Action</div>
       ),
       // dataIndex: "action",
       // key: "action",
-      width: "10vw",
+      width: "5vw",
       render: (row) => {
         console.log(row?.tbs_client_id, "rowrowrow");
         return (

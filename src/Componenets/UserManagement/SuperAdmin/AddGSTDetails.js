@@ -1,4 +1,4 @@
-import { Modal, Progress } from "antd";
+import { Modal, Progress, Spin } from "antd";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { FaCloudUploadAlt, FaPlus } from "react-icons/fa";
@@ -14,6 +14,7 @@ import {
   // SubmitClientGSTData,
 } from "../../../Api/UserManagement/SuperAdmin";
 import { useDispatch } from "react-redux";
+import { capitalizeFirstLetter } from "../../Common/Captilization";
 // import { GetClientGSTById } from "../../../Api/UserManagement/Client";
 
 const validationSchema = Yup.object().shape({
@@ -51,6 +52,7 @@ export default function AddGSTDetails({
 
   const dispatch = useDispatch();
   const [superadmingstdata, setSuperAdminGSTData] = useState("");
+  const [spinning, setSpinning] = useState(false);
 
   const handleSubmit = async (values) => {
     if (superadmingstdata?.state_name) {
@@ -82,7 +84,8 @@ export default function AddGSTDetails({
       const data = await GetSuperAdminGSTById(
         operatorID,
         operatorID,
-        setSuperAdminGSTData
+        setSuperAdminGSTData,
+        setSpinning
       );
       setSuperAdminGSTData(data);
       console.log(superadmingstdata,"admindatadadghdfkg");
@@ -111,6 +114,7 @@ const openModal = (event) => {
     if (operatorID != null || clientID) {
       console.log(superadmingstdata, "superadmingstdata");
       fetchGetUser();
+      setSpinning(true)
     }
     console.log(operatorID, "clientID");
   }, [operatorID, setOperatorID, setSuperAdminGSTData]);
@@ -178,6 +182,11 @@ const openModal = (event) => {
               touched,
             }) => (
               <Form onSubmit={handleSubmit}>
+                  {spinning ? (
+                  <div className=" flex justify-center h-[23.8vw] items-center">
+                    <Spin size="large" />
+                  </div>
+                ) : (
                 <div className="gap-y-[1.5vw] flex-col flex">
                   {/* <div className="grid grid-cols-2 w-full gap-x-[2vw] items-center">
                     <div className="col-span-1">
@@ -267,7 +276,7 @@ const openModal = (event) => {
                       <div className="gap-y-[1vw] text-[#1F4B7F] text-[1vw]">
                         <div className="grid grid-cols-2 ">
                           <div className="font-semibold">State:</div>
-                          <div>{superadmingstdata?.state_name}</div>
+                          <div>{capitalizeFirstLetter(superadmingstdata?.state_name)}</div>
                         </div>
                         <div className="grid grid-cols-2 mt-[1vw]">
                           <div className="font-semibold">
@@ -281,7 +290,7 @@ const openModal = (event) => {
                         </div>
                         <div className="grid grid-cols-2 mt-[1vw]">
                           <div className="font-semibold">Head Office:</div>
-                          <div>{superadmingstdata?.head_office}</div>
+                          <div>{capitalizeFirstLetter(superadmingstdata?.head_office)}</div>
                         </div>
                         <div className="grid grid-cols-2 mt-[1vw]">
                           <div className="font-semibold">Uploaded Document:</div>
@@ -335,13 +344,20 @@ const openModal = (event) => {
                         onClick={() => {
                           setModalIsOpen(false);
                           setmodalIsOpen1(false);
+                          if(superadmingstdata?.state_name){
+                            toast.success("Form Updated Successfully")
+                          }
+                          else{
+                            toast.success("Form Submitted Successfully")
+                          }
                         }}
                       >
-                        {superadmingstdata?.state_name ? "Update" : "Submit"}
+                        {superadmingstdata?.state_name? "Update" : "Submit"}
                       </button>
                     </div>
                   </div>
                 </div>
+                )}
               </Form>
             )}
           </Formik>

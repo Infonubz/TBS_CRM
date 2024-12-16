@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { Table, Pagination, Spin, ConfigProvider } from "antd";
+import { Table, Pagination, Popover, Spin, ConfigProvider } from "antd";
 import { IoEyeOutline } from "react-icons/io5";
 import { IoSearch } from "react-icons/io5";
 import { DownOutlined } from "@ant-design/icons";
 import { Dropdown, Space, Typography } from "antd";
 import { IoEyeOffOutline } from "react-icons/io5";
 import Backdrop from "../../asserts/CRMbg.png";
+import { BsExclamationCircle } from "react-icons/bs";
 import "../../App.css";
 import {
+  GetSubscriptionByDate,
   GetSubscriptionList,
   handleAdsearch,
 } from "../../Api/Subscription/Subscription";
@@ -26,8 +28,9 @@ import { LiaSearchSolid } from "react-icons/lia";
 import { DatePicker } from "antd";
 import { IoIosArrowDropdownCircle } from "react-icons/io";
 import { IoIosArrowDropupCircle } from "react-icons/io";
+import moment from "moment";
 
-export default function Subscription({ }) {
+export default function Subscription({}) {
   const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const [expandedRowKey, setExpandedRowKey] = useState(null);
   const [showHalfMap, setShowHalfMap] = useState({}); // State to track which user's product key to show/hide
@@ -41,7 +44,28 @@ export default function Subscription({ }) {
   const getSubscriptionlist =
     useSelector((state) => state.crm.subscription_list) || [];
 
-  console.log(getSubscriptionlist, 'getsubscription')
+  const infos = [
+    {
+      title: "Operator Name",
+    },
+    {
+      title: "Owner Name",
+    },
+    {
+      title: "Plan Name",
+    },
+    {
+      title: "Plan Type",
+    },
+    {
+      title: "Activated Date",
+      description: "MMM DD (e.g. Jan 01) - Format",
+    },
+    {
+      title: "Expiry Date",
+      description: "MMM DD (e.g. Jan 01) - Format",
+    },
+  ];
 
   const paginatedData =
     Array.isArray(getSubscriptionlist) &&
@@ -50,7 +74,7 @@ export default function Subscription({ }) {
       currentPage * pageSize
     );
 
-  console.log(operatorData, 'operator_data')
+  console.log(operatorData, "operator_data");
   const [activePage, setActivePage] = useState(1);
   const itemsPerPage = 10; // Number of items to display per page
 
@@ -95,7 +119,6 @@ export default function Subscription({ }) {
     setExpandedRowKey(record.key === expandedRowKey ? null : record.key);
   };
 
-
   const fetchGetSubscription = async () => {
     try {
       const data = await GetOperatorDataById(
@@ -118,13 +141,11 @@ export default function Subscription({ }) {
 
   const { RangePicker } = DatePicker;
 
-
   const columns = [
-
     {
       title: (
         <div
-          className="text-[1.2vw] text-center"
+          className="text-[1.2vw] text-center font-bold"
           style={{ color: "white" }}
         >
           Logo
@@ -147,7 +168,7 @@ export default function Subscription({ }) {
     {
       title: (
         <div
-          className="text-[1.2vw] text-center "
+          className="text-[1.2vw] text-center font-bold"
           style={{ color: "white" }}
         >
           Operator Name
@@ -158,20 +179,18 @@ export default function Subscription({ }) {
         console.log(row, "row852852");
         console.log(rowdta, "rowdta852852");
 
-
         const pageNo = (activePage - 1) * itemsPerPage + index + 1;
         return (
-          <div className="flex items-center justify-center text-[#1F4B7F] font-bold  text-[1vw]">
+          <div className="flex pl-[3vw] text-[#1F4B7F] font-bold  text-[1vw]">
             <h1 className="">{row.company_name}</h1>
           </div>
         );
       },
     },
-
     {
       title: (
         <div
-          className="text-[1.2vw]  text-center"
+          className="text-[1.2vw] text-center font-bold"
           style={{ color: "white" }}
         >
           Product Key
@@ -179,15 +198,18 @@ export default function Subscription({ }) {
       ),
       dataIndex: "generate_key",
       key: "generate_key",
-      width: '16vw',
+      width: "16vw",
       render: (text, row) => (
-        <div className="flex items-center justify-center w-full mr-[0.5vw] text-[#1F4B7F] font-bold text-[1vw]">
+        <div className="flex pl-[2vw] w-full mr-[0.5vw] text-[#1F4B7F] font-bold text-[1vw]">
           <div className="w-[10vw]">
             <span className=" w-full text-[1vw]">
               {!showHalfMap[row.tbs_operator_id] ? maskProductKey(text) : text}
             </span>
           </div>
-          <div className="cursor-pointer flex justify-center items-center" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="cursor-pointer flex justify-center items-center"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button onClick={() => toggleShowHalf(row.tbs_operator_id)}>
               {eyeIcon[row.tbs_operator_id] ? (
                 <IoEyeOutline style={{ height: "1.3vw", width: "1.3vw" }} />
@@ -199,28 +221,35 @@ export default function Subscription({ }) {
         </div>
       ),
     },
-
     {
       title: (
         <div
-          className="text-[1.2vw] text-center "
+          className="text-[1.1vw] text-center font-bold"
           style={{ color: "white" }}
         >
           Plan Name
         </div>
       ),
       dataIndex: "plan_name",
-      width: '12vw',
-      render: (text) => (
-        <div className="flex items-center justify-start px-[2vw] font-bold text-[#1F4B7F] text-[1vw]">
-          {/* Replace #desiredColor with your desired color */}
+      width: "12vw",
+      render: (text, row) => (
+        <div className="flex items-center justify-center">
+          {row?.plan_name ? (
+            <div className="flex  font-bold text-[#1F4B7F] text-[1vw]">
+              {row?.plan_name}
+            </div>
+          ) : (
+            <div className="flex  font-extrabold text-[#1F4B7F] text-[1vw]">
+              -
+            </div>
+          )}
         </div>
       ),
     },
     {
       title: (
         <div
-          className="text-[1.2vw]  text-center"
+          className="text-[1.2vw] text-center font-bold"
           style={{ color: "white" }}
         >
           Plan Type
@@ -228,15 +257,22 @@ export default function Subscription({ }) {
       ),
       dataIndex: "created_date",
       width: "12vw",
-      render: (text) => (
-        <div className="flex items-center justify-start text-[#1F4B7F] font-bold px-[2vw] text-[1vw]">
+      render: (text, row) => (
+        <div className="flex items-center justify-center">
+          {row?.plan_type ? (
+            <div className="flex  text-[#1F4B7F] font-bold text-[1vw]">
+              {row?.plan_type}
+            </div>
+          ) : (
+            <div className="flex  text-[#1F4B7F] font-bold text-[1vw]">-</div>
+          )}
         </div>
       ),
     },
     {
       title: (
         <div
-          className="text-[1.2vw] text-center "
+          className="text-[1.2vw] text-center font-bold"
           style={{ color: "white" }}
         >
           Activated Date
@@ -245,7 +281,7 @@ export default function Subscription({ }) {
       dataIndex: "created_date",
       width: "12vw",
       render: (text) => (
-        <div className="flex justify-center items-center text-[#1F4B7F] px-[2vw]  font-bold text-[1vw]">
+        <div className="flex pl-[3vw] text-[#1F4B7F] px-[2vw] text-[1vw]">
           <span className="text-[1vw] text-[#1F487C]">{text}</span>{" "}
         </div>
       ),
@@ -253,7 +289,7 @@ export default function Subscription({ }) {
     {
       title: (
         <div
-          className="text-[1.2vw] text-center"
+          className="text-[1.2vw] text-center font-bold"
           style={{ color: "white" }}
         >
           Expiry Date
@@ -262,8 +298,11 @@ export default function Subscription({ }) {
       dataIndex: "expiriy_date",
       width: "12vw",
       render: (text, row) => (
-        <div className="flex justify-between items-center text-[#1F4B7F] px-[2vw] font-bold text-[1vw]">
-          <span className="text-[1vw] flex items-center justify-center text-[#1F487C]">{text}</span>
+        <div className="flex justify-between items-center text-[#1F4B7F] px-[2vw] text-[1vw]">
+          <span className="text-[1vw] flex items-center pl-[4vw] font-bold justify-center text-[#1F487C]">
+            {/* {text} */}
+            -
+          </span>
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -272,16 +311,29 @@ export default function Subscription({ }) {
             className=""
           >
             {row.key === expandedRowKey ? (
-              <IoIosArrowDropupCircle style={{ height: "1.3vw", width: "1.3vw" }} />
+              <IoIosArrowDropupCircle
+                style={{ height: "1.3vw", width: "1.3vw" }}
+              />
             ) : (
-              <IoIosArrowDropdownCircle style={{ height: "1.3vw", width: "1.3vw" }} />
+              <IoIosArrowDropdownCircle
+                style={{ height: "1.3vw", width: "1.3vw" }}
+              />
             )}
           </button>
         </div>
+        // <div className="flex items-center justify-center">
+        //   {row?.plan_type ? (
+        //     <div className="flex  text-[#1F4B7F] font-bold text-[1vw]">
+        //       {row?.plan_type}
+        //     </div>
+        //   ) : (
+        //     <div className="flex  text-[#1F4B7F] font-bold text-[1vw]">-</div>
+        //   )}
+        // </div>
       ),
     },
-
   ];
+  console.log(currentItems, "currentItemscurrentItems");
 
   const data =
     currentItems?.length > 0 &&
@@ -292,13 +344,12 @@ export default function Subscription({ }) {
       generate_key: item.generate_key,
       created_date: dayjs(item?.created_date).format("DD MMM, YYYY"),
       plan_name: item.plan_name,
-      expiriy_date: dayjs(item?.expiriy_date).format("DD MMM, YYYY"),
+      expiriy_date: item.plan_type,
       plan_type: item.plan_type,
       company_name: item.company_name,
       profile_img: item.profileimg,
       gst_number: item.gstin,
       hidden_details: (
-
         <div className="grid grid-cols-5 items-center py-[1vw]">
           <div className="col-span-1 flex flex-col gap-[1vw] justify-center items-center border-r-[0.1vw] border-[#1F487C] w-full h-full">
             <img
@@ -307,7 +358,7 @@ export default function Subscription({ }) {
               className="w-[6vw] h-[6vw] border-[0.1vw] border-slate-200 rounded-full"
             />
             <span className="font-bold text-[#1F487C] text-[1.5vw]">
-              {item?.owner_name}
+              {item?.company_name}
             </span>
           </div>
           <div className=" col-span-2 px-[5vw]  border-r-[0.1vw] border-[#1F487C] w-full h-full">
@@ -323,20 +374,24 @@ export default function Subscription({ }) {
                 </span>
               </div>
               <div className="flex justify-between gap-x-[2vw] text-[1vw] text-[#1F487C]">
-                <span className="font-semibold order-first">Type of Business</span>
-                <span className="order-last">
-                  {item?.type_of_constitution}
+                <span className="font-semibold order-first">
+                  Type of Business
                 </span>
+                <span className="order-last">{item?.type_of_constitution}</span>
               </div>
               <div className=" flex justify-between gap-x-[2vw] text-[1vw] text-[#1F487C] ">
-                <span className="font-semibold order-first">Contact Number</span>
+                <span className="font-semibold order-first">
+                  Contact Number
+                </span>
                 <span className="order-last">{item?.phone}</span>
               </div>
-              <div className="flex justify-between gap-x-[2vw] text-[1vw] text-[#1F487C]">
-                <span className="font-semibold order-first">Current Subscription</span>
-                {/* <span className="font-semibold">Half-Yearly Plan</span> */}
+              {/* <div className="flex justify-between gap-x-[2vw] text-[1vw] text-[#1F487C]">
+                <span className="font-semibold order-first">
+                  Current Subscription
+                </span>
+                <span className="font-semibold">Half-Yearly Plan</span>
                 <span className="order-last">{item?.phone}</span>
-              </div>
+              </div> */}
               <div className="flex justify-between gap-x-[2vw] text-[1vw] text-[#1F487C]">
                 <span className="order-first font-semibold">Member Since</span>
                 <span className="order-last">{`${dayjs(
@@ -375,15 +430,12 @@ export default function Subscription({ }) {
                   <span className="text-white font-normal text-[1vw]">
                     {`${dayjs(item?.created_date).format("DD MMM, YYYY")}`}
                   </span>
-                  <span className="text-white font-normal text-[1vw]">
-                    221
-                  </span>
+                  <span className="text-white font-normal text-[1vw]">221</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
-
       ),
     }));
   const dispatch = useDispatch();
@@ -398,7 +450,23 @@ export default function Subscription({ }) {
       fetchGetSubscription();
     }
   }, [updatedata]);
+  const [dateClear, setDateClear] = useState();
 
+  const datefilter = async (values) => {
+    try {
+      setDateClear(values);
+
+      await GetSubscriptionByDate(
+        dispatch,
+        moment(values[0].$d).format("YYYY-MM-DD"),
+        moment(values[1].$d).format("YYYY-MM-DD")
+      );
+      // functioncall()
+    } catch (err) {
+      console.log(err, "iam the error");
+      GetSubscriptionList(dispatch, setSpinning);
+    }
+  };
   return (
     <div
       className="h-screen w-screen"
@@ -418,31 +486,60 @@ export default function Subscription({ }) {
         <div className="flex justify-between">
           <div className="relative flex items-center pb-[0.5vw]">
             <LiaSearchSolid
-              className="absolute left-[0.75vw]"
+              className="absolute left-[0.5vw] top-[0.6vw]"
               size={"1vw"}
-              color="#1F4B7F"
+              color="#9CA3AF"
             />
             <input
               type="text"
-              className="bg-white outline-none pl-[2.5vw] placeholder-[#1F487C] placeholder:opacity-75 w-[15vw] h-[2.5vw] text-[0.9vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.75vw] border-r-[0.2vw] border-b-[0.2vw]"
-              placeholder="Search By Plan"
+              className="bg-white outline-none pl-[2vw] w-[17vw] text-[#1f487c] h-[5vh] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.75vw] border-r-[0.25vw] border-b-[0.25vw]"
+              placeholder="Search..."
               onChange={(e) => {
                 Search(e);
               }}
             />
+            <span className="inline-block cursor-pointer text-[#1F4B7F] text-[1vw] align-text-bottom absolute right-[1vw]">
+              {" "}
+              <Popover
+                color="white"
+                title={
+                  <div className=" text-[#1F4B7F] p-[1vw] max-h-[20vw] overflow-auto ">
+                    <span className="font-bold">SEARCH BY...</span>
+                    {infos.map((info, index) => (
+                      <div key={index} className="flex flex-col">
+                        <ul
+                          className="pl-[1vw]"
+                          style={{ listStyleType: "disc" }}
+                        >
+                          <li className="text-[0.8vw] ">
+                            <p className="">{info.title}</p>
+                          </li>
+                        </ul>
+                        <span className="text-[.7vw] pl-[1vw] text-[#9CA3AF]">
+                          {info.description}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                }
+                placement="bottom"
+              >
+                <BsExclamationCircle size={"1vw"} color="#9CA3AF" />
+              </Popover>
+            </span>
           </div>
           <div className="order-last">
-
             <div className="reqman">
               <ConfigProvider
                 theme={{
                   token: {
-                    fontSize: 14,
+                    fontSize: 13,
                     lineHeight: 0,
                   },
                   components: {
                     DatePicker: {
-                      colorText: '#1F487C',
+                      cellWidth: 21,
+                      cellHeight: 20,
                     },
                   },
                 }}
@@ -450,12 +547,13 @@ export default function Subscription({ }) {
                 <RangePicker
                   allowClear={true}
                   autoFocus={false}
-                  className="custom-range-picker bg-white outline-none pl-[1.5vw] w-[17vw] h-[2.5vw] text-[0.9vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.75vw] border-r-[0.2vw] border-b-[0.2vw]"
-                  disabledDate={(current) => current < dayjs().startOf('day')}
+                  onChange={datefilter}
+                  value={dateClear}
+                  className="custom-range-picker bg-white outline-none pl-[1.5vw] w-[17vw] h-[2.5vw] text-[0.9vw] border-[#1F4B7F] border-l-[0.1vw] px-[1vw] border-t-[0.1vw] rounded-[0.75vw] border-r-[0.2vw] border-b-[0.2vw]"
+                  // disabledDate={(current) => current < dayjs().startOf("day")}
                 />
               </ConfigProvider>
             </div>
-
           </div>
         </div>
         <div className="h-[72.3vh]">
@@ -510,7 +608,6 @@ export default function Subscription({ }) {
               <span>data</span>
             </div>
             <div>
-
               <ReactPaginate
                 activePage={activePage}
                 itemsCountPerPage={itemsPerPage}
