@@ -20,7 +20,7 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
     SetRestoreModalOpen(false);
   };
 
-  console.log(tbsId, "namenamenamename");
+  console.log(selectedTab, "namenamenamename");
 
   const columns = [
     {
@@ -46,32 +46,32 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
       align: "center",
       render: (row) => {
         const image = `${apiImgUrl}${selectedTab === 5
-            ? row?.deleted_data?.operator?.profileimg
-            : selectedTab === 7
-              ? row?.deleted_data?.clientCompanyDetails?.company_logo
-              : selectedTab === 9
-                ? row?.deleted_data?.partnerDetails?.profile_img
-                : selectedTab === 8
+          ? row?.deleted_data?.operator?.profileimg
+          : selectedTab === 7
+            ? row?.deleted_data?.clientCompanyDetails?.company_logo
+            : selectedTab === 9
+              ? row?.deleted_data?.partnerDetails?.profile_img
+              : selectedTab === 8
+                ? row?.deleted_data?.empPersonal?.profile_img
+                : selectedTab === 6
                   ? row?.deleted_data?.empPersonal?.profile_img
-                  : selectedTab === 6
-                    ? row?.deleted_data?.empPersonal?.profile_img
-                    : ""
+                  : ""
           }`;
         console.log(row?.deleted_data?.operator?.profileimg, "imageimage");
         return (
           <div className="flex justify-center  items-center">
             <img
               src={`${apiImgUrl}${selectedTab === 5
-                  ? row?.deleted_data?.operator?.profileimg
-                  : selectedTab === 7
-                    ? row?.deleted_data?.clientCompanyDetails?.company_logo
-                    : selectedTab === 9
-                      ? row?.deleted_data?.partnerDetails?.profile_img
-                      : selectedTab === 8
+                ? row?.deleted_data?.operator?.profileimg
+                : selectedTab === 7
+                  ? row?.deleted_data?.clientCompanyDetails?.company_logo
+                  : selectedTab === 9
+                    ? row?.deleted_data?.partnerDetails?.profile_img
+                    : selectedTab === 8
+                      ? row?.deleted_data?.empPersonal?.profile_img
+                      : selectedTab === 6
                         ? row?.deleted_data?.empPersonal?.profile_img
-                        : selectedTab === 6
-                          ? row?.deleted_data?.empPersonal?.profile_img
-                          : ""
+                        : ""
                 }`}
               alt="Photo"
               className="w-[2.15vw] h-[2.15vw] object-cover rounded-[0.2vw]"
@@ -90,32 +90,32 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
       ), // dataIndex: "name",
       key: "name",
       sorter: (a, b) => {
+        // Get the respective names for comparison
         const nameA =
           selectedTab === 5
-            ? a.deleted_data?.operator?.company_name.toUpperCase()
+            ? (a.deleted_data?.operator?.company_name || "").toUpperCase()
             : selectedTab === 7
-              ? a.deleted_data?.clientCompanyDetails?.company_name
+              ? (a.deleted_data?.clientCompanyDetails?.company_name || "")
               : selectedTab === 9
-                ? a.deleted_data.partnerDetails?.partner_first_name
-                : selectedTab === 8
-                  ? a.deleted_data?.empPersonal?.emp_first_name
-                  : selectedTab === 6
-                    ? a.deleted_data?.empPersonal?.emp_first_name
-                    : "";
+                ? (a.deleted_data?.partnerDetails?.partner_first_name || "")
+                : selectedTab === 8 || selectedTab === 6
+                  ? (a.deleted_data?.empPersonal?.emp_first_name || "")
+                  : "";
         const nameB =
           selectedTab === 5
-            ? b.deleted_data?.operator?.company_name.toUpperCase()
+            ? (b.deleted_data?.operator?.company_name || "").toUpperCase()
             : selectedTab === 7
-              ? b.deleted_data?.clientCompanyDetails?.company_name
+              ? (b.deleted_data?.clientCompanyDetails?.company_name || "")
               : selectedTab === 9
-                ? b.deleted_data.partnerDetails?.partner_first_name
-                : selectedTab === 8
-                  ? a.deleted_data?.empPersonal?.emp_first_name
-                  : selectedTab === 6
-                    ? b.deleted_data?.empPersonal?.emp_first_name
-                    : "";
-        return nameA.localeCompare(nameB);
+                ? (b.deleted_data?.partnerDetails?.partner_first_name || "")
+                : selectedTab === 8 || selectedTab === 6
+                  ? (b.deleted_data?.empPersonal?.emp_first_name || "")
+                  : "";
+
+        // Sort using localeCompare (case-insensitive)
+        return nameA.localeCompare(nameB, undefined, { sensitivity: 'base' });
       },
+
       width: "13vw",
       render: (row) => (
         // <div className="flex pl-[1vw] items-center">
@@ -142,52 +142,94 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
         //     }`}</p>
         // </div>
         <div className="flex pl-[1vw] items-center">
-  <p className="text-[1vw] text-[#1F4B7F] font-bold">
-    {selectedTab === 5 ? (
-      row?.deleted_data?.operator?.company_name?.length > 25 ? (
-        <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={row?.deleted_data?.operator?.company_name}>
-          <span>{`${row?.deleted_data?.operator?.company_name.slice(0, 25)}...`}</span>
-        </Tooltip>
-      ) : (
-        <span>{row?.deleted_data?.operator?.company_name}</span>
-      )
-    ) : selectedTab === 7 ? (
-      row?.deleted_data?.clientCompanyDetails?.company_name?.length > 25 ? (
-        <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={row?.deleted_data?.clientCompanyDetails?.company_name}>
-          <span>{`${row?.deleted_data?.clientCompanyDetails?.company_name.slice(0, 25)}...`}</span>
-        </Tooltip>
-      ) : (
-        <span>{row?.deleted_data?.clientCompanyDetails?.company_name}</span>
-      )
-    ) : selectedTab === 9 ? (
-      row?.deleted_data?.partnerDetails?.partner_first_name?.length > 25 ? (
-        <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={row?.deleted_data?.partnerDetails?.partner_first_name}>
-          <span>{`${row?.deleted_data?.partnerDetails?.partner_first_name.slice(0, 25)}...`}</span>
-        </Tooltip>
-      ) : (
-        <span>{row?.deleted_data?.partnerDetails?.partner_first_name}</span>
-      )
-    ) : selectedTab === 8 ? (
-      row?.deleted_data?.empPersonal?.emp_first_name?.length > 25 ? (
-        <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={row?.deleted_data?.empPersonal?.emp_first_name}>
-          <span>{`${row?.deleted_data?.empPersonal?.emp_first_name.slice(0, 25)}...`}</span>
-        </Tooltip>
-      ) : (
-        <span>{row?.deleted_data?.empPersonal?.emp_first_name}</span>
-      )
-    ) : selectedTab === 6 ? (
-      row?.deleted_data?.empPersonal?.emp_first_name?.length > 25 ? (
-        <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={row?.deleted_data?.empPersonal?.emp_first_name}>
-          <span>{`${row?.deleted_data?.empPersonal?.emp_first_name.slice(0, 25)}...`}</span>
-        </Tooltip>
-      ) : (
-        <span>{row?.deleted_data?.empPersonal?.emp_first_name}</span>
-      )
-    ) : (
-      ""
-    )}
-  </p>
-  {/* <p className="text-[1.1vw] text-[#1F4B7F] pl-[.4vw] font-semibold">
+          <p className="text-[1vw] text-[#1F4B7F] font-bold">
+            {selectedTab === 5 ? (
+              row?.deleted_data?.operator?.company_name?.length > 25 ? (
+                <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={row?.deleted_data?.operator?.company_name}>
+                  <span>
+                    {`${row?.deleted_data?.operator?.company_name?.charAt(0) === row?.deleted_data?.operator?.company_name?.charAt(0).toLowerCase()
+                      ? capitalizeFirstLetter(row?.deleted_data?.operator?.company_name.slice(0, 25))
+                      : row?.deleted_data?.operator?.company_name.slice(0, 25)}...`}
+                  </span>
+                </Tooltip>
+              ) : (
+                <span>
+                  {row?.deleted_data?.operator?.company_name?.charAt(0) === row?.deleted_data?.operator?.company_name?.charAt(0).toLowerCase()
+                    ? capitalizeFirstLetter(row?.deleted_data?.operator?.company_name)
+                    : row?.deleted_data?.operator?.company_name}
+                </span>
+
+              )
+            ) : selectedTab === 7 ? (
+              row?.deleted_data?.clientCompanyDetails?.company_name?.length > 25 ? (
+                <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={row?.deleted_data?.clientCompanyDetails?.company_name}>
+                  <span>
+                    {`${row?.deleted_data?.clientCompanyDetails?.company_name?.charAt(0) === row?.deleted_data?.clientCompanyDetails?.company_name?.charAt(0).toLowerCase()
+                      ? capitalizeFirstLetter(row?.deleted_data?.clientCompanyDetails?.company_name.slice(0, 25))
+                      : row?.deleted_data?.clientCompanyDetails?.company_name.slice(0, 25)}...`}
+                  </span>
+                </Tooltip>
+              ) : (
+                <span>
+                  {row?.deleted_data?.clientCompanyDetails?.company_name?.charAt(0) === row?.deleted_data?.clientCompanyDetails?.company_name?.charAt(0).toLowerCase()
+                    ? capitalizeFirstLetter(row?.deleted_data?.clientCompanyDetails?.company_name)
+                    : row?.deleted_data?.clientCompanyDetails?.company_name}
+                </span>
+              )
+            ) : selectedTab === 9 ? (
+              row?.deleted_data?.partnerDetails?.partner_first_name?.length > 25 ? (
+                <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={row?.deleted_data?.partnerDetails?.partner_first_name}>
+                  <span>
+                    {`${row?.deleted_data?.partnerDetails?.partner_first_name?.charAt(0) === row?.deleted_data?.partnerDetails?.partner_first_name?.charAt(0).toLowerCase()
+                      ? capitalizeFirstLetter(row?.deleted_data?.partnerDetails?.partner_first_name.slice(0, 25))
+                      : row?.deleted_data?.partnerDetails?.partner_first_name.slice(0, 25)}...`}
+                  </span>
+                </Tooltip>
+              ) : (
+                <span>
+                  {row?.deleted_data?.partnerDetails?.partner_first_name?.charAt(0) === row?.deleted_data?.partnerDetails?.partner_first_name?.charAt(0).toLowerCase()
+                    ? capitalizeFirstLetter(row?.deleted_data?.partnerDetails?.partner_first_name)
+                    : row?.deleted_data?.partnerDetails?.partner_first_name}
+                </span>
+
+              )
+            ) : selectedTab === 8 ? (
+              row?.deleted_data?.empPersonal?.emp_first_name?.length > 25 ? (
+                <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={row?.deleted_data?.empPersonal?.emp_first_name}>
+                  <span>
+                    {`${row?.deleted_data?.empPersonal?.emp_first_name?.charAt(0) === row?.deleted_data?.empPersonal?.emp_first_name?.charAt(0).toLowerCase()
+                      ? capitalizeFirstLetter(row?.deleted_data?.empPersonal?.emp_first_name.slice(0, 25))
+                      : row?.deleted_data?.empPersonal?.emp_first_name.slice(0, 25)}...`}
+                  </span>
+                </Tooltip>
+              ) : (
+                <span>
+                  {row?.deleted_data?.empPersonal?.emp_first_name?.charAt(0) === row?.deleted_data?.empPersonal?.emp_first_name?.charAt(0).toLowerCase()
+                    ? capitalizeFirstLetter(row?.deleted_data?.empPersonal?.emp_first_name)
+                    : row?.deleted_data?.empPersonal?.emp_first_name}
+                </span>
+              )
+            ) : selectedTab === 6 ? (
+              row?.deleted_data?.empPersonal?.emp_first_name?.length > 25 ? (
+                <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={row?.deleted_data?.empPersonal?.emp_first_name}>
+                  <span>
+                    {`${row?.deleted_data?.empPersonal?.emp_first_name?.charAt(0) === row?.deleted_data?.empPersonal?.emp_first_name?.charAt(0).toLowerCase()
+                      ? capitalizeFirstLetter(row?.deleted_data?.empPersonal?.emp_first_name.slice(0, 25))
+                      : row?.deleted_data?.empPersonal?.emp_first_name.slice(0, 25)}...`}
+                  </span>
+                </Tooltip>
+              ) : (
+                <span>
+                  {row?.deleted_data?.empPersonal?.emp_first_name?.charAt(0) === row?.deleted_data?.empPersonal?.emp_first_name?.charAt(0).toLowerCase()
+                    ? capitalizeFirstLetter(row?.deleted_data?.empPersonal?.emp_first_name)
+                    : row?.deleted_data?.empPersonal?.emp_first_name}
+                </span>
+              )
+            ) : (
+              ""
+            )}
+          </p>
+          {/* <p className="text-[1.1vw] text-[#1F4B7F] pl-[.4vw] font-semibold">
     {selectedTab === 8 ? (
       row?.deleted_data?.empPersonal?.emp_last_name?.length > 25 ? (
         <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={row?.deleted_data?.empPersonal?.emp_last_name}>
@@ -208,7 +250,7 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
       ""
     )}
   </p> */}
-</div>
+        </div>
 
       ),
     },
@@ -282,52 +324,25 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
       ),
       key: "email",
       sorter: (a, b) => {
+        let emailA = "";
+        let emailB = "";
+
         if (selectedTab === 5) {
-          return (
-            (a.deleted_data?.operator?.emailid
-              ? a.deleted_data?.operator?.emailid.length
-              : 0) -
-            (b.deleted_data?.operator?.emailid
-              ? b.deleted_data?.operator?.emailid.length
-              : 0)
-          );
+          emailA = a.deleted_data?.operator?.emailid || "";
+          emailB = b.deleted_data?.operator?.emailid || "";
         } else if (selectedTab === 7) {
-          return (
-            (a.deleted_data?.clientCompanyDetails?.emailid
-              ? a.deleted_data?.clientCompanyDetails?.emailid?.length
-              : 0) -
-            (b.deleted_data?.clientCompanyDetails?.emailid
-              ? b.deleted_data?.clientCompanyDetails?.emailid?.length
-              : 0)
-          );
+          emailA = a.deleted_data?.clientCompanyDetails?.emailid || "";
+          emailB = b.deleted_data?.clientCompanyDetails?.emailid || "";
         } else if (selectedTab === 9) {
-          return (
-            (a.deleted_data?.partnerDetails?.emailid
-              ? a.deleted_data?.partnerDetails?.emailid?.length
-              : 0) -
-            (b.deleted_data?.partnerDetails?.emailid
-              ? b.deleted_data?.partnerDetails?.emailid?.length
-              : 0)
-          );
-        } else if (selectedTab === 8) {
-          return (
-            (a.deleted_data?.empPersonal?.email_id
-              ? a.deleted_data?.empPersonal?.email_id?.length
-              : 0) -
-            (b.deleted_data?.empPersonal?.email_id
-              ? b.deleted_data?.empPersonal?.email_id?.length
-              : 0)
-          );
-        } else if (selectedTab === 6) {
-          return (
-            (a.deleted_data?.empPersonal?.email_id
-              ? a.deleted_data?.empPersonal?.email_id?.length
-              : 0) -
-            (b.deleted_data?.empPersonal?.email_id
-              ? b.deleted_data?.empPersonal?.email_id?.length
-              : 0)
-          );
+          emailA = a.deleted_data?.partnerDetails?.emailid || "";
+          emailB = b.deleted_data?.partnerDetails?.emailid || "";
+        } else if (selectedTab === 8 || selectedTab === 6) {
+          emailA = a.deleted_data?.empPersonal?.email_id || "";
+          emailB = b.deleted_data?.empPersonal?.email_id || "";
         }
+
+        // Sorting emails lexicographically (alphabetically)
+        return emailA.localeCompare(emailB);
       },
       ellipsis: true,
       width: "14vw",
@@ -349,52 +364,52 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
           //   </p>
           // </div>
           <div className="flex items-center pl-[1.5vw] text-[#1F4B7F]">
-  <p className="text-[1vw]">
-    {selectedTab === 5 ? (
-      row.deleted_data?.operator?.emailid?.length > 25 ? (
-        <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={row.deleted_data?.operator?.emailid}>
-          <span>{`${row.deleted_data?.operator?.emailid.slice(0, 25)}...`}</span>
-        </Tooltip>
-      ) : (
-        <span>{row.deleted_data?.operator?.emailid}</span>
-      )
-    ) : selectedTab === 7 ? (
-      row?.deleted_data?.clientCompanyDetails?.emailid?.length > 25 ? (
-        <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={row?.deleted_data?.clientCompanyDetails?.emailid}>
-          <span>{`${row?.deleted_data?.clientCompanyDetails?.emailid.slice(0, 25)}...`}</span>
-        </Tooltip>
-      ) : (
-        <span>{row?.deleted_data?.clientCompanyDetails?.emailid}</span>
-      )
-    ) : selectedTab === 9 ? (
-      row?.deleted_data?.partnerDetails?.emailid?.length > 25 ? (
-        <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={row?.deleted_data?.partnerDetails?.emailid}>
-          <span>{`${row?.deleted_data?.partnerDetails?.emailid.slice(0, 25)}...`}</span>
-        </Tooltip>
-      ) : (
-        <span>{row?.deleted_data?.partnerDetails?.emailid}</span>
-      )
-    ) : selectedTab === 8 ? (
-      row?.deleted_data?.empPersonal?.email_id?.length > 25 ? (
-        <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={row?.deleted_data?.empPersonal?.email_id}>
-          <span>{`${row?.deleted_data?.empPersonal?.email_id.slice(0, 25)}...`}</span>
-        </Tooltip>
-      ) : (
-        <span>{row?.deleted_data?.empPersonal?.email_id}</span>
-      )
-    ) : selectedTab === 6 ? (
-      row?.deleted_data?.empPersonal?.email_id?.length > 25 ? (
-        <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={row?.deleted_data?.empPersonal?.email_id}>
-          <span>{`${row?.deleted_data?.empPersonal?.email_id.slice(0, 25)}...`}</span>
-        </Tooltip>
-      ) : (
-        <span>{row?.deleted_data?.empPersonal?.email_id}</span>
-      )
-    ) : (
-      ""
-    )}
-  </p>
-</div>
+            <p className="text-[1vw]">
+              {selectedTab === 5 ? (
+                row.deleted_data?.operator?.emailid?.length > 25 ? (
+                  <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={row.deleted_data?.operator?.emailid}>
+                    <span>{`${row.deleted_data?.operator?.emailid.slice(0, 25)}...`}</span>
+                  </Tooltip>
+                ) : (
+                  <span>{row.deleted_data?.operator?.emailid}</span>
+                )
+              ) : selectedTab === 7 ? (
+                row?.deleted_data?.clientCompanyDetails?.emailid?.length > 25 ? (
+                  <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={row?.deleted_data?.clientCompanyDetails?.emailid}>
+                    <span>{`${row?.deleted_data?.clientCompanyDetails?.emailid.slice(0, 25)}...`}</span>
+                  </Tooltip>
+                ) : (
+                  <span>{row?.deleted_data?.clientCompanyDetails?.emailid}</span>
+                )
+              ) : selectedTab === 9 ? (
+                row?.deleted_data?.partnerDetails?.emailid?.length > 25 ? (
+                  <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={row?.deleted_data?.partnerDetails?.emailid}>
+                    <span>{`${row?.deleted_data?.partnerDetails?.emailid.slice(0, 25)}...`}</span>
+                  </Tooltip>
+                ) : (
+                  <span>{row?.deleted_data?.partnerDetails?.emailid}</span>
+                )
+              ) : selectedTab === 8 ? (
+                row?.deleted_data?.empPersonal?.email_id?.length > 25 ? (
+                  <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={row?.deleted_data?.empPersonal?.email_id}>
+                    <span>{`${row?.deleted_data?.empPersonal?.email_id.slice(0, 25)}...`}</span>
+                  </Tooltip>
+                ) : (
+                  <span>{row?.deleted_data?.empPersonal?.email_id}</span>
+                )
+              ) : selectedTab === 6 ? (
+                row?.deleted_data?.empPersonal?.email_id?.length > 25 ? (
+                  <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={row?.deleted_data?.empPersonal?.email_id}>
+                    <span>{`${row?.deleted_data?.empPersonal?.email_id.slice(0, 25)}...`}</span>
+                  </Tooltip>
+                ) : (
+                  <span>{row?.deleted_data?.empPersonal?.email_id}</span>
+                )
+              ) : (
+                ""
+              )}
+            </p>
+          </div>
 
         );
       },
@@ -437,46 +452,46 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
                     ? "bg-[#646262]"
                     : row.deleted_data?.operator?.user_status_id == 1
                       ? "bg-[#FF9900]"
-                       : row.deleted_data?.operator?.user_status_id == 2
-                      ? "bg-[#38ac2c]"
-                         : row.deleted_data?.operator?.user_status_id == 3
-                      ? "bg-[#FD3434]"
-                      : "bg-[#2A99FF] cursor-not-allowed";
+                      : row.deleted_data?.operator?.user_status_id == 2
+                        ? "bg-[#34AE2B]"
+                        : row.deleted_data?.operator?.user_status_id == 3
+                          ? "bg-[#FD3434]"
+                          : "bg-[#2A99FF] cursor-not-allowed";
                 } else if (selectedTab === 7) {
                   return row.deleted_data?.clientCompanyDetails?.status_id == 0
                     ? "bg-[#646262]"
                     : row.deleted_data?.clientCompanyDetails?.status_id == 1
-                      ? "bg-[#38ac2c]"
+                      ? "bg-[#34AE2B]"
                       : row.deleted_data?.clientCompanyDetails?.status_id == 2
-                      ? "bg-[#FD3434]"
-                      : "bg-[#2A99FF] cursor-not-allowed";
+                        ? "bg-[#FD3434]"
+                        : "bg-[#2A99FF] cursor-not-allowed";
                 } else if (selectedTab === 9) {
                   return row.deleted_data?.partnerDetails?.partner_status_id ==
                     0
                     ? "bg-[#646262]"
                     : row.deleted_data?.partnerDetails?.partner_status_id == 1
                       ? "bg-[#FF9900]"
-                       : row.deleted_data?.partnerDetails?.partner_status_id == 2
-                      ? "bg-[#38ac2c]"
-                       : row.deleted_data?.partnerDetails?.partner_status_id == 3
-                      ? "bg-[#FD3434]"
-                      : "bg-[#2A99FF]  cursor-not-allowed";
+                      : row.deleted_data?.partnerDetails?.partner_status_id == 2
+                        ? "bg-[#34AE2B]"
+                        : row.deleted_data?.partnerDetails?.partner_status_id == 3
+                          ? "bg-[#FD3434]"
+                          : "bg-[#2A99FF]  cursor-not-allowed";
                 } else if (selectedTab === 8) {
                   return row.deleted_data?.empPersonal?.emp_status_id == 0
                     ? "bg-[#646262]"
                     : row.deleted_data?.empPersonal?.emp_status_id == 1
-                      ? "bg-[#38ac2c]"
+                      ? "bg-[#34AE2B]"
                       : row.deleted_data?.empPersonal?.emp_status_id == 2
-                      ? "bg-[#FD3434]"
-                      : "bg-[#2A99FF] cursor-not-allowed";
+                        ? "bg-[#FD3434]"
+                        : "bg-[#2A99FF] cursor-not-allowed";
                 } else if (selectedTab === 6) {
                   return row.deleted_data?.empPersonal?.emp_status_id == 0
                     ? "bg-[#646262]"
                     : row.deleted_data?.empPersonal?.emp_status_id == 1
-                      ? "bg-[#38ac2c]"
+                      ? "bg-[#34AE2B]"
                       : row.deleted_data?.empPersonal?.emp_status_id == 2
-                      ? "bg-[#FD3434]"
-                      : "bg-[#2A99FF] cursor-not-allowed";
+                        ? "bg-[#FD3434]"
+                        : "bg-[#2A99FF] cursor-not-allowed";
                 } else {
                   return "bg-[#FF9900] cursor-not-allowed";
                 }
@@ -569,7 +584,7 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
 
   return (
     <>
-    
+
       <div className="h-[72vh] w-full">
         <Table
           dataSource={currentItems}
@@ -591,7 +606,7 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
           // title={`want to delete ( ${rowName} ) Permenantly`}
           title={
             <>
-              Want to delete <span style={{ fontWeight: 'bold' }}>{rowName}</span> permanently
+              Want to delete <span style={{ fontWeight: 'bold' }}>{capitalizeFirstLetter(rowName)}</span> permanently
             </>
           }
           id={tbsId}
@@ -611,7 +626,7 @@ export default function UserManagement({ currentItems, selectedTab, activePage, 
           // title={`want to restore ( ${rowName} ) `}
           title={
             <>
-             want to restore <span style={{ fontWeight: 'bold' }}>{rowName}</span> 
+              want to restore <span style={{ fontWeight: 'bold' }}>{capitalizeFirstLetter(rowName)}</span>
             </>
           }
           id={tbsId}

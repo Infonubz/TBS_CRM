@@ -3,7 +3,7 @@ import image from "../../asserts/promotion_image.png";
 import "../../App.css";
 import dayjs from "dayjs";
 import userimg from "../../asserts/userprofile.png";
-import { FaPhone } from "react-icons/fa";
+import { FaPhone, FaPhoneAlt } from "react-icons/fa";
 import { TbMailFilled } from "react-icons/tb";
 import { Modal, Popover } from "antd";
 import { faEdit, faEllipsisVertical, faTrash } from "@fortawesome/free-solid-svg-icons";
@@ -57,21 +57,21 @@ export default function EmployeeGridView({
     setDeleteEmpModalIsOpen(false);
   };
   const [isModalOpen, setIsModalOpen] = useState(false);
-    const [modalImage, setModalImage] = useState(null);
-  
-    const openModal = (event) => {
-      // Get the image source (src) using `getElementById`
-      const imageSrc = event.target.getAttribute('src');
-  
-      // Set the modal image source
-      setModalImage(imageSrc);
-  
-      // Open the modal
-      setIsModalOpen(true);
-    };
-    const closeModal = () => {
-      setIsModalOpen(false);
-    };
+  const [modalImage, setModalImage] = useState(null);
+
+  const openModal = (event) => {
+    // Get the image source (src) using `getElementById`
+    const imageSrc = event.target.getAttribute('src');
+
+    // Set the modal image source
+    setModalImage(imageSrc);
+
+    // Open the modal
+    setIsModalOpen(true);
+  };
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
   return (
     <>
@@ -79,7 +79,9 @@ export default function EmployeeGridView({
         <div className="grid grid-cols-5 w-full gap-x-[3vw] gap-y-[1.1vw]">
           {currentData?.length > 0 &&
             currentData?.map((item) => {
-              const fullname = `${capitalizeFirstLetter(item?.emp_first_name)} ${item.emp_last_name}`
+              const fullname = `${item?.emp_first_name.charAt(0) === item?.emp_first_name.charAt(0)?.toLowerCase()
+                ? capitalizeFirstLetter(item?.emp_first_name)
+                : item?.emp_first_name} ${item?.emp_last_name}`;
               return (
                 <div
                   className={`  bg-white h-[33.5vh] border-[#1f4b7f] border-l-[0.1vw]  border-r-[0.3vw] border-b-[0.3vw] border-t-[0.1vw] rounded-[0.5vw]`}
@@ -116,7 +118,7 @@ export default function EmployeeGridView({
                       <Popover
                         placement="bottomRight"
                         content={
-                          <div className="flex flex-col p-[.5vw]">
+                          <div className="flex flex-col p-[.5vw] border-[.1vw] border-[#1f487c] rounded-[.5vw]">
                             <div>
                               <a
                                 onClick={() => {
@@ -228,13 +230,13 @@ export default function EmployeeGridView({
                             transition: "ease-out 1s",
                           }}
                         >
-                          <FaPhone
+                          <FaPhoneAlt
                             size="1vw"
                             color={`${"#1f487c"
                               }`}
                           />
                         </div>
-                        <div className="text-[0.9vw] text-[#1f4b7f]">{item.phone}</div>
+                        <div className="text-[0.9vw] text-[#1f4b7f]">{item?.phone === null || item?.phone?.length <= 0 ? "Not Available" : item.phone}</div>
                       </div>
                       <div className="flex flex-row items-center space-x-[0.5vw] ">
                         <div
@@ -266,7 +268,8 @@ export default function EmployeeGridView({
                           </Tooltip>
                         ) : (
                           <div className="text-[0.9vw] text-[#1f4b7f]">
-                            {item?.email_id?.slice(0, 18)}
+                            {/* {item?.email_id?.slice(0, 18)} */}
+                            {item?.email_id === null || item?.email_id?.length <= 0 ? "Not Available" : item?.email_id?.slice(0, 18)}
                           </div>
                         )}
                       </div>

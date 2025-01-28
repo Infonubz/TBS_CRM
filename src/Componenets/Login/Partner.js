@@ -42,6 +42,7 @@ export default function Partner({setForgotPassword}) {
     const validationResult = validateInput(values.emailid_phone);
     try {
       const data = await PartnerLogin(values, validationResult);
+      console.log(data,"partnerdataata")
       toast.warning(data?.message);
         if (data?.token !== undefined) {
           console.log(data, "data2");
@@ -80,7 +81,7 @@ export default function Partner({setForgotPassword}) {
           <Form onSubmit={handleSubmit}>
             <div className="gap-y-[1.5vw] flex-col flex">
               {/* Email / Phone Field */}
-              <div className="col-span-1">
+              <div className="col-span-1 relative ">
                 <label className="text-[#1F487C] text-[1.1vw]">
                   Email / Phone
                   <span className="text-[1vw] text-red-600 pl-[0.2vw]">*</span>
@@ -94,12 +95,12 @@ export default function Partner({setForgotPassword}) {
                 <ErrorMessage
                   name="emailid_phone"
                   component="div"
-                  className="text-red-500 text-[0.8vw]"
+                  className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]"
                 />
               </div>
 
               {/* Password Field */}
-              <div className="col-span-1">
+              <div className="col-span-1 relative">
                 <label className="text-[#1F487C] text-[1.1vw]">
                   Password
                   <span className="text-[1vw] text-red-600 pl-[0.2vw]">*</span>
@@ -125,7 +126,7 @@ export default function Partner({setForgotPassword}) {
                 <ErrorMessage
                   name="password"
                   component="div"
-                  className="text-red-500 text-[0.8vw]"
+                  className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]"
                 />
               </div>
 
@@ -137,7 +138,7 @@ export default function Partner({setForgotPassword}) {
                   </Checkbox>
                 </div>
                 <div>
-                  <p className="text-[#1F487C] text-[1vw]">Forgot Password</p>
+                  <p onClick={() => setForgotPassword(true)} className="text-[#1F487C] text-[1vw]">Forgot Password</p>
                 </div>
               </div>
 

@@ -22,7 +22,7 @@ const validationSchema = Yup.object().shape({
   password: Yup.string().required("Password is required"),
 });
 
-export default function OperatorEmployee({ setAuthtoken }) {
+export default function OperatorEmployee({ setAuthtoken ,setForgotPassword}) {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   //const [toastError, setToastError] = useState();
@@ -76,7 +76,7 @@ export default function OperatorEmployee({ setAuthtoken }) {
           <Form onSubmit={handleSubmit}>
             <div className="gap-y-[1.5vw] flex-col flex">
               {/* Email / Phone Field */}
-              <div className="col-span-1">
+              <div className="col-span-1 relative">
                 <label className="text-[#1F487C] text-[1.1vw]">
                   Email / Phone
                   <span className="text-[1vw] text-red-600 pl-[0.2vw]">*</span>
@@ -90,12 +90,12 @@ export default function OperatorEmployee({ setAuthtoken }) {
                 <ErrorMessage
                   name="emailid_phone"
                   component="div"
-                  className="text-red-500 text-[0.8vw]"
+                  className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]"
                 />
               </div>
 
               {/* Password Field */}
-              <div className="col-span-1">
+              <div className="col-span-1 relative">
                 <label className="text-[#1F487C] text-[1.1vw]">
                   Password
                   <span className="text-[1vw] text-red-600 pl-[0.2vw]">*</span>
@@ -121,7 +121,7 @@ export default function OperatorEmployee({ setAuthtoken }) {
                 <ErrorMessage
                   name="password"
                   component="div"
-                  className="text-red-500 text-[0.8vw]"
+                  className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]"
                 />
               </div>
 
@@ -133,7 +133,7 @@ export default function OperatorEmployee({ setAuthtoken }) {
                   </Checkbox>
                 </div>
                 <div>
-                  <p className="text-[#1F487C] text-[1vw]">Forgot Password</p>
+                  <p onClick={() => setForgotPassword(true)} className="text-[#1F487C] text-[1vw] cursor-pointer ">Forgot Password</p>
                 </div>
               </div>
 

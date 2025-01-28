@@ -90,7 +90,25 @@ const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPag
                       <p>{handleSno(index)}</p>
                     </div>
                     <div className='col-span-2 text-[1vw] text-[#1F487C] grid grid-items-4 gap-[0.75vw] pt-[0.75vw]'>
-                      <p className='font-bold text-[1.2vw]'>{item?.client_details}</p>
+                      <p className='font-bold text-[1.2vw]'>  {
+                        item?.client_details?.length > 15 ? (
+                          <Tooltip color="white"
+                            overlayInnerStyle={{ color: "#1F4B7F" }} title={capitalizeFirstLetter(item?.client_details)}>
+                            <span>
+                              {`${item?.client_details?.charAt(0) === item?.client_details?.charAt(0)?.toLowerCase()
+                                ? capitalizeFirstLetter(item?.client_details).slice(0, 15)
+                                : item?.client_details?.slice(0, 15)}...`}
+                            </span>
+
+                          </Tooltip>
+                        ) : (
+                          <span>
+                            {item?.client_details?.charAt(0) === item?.client_details?.charAt(0)?.toLowerCase()
+                              ? capitalizeFirstLetter(item?.client_details)
+                              : item?.client_details}
+                          </span>
+                        )
+                      }</p>
                       <p className='flex items-center gap-[.5vw]'><FaPhoneAlt size={"0.8vw"} color="#1F4B7F" />{item?.phone}</p>
                       <p className="text-[1vw] text-[#1F4B7F] font-medium">
                         {item?.web_url?.length > 20 ? (
@@ -115,20 +133,20 @@ const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPag
                         )}
                       </p>
                       <p>{item.emailid?.length > 20 ?
-                      ( <Tooltip
-                        placement="bottom"
-                        title={item?.emailid}
-                        className="cursor-pointer"
-                        color="#1F487C"
-                      >
-                        <div className="text-[1vw] text-[#1F4B7C] flex items-center gap-[.5vw]">
-                        <MdMail size={"1vw"} color="#1F4B7F" /> <span>{`${item?.emailid?.slice(0, 20)}...`}</span>
-                        </div>
-                      </Tooltip>):
-                      (
-                        <div className="text-[1vw] text-[#1F4B7F] flex items-center gap-[.5vw]">
-                         <MdMail size={"1vw"} color="#1F4B7F" /> <span>{item?.emailid?.slice(0, 20)}</span>
-                        </div>)
+                        (<Tooltip
+                          placement="bottom"
+                          title={item?.emailid}
+                          className="cursor-pointer"
+                          color="#1F487C"
+                        >
+                          <div className="text-[1vw] text-[#1F4B7C] flex items-center gap-[.5vw]">
+                            <MdMail size={"1vw"} color="#1F4B7F" /> <span>{`${item?.emailid?.slice(0, 20)}...`}</span>
+                          </div>
+                        </Tooltip>) :
+                        (
+                          <div className="text-[1vw] text-[#1F4B7F] flex items-center gap-[.5vw]">
+                            <MdMail size={"1vw"} color="#1F4B7F" /> <span>{item?.emailid?.slice(0, 20)}</span>
+                          </div>)
                       }</p>
                     </div>
 
@@ -136,48 +154,54 @@ const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPag
                       <div className='flex justify-between'>
                         <div className='grid grid-items-4 gap-[0.75vw] pt-[0.75vw] h-[21vh] justify-between order-first'>
                           {/* <div className='flex flex-col justify-between'> */}
-                        <div className=" pt-[8vw] sm:pt-[4vw]  md:pt-[3vw] lg:pt-[1vw] xl:pt-[.9vw] 2xl:pt-[.8vw] content-center items-center">
-                          <p className="text-[1.2vw] text-[#1F4B7F] font-bold">
-                            {item?.ad_title?.length > 20 ? (
-                              <Tooltip
-                                placement="bottom"
-                                title={item?.ad_title}
-                                className="cursor-pointer"
-                                color="#1F487C"
-                              >
-                                <div className="text-[1.2vw] text-[#1F4B7C] font-bold">
-                                  {`${item?.ad_title?.slice(0, 20)}...`}
-                                </div>
-                              </Tooltip>
-                            ) : (
-                              <div className="text-[1.2vw] text-[#1F4B7F] font-bold">
-                                {item?.ad_title?.slice(0, 20)}
-                              </div>)}
-                          </p>
-                          <p className="text-[1vw] text-[#1F4B7F] font-medium">
-                            {item?.ad_description?.length > 20 ? (
-                              <Tooltip
-                                placement="bottom"
-                                title={item?.ad_description}
-                                className="cursor-pointer"
-                                color="#1F487C"
-                              >
-                                <div className="text-[1vw] text-[#1F4B7C] font-medium">
-                                  {`${item?.ad_description?.slice(0, 20)}...`}
-                                </div>
-                              </Tooltip>
-                            ) : (
-                              <div className="text-[1vw] text-[#1F4B7F] font-medium">
-                                {item?.ad_description?.slice(0, 20)}
-                              </div>)}
-                          </p>
-                          <span className='flex items-center gap-[.5vw] text-[.9vw] font-semibold'>
-                          <MdDateRange size={"1vw"} color="#1F4B7F" />
-                          <p>
-                            {`${dayjs(item?.start_date).format("DD MMM, YY")}`} -{" "}
-                            {`${dayjs(item?.end_date).format("DD MMM, YY")}`}
-                          </p>
-                          </span>
+                          <div className=" pt-[8vw] sm:pt-[4vw]  md:pt-[3vw] lg:pt-[1vw] xl:pt-[.9vw] 2xl:pt-[.8vw] content-center items-center">
+                            <p className="text-[1.2vw] text-[#1F4B7F] font-bold">
+                              {item?.ad_title?.length > 20 ? (
+                                <Tooltip
+                                  placement="bottom"
+                                  title={item?.ad_title}
+                                  className="cursor-pointer"
+                                  color="#1F487C"
+                                >
+                                  <div className="text-[1.2vw] text-[#1F4B7C] font-bold">
+                                    {`${item?.ad_title?.charAt(0) === item?.ad_title?.charAt(0).toLowerCase()
+                                      ? capitalizeFirstLetter(item?.ad_title).slice(0, 20)
+                                      : item?.ad_title?.slice(0, 20)}...`}
+                                  </div>
+                                </Tooltip>
+                              ) : (
+                                <div className="text-[1.2vw] text-[#1F4B7F] font-bold">
+                                  {
+                                    item?.ad_title?.charAt(0) === item?.ad_title?.charAt(0).toLowerCase()
+                                      ? capitalizeFirstLetter(item?.ad_title).slice(0, 20)
+                                      : item?.ad_title?.slice(0, 20)
+                                  }
+                                </div>)}
+                            </p>
+                            <p className="text-[1vw] text-[#1F4B7F] font-medium">
+                              {item?.ad_description?.length > 20 ? (
+                                <Tooltip
+                                  placement="bottom"
+                                  title={item?.ad_description}
+                                  className="cursor-pointer"
+                                  color="#1F487C"
+                                >
+                                  <div className="text-[1vw] text-[#1F4B7C] font-medium">
+                                    {`${item?.ad_description?.slice(0, 20)}...`}
+                                  </div>
+                                </Tooltip>
+                              ) : (
+                                <div className="text-[1vw] text-[#1F4B7F] font-medium">
+                                  {item?.ad_description?.slice(0, 20)}
+                                </div>)}
+                            </p>
+                            <span className='flex items-center gap-[.5vw] text-[.9vw] font-semibold'>
+                              <MdDateRange size={"1vw"} color="#1F4B7F" />
+                              <p>
+                                {`${dayjs(item?.start_date).format("DD MMM, YY")}`} -{" "}
+                                {`${dayjs(item?.end_date).format("DD MMM, YY")}`}
+                              </p>
+                            </span>
                           </div>
                           {/* </div> */}
                           <div className='flex flex-col items-end content-end justify-end'>
@@ -189,11 +213,11 @@ const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPag
                                   : item.ads_status_id == 1
                                     ? "bg-[#FF9900]"
                                     : item.ads_status_id == 3 ? "bg-[#2A99FF]" : "bg-[#646262]"
-                              } rounded-t-xl text-[1vw] font-semibold text-white w-[10.5vw] py-[0.15vw] `}
+                                } rounded-t-xl text-[1vw] font-semibold text-white w-[10.5vw] py-[0.15vw] `}
                             >
                               {capitalizeFirstLetter(item?.ads_status)}
                             </button>
-                          
+
                           </div>
                         </div>
                         <div className="order-last py-[0.5vw]">
@@ -235,6 +259,7 @@ const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPag
                           >
                             <FontAwesomeIcon
                               icon={faEllipsisVertical}
+                              className='cursor-pointer'
                               color="#1f487c"
                               style={{
                                 height: "1.5vw",
@@ -294,7 +319,7 @@ const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPag
                       <p className='font-bold text-[1.2vw]'>{item?.client_details}</p>
                       <p className='flex items-center gap-[.5vw]'><FaPhoneAlt size={"0.8vw"} color="#1F4B7F" />{item?.phone}</p>
                       <p className="text-[1vw] text-[#1F4B7F] font-medium">
-                      {item?.web_url?.length > 20 ? (
+                        {item?.web_url?.length > 20 ? (
                           <Tooltip
                             placement="top"
                             title={item?.web_url}
@@ -316,20 +341,20 @@ const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPag
                         )}
                       </p>
                       <p>{item.emailid?.length > 20 ?
-                      ( <Tooltip
-                        placement="bottom"
-                        title={item?.emailid}
-                        className="cursor-pointer"
-                        color="#1F487C"
-                      >
-                        <div className="text-[1vw] text-[#1F4B7C] flex items-center gap-[.5vw]">
-                        <MdMail size={"1vw"} color="#1F4B7F" /> <span>{`${item?.emailid?.slice(0, 20)}...`}</span>
-                        </div>
-                      </Tooltip>):
-                      (
-                        <div className="text-[1vw] text-[#1F4B7F] flex items-center gap-[.5vw]">
-                         <MdMail size={"1vw"} color="#1F4B7F" /> <span>{item?.emailid?.slice(0, 20)}</span>
-                        </div>)
+                        (<Tooltip
+                          placement="bottom"
+                          title={item?.emailid}
+                          className="cursor-pointer"
+                          color="#1F487C"
+                        >
+                          <div className="text-[1vw] text-[#1F4B7C] flex items-center gap-[.5vw]">
+                            <MdMail size={"1vw"} color="#1F4B7F" /> <span>{`${item?.emailid?.slice(0, 20)}...`}</span>
+                          </div>
+                        </Tooltip>) :
+                        (
+                          <div className="text-[1vw] text-[#1F4B7F] flex items-center gap-[.5vw]">
+                            <MdMail size={"1vw"} color="#1F4B7F" /> <span>{item?.emailid?.slice(0, 20)}</span>
+                          </div>)
                       }</p>
                     </div>
 
@@ -337,48 +362,48 @@ const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPag
                       <div className='flex justify-between'>
                         <div className='grid grid-items-4 gap-[0.75vw] pt-[0.75vw] h-[21vh] justify-between order-first'>
                           {/* <div className='flex flex-col justify-between'> */}
-                        <div className=" pt-[8vw] sm:pt-[4vw]  md:pt-[3vw] lg:pt-[1vw] xl:pt-[.9vw] 2xl:pt-[.8vw] content-center items-center">
-                          <p className="text-[1.2vw] text-[#1F4B7F] font-bold">
-                            {item?.mobad_title?.length > 20 ? (
-                              <Tooltip
-                                placement="bottom"
-                                title={item?.mobad_title}
-                                className="cursor-pointer"
-                                color="#1F487C"
-                              >
-                                <div className="text-[1.2vw] text-[#1F4B7C] font-bold">
-                                  {`${item?.mobad_title?.slice(0, 20)}...`}
-                                </div>
-                              </Tooltip>
-                            ) : (
-                              <div className="text-[1.2vw] text-[#1F4B7F] font-bold">
-                                {item?.mobad_title?.slice(0, 20)}
-                              </div>)}
-                          </p>
-                          <p className="text-[1vw] text-[#1F4B7F] font-medium">
-                            {item?.mobad_description?.length > 20 ? (
-                              <Tooltip
-                                placement="bottom"
-                                title={item?.mobad_description}
-                                className="cursor-pointer"
-                                color="#1F487C"
-                              >
-                                <div className="text-[1vw] text-[#1F4B7C] font-medium">
-                                  {`${item?.mobad_description?.slice(0, 20)}...`}
-                                </div>
-                              </Tooltip>
-                            ) : (
-                              <div className="text-[1vw] text-[#1F4B7F] font-medium">
-                                {item?.mobad_description?.slice(0, 20)}
-                              </div>)}
-                          </p>
-                          <span className='flex items-center gap-[.5vw] text-[.9vw] font-semibold'>
-                          <MdDateRange size={"1vw"} color="#1F4B7F" />
-                          <p>
-                            {`${dayjs(item?.start_date).format("DD MMM, YY")}`} -{" "}
-                            {`${dayjs(item?.end_date).format("DD MMM, YY")}`}
-                          </p>
-                          </span>
+                          <div className=" pt-[8vw] sm:pt-[4vw]  md:pt-[3vw] lg:pt-[1vw] xl:pt-[.9vw] 2xl:pt-[.8vw] content-center items-center">
+                            <p className="text-[1.2vw] text-[#1F4B7F] font-bold">
+                              {item?.mobad_title?.length > 20 ? (
+                                <Tooltip
+                                  placement="bottom"
+                                  title={item?.mobad_title}
+                                  className="cursor-pointer"
+                                  color="#1F487C"
+                                >
+                                  <div className="text-[1.2vw] text-[#1F4B7C] font-bold">
+                                    {`${item?.mobad_title?.slice(0, 20)}...`}
+                                  </div>
+                                </Tooltip>
+                              ) : (
+                                <div className="text-[1.2vw] text-[#1F4B7F] font-bold">
+                                  {item?.mobad_title?.slice(0, 20)}
+                                </div>)}
+                            </p>
+                            <p className="text-[1vw] text-[#1F4B7F] font-medium">
+                              {item?.mobad_description?.length > 20 ? (
+                                <Tooltip
+                                  placement="bottom"
+                                  title={item?.mobad_description}
+                                  className="cursor-pointer"
+                                  color="#1F487C"
+                                >
+                                  <div className="text-[1vw] text-[#1F4B7C] font-medium">
+                                    {`${item?.mobad_description?.slice(0, 20)}...`}
+                                  </div>
+                                </Tooltip>
+                              ) : (
+                                <div className="text-[1vw] text-[#1F4B7F] font-medium">
+                                  {item?.mobad_description?.slice(0, 20)}
+                                </div>)}
+                            </p>
+                            <span className='flex items-center gap-[.5vw] text-[.9vw] font-semibold'>
+                              <MdDateRange size={"1vw"} color="#1F4B7F" />
+                              <p>
+                                {`${dayjs(item?.start_date).format("DD MMM, YY")}`} -{" "}
+                                {`${dayjs(item?.end_date).format("DD MMM, YY")}`}
+                              </p>
+                            </span>
                           </div>
                           {/* </div> */}
                           <div className='flex flex-col items-end content-end justify-end'>
@@ -390,11 +415,11 @@ const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPag
                                   : item.ads_status_id == 1
                                     ? "bg-[#FF9900]"
                                     : item.ads_status_id == 3 ? "bg-[#2A99FF]" : "bg-[#646262]"
-                              } rounded-t-xl text-[1vw] font-semibold text-white w-[10.5vw] py-[0.15vw] `}
+                                } rounded-t-xl text-[1vw] font-semibold text-white w-[10.5vw] py-[0.15vw] `}
                             >
                               {capitalizeFirstLetter(item?.ads_status)}
                             </button>
-                          
+
                           </div>
                         </div>
                         <div className="order-last py-[0.5vw]">
@@ -436,6 +461,7 @@ const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPag
                           >
                             <FontAwesomeIcon
                               icon={faEllipsisVertical}
+                              className="cursor-pointer"
                               color="#1f487c"
                               style={{
                                 height: "1.5vw",

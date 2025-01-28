@@ -31,6 +31,7 @@ export default function Verify_Modal({
   statusFromEdit,
   comments,
   tabfilter,
+  setSpinning
 }) {
   const [value, setValue] = useState(1);
   const [isUpdateStatus, setIsUpdateStatus] = useState(false);
@@ -155,8 +156,7 @@ export default function Verify_Modal({
     zip.generateAsync({ type: "blob" }).then((content) => {
       saveAs(
         content,
-        `${
-          isOperator ? requestData?.tbs_operator_id : requestData.tbs_partner_id
+        `${isOperator ? requestData?.tbs_operator_id : requestData.tbs_partner_id
         }.zip`
       );
     });
@@ -165,18 +165,18 @@ export default function Verify_Modal({
   const fetchImages = async () => {
     return verifyData.startsWith("tbs-op")
       ? [
-          `${apiImgUrl}${requestData?.aadar_front_doc}`,
-          `${apiImgUrl}${requestData?.aadar_back_doc}`,
-          `${apiImgUrl}${requestData?.pancard_front_doc}`,
-          `${apiImgUrl}${requestData?.pancard_back_doc}`,
-          `${apiImgUrl}${requestData?.msme_docs}`,
-        ]
+        `${apiImgUrl}${requestData?.aadar_front_doc}`,
+        `${apiImgUrl}${requestData?.aadar_back_doc}`,
+        `${apiImgUrl}${requestData?.pancard_front_doc}`,
+        `${apiImgUrl}${requestData?.pancard_back_doc}`,
+        `${apiImgUrl}${requestData?.msme_docs}`,
+      ]
       : [
-          `${apiImgUrl}${requestData?.aadhar_card_front}`,
-          `${apiImgUrl}${requestData?.aadhar_card_back}`,
-          `${apiImgUrl}${requestData?.pan_card_front}`,
-          `${apiImgUrl}${requestData?.pan_card_back}`,
-        ];
+        `${apiImgUrl}${requestData?.aadhar_card_front}`,
+        `${apiImgUrl}${requestData?.aadhar_card_back}`,
+        `${apiImgUrl}${requestData?.pan_card_front}`,
+        `${apiImgUrl}${requestData?.pan_card_back}`,
+      ];
   };
 
   return (
@@ -218,43 +218,41 @@ export default function Verify_Modal({
                   <div className=" grid grid-cols-5 w-full h-[30vw] relative">
                     <div className="col-span-2 w-full pr-[1vw] gapy-y-[1vw]">
                       <div
-                        className={`grid ${
-                          isOperator ? "grid-rows-3" : "grid-rows-2"
-                        }  w-full h-full`}
+                        className={`grid ${isOperator ? "grid-rows-3" : "grid-rows-2"
+                          }  w-full h-full`}
                       >
                         <div
-                          className={`row-span-1 ${
-                            isOperator ? "" : "flex  flex-col"
-                          }`}
+                          className={`row-span-1 ${isOperator ? "" : "flex  flex-col"
+                            }`}
                         >
                           <p className="text-[1.2vw] font-bold text-[#1F487C]">
-                            Aadhar Card Details:
+                            Aadhaar Card Details:
                           </p>
                           <Field
                             type="text"
                             name="owner_name"
                             placeholder="Name"
-                            value={capitalizeFirstLetter(values?.owner_name)}
+                            // value={capitalizeFirstLetter(values?.owner_name)}
+                            value={values?.owner_name?.charAt(0) === values?.owner_name?.charAt(0)?.toLowerCase()
+                              ? capitalizeFirstLetter(values?.owner_name)
+                              : values?.owner_name}
                             disabled
-                            className={`border-r-[0.3vw] ${
-                              isOperator ? "" : "mt-[1.5vw]"
-                            } cursor-not-allowed mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                            className={`border-r-[0.3vw] ${isOperator ? "" : "mt-[1.5vw]"
+                              } cursor-not-allowed mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                           />
                           <Field
                             type="text"
                             name="aadharcard_number"
-                            placeholder="Aadhar card Number"
+                            placeholder="Aadhaar card Number"
                             value={values?.aadharcard_number}
                             disabled
-                            className={`border-r-[0.3vw] cursor-not-allowed ${
-                              isOperator ? "mt-[.5vw]" : "mt-[1.5vw]"
-                            } border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                            className={`border-r-[0.3vw] cursor-not-allowed ${isOperator ? "mt-[.5vw]" : "mt-[1.5vw]"
+                              } border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                           />
                         </div>
                         <div
-                          className={`row-span-1 ${
-                            isOperator ? "" : "flex flex-col"
-                          }`}
+                          className={`row-span-1 ${isOperator ? "" : "flex flex-col"
+                            }`}
                         >
                           <p className="text-[1.2vw] font-bold text-[#1F487C]">
                             Pan Card Details:
@@ -263,11 +261,13 @@ export default function Verify_Modal({
                             type="text"
                             name="owner_name"
                             placeholder="Name"
-                            value={capitalizeFirstLetter(values?.owner_name)}
+                            // value={capitalizeFirstLetter(values?.owner_name)}
+                            value={values?.owner_name?.charAt(0) === values?.owner_name?.charAt(0)?.toLowerCase()
+                              ? capitalizeFirstLetter(values?.owner_name)
+                              : values?.owner_name}
                             disabled
-                            className={`border-r-[0.3vw] mt-[0.5vw] ${
-                              isOperator ? "" : "mt-[1.5vw]"
-                            } cursor-not-allowed border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                            className={`border-r-[0.3vw] mt-[0.5vw] ${isOperator ? "" : "mt-[1.5vw]"
+                              } cursor-not-allowed border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                           />
                           <Field
                             type="text"
@@ -275,9 +275,8 @@ export default function Verify_Modal({
                             placeholder="Pan Card Number"
                             value={values?.pancard_number}
                             disabled
-                            className={`border-r-[0.3vw] cursor-not-allowed ${
-                              isOperator ? "mt-[.5vw]" : "mt-[1.5vw]"
-                            } border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                            className={`border-r-[0.3vw] cursor-not-allowed ${isOperator ? "mt-[.5vw]" : "mt-[1.5vw]"
+                              } border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                           />
                         </div>
                         {isOperator ? (
@@ -289,7 +288,10 @@ export default function Verify_Modal({
                               type="text"
                               name="owner_name"
                               placeholder="Name"
-                              value={capitalizeFirstLetter(values?.owner_name)}
+                              // value={capitalizeFirstLetter(values?.owner_name)}
+                              value={values?.owner_name?.charAt(0) === values?.owner_name?.charAt(0)?.toLowerCase()
+                                ? capitalizeFirstLetter(values?.owner_name)
+                                : values?.owner_name}
                               disabled
                               className="border-r-[0.3vw] cursor-not-allowed mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                             />
@@ -315,11 +317,10 @@ export default function Verify_Modal({
                             : no_image_available
                         }
                         alt="Aadhar Front Img"
-                        className={`w-full ${
-                          currentfile == 1
+                        className={`w-full ${currentfile == 1
                             ? "h-[20vw] object-fill"
                             : "h-[10vw] object-cover"
-                        } object-cover cursor-zoom-in border-[#1F487C] border-[0.2vw] border-dashed rounded-[1vw]`}
+                          } object-cover cursor-zoom-in border-[#1F487C] border-[0.2vw] border-dashed rounded-[1vw]`}
                         style={{
                           transition: "ease-in 0.5s",
                         }}
@@ -334,17 +335,16 @@ export default function Verify_Modal({
                             : no_image_available
                         }
                         alt="Aadhar Back Img"
-                        className={`w-full ${
-                          currentfile == 2
+                        className={`w-full ${currentfile == 2
                             ? "h-[20vw] object-fill"
                             : "h-[10vw] object-cover"
-                        } object-cover cursor-zoom-in border-[#1F487C] border-[0.2vw] border-dashed rounded-[1vw]`}
+                          } object-cover cursor-zoom-in border-[#1F487C] border-[0.2vw] border-dashed rounded-[1vw]`}
                         style={{
                           transition: "ease-in 0.5s",
                         }}
                         onMouseEnter={() => setCurrentFile(2)}
                         onMouseLeave={() => setCurrentFile(null)}
-                        // onClick={() => setCurrentFile(2)}
+                      // onClick={() => setCurrentFile(2)}
                       />
                       <img
                         src={
@@ -353,11 +353,10 @@ export default function Verify_Modal({
                             : no_image_available
                         }
                         alt="PAN Front Img"
-                        className={`w-full ${
-                          currentfile == 3
+                        className={`w-full ${currentfile == 3
                             ? "h-[20vw] object-fill"
                             : "h-[10vw] object-cover"
-                        } object-cover cursor-zoom-in border-[#1F487C] border-[0.2vw] border-dashed rounded-[1vw]`}
+                          } object-cover cursor-zoom-in border-[#1F487C] border-[0.2vw] border-dashed rounded-[1vw]`}
                         style={{
                           transition: "ease-in 0.5s",
                         }}
@@ -371,11 +370,10 @@ export default function Verify_Modal({
                             : no_image_available
                         }
                         alt="PAN Back Img"
-                        className={`w-full ${
-                          currentfile == 4
+                        className={`w-full ${currentfile == 4
                             ? "h-[20vw] object-fill"
                             : "h-[10vw] object-cover"
-                        } object-cover cursor-zoom-in border-[#1F487C] border-[0.2vw] border-dashed rounded-[1vw]`}
+                          } object-cover cursor-zoom-in border-[#1F487C] border-[0.2vw] border-dashed rounded-[1vw]`}
                         style={{
                           transition: "ease-in 0.5s",
                         }}
@@ -390,11 +388,10 @@ export default function Verify_Modal({
                               : no_image_available
                           }
                           alt="MSME"
-                          className={`w-full ${
-                            currentfile == 5
+                          className={`w-full ${currentfile == 5
                               ? "h-[30vw] object-fill"
                               : "h-[10vw] object-cover"
-                          }  cursor-zoom-in border-[#1F487C] border-[0.2vw] border-dashed rounded-[1vw]`}
+                            }  cursor-zoom-in border-[#1F487C] border-[0.2vw] border-dashed rounded-[1vw]`}
                           style={{
                             transition: "ease-in 0.5s",
                           }}
@@ -450,7 +447,7 @@ export default function Verify_Modal({
                           alt="Aadhar Front Img"
                           className="col-span-4 hover-img hover:mt-[1vw] hover:ml-[4.5vw] hover:h-[11.5vw] hover:w-[30.5vw] h-[10vw] w-[13vw] 
                               hover:-translate-x-37 hover:translate-y-10 hover:scale-150 duration-500 hover:shadow-lg hover:shadow-black/30"
-                        />
+                        />                                                                                                                
                       </div>
                       <div className="h-[7vw] w-[15vw] mt-[0.4vw]">
                         <img
@@ -640,7 +637,7 @@ export default function Verify_Modal({
                         onClick={() => {
                           setIsUpdateStatus(true);
                         }}
-                        // disabled={requestData.req_status_id == 2}
+                      // disabled={requestData.req_status_id == 2}
                       >
                         {requestData?.req_status_id == 2 ? (
                           <span>Update Status</span>
@@ -675,6 +672,7 @@ export default function Verify_Modal({
           setIsVerifyModal={setIsVerifyModal}
           comments={comments}
           tabfilter={tabfilter}
+          setSpinning={setSpinning}
         />
       </ModalPopup>
 

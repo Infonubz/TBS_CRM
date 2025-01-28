@@ -65,13 +65,17 @@ const ForgotPassword = () => {
   const [spinning, setSpinning] = useState(false);
 
   console.log(Login, "login_map_s");
+  const typeID = sessionStorage.getItem("type_id")
+  ? sessionStorage.getItem("type_id")
+  : localStorage.getItem("type_id");
+
   const handleSendOTP = async (values) => {
     console.log(values, "values emailid");
     try {
       setSpinning(true);
       const otpMail = values.email_id;
       setEmailId({ email_id: otpMail });
-      const response = await SendOTP(otpMail, setSpinning);
+      const response = await SendOTP(otpMail,typeID, setSpinning);
       console.log(response, "-----response emailid");
       // toast.success(response?.data?.message);
       console.log(response.data.otp, "this is otp my");
@@ -115,7 +119,7 @@ const ForgotPassword = () => {
       if (values.newPassword !== pass) {
         try {
           setSpinning(true);
-          const response = await ResetPassword(values, setSpinning);
+          const response = await ResetPassword(values,typeID, setSpinning);
           // setTimeout(() => {
           //   setOtpEnabled(false);
           // }, 2000);

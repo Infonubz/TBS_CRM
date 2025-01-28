@@ -58,11 +58,11 @@ const validationSchema = Yup.object().shape({
   promo_code: Yup.string()
     .required("Enter Promo Code")
     .min(5, "Promo Code must be at least 5 digit")
-    .max(100, "Promo code cannot exceed 20")
+    .max(15, "Promo code cannot exceed 15 characters")
     .matches(/^[a-zA-Z0-9]+$/, "Only alphabets and numbers are allowed"),
-  status: Yup.string().required("This field is required"),
+  status: Yup.string().required("Status is required"),
   file: Yup.mixed()
-    .test("required", "A file is required", function (value) {
+    .test("required", "Promo image is required", function (value) {
       const { isEdit } = this.options.context;
       if (!isEdit && !value) {
         return false;
@@ -93,6 +93,7 @@ export default function AddPromoIndex({
   setPromotionId,
   CurrentTab,
   ownerName,
+  listType
   // setPromolist,
   // promolist,
 }) {
@@ -128,8 +129,12 @@ export default function AddPromoIndex({
  // const user_name = sessionStorage.getItem("user_name");
   const [isImageConverted, setIsImageConverted] = useState(false);
   const user = sessionStorage.getItem("user_name");
+  const companyName = sessionStorage.getItem("company_name")
+  const [noValToStatus,setNoValToStatus] = useState(true)
 
-  const operatorName = type_Id === "OP101" ? user : ownerName;
+  const [operatorName ,setOperatorName] = useState(type_Id === "OP101" || type_Id === "OPEMP101" ? companyName : ownerName)
+  console.log(user,"ownername");
+  
   // const [loading, setLoading] = useState(false);
   // const handleSubmit = async (values) => {
   //   // const promo_background = useSelector((state) => state.crm.promo_bg);
@@ -232,6 +237,10 @@ export default function AddPromoIndex({
 
   // Handle form submission
   const handleSubmit = async (values) => {
+  console.log(values,"promotionlog")
+    // if(5 === 4){
+
+ 
     if (CurrentPage === 1) {
       setCurrentPromodata(values);
       setCurrentPage(2);
@@ -249,11 +258,13 @@ export default function AddPromoIndex({
             promotionId,
             promo_background,
             valuesymbol,
-            promodata
+            promodata,
+            operatorName,
+            noValToStatus
           );
           if (data?.message) {
             toast.success(data?.message);
-            GetPromotionDataByStatus(dispatch, CurrentTab); // Reload promotion data
+            GetPromotionDataByStatus(dispatch, CurrentTab,listType); // Reload promotion data
             setModalIsOpen(false); // Close modal
           }
         } else {
@@ -266,6 +277,7 @@ export default function AddPromoIndex({
       //   setLoading(false);
       // }
     }
+  // }
   };
 
   const fetchGetPromo = async () => {
@@ -304,7 +316,10 @@ export default function AddPromoIndex({
       setLoading(true)
     }
   }, [promotionId, setPromotionId, setPromoData]);
-
+// {type_Id==="OP101" && promodata?.tbs_user_id?.startsWith("tbs-op_emp") ? true : type_Id ==="PRO101" && promodata?.tbs_user_id?.startsWith("tbs-op") ? true : false }
+// useEffect(()=>{
+//   type_Id==="OP101" && promodata?.tbs_user_id?.startsWith("tbs-op_emp") ? setNoValToStatus(true)  : type_Id ==="PRO101" && promodata?.tbs_user_id?.startsWith("tbs-op") ? setNoValToStatus(true) : setNoValToStatus(false) 
+// },[noValToStatus,setNoValToStatus])
   return (
     <>
       <Formik
@@ -418,6 +433,8 @@ export default function AddPromoIndex({
                   CurrentTab={CurrentTab}
                   ownerName={ownerName}
                   operatorName={operatorName}
+                  // userId={promodata.tbs_user_id}
+                  setNoValToStatus={setNoValToStatus}
                 />
               ) : (
                 <Background_View

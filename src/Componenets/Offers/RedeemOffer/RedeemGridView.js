@@ -16,6 +16,7 @@ import { FaEye } from "react-icons/fa";
 import NOIMAGE from "../../../asserts/NOIMAGE.png";
 import { CiImageOff } from "react-icons/ci";
 import { MdDelete, MdEdit } from "react-icons/md";
+import { capitalizeFirstLetter } from "../../Common/Captilization";
 
 export default function RedeemGridView({
   currentData,
@@ -76,7 +77,7 @@ export default function RedeemGridView({
               <Popover
                 placement="bottomRight"
                 content={
-                  <div className="flex flex-col px-[0.5vw]">
+                  <div className="flex flex-col px-[0.5vw] border-[.1vw] border-[#1F487C] rounded-[.5vw]">
                     <div className="flex items-center gap-x-[0.5vw] py-[0.25vw] border-b-[0.1vw] border-[#1F487C]">
                       <span>
                         <MdEdit
@@ -102,9 +103,9 @@ export default function RedeemGridView({
                           size={"1.2vw"}
                           color="#1F4B7F"
                           className=" cursor-pointer"
-                          // onClick={() => {
-                          //   handleDelete(row.promo_id);
-                          // }}
+                        // onClick={() => {
+                        //   handleDelete(row.promo_id);
+                        // }}
                         />
                       </span>
                       <a
@@ -154,9 +155,8 @@ export default function RedeemGridView({
                     setOfferImage(item.theme);
                     handleOptionClick(item.tbs_offer_id);
                   }}
-                  className={`h-[5vw] w-auto rounded-[0.5vw] ${
-                    item?.theme ? "cursor-pointer" : ""
-                  }`}
+                  className={`h-[5vw] w-auto rounded-[0.5vw] ${item?.theme ? "cursor-pointer" : ""
+                    }`}
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center w-auto px-[1vw] h-[5vw] ">
@@ -166,7 +166,11 @@ export default function RedeemGridView({
 
               <div className=" w-full flex flex-col items-center gap-[0.6vw] mt-[0.7vw]">
                 <div className="font-bold text-[0.9vw]  ">
-                  {item.offer_name}
+                  {
+                    item?.offer_name?.charAt(0) === item?.offer_name?.charAt(0).toLowerCase()
+                      ? capitalizeFirstLetter(item?.offer_name)
+                      : item?.offer_name
+                  }
                 </div>
                 <div className="text-[0.9vw]  flex ">
                   <span className="font-semibold pr-[0.5vw] ">Usage: </span>
@@ -183,30 +187,28 @@ export default function RedeemGridView({
                 </div>
                 <div className="px-[1.5vw] w-full">
                   <div
-                    className={`${
-                      item.req_status_id == 2
-                        ? " border-[0.1vw] border-[#34AE2A]"
+                    className={`${item.req_status_id == 2
+                        ? " border-[0.1vw] border-[#34AE2B]"
                         : item.req_status_id == 0
-                        ? "border-[0.1vw] border-[#646262]"
-                        : item.req_status_id == 3
-                        ? "border-[0.1vw] border-[#2A99FF]"
-                        : item.req_status_id == 4
-                        ? "border-[#FF0000] border-[0.1vw]"
-                        : "border-[#FF9900] border-[0.1vw]"
-                    } rounded-full `}
+                          ? "border-[0.1vw] border-[#646262]"
+                          : item.req_status_id == 3
+                            ? "border-[0.1vw] border-[#2A99FF]"
+                            : item.req_status_id == 4
+                              ? "border-[#FD3434] border-[0.1vw]"
+                              : "border-[#FF9900] border-[0.1vw]"
+                      } rounded-full `}
                   >
                     <div
-                      className={`${
-                        item.req_status_id == 2
-                          ? "bg-[#34AE2A] "
+                      className={`${item.req_status_id == 2
+                          ? "bg-[#34AE2B] "
                           : item.req_status_id == 0
-                          ? "bg-[#646262]"
-                          : item.req_status_id == 3
-                          ? "bg-[#2A99FF]"
-                          : item.req_status_id == 4
-                          ? "bg-[#FF0000]"
-                          : "bg-[#FF9900]"
-                      } border-dashed  border-white border-[0.2vw] text-[1.1vw] rounded-full text-white  py-[0.2vw] w-full flex items-center justify-center `}
+                            ? "bg-[#646262]"
+                            : item.req_status_id == 3
+                              ? "bg-[#2A99FF]"
+                              : item.req_status_id == 4
+                                ? "bg-[#FD3434]"
+                                : "bg-[#FF9900]"
+                        } border-dashed  border-white border-[0.2vw] text-[1.1vw] rounded-full text-white  py-[0.2vw] w-full flex items-center justify-center `}
                     >
                       {item.code}
                     </div>

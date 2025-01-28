@@ -41,11 +41,10 @@ export default function Partner({ data, tabfilter }) {
         return (
           <div className="flex justify-center items-center">
             <img
-              src={`${
-                row?.profile_img
+              src={`${row?.profile_img
                   ? `${apiImgUrl}${row?.profile_img}`
                   : UserProfile
-              } `}
+                } `}
               alt="Photo"
               className="w-[2.15vw] h-[2.15vw] object-cover rounded-[0.2vw]"
             />
@@ -117,9 +116,9 @@ export default function Partner({ data, tabfilter }) {
       },
       width: "12vw",
       render: (row) => {
-        const fullname = `${capitalizeFirstLetter(row?.partner_first_name)} ${
-          row.partner_last_name
-        }`;
+        const fullname = `${row?.partner_first_name?.charAt(0) === row?.partner_first_name?.charAt(0).toLowerCase()
+          ? capitalizeFirstLetter(row?.partner_first_name)
+          : row?.partner_first_name} ${row?.partner_last_name}`;
         return (
           <div className="flex items-center pl-[1.5vw]">
             <p className="text-[1vw] font-bold text-[#1F4B7F]">
@@ -127,9 +126,8 @@ export default function Partner({ data, tabfilter }) {
                 <Tooltip
                   color="white"
                   overlayInnerStyle={{ color: "#1F4B7F" }}
-                  title={`${capitalizeFirstLetter(row?.partner_first_name)} ${
-                    row.partner_last_name
-                  }`}
+                  title={`${capitalizeFirstLetter(row?.partner_first_name)} ${row.partner_last_name
+                    }`}
                   className="cursor-pointer"
                 >
                   {fullname?.slice(0, 16) + ".."}
@@ -335,13 +333,13 @@ export default function Partner({ data, tabfilter }) {
                 row?.req_status_id == 1
                   ? "bg-[#FF9900] cursor-not-allowed"
                   : row?.req_status_id == 4
-                  ? "bg-[#2A99FF] cursor-pointer"
-                  : row?.req_status_id == 5
-                  ? "bg-[#34AE2A] cursor-pointer"
-                  : row?.req_status_id == 6
-                  ? "bg-[#e60f00] cursor-pointer"
-                  : "bg-[#646262]"
-              } rounded-[0.5vw] text-[1vw] font-extrabold shadow-md shadow-black text-white w-[7vw] py-[0.2vw]`}
+                    ? "bg-[#2A99FF] cursor-pointer"
+                    : row?.req_status_id == 5
+                      ? "bg-[#34AE2A] cursor-pointer"
+                      : row?.req_status_id == 6
+                        ? "bg-[#FD3434] cursor-pointer"
+                        : "bg-[#646262]"
+                } rounded-[0.5vw] text-[1vw] font-extrabold shadow-md shadow-black text-white w-[7vw] py-[0.2vw]`}
             >
               {capitalizeFirstLetter(row?.req_status)}
             </button>

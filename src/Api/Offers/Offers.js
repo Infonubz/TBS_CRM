@@ -22,13 +22,14 @@ const api = axios.create({
   },
 });
 const apiUrl = process.env.REACT_APP_API_URL;
+const user = sessionStorage.getItem("USER_ID");
 
 export const GetOffersData = async (dispatch, filter) => {
   try {
     // const response = await axios.get(`${apiUrl}/offers-deals-occupation/${occuTab}`);
     // const response = await axios.get(`${apiUrl}/offers-deals`);
     const response = await api.get(
-      `${apiUrl}/request-DiscountofferStatus/${
+      `${apiUrl}/request-DiscountofferStatus/${user}/${
         filter == "all"
           ? 5
           : filter == "pending"
@@ -62,7 +63,8 @@ export const Deleteall = async (
   module,
   filter,
   setPermission,
-  CurrentTab
+  CurrentTab,
+  listType
 ) => {
   try {
     const response = await axios.delete(api);
@@ -77,15 +79,15 @@ export const Deleteall = async (
     } else if (module === "partner") {
       GetPartnerData(dispatch);
     } else if (module === "offer") {
-      GetOffersData(dispatch);
+      GetOffersData(dispatch,filter);
     } else if (module === "ads") {
       GetAdsData(dispatch);
     } else if (module === "promotion") {
-      GetPromotionDataByStatus(dispatch, CurrentTab);
+      GetPromotionDataByStatus(dispatch, CurrentTab,listType);
     } else if (module === "client") {
       GetClientData(dispatch);
     } else if (module === "redeemoffer") {
-      GetRedeemOffersData(dispatch);
+      GetRedeemOffersData(dispatch,filter);
     } else if (module === "roles") {
       GetRolesData(filter, dispatch);
     } else if (module === "permissions") {
@@ -180,7 +182,8 @@ export const SubmitOffersData = async (
   updatedata,
   offerlist,
   offerBackGround,
-  OfferFilter
+  OfferFilter,
+  noValToStatus
 ) => {
   console.log(promotionvalues, "promotionvalues.file");
   const formData = new FormData();
@@ -188,7 +191,7 @@ export const SubmitOffersData = async (
     "offer_name",
     promotionvalues.offer_name ? promotionvalues.offer_name : null
   );
-  formData.append("code", promotionvalues.code ? promotionvalues.code : null);
+  formData.append("code", promotionvalues.code ? promotionvalues?.code?.toUpperCase() : null);
   formData.append(
     "start_date",
     promotionvalues.start_date ? promotionvalues.start_date : new Date()
@@ -206,6 +209,9 @@ export const SubmitOffersData = async (
     // promotionvalues.usage ? promotionvalues.usage : null
     offerlist.usage ? offerlist.usage : null
   );
+ 
+  if(noValToStatus===false)
+    {
   formData.append(
     "status",
     promotionvalues.status ? promotionvalues.status : null
@@ -227,16 +233,18 @@ export const SubmitOffersData = async (
       ? "Draft"
       : promotionvalues.status == "Posted"
       ? "Pending"
-      : "Approved"
+      : "Active"
   );
   formData.append(
     "req_status_id",
     promotionvalues.status == "Draft"
       ? 0
       : promotionvalues.status == "Posted"
-      ? 1
+      ? 6
       : 2
   );
+  formData.append("tbs_user_id", sessionStorage.getItem("USER_ID"));
+}
 
   formData.append(
     "offer_desc",
@@ -268,7 +276,7 @@ export const SubmitOffersData = async (
   formData.append("theme", offerBackGround);
   formData.append("value_symbol", promotionvalues?.value_symbol);
 
-  formData.append("tbs_user_id", sessionStorage.getItem("USER_ID"));
+
 
   console.log(updatedata, "ADD_UPDATE_OFFERS_DATA");
   const url = updatedata
@@ -308,7 +316,7 @@ export const ChangeDisscountStatus = async (
     status:
       id === 2 ? "Active" : id === 3 ? "Hold" : id === 4 ? "Rejected" : "",
     status_id: id,
-    comments: cmnt,
+    comments: id == 2 ? null : cmnt,
   };
 
   const url = `${apiUrl}/request-management-Discountoffer/${currentid}`;

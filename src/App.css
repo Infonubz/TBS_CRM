@@ -856,13 +856,9 @@ html {
 .ant-select-outlined:not(.ant-select-customize-input) .ant-select-selector {
   border-radius: 0.1vw;
 }
-:where(
-    .css-dev-only-do-not-override-m4timi
-  ).ant-upload-wrapper.ant-upload-picture-card-wrapper
+:where(.umimgupload).ant-upload-wrapper.ant-upload-picture-card-wrapper
   .ant-upload.ant-upload-select,
-:where(
-    .css-dev-only-do-not-override-m4timi
-  ).ant-upload-wrapper.ant-upload-picture-circle-wrapper
+:where(.umimgupload).ant-upload-wrapper.ant-upload-picture-circle-wrapper
   .ant-upload.ant-upload-select {
   width: 6vw !important;
   height: 6vw !important;
@@ -875,24 +871,16 @@ html {
   transition: border-color 0.3s;
 }
 
-:where(
-    .css-dev-only-do-not-override-m4timi
-  ).ant-upload-wrapper.ant-upload-picture-card-wrapper
+:where(.umimgupload).ant-upload-wrapper.ant-upload-picture-card-wrapper
   .ant-upload-list.ant-upload-list-picture-card
   .ant-upload-list-item-container,
-:where(
-    .css-dev-only-do-not-override-m4timi
-  ).ant-upload-wrapper.ant-upload-picture-circle-wrapper
+:where(.umimgupload).ant-upload-wrapper.ant-upload-picture-circle-wrapper
   .ant-upload-list.ant-upload-list-picture-card
   .ant-upload-list-item-container,
-:where(
-    .css-dev-only-do-not-override-m4timi
-  ).ant-upload-wrapper.ant-upload-picture-card-wrapper
+:where(.umimgupload).ant-upload-wrapper.ant-upload-picture-card-wrapper
   .ant-upload-list.ant-upload-list-picture-circle
   .ant-upload-list-item-container,
-:where(
-    .css-dev-only-do-not-override-m4timi
-  ).ant-upload-wrapper.ant-upload-picture-circle-wrapper
+:where(.umimgupload).ant-upload-wrapper.ant-upload-picture-circle-wrapper
   .ant-upload-list.ant-upload-list-picture-circle
   .ant-upload-list-item-container {
   display: inline-block;
@@ -901,14 +889,10 @@ html {
   vertical-align: top;
 }
 
-:where(
-    .css-dev-only-do-not-override-m4timi
-  ).ant-upload-wrapper.ant-upload-picture-card-wrapper
+:where(.umimgupload).ant-upload-wrapper.ant-upload-picture-card-wrapper
   .ant-upload.ant-upload-select
   > .ant-upload,
-:where(
-    .css-dev-only-do-not-override-m4timi
-  ).ant-upload-wrapper.ant-upload-picture-circle-wrapper
+:where(.umimgupload).ant-upload-wrapper.ant-upload-picture-circle-wrapper
   .ant-upload.ant-upload-select
   > .ant-upload {
   display: flex;
@@ -1062,7 +1046,7 @@ html {
 }
 
 .scrollbar-custom::-webkit-scrollbar {
-  height: 0.5vw; 
+  height: 0.5vw;
   margin-bottom: 1vw;
 }
 .modal-contentn {
@@ -1265,7 +1249,7 @@ html {
 }
 
 .ant-select-dropdown::-webkit-scrollbar-thumb {
-  background-color: #1F487C; /* Color of the scrollbar thumb */
+  background-color: #1f487c; /* Color of the scrollbar thumb */
   border-radius: 10px; /* Round the corners of the thumb */
 }
 
@@ -1274,94 +1258,93 @@ html {
   border-radius: 10px; /* Round the corners of the track */
 }
 
-
 /* ads-date class for the RangePicker */
 .ads-date {
-  border-radius: 0.5vw;  /* Rounded corners */
-  border-width: 0.1vw 0.25vw 0.25vw 0.1vw;  /* Border widths (top, right, bottom, left) */
-  border-style: solid;  /* Solid borders */
-  border-color: #1F487C;  /* Blue border color */
-  color: #1F487C;  /* Text color blue */
-  font-size: 1vw;  /* Text size */
-  height: 3vw;  /* Height of the picker */
-  width: 100%;  /* Full width */
-  outline: none;  /* Remove default outline */
-  padding-left: 1vw;  /* Padding inside the left side */
-  padding-right: 1vw;  /* Padding inside the right side */
-  padding-top: 0.5vw;  /* Padding on top */
-  padding-bottom: 0.5vw;  /* Padding on bottom */
+  border-radius: 0.5vw; /* Rounded corners */
+  border-width: 0.1vw 0.25vw 0.25vw 0.1vw; /* Border widths (top, right, bottom, left) */
+  border-style: solid; /* Solid borders */
+  border-color: #1f487c; /* Blue border color */
+  color: #1f487c; /* Text color blue */
+  font-size: 1vw; /* Text size */
+  height: 3vw; /* Height of the picker */
+  width: 100%; /* Full width */
+  outline: none; /* Remove default outline */
+  padding-left: 1vw; /* Padding inside the left side */
+  padding-right: 1vw; /* Padding inside the right side */
+  padding-top: 0.5vw; /* Padding on top */
+  padding-bottom: 0.5vw; /* Padding on bottom */
 }
 .ads-date1 {
-  border-radius: 0.5vw;  /* Rounded corners */
-  border-width: 0.1vw 0.25vw 0.25vw 0.1vw;  /* Border widths (top, right, bottom, left) */
-  border-style: solid;  /* Solid borders */
-  border-color: #1F487C;  /* Blue border color */
-  color: #1F487C;  /* Text color blue */
-  font-size: 1vw;  /* Text size */
-  height: 5vh;  /* Height of the picker */
-  width: 100%;  /* Full width */
-  outline: none;  /* Remove default outline */
-  padding-left: 1vw;  /* Padding inside the left side */
-  padding-right: 1vw;  /* Padding inside the right side */
-  padding-top: 0.5vw;  /* Padding on top */
-  padding-bottom: 0.5vw;  /* Padding on bottom */
+  border-radius: 0.5vw; /* Rounded corners */
+  border-width: 0.1vw 0.25vw 0.25vw 0.1vw; /* Border widths (top, right, bottom, left) */
+  border-style: solid; /* Solid borders */
+  border-color: #1f487c; /* Blue border color */
+  color: #1f487c; /* Text color blue */
+  font-size: 1vw; /* Text size */
+  height: 5vh; /* Height of the picker */
+  width: 100%; /* Full width */
+  outline: none; /* Remove default outline */
+  padding-left: 1vw; /* Padding inside the left side */
+  padding-right: 1vw; /* Padding inside the right side */
+  padding-top: 0.5vw; /* Padding on top */
+  padding-bottom: 0.5vw; /* Padding on bottom */
 }
 .ads-date .ant-picker-input > input {
-  color: #1F487C;  /* Input text color */
-  font-size: 1vw;  /* Font size for the input */
-  outline: none;  /* Remove input outline */
+  color: #1f487c; /* Input text color */
+  font-size: 1vw; /* Font size for the input */
+  outline: none; /* Remove input outline */
 }
 
 .ads-date .ant-picker-panel {
-  border-radius: 0.5vw;  /* Round the calendar panel corners */
-  border: 0.25vw solid #1F487C;  /* Blue border around the calendar */
+  border-radius: 0.5vw; /* Round the calendar panel corners */
+  border: 0.25vw solid #1f487c; /* Blue border around the calendar */
 }
 
 .ads-date .ant-picker-header {
-  background-color: #1F487C;  /* Header background color */
-  color: white;  /* Header text color */
+  background-color: #1f487c; /* Header background color */
+  color: white; /* Header text color */
 }
 
 .ads-date .ant-picker-footer {
-  border-top: 1px solid #1F487C;  /* Border on the footer */
+  border-top: 1px solid #1f487c; /* Border on the footer */
 }
 
 .ads-date .ant-picker-today-btn {
-  color: #1F487C;  /* Today's button text color */
-  background-color: transparent;  /* Transparent background */
-  border: 1px solid #1F487C;  /* Blue border around today button */
-  border-radius: 4px;  /* Rounded corners for button */
+  color: #1f487c; /* Today's button text color */
+  background-color: transparent; /* Transparent background */
+  border: 1px solid #1f487c; /* Blue border around today button */
+  border-radius: 4px; /* Rounded corners for button */
 }
 
 .ads-date .ant-picker-today-btn:hover {
-  background-color: #1F487C;  /* Hover effect for today's button */
-  color: white;  /* Text color when hovering */
+  background-color: #1f487c; /* Hover effect for today's button */
+  color: white; /* Text color when hovering */
 }
 
 .ads-date .ant-picker-cell {
-  font-size: 1vw;  /* Font size for each day cell */
+  font-size: 1vw; /* Font size for each day cell */
 }
 
 .ads-date .ant-picker-cell-selected {
-  background-color: #1F487C;  /* Background color for selected dates */
-  color: white;  /* Text color for selected dates */
+  background-color: #1f487c; /* Background color for selected dates */
+  color: white; /* Text color for selected dates */
 }
 
 .ads-date .ant-picker-cell-disabled {
-  color: #d9d9d9;  /* Disabled date color */
-  background-color: transparent;  /* No background for disabled dates */
+  color: #d9d9d9; /* Disabled date color */
+  background-color: transparent; /* No background for disabled dates */
 }
 
 .ads-date .ant-picker-cell-in-range {
-  background-color: #e6f7ff;  /* Background color for dates in range */
+  background-color: #e6f7ff; /* Background color for dates in range */
 }
 
 .ads-date .ant-picker-range .ant-picker-date-input {
-  background-color: transparent;  /* Transparent background for date inputs */
+  background-color: transparent; /* Transparent background for date inputs */
 }
 
 .ads-date .ant-picker-input input {
-  color: #1F487C;  /* Input text color */
+  color: #1f487c; /* Input text color */
 }
 .ql-editor {
   border: 1px solid #1f4b7f;
@@ -1395,4 +1378,117 @@ html {
 .ql-snow .ql-toolbar button svg {
   float: left;
   height: 1.5vw !important;
+}
+
+:where(.custom-upload).ant-upload-wrapper.ant-upload-picture-card-wrapper
+  .ant-upload.ant-upload-select,
+:where(.custom-upload).ant-upload-wrapper.ant-upload-picture-circle-wrapper
+  .ant-upload.ant-upload-select {
+  width: 8vw !important;
+  height: 8vw !important;
+  text-align: center;
+  vertical-align: top;
+  background-color: rgba(0, 0, 0, 0.02);
+  border: 1px dashed #d9d9d9;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+:where(.custom-upload).ant-upload-wrapper.ant-upload-picture-card-wrapper
+  .ant-upload-list.ant-upload-list-picture-card
+  .ant-upload-list-item-container,
+:where(.custom-upload).ant-upload-wrapper.ant-upload-picture-circle-wrapper
+  .ant-upload-list.ant-upload-list-picture-card
+  .ant-upload-list-item-container,
+:where(.custom-upload).ant-upload-wrapper.ant-upload-picture-card-wrapper
+  .ant-upload-list.ant-upload-list-picture-circle
+  .ant-upload-list-item-container,
+:where(.custom-upload).ant-upload-wrapper.ant-upload-picture-circle-wrapper
+  .ant-upload-list.ant-upload-list-picture-circle
+  .ant-upload-list-item-container {
+  display: inline-block;
+  width: 9vw;
+  height: 9vw;
+  vertical-align: top;
+}
+
+:where(.custom-upload).ant-upload-wrapper.ant-upload-picture-card-wrapper
+  .ant-upload.ant-upload-select
+  > .ant-upload,
+:where(.custom-upload).ant-upload-wrapper.ant-upload-picture-circle-wrapper
+  .ant-upload.ant-upload-select
+  > .ant-upload {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  font-size: 1vw;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(20%) sepia(100%) saturate(500%) hue-rotate(180deg);
+}
+
+.umselect{
+  .anticon svg {
+    color: #1f4b7f;
+}
+/* .umselect{
+  :where(.css-dev-only-do-not-override-1a73bup).ant-select-single:not(.ant-select-customize-input) .ant-select-selector {
+    width: 100%;
+    height: 100%;
+    padding: 0px !important;
+}
+  
+}
+
+
+:where(.css-dev-only-do-not-override-1a73bup).ant-select-single:not(.ant-select-customize-input) .ant-select-selector {
+  width: 100%;
+  height: 100%;
+  padding: 0vw;
+} */
+
+:where(.css-dev-only-do-not-override-1a73bup).ant-select-outlined.ant-select-disabled:not(.ant-select-customize-input) .ant-select-selector {
+
+  background: #fafafa  !important;
+  /* color: rgba(0, 0, 0, 0.25) !important; */
+  
+  }
+}
+body{
+:where(.css-dev-only-do-not-override-1a73bup).ant-select-outlined.ant-select-disabled:not(.ant-select-customize-input) .ant-select-selector {
+
+  background: #fafafa  !important;
+  /* color: rgba(0, 0, 0, 0.25) !important; */
+  
+  }
+  :where(.css-dev-only-do-not-override-hi8h8m).ant-select-outlined.ant-select-disabled:not(.ant-select-customize-input) .ant-select-selector {
+    background: #fafafa !important;
+    /* color: rgba(0, 0, 0, 0.25); */
+}
+}
+
+
+:where(.css-dev-only-do-not-override-m4timi).ant-modal .ant-modal-close {
+  position: absolute;
+  top: 0.25vw;
+  right: 0.25vw;
+  /* inset-inline-end: 1vw; */
+  z-index: 1010;
+  padding: 0;
+  color: rgb(0, 0, 0);
+  /* font-weight: 600; */
+  line-height: 1;
+  text-decoration: none;
+  background: #1f477cbc;
+  border-radius: 4px;
+  width: 2vw;
+  height: 2vw;
+  border: 0;
+  outline: 0;
+  cursor: pointer;
+  transition: color 0.2s, background-color 0.2s;
 }

@@ -11,9 +11,11 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import { FiEdit } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import { GetPermissionData } from "../../Api/Role&Responsibilites/ActivePermission";
-import { Table, 
+import {
+  Table,
   // Pagination, 
-  Tooltip } from "antd";
+  Tooltip
+} from "antd";
 import { capitalizeFirstLetter } from "../Common/Captilization";
 import ReactPaginate from "react-js-pagination";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -54,23 +56,23 @@ export default function Permission({
     ? storedCrudPermissions.split(",")
     : [];
 
- // const showCreateIcon = crudPermissions.includes("create");
+  // const showCreateIcon = crudPermissions.includes("create");
   const showEditIcon = crudPermissions.includes("update");
   const showDeleteIcon = crudPermissions.includes("delete");
- // const showViewIcon = crudPermissions.includes("view");
+  // const showViewIcon = crudPermissions.includes("view");
 
-  const type =  type_id === "PRO101" || type_id === "OP101";
+  const type = type_id === "PRO101" || type_id === "OP101";
 
 
-  const permissionData = async(filter) =>{
-    try{
-     const data = await GetPermissionData(filter, dispatch);
-     console.log(data, "permission data");
+  const permissionData = async (filter) => {
+    try {
+      const data = await GetPermissionData(filter, dispatch);
+      console.log(data, "permission data");
     }
-    catch(error){
+    catch (error) {
       console.error(error, "Error fetching data");
     }
-    }
+  }
 
   const paginatedData =
     getpermissionlist?.length > 0 &&
@@ -115,11 +117,30 @@ export default function Permission({
     // },
     // Role column
     {
-      title: <span className="text-[1.2vw] font-bold text-[#1F487C] pl-[2.5vw]">Role</span>,
+      title: <span className="text-[1.1vw] font-bold text-[#1F487C] pl-[2.5vw]">Role</span>,
       render: (row) => {
         return (
           <span className="flex items-center pl-[2.5vw]">
-            <h1 className="text-[1.1vw] text-[#1F487C]">{capitalizeFirstLetter(row?.role_type)}</h1>
+            <h1 className="text-[1vw] text-[#1F487C]">    {
+              row?.role_type?.length > 18 ? (
+                <Tooltip color="white"
+                  overlayInnerStyle={{ color: "#1F4B7F" }} title={capitalizeFirstLetter(row?.role_type)}>
+                  <span>
+                    {`${row?.role_type?.charAt(0) === row?.role_type?.charAt(0)?.toLowerCase()
+                      ? capitalizeFirstLetter(row?.role_type).slice(0, 18)
+                      : row?.role_type?.slice(0, 18)}...`}
+                  </span>
+
+                </Tooltip>
+              ) : (
+                <span>
+                  {row?.role_type?.charAt(0) === row?.role_type?.charAt(0)?.toLowerCase()
+                    ? capitalizeFirstLetter(row?.role_type)
+                    : row?.role_type}
+                </span>
+
+              )
+            }</h1>
           </span>
         );
       },
@@ -127,28 +148,28 @@ export default function Permission({
       className: viewMode === "product" ? "hidden" : "",
     },
     {
-      title: <span className="text-[1.2vw] font-bold text-[#1F487C] pl-[2.5vw]">Permission</span>,
+      title: <span className="text-[1.1vw] font-bold text-[#1F487C] pl-[2.5vw]">Permission</span>,
       render: (row) => {
         const permissions = row.crud_permissions || [];
         const icons = {
           view: (
             <Tooltip className="cursor-pointer" color="#1F487C" title="View">
-              <LuEye size={"1.5vw"} key="view" color="#1F487C" />
+              <LuEye size={"1.4vw"} key="view" color="#1F487C" />
             </Tooltip>
           ),
           create: (
             <Tooltip className="cursor-pointer" color="#1F487C" title="Create">
-              <HiOutlineDocumentPlus size={"1.4vw"} key="create" color="#1F487C" />
+              <HiOutlineDocumentPlus size={"1.3vw"} key="create" color="#1F487C" />
             </Tooltip>
           ),
           update: (
             <Tooltip className="cursor-pointer" color="#1F487C" title="Update">
-              <FiEdit size={"1.2vw"} key="update" color="#1F487C" />
+              <FiEdit size={"1.1vw"} key="update" color="#1F487C" />
             </Tooltip>
           ),
           delete: (
             <Tooltip className="cursor-pointer" color="#1F487C" title="Delete">
-              <RiDeleteBin6Line size={"1.3vw"} key="delete" color="#1F487C" />
+              <RiDeleteBin6Line size={"1.2vw"} key="delete" color="#1F487C" />
             </Tooltip>
           ),
         };
@@ -164,8 +185,8 @@ export default function Permission({
       },
     },
     {
-      title: <span className="text-[1.2vw] font-bold text-[#1F487C] pl-[2.5vw]">Module Permission</span>,
-      width:"22vw",
+      title: <span className="text-[1.1vw] font-bold text-[#1F487C] pl-[2.5vw]">Module Permission</span>,
+      width: "22vw",
       className: filter === "OP" ? "hidden" : "",
       render: (row) => {
         const modulePermissions = Array.isArray(row?.module_permissions)
@@ -175,37 +196,37 @@ export default function Permission({
           (permission) => permission.module_name
         );
         const moduleName = moduleNames.join(", ");
-    
+
         return (
-              <div className="flex items-center pl-4">
-              {moduleName?.length > 30 ? (
-                <Tooltip
+          <div className="flex items-center pl-4">
+            {moduleName?.length > 30 ? (
+              <Tooltip
                 color="#1f4b7f"
-                  placement="top"
-                  title={moduleName}
-                  className="cursor-pointer"
-                >
-                  <div className="text-[1.1vw] pl-8 text-center text-[#1f4b7f]">
-                    {" "}
-                    {`${moduleName?.slice(0, 30)}...`}
-                  </div>
-                </Tooltip>
-              ) : (
-                <div className="text-[1.1vw] pl-8 text-center text-[#1f4b7f]">
-                  {moduleName?.slice(0, 30)}
+                placement="top"
+                title={moduleName}
+                className="cursor-pointer"
+              >
+                <div className="text-[1vw] pl-8 text-center text-[#1f4b7f]">
+                  {" "}
+                  {`${moduleName?.slice(0, 30)}...`}
                 </div>
-              )}
-            </div>
-           
+              </Tooltip>
+            ) : (
+              <div className="text-[1vw] pl-8 text-center text-[#1f4b7f]">
+                {moduleName?.slice(0, 30)}
+              </div>
+            )}
+          </div>
+
         );
       },
     },
     {
-      title: <span className="text-[1.2vw] font-bold text-[#1F487C] pl-[2.5vw]">Created</span>,
+      title: <span className="text-[1.1vw] font-bold text-[#1F487C] pl-[2.5vw]">Created</span>,
       render: (row) => {
         return (
           <span className="flex items-center pl-[2.5vw]">
-            <h1 className="text-[1.1vw] text-[#1F487C]">{`${dayjs(row?.created_date).format(
+            <h1 className="text-[1vw] text-[#1F487C]">{`${dayjs(row?.created_date).format(
               "DD MMM YY - hh:mm a"
             )}`}</h1>
           </span>
@@ -213,11 +234,11 @@ export default function Permission({
       },
     },
     {
-      title: <span className="text-[1.2vw] font-bold text-[#1F487C] pl-[2.5vw]">Updated</span>,
+      title: <span className="text-[1.1vw] font-bold text-[#1F487C] pl-[2.5vw]">Updated</span>,
       render: (row) => {
         return (
           <span className="flex items-center pl-[2.5vw]">
-            <h1 className="text-[1.1vw] text-[#1F487C]">{`${dayjs(row?.updated_date).format(
+            <h1 className="text-[1vw] text-[#1F487C]">{`${dayjs(row?.updated_date).format(
               "DD MMM YY - hh:mm a"
             )}`}</h1>
           </span>
@@ -225,41 +246,41 @@ export default function Permission({
       },
     },
     {
-      title: <span className="text-[1.2vw] font-bold text-[#1F487C] pl-[2.5vw]">Actions</span>,
+      title: <span className="text-[1.1vw] font-bold text-[#1F487C] pl-[2.5vw]">Actions</span>,
       render: (row) => {
         const handleDelete = () => {
           setUser(row);
           setDeleteModalIsOpen(true);
-          if(type_id === "PRO101"){
+          if (type_id === "PRO101") {
             setdelete(row.crud_permission_id);
           }
-       else{
-        setdelete(row.permission_id);
-       }
+          else {
+            setdelete(row.permission_id);
+          }
         };
         return (
-          <span className="flex items-center pl-[2.5vw]">
-           {(showEditIcon || type) && (
-            <MdModeEdit
-              className="h-[1.8vw] w-[1.8vw] cursor-pointer"
-              onClick={() => {
-                if(type_id === "PRO101"){
-                  SetPermissionUpdate(row.crud_permission_id);
-                }else{
-                  SetPermissionUpdate(row.permission_id);
-                }
-                setIsPermissionModalOpen(true);
-              }}
-              color="#1F4B7F"
-            />
+          <span className="flex items-center gap-2 pl-[2.5vw]">
+            {(showEditIcon || type) && (
+              <MdModeEdit
+                className="h-[1.5vw] w-[1.5vw] cursor-pointer"
+                onClick={() => {
+                  if (type_id === "PRO101") {
+                    SetPermissionUpdate(row.crud_permission_id);
+                  } else {
+                    SetPermissionUpdate(row.permission_id);
+                  }
+                  setIsPermissionModalOpen(true);
+                }}
+                color="#1F4B7F"
+              />
             )}
             {(showDeleteIcon || type) && (
-            <MdDelete
-              className="h-[1.8vw] w-[1.8vw] cursor-pointer"
-              onClick={handleDelete}
-              color="#1F4B7F"
-            />
-      )}
+              <MdDelete
+                className="h-[1.5vw] w-[1.5vw] cursor-pointer"
+                onClick={handleDelete}
+                color="#1F4B7F"
+              />
+            )}
             <i
               className="pi pi-ellipsis-v text-[#1F4B7F] pt-[0.2vw]"
               style={{ fontSize: "1.25rem" }}
@@ -272,7 +293,7 @@ export default function Permission({
 
   // Calculate pagination slice based on activePage
   const indexOfLastItem = activePage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage; 
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems =
     getpermissionlist?.length > 0 &&
     getpermissionlist?.slice(indexOfFirstItem, indexOfLastItem);
@@ -286,11 +307,11 @@ export default function Permission({
     permissionData(filter);
   }, [filter]);
 
- useEffect(() =>{
-if(currentItems?.length === 0){
-  setActivePage(activePage-1);
-}
- },[currentItems])
+  useEffect(() => {
+    if (currentItems?.length === 0) {
+      setActivePage(activePage - 1);
+    }
+  }, [currentItems])
 
   return (
     <>
@@ -306,19 +327,19 @@ if(currentItems?.length === 0){
           }
         />
         {getpermissionlist?.length > 3 ? (
-        <div className={`w-full h-[7vh] px-[1vw] flex justify-between items-center`}>
-          <div className={`text-[#1f4b7f] flex text-[1vw] gap-[0.5vw]`}>
-            <span>Showing</span>
-            <span className="font-bold">{currentItems && currentItems?.length > 0
-              ? <div>{indexOfFirstItem + 1} - {indexOfFirstItem + currentItems?.length}</div> : '0'}</span>
-            <span>from</span>
-            <span className="font-bold">
-              {getpermissionlist?.length > 0 ? getpermissionlist?.length : 0}
-            </span>
-            <span>data</span>
-          </div>
-          <div>
-            {/* <Pagination
+          <div className={`w-full h-[7vh] px-[1vw] flex justify-between items-center`}>
+            <div className={`text-[#1f4b7f] flex text-[1vw] gap-[0.5vw]`}>
+              <span>Showing</span>
+              <span className="font-bold">{currentItems && currentItems?.length > 0
+                ? <div>{indexOfFirstItem + 1} - {indexOfFirstItem + currentItems?.length}</div> : '0'}</span>
+              <span>from</span>
+              <span className="font-bold">
+                {getpermissionlist?.length > 0 ? getpermissionlist?.length : 0}
+              </span>
+              <span>data</span>
+            </div>
+            <div>
+              {/* <Pagination
                   current={currentPage}
                   pageSize={pageSize}
                   total={getofferlist?.length}
@@ -326,35 +347,35 @@ if(currentItems?.length === 0){
                   onShowSizeChange={handlePageChange}
                   // showSizeChanger
                 /> */}
-            <ReactPaginate
-              activePage={activePage}
-              itemsCountPerPage={itemsPerPage}
-              totalItemsCount={getpermissionlist?.length}
-              pageRangeDisplayed={3}
-              onChange={handlePageChange}
-              itemClass="page-item"
-              linkClass="page-link"
-              activeClass="active"
-              prevPageText={<FontAwesomeIcon icon={faChevronLeft} size="1vw" />}
-              nextPageText={
-                <FontAwesomeIcon icon={faChevronRight} size="1vw" />
-              }
-              firstPageText={
-                <FontAwesomeIcon icon={faAngleDoubleLeft} size="1vw" />
-              }
-              lastPageText={
-                <FontAwesomeIcon icon={faAngleDoubleRight} size="1vw" />
-              }
-            />
+              <ReactPaginate
+                activePage={activePage}
+                itemsCountPerPage={itemsPerPage}
+                totalItemsCount={getpermissionlist?.length}
+                pageRangeDisplayed={3}
+                onChange={handlePageChange}
+                itemClass="page-item"
+                linkClass="page-link"
+                activeClass="active"
+                prevPageText={<FontAwesomeIcon icon={faChevronLeft} size="0.5vw" />}
+                nextPageText={
+                  <FontAwesomeIcon icon={faChevronRight} size="0.5vw" />
+                }
+                firstPageText={
+                  <FontAwesomeIcon icon={faAngleDoubleLeft} size="0.5vw" />
+                }
+                lastPageText={
+                  <FontAwesomeIcon icon={faAngleDoubleRight} size="0.5vw" />
+                }
+              />
 
-            {/* <input
+              {/* <input
                 type="file"
                 // onChange={(e) => console.log(e.target.value, "datatatat")}
                 onChange={(e) => handleSubmit(e)}
               /> */}
+            </div>
           </div>
-        </div>
-      ) : ""}
+        ) : ""}
 
         <ModalPopup
           show={deletemodalIsOpen}
@@ -368,7 +389,7 @@ if(currentItems?.length === 0){
             title={`want to delete this ${user?.role_type}`}
             api={`${apiUrl}/permissions/${userId}/${deleteid}`}
             module={"permissions"}
-            filter = {filter}
+            filter={filter}
             setPermission={setPermission}
           />
         </ModalPopup>

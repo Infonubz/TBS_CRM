@@ -13,6 +13,7 @@ export default function DeleteList({
   filter,
   setPermission,
   CurrentTab,
+  listType
 }) {
   // const DeletePromoData = async () => {
   //   const response = await axios.delete(api);
@@ -22,7 +23,7 @@ export default function DeleteList({
   const dispatch = useDispatch();
   const handlesubmit = () => {
     setDeleteModalIsOpen(false);
-    Deleteall(api, dispatch, module, filter, setPermission, CurrentTab);
+    Deleteall(api, dispatch, module, filter, setPermission, CurrentTab,listType);
   };
   return (
     <div>

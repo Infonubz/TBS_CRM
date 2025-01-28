@@ -572,7 +572,7 @@ export default function CreatePermission({
                       Select: {
                         optionActiveBg: "#aebed1",
                         optionSelectedColor: "#FFF",
-                        optionSelectedBg: "#aebed1",
+                        optionSelectedBg: '#e5e5e5',
                         optionHeight: "2",
                       },
                     },

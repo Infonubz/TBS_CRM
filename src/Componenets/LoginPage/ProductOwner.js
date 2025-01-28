@@ -44,6 +44,7 @@ export default function ProductOwnerLoginPage({ setAuthtoken }) {
             ) : (
               <ProductOwnerForgotPassword
                 setForgotPassword={setForgotPassword}
+                typeID={"PRO101"}  
               />
             )}
           </div>

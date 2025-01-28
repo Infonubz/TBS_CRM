@@ -3,7 +3,7 @@ import image from "../../asserts/promotion_image.png";
 import "../../App.css";
 import dayjs from "dayjs";
 import userimg from "../../asserts/userprofile.png";
-import { FaPhone } from "react-icons/fa";
+import { FaPhone, FaPhoneAlt } from "react-icons/fa";
 import { TbMailFilled } from "react-icons/tb";
 import { Modal, Popover } from "antd";
 import ModalPopup from "../Common/Modal/Modal";
@@ -57,22 +57,22 @@ export default function ClientGridView({
     setDeleteModalIsOpen(false);
   };
 
-   const [isModalOpen, setIsModalOpen] = useState(false);
-      const [modalImage, setModalImage] = useState(null);
-    
-      const openModal = (event) => {
-        // Get the image source (src) using `getElementById`
-        const imageSrc = event.target.getAttribute('src');
-    
-        // Set the modal image source
-        setModalImage(imageSrc);
-    
-        // Open the modal
-        setIsModalOpen(true);
-      };
-      const closeModal = () => {
-        setIsModalOpen(false);
-      };
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalImage, setModalImage] = useState(null);
+
+  const openModal = (event) => {
+    // Get the image source (src) using `getElementById`
+    const imageSrc = event.target.getAttribute('src');
+
+    // Set the modal image source
+    setModalImage(imageSrc);
+
+    // Open the modal
+    setIsModalOpen(true);
+  };
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
 
 
@@ -109,7 +109,7 @@ export default function ClientGridView({
                     <Popover
                       placement="bottomRight"
                       content={
-                        <div className="flex flex-col p-[.5vw]">
+                        <div className="flex flex-col p-[.5vw] border-[.1vw] border-[#1f487c] rounded-[.5vw] ">
                           <div>
                             <a
                               onClick={() => {
@@ -174,10 +174,20 @@ export default function ClientGridView({
                         <Tooltip color="white"
                           placement="top"
                           overlayInnerStyle={{ color: "#1F4B7F" }} title={capitalizeFirstLetter(item?.owner_name)}>
-                          <span>{`${capitalizeFirstLetter(item?.owner_name).slice(0, 15)}...`}</span>
+                          <span>
+                            {item?.owner_name.charAt(0) === item?.owner_name.charAt(0)?.toLowerCase()
+                              ? `${capitalizeFirstLetter(item?.owner_name).slice(0, 15)}...`
+                              : `${item?.owner_name.slice(0, 15)}...`}
+                          </span>
+
                         </Tooltip>
                       ) : (
-                        <span>{capitalizeFirstLetter(item?.owner_name)}</span>
+                        <span>
+                          {item?.owner_name.charAt(0) === item?.owner_name.charAt(0)?.toLowerCase()
+                            ? capitalizeFirstLetter(item?.owner_name)
+                            : item?.owner_name}
+                        </span>
+
                       )
                     }
                   </h1>
@@ -189,13 +199,13 @@ export default function ClientGridView({
                           transition: "ease-out 1s",
                         }}
                       >
-                        <FaPhone
+                        <FaPhoneAlt
                           size="1vw"
                           color={`${"#1f487c"
                             }`}
                         />
                       </div>
-                      <div className="text-[0.9vw] text-[#1f4b7f]">{item.phone}</div>
+                      <div className="text-[0.9vw] text-[#1f4b7f]">{item?.phone === null || item?.phone?.length <= 0 ? "Not Available" : item.phone}</div>
                     </div>
                     <div className="flex flex-row items-center space-x-[0.5vw] ">
                       <div
@@ -227,7 +237,7 @@ export default function ClientGridView({
                         </Tooltip>
                       ) : (
                         <div className="text-[0.9vw] text-[#1f4b7f]">
-                          {item?.emailid?.slice(0, 18)}
+                          {item?.emailid === null || item?.emailid?.length <= 0 ? "Not Available" : item?.emailid?.slice(0, 18)}
                         </div>
                       )}
                     </div>

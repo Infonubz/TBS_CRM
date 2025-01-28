@@ -167,6 +167,7 @@ export const OpEmpLogin = async (personalvalues, validationResult) => {
       sessionStorage.setItem("type_name", response.data.type_name);
       sessionStorage.setItem("crud_permission", crudPermissions);
       sessionStorage.setItem("module_permission", JSON.stringify(modulePermissions));
+      sessionStorage.setItem("company_name",response.data.company_name)
       return response.data;
     } else {
       throw new Error("Invalid response from server");
@@ -247,6 +248,7 @@ export const OperatorLogin = async (values, validationResult) => {
       sessionStorage.setItem("type_id", response.data.type_id);
       sessionStorage.setItem("type_name", response.data.type_name);
       sessionStorage.setItem("user_name", response.data.owner_name);
+      sessionStorage.setItem("company_name",response.data.company_name)
       return response?.data;
     }
   } catch (error) {
@@ -292,10 +294,10 @@ export const PartnerLogin = async (values, validationResult) => {
       sessionStorage.setItem("SPA_ID", response.data.id);
       sessionStorage.setItem("USER_ID", response.data.id);
       sessionStorage.setItem("token", response.data.token);
-      sessionStorage.setItem("user_name", response.data.user_name);
+      // sessionStorage.setItem("user_name", response.data.user_name);
       sessionStorage.setItem("type_id", response.data.type_id);
       sessionStorage.setItem("type_name", response.data.type_name);
-      sessionStorage.setItem("user_name", response.data.owner_name);
+      sessionStorage.setItem("user_name", response.data.user_name);
       return response?.data;
     }
   } catch (error) {

@@ -33,6 +33,7 @@ export const GetPromotionData = async (dispatch, CurrentTab) => {
 };
 
 export const GetPromoDataByEmp = async (dispatch, CurrentTab) => {
+  // alert(CurrentTab)
   let status;
 
   if (CurrentTab === "All") {
@@ -41,12 +42,14 @@ export const GetPromoDataByEmp = async (dispatch, CurrentTab) => {
     status = 1;
   } else if (CurrentTab === "Approved") {
     status = 2;
-  } else if (CurrentTab === "OnHold") {
+  } else if (CurrentTab === "Hold") {
     status = 3;
   } else if (CurrentTab === "Rejected") {
     status = 4;
   } else if (CurrentTab === "Draft") {
     status = 0;
+  }else if(CurrentTab === "Repost"){
+    status = 6;
   }
 
     try {
@@ -66,21 +69,24 @@ export const GetPromoDataByEmp = async (dispatch, CurrentTab) => {
 };
 
 
-export const GetPromotionDataByStatus = async (dispatch, CurrentTab) => {
+export const GetPromotionDataByStatus = async (dispatch, CurrentTab,listType) => {
   let status;
-
+// alert("hiiii")
   if (CurrentTab === "All") {
     status = 5;
   } else if (CurrentTab === "Pending") {
     status = 1;
   } else if (CurrentTab === "Approved") {
     status = 2;
-  } else if (CurrentTab === "OnHold") {
+  } else if (CurrentTab === "Hold") {
     status = 3;
   } else if (CurrentTab === "Rejected") {
     status = 4;
   } else if (CurrentTab === "Draft") {
     status = 0;
+  }
+  else if (CurrentTab === "Repost"){
+    status = 6;
   }
 
   if(typeID === "PRO101"){
@@ -93,9 +99,19 @@ export const GetPromotionDataByStatus = async (dispatch, CurrentTab) => {
       return null;
     }
   }
+  else if(typeID === "OPEMP101"){
+    try {
+      const response = await api.get(`${apiUrl}/promo-status-userid/${userID}/${status}`)  ;
+      dispatch({ type: PROMOTION_DATA, payload: response.data });
+      return response.data;
+    } catch (error) {
+      handleError(error);
+      return null;
+    }
+  }
 else{
   try {
-    const response = await api.get(`${apiUrl}/promo-status-userid/${userID}/${status}`);
+    const response = listType ==="operator" ? await api.get(`${apiUrl}/promo-status-userid/${userID}/${status}`) : await api.get(`${apiUrl}/promo-status-empuserid/${userID}/${status}`) ;
     dispatch({ type: PROMOTION_DATA, payload: response.data });
     return response.data;
   } catch (error) {
@@ -149,7 +165,7 @@ export const handlePromosearch = async (e, dispatch, CurrentTab) => {
   let statusId;
   if (CurrentTab === "Approved") {
     statusId = 2;
-  } else if (CurrentTab === "On Hold") {
+  } else if (CurrentTab === "Hold") {
     statusId = 3;
   } else if (CurrentTab === "Rejected") {
     statusId = 4;
@@ -192,33 +208,35 @@ export const handlePromosearch = async (e, dispatch, CurrentTab) => {
 
 export const UpdateStatus = async ({ valueid, promotionId, dispatch, CurrentTab, inputValue }) => {
   console.log(promotionId, "promotionId123");
-
+alert("hello")
   let userstatus;
+// if (typeID === "OP101")
   if (valueid === 2) {
     userstatus = "Approved";
   } else if (valueid === 3) {
-    userstatus = "On Hold";
+    userstatus = "Hold";
   } else if (valueid === 4) {
     userstatus = "Rejected";
-  } else if (valueid === 5) {
-    userstatus = "Pending";
+  } else if (valueid === 6) {
+    userstatus = "Repost";
   }
 
   let status;
   if (valueid === 2) {
     status = "Active";
   } else if (valueid === 3) {
-    status = "On Hold";
+    status = "Hold";
   } else if (valueid === 4) {
     status = "Rejected";
-  }else if (valueid === 5) {
-    status = "Pending";
+  }else if (valueid === 6) {
+    // status = "Pending";
+    status = "Repost"
   }
 
   const payload = {
     promo_status_id: valueid,
     promo_status: status,
-    user_status_id: valueid === 5 ? 1 : valueid,
+    user_status_id: valueid === 6 ? 6 : typeID === "OP101" && valueid === 4 ? 7 : typeID === "OP101" && valueid === 3 ? 7 :  valueid,
     user_status: userstatus,
     comments: valueid === 2 ? "" : inputValue ? inputValue : "",
   };
@@ -247,7 +265,8 @@ export const UpdateStatus = async ({ valueid, promotionId, dispatch, CurrentTab,
 export const GetPromotionById = async (
   updatedata,
   SetUpdateData,
-  setPromoData
+  setPromoData,
+  setLoading
 ) => {
   console.log(updatedata, "GetPromotionById is live");
   try {
@@ -258,6 +277,9 @@ export const GetPromotionById = async (
   } catch (error) {
     handleError(error);
     return null;
+  }
+  finally{
+    setLoading && setLoading(false)
   }
 };
 
@@ -282,7 +304,9 @@ export const SubmitPromotionData = async (
   promotionId,
   promo_background,
   valuesymbol,
-  promodata
+  promodata,
+  operatorName,
+  noValToStatus
 ) => {
 
   console.log(currentPromodata.status,'current_promodata')
@@ -297,10 +321,12 @@ export const SubmitPromotionData = async (
   //   console.log(reconstructedFile,"reconstructedFile");
   // }
   // const [Bg_Promo, setBgPromo] = useState("");
-  const operator_details =
-    userType !== "PRODUCTOWNER"
-      ? sessionStorage.getItem("user_name")
-      : currentPromodata.operator_details;
+
+  // const operator_details =
+  //   userType !== "PRODUCTOWNER"
+  //     ? sessionStorage.getItem("user_name")
+  //     : currentPromodata.operator_details;
+  const operator_details = typeID === "PRO101" ? currentPromodata.operator_details : typeID === "OP101" ? sessionStorage.getItem("company_name") : operatorName
  
   const formData = new FormData();
   formData.append("promo_name", currentPromodata.promotion_name);
@@ -313,6 +339,21 @@ export const SubmitPromotionData = async (
   // formData.append("promo_image", currentPromodata.file);
   // }
   formData.append("promo_image", currentPromodata.file);
+  if(noValToStatus === false) {
+  if(typeID === "OPEMP101"){
+    formData.append(
+      "promo_status_id",
+      currentPromodata.status == "Draft"
+        ? 0
+        : currentPromodata.status == "Posted"
+        ? 1
+        : 2
+    );
+    formData.append("user_status_id", currentPromodata.status === "Draft" ? 0 : currentPromodata.status === "Posted" ? 1 : 2);
+    formData.append( "user_status",currentPromodata.status === "Draft" ? "Draft" : currentPromodata.status === "Active" ? "Active" : "Posted");
+    formData.append("promo_status", currentPromodata.status === "Draft" ? "Draft" :"Pending");
+  }
+  else{
   formData.append(
     "promo_status_id",
     currentPromodata.status == "Draft"
@@ -324,10 +365,14 @@ export const SubmitPromotionData = async (
   formData.append("user_status_id", currentPromodata.status === "Draft" ? 0 : currentPromodata.status === "Posted" ? 1 : 2);
   formData.append( "user_status",currentPromodata.status === "Draft" ? "Draft" : currentPromodata.status === "Active" ? "Active" : "Posted");
   formData.append("promo_status", currentPromodata.status);
-  formData.append("tbs_user_id", promotionId && typeID === "PRO101" ? promodata?.tbs_user_id : sessionStorage.getItem("USER_ID"));
+}
+  }
+
+
+  formData.append("tbs_user_id", promotionId && typeID === "PRO101" ? promodata?.tbs_user_id : sessionStorage.getItem("currenttbsuserid") ? sessionStorage.getItem("currenttbsuserid") : userID );
   formData.append("background_image", promo_background);
   formData.append("promo_value", currentPromodata?.promo_value);
-  formData.append("promo_code", currentPromodata?.promo_code);
+  formData.append("promo_code", currentPromodata?.promo_code?.toUpperCase());
   formData.append("value_symbol", currentPromodata?.value_symbol || valuesymbol);
 
   const url = promotionId

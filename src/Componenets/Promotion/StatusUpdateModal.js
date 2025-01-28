@@ -33,6 +33,7 @@ export default function StatusUpdateModal({
     }
 
     try {
+      setStatusUpdateModal(false);
       console.log(promotionId, "promotionId");
       const data = await UpdateStatus({
         valueid,
@@ -80,9 +81,9 @@ export default function StatusUpdateModal({
           className="border-r-[0.3vw] pl-[1vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none "
         />
         {showError === false && (
-          <span className="text-[1vw] text-red-600 absolute bottom-[-1.2vw] left-[.5vw]">
+          <span className="text-[.9vw] text-red-600 absolute bottom-[-1.2vw] left-[.5vw]">
             {" "}
-            Comments is required for Reject and On Hold
+            Comments is required for Reject and Hold
           </span>
         )}
       </div>
@@ -90,25 +91,25 @@ export default function StatusUpdateModal({
       <div className="flex gap-x-[2.5vw] mt-[1.5vw]">
         <button
           className="items-center text-[1vw] text-white shadow-md shadow-black font-extrabold space-x-[0.7vw] px-[0.8vw] w-[7vw] h-[2vw] bg-[#2A99FF] rounded-[0.5vw]"
-          onClick={() => handlechange(3, "On Hold")}
+          onClick={() => handlechange(3, "Hold")}
         >
          Hold
         </button>
         {type_Id === "PRO101" ? (
           <button
-            className="items-center text-[1vw] text-white shadow-md shadow-black font-extrabold space-x-[0.7vw] px-[0.8vw] w-[7vw] h-[2vw] bg-[#34AE2A] rounded-[0.5vw]"
+            className="items-center text-[1vw] text-white shadow-md shadow-black font-extrabold space-x-[0.7vw] px-[0.8vw] w-[7vw] h-[2vw] bg-[#34AE2B] rounded-[0.5vw]"
             onClick={() => {
               handlechange(2, "Approved");
-              setStatusUpdateModal(false);
+             
             }}
           >
             Active
           </button>
         ) : (
           <button
-            className="items-center text-[1vw] text-white font-extrabold shadow-md shadow-black space-x-[0.7vw] px-[0.8vw] w-[7vw] h-[2vw] bg-[#34AE2A] rounded-[0.5vw]"
+            className="items-center text-[1vw] text-white font-extrabold shadow-md shadow-black space-x-[0.7vw] px-[0.8vw] w-[7vw] h-[2vw] bg-[#FF9900] rounded-[0.5vw]"
             onClick={() => {
-              handlechange(5, "Repost");
+              handlechange(6, "Repost");
               setStatusUpdateModal(false);
             }}
           >
@@ -117,7 +118,7 @@ export default function StatusUpdateModal({
         )}
 
         <button
-          className="items-center text-[1vw] text-white font-extrabold shadow-md shadow-black space-x-[0.7vw] px-[0.8vw] w-[8vw] h-[2vw] bg-[#FF1100] rounded-[0.5vw]"
+          className="items-center text-[1vw] text-white font-extrabold shadow-md shadow-black space-x-[0.7vw] px-[0.8vw] w-[8vw] h-[2vw] bg-[#FD3434] rounded-[0.5vw]"
           onClick={() => handlechange(4, "Rejected")}
         >
           Reject

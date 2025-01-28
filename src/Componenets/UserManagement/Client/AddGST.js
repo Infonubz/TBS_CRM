@@ -62,7 +62,7 @@ const validationSchema = Yup.object().shape({
       }
       return false;
     }),
-  ctc: Yup.string().required("GST is required"),
+  ctc: Yup.string().required("Aggregate turnover is required"),
 });
 export default function AddGST({
   setCurrentpage,
@@ -99,6 +99,7 @@ export default function AddGST({
   const [previewImage, setPreviewImage] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
   const [inputPreview, setInputPreview] = useState()
+  const [reset,setReset] = useState("")
 
   // const handlePreview = (file) => {
   //   const reader = new FileReader();
@@ -215,12 +216,12 @@ export default function AddGST({
         <div>
           <Formik
             initialValues={{
-              gst: superadmingstdata?.gstin || "",
-              state_code: superadmingstdata?.state_code_number || "",
-              state: superadmingstdata?.state_name || "",
-              head_office: superadmingstdata?.head_office || "",
-              gst_file: superadmingstdata?.upload_gst || null,
-              ctc: superadmingstdata?.aggregate_turnover_exceeded  == true ? 1 : superadmingstdata?.aggregate_turnover_exceeded  == false ? 0 :"" || "",
+              gst:reset?"": superadmingstdata?.gstin || "",
+              state_code: reset?"": superadmingstdata?.state_code_number || "",
+              state: reset?"": superadmingstdata?.state_name || "",
+              head_office: reset?"": superadmingstdata?.head_office || "",
+              gst_file: reset?null: superadmingstdata?.upload_gst || null,
+              ctc: reset?"": superadmingstdata?.aggregate_turnover_exceeded  == true ? 1 : superadmingstdata?.aggregate_turnover_exceeded  == false ? 0 :"" || "",
             }}
             validationSchema={validationSchema}
             onSubmit={(values) => {
@@ -266,7 +267,7 @@ export default function AddGST({
                     </div>
                     <div className="col-span-1 relative">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
-                       Gst State code number
+                       State Code
                         <span className="text-[1vw] text-red-600 pl-[0.2vw]">
                           *
                         </span>
@@ -313,7 +314,7 @@ export default function AddGST({
                             Select: {
                               optionActiveBg: '#aebed1',
                               optionSelectedColor: '#FFF',
-                              optionSelectedBg: '#aebed1',
+                              optionSelectedBg: '#e5e5e5',
                               optionHeight: '2',
                             },
                           },
@@ -502,13 +503,13 @@ export default function AddGST({
                           />
                           <div className="relative">
                           <button
-                            className="border-r-[0.3vw]  flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none"
+                            className="border-r-[0.3vw]  flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C]  text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none"
                             onClick={(event) => {
                               event.preventDefault();
                               document.getElementById("gst_file").click();
                             }}
                           >
-                            <span className="opacity-50">Upload GST Image</span>
+                            <span className="text-[#9CA3AF]">Upload GST Image</span>
                             {/* <FaCloudUploadAlt
                               color="#1F487C"
                               size={"2vw"}
@@ -649,7 +650,9 @@ export default function AddGST({
                   </div>
                   <div className="flex items-center w-full  justify-between ">
                     <div className="flex w-full justify-between gap-x-[1vw]">
-                      <button type="button" onClick={resetForm} className="border-[#1F487C] w-[5vw] font-semibold text-[1vw] h-[2vw] rounded-full border-r-[0.2vw]  border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw]">
+                      <button type="button" onClick={()=>{setReset(true)
+                        setInputPreview("")
+                      }} className="border-[#1F487C] w-[5vw] font-semibold text-[1vw] h-[2vw] rounded-full border-r-[0.2vw]  border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw]">
                         Reset
                       </button>
                       <button

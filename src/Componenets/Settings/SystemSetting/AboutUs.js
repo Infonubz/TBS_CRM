@@ -173,6 +173,18 @@ const AboutUs = () => {
     // if (!validationError) {
     //     console.log(`${key} is valid and ready to be saved:`, file);
     // }
+    console.log(file,"savebuttonfile");
+
+    if(legal_info && file == ""){
+      setAbtIsEdit(false);
+      setPvcIsEdit(false);
+      setTmcIsEdit(false);
+      setUseIsEdit(false);
+      toast.success(`${key} content Updated successfully!`)
+    }
+    
+else{
+
     const validationError = validateFile(file);
     setErrors((prevErrors) => ({
       ...prevErrors,
@@ -271,6 +283,7 @@ const AboutUs = () => {
     } else {
       return errors;
     }
+  }
   };
 
   console.log(
@@ -372,7 +385,7 @@ const AboutUs = () => {
                         {aboutUs.name}
                       </div>
                     ) : (
-                      <span className="opacity-80 text-[#1F4B7F] text-[0.8vw]">
+                      <span className="text-[#1F487C] text-[0.9vw]">
                         {getFileName("about_us")}
                       </span>
                     )}
@@ -534,7 +547,7 @@ const AboutUs = () => {
                         {privacyPolicy.name}
                       </div>
                     ) : (
-                      <span className="opacity-80 text-[#1F4B7F] text-[0.8vw]">
+                      <span className="text-[#1F487C] text-[0.9vw]">
                         {" "}
                         {getFileName("privacy_policy")}
                       </span>
@@ -642,7 +655,7 @@ const AboutUs = () => {
                     onMouseLeave={() => {
                       setButtonHover("");
                     }}
-                    disabled={!uploadStatus.privacy_policy}
+                    // disabled={!uploadStatus.privacy_policy}
                   >
                     Update
                   </button>
@@ -696,7 +709,7 @@ const AboutUs = () => {
                         {termsConditions.name}
                       </div>
                     ) : (
-                      <span className="opacity-80 text-[#1F4B7F] text-[0.8vw]">
+                      <span className="text-[#1F487C] text-[0.9vw]">
                         {" "}
                         {getFileName("terms_conditions")}
                       </span>
@@ -812,7 +825,7 @@ const AboutUs = () => {
                     onMouseLeave={() => {
                       setButtonHover("");
                     }}
-                    disabled={!uploadStatus.terms_condition}
+                    // disabled={!uploadStatus.terms_condition}
                   >
                     Update
                   </button>
@@ -866,7 +879,7 @@ const AboutUs = () => {
                         {userAgreement.name}
                       </div>
                     ) : (
-                      <span className="opacity-80 text-[#1F4B7F] text-[0.8vw]">
+                      <span className=" text-[#1F487C] text-[0.9vw]">
                         {" "}
                         {getFileName("user_agreement")}
                       </span>
@@ -980,7 +993,7 @@ const AboutUs = () => {
                     onMouseLeave={() => {
                       setButtonHover("");
                     }}
-                    disabled={!uploadStatus.user_agreement}
+                    // disabled={!uploadStatus.user_agreement}
                   >
                     Update
                   </button>

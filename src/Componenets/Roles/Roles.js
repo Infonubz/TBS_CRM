@@ -195,7 +195,7 @@ export default function Roles() {
     // },
     {
       title: (
-        <span className="text-[1.2vw] font-bold text-[#1F487C] pl-[2.5vw]">
+        <span className="text-[1.1vw] font-bold text-[#1F487C] pl-[2.5vw]">
           Role Type
         </span>
       ),
@@ -203,14 +203,35 @@ export default function Roles() {
       render: (row) => {
         return (
           <span className="flex items-center pl-[2.5vw]">
-            <p className="text-[1.1vw] text-[#1F487C]">{capitalizeFirstLetter(row?.role_type)}</p>
+            <p className="text-[1vw] text-[#1F487C]">
+              {
+                row?.role_type?.length > 18 ? (
+                  <Tooltip color="white"
+                    overlayInnerStyle={{ color: "#1F4B7F" }} title={capitalizeFirstLetter(row?.role_type)}>
+                    <span>
+                      {`${row?.role_type?.charAt(0) === row?.role_type?.charAt(0).toLowerCase()
+                        ? capitalizeFirstLetter(row?.role_type).slice(0, 18)
+                        : row?.role_type?.slice(0, 18)}...`}
+                    </span>
+
+                  </Tooltip>
+                ) : (
+                  <span>
+                    {row?.role_type?.charAt(0) === row?.role_type?.charAt(0).toLowerCase()
+                      ? capitalizeFirstLetter(row?.role_type)
+                      : row?.role_type}
+                  </span>
+
+                )
+              }
+            </p>
           </span>
         );
       },
     },
     {
       title: (
-        <span className="text-[1.2vw] font-bold text-[#1F487C] pl-4">
+        <span className="text-[1.1vw] font-bold text-[#1F487C] pl-4">
           Member Count
         </span>
       ),
@@ -218,7 +239,7 @@ export default function Roles() {
       render: (row) => {
         return (
           <span className="flex items-center pl-[4.5vw]">
-            <p className="text-[1.1vw] text-center text-[#1F487C]">
+            <p className="text-[1vw] text-center text-[#1F487C]">
               {row?.role_member_count}
             </p>
           </span>
@@ -227,7 +248,7 @@ export default function Roles() {
     },
     {
       title: (
-        <span className="text-[1.2vw] font-bold text-[#1F487C] pl-4">
+        <span className="text-[1.1vw] font-bold text-[#1F487C] pl-4">
           Description
         </span>
       ),
@@ -241,18 +262,18 @@ export default function Roles() {
           <div className="flex items-center pl-4">
             {row?.description?.length > 30 ? (
               <Tooltip
-               color="#1F487C"
+                color="#1F487C"
                 placement="top"
                 title={row?.description}
                 className="cursor-pointer"
               >
-                <div className="text-[1.1vw] text-center text-[#1f4b7f]">
+                <div className="text-[1vw] text-center text-[#1f4b7f]">
                   {" "}
                   {`${row?.description?.slice(0, 30)}...`}
                 </div>
               </Tooltip>
             ) : (
-              <div className="text-[1.1vw] text-center text-[#1f4b7f]">
+              <div className="text-[1vw] text-center text-[#1f4b7f]">
                 {capitalizeFirstLetter(row?.description?.slice(0, 30))}
               </div>
             )}
@@ -262,7 +283,7 @@ export default function Roles() {
     },
     {
       title: (
-        <span className="text-[1.2vw] font-bold text-[#1F487C] pl-4">
+        <span className="text-[1.1vw] font-bold text-[#1F487C] pl-4">
           Created
         </span>
       ),
@@ -271,7 +292,7 @@ export default function Roles() {
           <span className="flex items-center pl-4">
             {" "}
             {/* Same padding */}
-            <p className="text-[1.1vw] text-[#1F487C]">
+            <p className="text-[1vw] text-[#1F487C]">
               {dayjs(row?.created_date).format("DD MMM YY - hh:mm a")}
             </p>
           </span>
@@ -280,7 +301,7 @@ export default function Roles() {
     },
     {
       title: (
-        <span className="text-[1.2vw] font-bold text-[#1F487C] pl-4">
+        <span className="text-[1.1vw] font-bold text-[#1F487C] pl-4">
           Updated
         </span>
       ),
@@ -289,7 +310,7 @@ export default function Roles() {
           <span className="flex items-center pl-4">
             {" "}
             {/* Same padding */}
-            <p className="text-[1.1vw] text-[#1F487C]">
+            <p className="text-[1vw] text-[#1F487C]">
               {dayjs(row?.updated_date).format("DD MMM YY - hh:mm a")}
             </p>
           </span>
@@ -298,7 +319,7 @@ export default function Roles() {
     },
     {
       title: (
-        <span className="text-[1.2vw] font-bold text-[#1F487C] pl-4">
+        <span className="text-[1.1vw] font-bold text-[#1F487C] pl-4">
           Actions
         </span>
       ),
@@ -310,22 +331,29 @@ export default function Roles() {
         };
 
         return (
-          <span className="action-icons flex gap-2 items-center pl-4">
+          <span className="action-icons flex gap-2  pl-4">
             {" "}
             {/* Same padding */}
             <MdModeEdit
-              className="h-[1.8vw] w-[1.8vw] cursor-pointer"
+              className="h-[1.5vw] w-[1.5vw] cursor-pointer"
               onClick={() => {
                 setIsModalOpen(true);
                 SetUpdateData(row.role_id);
               }}
               color="#1F4B7F"
             />
-            <MdDelete
-              className="h-[1.8vw] w-[1.8vw] cursor-pointer"
-              onClick={handleDelete}
-              color="#1F4B7F"
-            />
+            {
+              row?.role_member_count <= 0 ?
+                <MdDelete
+                  className="h-[1.5vw] w-[1.5vw] cursor-pointer"
+                  onClick={handleDelete}
+                  color="#1F4B7F"
+                />
+                : ""
+            }
+
+
+
             <i
               className="pi pi-ellipsis-v text-[#1F4B7F] pt-[0.2vw]"
               style={{ fontSize: "1.25rem" }}
@@ -392,8 +420,8 @@ export default function Roles() {
     setActivePage(pageNumber);
   };
 
-  useEffect(() =>{
-    if(currentItems?.length === 0){
+  useEffect(() => {
+    if (currentItems?.length === 0) {
       setActivePage(activePage - 1);
     }
   }, [currentItems])
@@ -431,6 +459,25 @@ export default function Roles() {
       permissionCountList();
     }
   }, [filter]);
+  const handleKeyDown = (e) => {
+    // Allow control keys like Backspace, Delete, ArrowLeft, ArrowRight, Tab
+    const isControlKey = [
+      "Backspace",
+      "Tab",
+      "ArrowLeft",
+      "ArrowRight",
+      "Delete",
+    ].includes(e.key);
+
+    if (isControlKey) {
+      return; // If it's a control key, do nothing and allow it to execute
+    }
+
+    // Allow only alphabets (A-Z, a-z), numbers (0-9), and space
+    if (!/^[A-Za-z0-9\s]$/.test(e.key)) {
+      e.preventDefault(); // Prevent the key if it's not an alphabet, number, or space
+    }
+  };
 
   return (
     <>
@@ -448,11 +495,10 @@ export default function Roles() {
             ROLES AND RESPONSIBILITES{" "}
           </p>
           <div
-            className={` ${
-              typeid === "PRO101"
-                ? "grid grid-cols-3"
-                : "w-[100vw] h-[15vw] flex justify-between"
-            } w-full justify-between`}
+            className={` ${typeid === "PRO101"
+              ? "grid grid-cols-3"
+              : "w-[100vw] h-[15vw] flex justify-between"
+              } w-full justify-between`}
           >
             <div className={`h-[15vw] w-[30vw] rounded-[1vw] bg-white border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.3vw] border-[#1F487C]`}>
               <p className={`text-white h-[3vw] rounded-tr-[0.8vw] rounded-tl-[0.8vw] bg-[#1F487C] font-medium text-[1.3vw] pt-[0.3vw] pb-[0.1vw]`}>
@@ -470,7 +516,7 @@ export default function Roles() {
                     </p>
                   </div> */}
                   <div className={`flex items-center justify-center`}>
-                    <label className={`text-[1.4vw] font-bold pl-[1vw]`}>
+                    <label className={`text-[1.2vw] font-bold pl-[1vw]`}>
                       ROLE
                     </label>
                   </div>
@@ -547,9 +593,10 @@ export default function Roles() {
                     <div className={`relative flex items-center`}>
                       <input
                         type="text"
-                        className={`bg-white outline-none pl-[2vw] text-black w-[14vw] h-[2.4vw] text-[1vw]  
+                        className={`bg-white outline-none pl-[2vw] text-[#1F487C] w-[14vw] h-[2.4vw] text-[1vw]  
                     rounded-[0.5vw] `}
                         placeholder="Search"
+                        onKeyDown={handleKeyDown}
                         onChange={(e) => {
                           Search(e);
                         }}
@@ -563,90 +610,89 @@ export default function Roles() {
                   </div>
                 </div>
               </p>
-              <div className={`h-[11.5vw] overflow-y-auto overflow-x-hidden flex flex-col`}>
-                {Array.isArray(roleCount) && roleCount.length > 0 ? (
-                  roleCount?.map((role, index) => (
-                    <div key={index}>
-                      <div className={`flex h-[3vw] border-t border-[#1F487C] items-center`}>
-                        <div className={`flex items-center px-[0.5vw] justify-between h-[2vw] w-[35vw] overflow-y-auto`}>
-                          <div className={`flex items-center w-full`}>
-                            <span className="">
-                              <IoMdAdd
-                                className={`w-[1.3vw] h-[1.3vw]`}
-                                color="#1F487C"
-                              />
-                            </span>
-                            {/* <span className="">
+              <div className={`h-[11.5vw]  flex flex-col pr-[.1vw]`}>
+                <span className="overflow-y-auto  overflow-x-hidden">
+                  {Array.isArray(roleCount) && roleCount.length > 0 ? (
+                    roleCount?.map((role, index) => (
+                      <div key={index}>
+                        <div className={`flex h-[3vw] border-t border-[#1F487C] items-center`}>
+                          <div className={`flex items-center px-[0.5vw] justify-between h-[2vw] w-[35vw] overflow-y-auto`}>
+                            <div className={`flex items-center w-full`}>
+                              <span className="">
+                                <IoMdAdd
+                                  className={`w-[1.3vw] h-[1.3vw]`}
+                                  color="#1F487C"
+                                />
+                              </span>
+                              {/* <span className="">
                               <p className="text-[1.1vw] font-medium text-[#1F487C]">
                                 Role:
                               </p>
                             </span> */}
-                            <span className="">
-                              <p className={`text-[1.1vw] pl-[0.2vw] font-bold text-[#1F487C]`}>
-                                {typeid === "PRO101"
-                                  ? capitalizeFirstLetter(role?.role)
-                                  : capitalizeFirstLetter(role?.role_type)}
-                              </p>
-                            </span>
-                          </div>
-                          <div className="pr-[1vw]">
-                            <div
-                              className={`flex rounded-[2vh] text-white items-center justify-center w-[5vw] text-[1vw] py-[0.3vh]`}
-                              style={{
-                                backgroundColor: "#34AE2A",
-                              }}
-                            >
-                              {`${role?.role_count} User`}
+                              <span className="">
+                                <p className={`text-[1vw] pl-[0.2vw] font-bold text-[#1F487C]`}>
+                                  {typeid === "PRO101"
+                                    ? capitalizeFirstLetter(role?.role)
+                                    : capitalizeFirstLetter(role?.role_type)}
+                                </p>
+                              </span>
                             </div>
-                          </div>
-                          <div className="">
-                            <div className={`flex rounded-[2vh] bg-[#D9D9D9] items-center justify-center w-[8vw] text-[1vw] py-[0.3vh]`}>
-                              {`${role?.permission_access_count} Permissions`}
+                            <div className="pr-[1vw]">
+                              <div
+                                className={`flex rounded-[2vh] text-white items-center justify-center w-[5vw] text-[.9vw] py-[0.3vh]`}
+                                style={{
+                                  backgroundColor: "#34AE2A",
+                                }}
+                              >
+                                {`${role?.role_count} User`}
+                              </div>
+                            </div>
+                            <div className="">
+                              <div className={`flex rounded-[2vh] bg-[#D9D9D9] items-center justify-center w-[8vw] text-[.9vw] py-[0.3vh]`}>
+                                {`${role?.permission_access_count} Permissions`}
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
+                    ))
+                  ) : (
+                    <div className={`flex justify-center pt-[2vw] items-center w-[30vw]`}>
+                      <p className={`text-center text-[1vw] text-[#1F487C] mt-[2vw]`}>
+                        No data available
+                      </p>
                     </div>
-                  ))
-                ) : (
-                  <div className={`flex justify-center pt-[2vw] items-center w-[30vw]`}>
-                    <p className={`text-center text-[1vw] text-[#1F487C] mt-[2vw]`}>
-                      No data available
-                    </p>
-                  </div>
-                )}
-              </div>
+                  )}
+                </span></div>
             </div>
 
             <div className={`flex ml-[6vw] h-[2vw] w-[20vw] gap-x-[2.5vw] text-[1.3vw]`}>
               {typeid === "PRO101" && (
                 <>
                   <div
-                    className={` cursor-pointer ${
-                      filter === "PO" ? "border-b-[0.25vw] font-bold border-[#1f487c]" : "" }`}
+                    className={` cursor-pointer ${filter === "PO" ? "border-b-[0.25vw] font-bold border-[#1f487c]" : ""}`}
                     onClick={() => {
                       SetFilter("PO");
-                      setUserlist({ ...userlist, user: "PO"});
+                      setUserlist({ ...userlist, user: "PO" });
                       empCount("PO");
                     }}
                   >
-                    <p className={`text-[1.4vw] text-[#1f487c] text-center`}>
+                    <p className={`text-[1.3vw] text-[#1f487c] text-center`}>
                       PO.Employee
                     </p>
                   </div>
                   <div
-                    className={` cursor-pointer ${
-                      filter === "OP"
-                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                        : ""
-                    } `}
+                    className={` cursor-pointer ${filter === "OP"
+                      ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                      : ""
+                      } `}
                     onClick={() => {
                       SetFilter("OP");
-                      setUserlist({ ...userlist, user: "OP"});
+                      setUserlist({ ...userlist, user: "OP" });
                       empCount("OP");
                     }}
                   >
-                    <p className="text-[1.4vw] text-[#1f487c] text-center">
+                    <p className="text-[1.3vw] text-[#1f487c] text-center">
                       OP.Employee
                     </p>
                   </div>
@@ -654,7 +700,7 @@ export default function Roles() {
               )}
             </div>
             <div className={`h-[15vw] w-[30vw] overflow-hidden ml-[1.5vw] rounded-[1vw] bg-white border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.3vw] border-[#1F487C]`}>
-              <p className="text-white h-[3vw] rounded-tr-[0.8vw] rounded-tl-[0.8vw] bg-[#1F487C] font-bold text-[1.35vw] pt-[0.6vw] pb-[0.6vw] pl-[1.6vw]">
+              <p className="text-white h-[3vw] rounded-tr-[0.8vw] rounded-tl-[0.8vw] bg-[#1F487C] font-bold text-[1.2vw] pt-[0.6vw] pb-[0.6vw] pl-[1.6vw]">
                 PERMISSIONS
               </p>
               <div>
@@ -686,7 +732,7 @@ export default function Roles() {
                               </span>
                             </div>
                             <div>
-                              <div className="flex rounded-[2vh] bg-[#34AE2A] items-center text-white justify-center w-[5vw] text-[1vw] py-[0.3vh]">
+                              <div className="flex rounded-[2vh] bg-[#34AE2A] items-center text-white justify-center w-[5vw] text-[.9vw] py-[0.3vh]">
                                 {`${permission.userCount} User`}
                               </div>
                             </div>
@@ -742,7 +788,7 @@ export default function Roles() {
                 header={
                   <div className="flex justify-between items-center h-[5vh]">
                     <div className="col-span-2 ">
-                      <span className="text-[#FFFFFF] font-bold text-[1.4vw]">
+                      <span className="text-[#FFFFFF] font-bold text-[1.2vw]">
                         ACTIVE ROLES
                       </span>
                     </div>
@@ -752,8 +798,8 @@ export default function Roles() {
                           className="flex items-center"
                           onClick={() => setIsModalOpen(true)}
                         >
-                          <HiOutlineDocumentPlus className="text-[#FFFFFF] mr-[0.6vw] h-[3.4vh] w-[3.4vh]" />
-                          <span className="text-[#FFFFFF] font-medium text-[1.25vw]">
+                          <HiOutlineDocumentPlus className="text-[#FFFFFF] mr-[0.6vw] h-[3.2vh] w-[3.2vh]" />
+                          <span className="text-[#FFFFFF] font-medium text-[1.2vw]">
                             Create New Role
                           </span>
                         </div>
@@ -773,8 +819,8 @@ export default function Roles() {
                     }
                     className="table-auto pb-[1vw]"
                   />
-                    {getrolelist?.length > 3 ? (
-                    <div className="w-full h-[8vh] px-[1vw] flex justify-between items-center">
+                  {getrolelist?.length > 3 ? (
+                    <div className="w-full h-[7vh] px-[1vw] flex justify-between items-center">
                       <div className="text-[#1f4b7f] flex text-[1vw] gap-[0.5vw]">
                         <span>Showing</span>
                         <span className="font-bold">
@@ -812,21 +858,21 @@ export default function Roles() {
                           linkClass="page-link"
                           activeClass="active"
                           prevPageText={
-                            <FontAwesomeIcon icon={faChevronLeft} size="1vw" />
+                            <FontAwesomeIcon icon={faChevronLeft} size="0.5vw" />
                           }
                           nextPageText={
-                            <FontAwesomeIcon icon={faChevronRight} size="1vw" />
+                            <FontAwesomeIcon icon={faChevronRight} size="0.5vw" />
                           }
                           firstPageText={
                             <FontAwesomeIcon
                               icon={faAngleDoubleLeft}
-                              size="1vw"
+                              size="0.5vw"
                             />
                           }
                           lastPageText={
                             <FontAwesomeIcon
                               icon={faAngleDoubleRight}
-                              size="1vw"
+                              size="0.5vw"
                             />
                           }
                         />
@@ -850,7 +896,7 @@ export default function Roles() {
                   >
                     <DeleteList
                       setDeleteModalIsOpen={setDeleteModalIsOpen}
-                      title={`Want to delete this ${user?.role_type}`}
+                      title={`Want to delete this ${capitalizeFirstLetter(user?.role_type)}`}
                       api={`${apiUrl}/role/${rolesid}`}
                       module={"roles"}
                       filter={filter}
@@ -901,27 +947,27 @@ export default function Roles() {
                 header={
                   <div className="flex justify-between items-center h-[5vh]">
                     <div className="col-span-2 ">
-                      <span className="text-[#FFFFFF] font-bold text-[1.4vw]">
+                      <span className="text-[#FFFFFF] font-bold text-[1.2vw]">
                         ACTIVE PERMISSIONS
                       </span>
                     </div>
                     {(typeid === "PRO101" ||
                       typeid === "OP101" ||
                       (typeid === "PROEMP101" && showCreateIcon)) && (
-                      <div
-                        className="flex items-center"
-                        onClick={() => {
-                          setIsPermissionModalOpen(true);
-                          SetPermissionData();
-                          SetPermissionUpdate(null);
-                        }}
-                      >
-                        <HiOutlineDocumentPlus className="text-[#FFFFFF] h-[3.4vh] w-[3.4vh] mr-[1vh]" />
-                        <span className="text-[#FFFFFF] font-medium text-[1.25vw]">
-                          Create New Permission
-                        </span>
-                      </div>
-                    )}
+                        <div
+                          className="flex items-center"
+                          onClick={() => {
+                            setIsPermissionModalOpen(true);
+                            SetPermissionData();
+                            SetPermissionUpdate(null);
+                          }}
+                        >
+                          <HiOutlineDocumentPlus className="text-[#FFFFFF] h-[3.2vh] w-[3.2vh] mr-[1vh]" />
+                          <span className="text-[#FFFFFF] font-medium text-[1.2vw]">
+                            Create New Permission
+                          </span>
+                        </div>
+                      )}
                   </div>
                   // <div className="flex justify-between">
                   //   <span className="text-[#FFFFFF] font-medium items-center pt-[0.4vw] text-[1.2vw] pl-[1vw]">

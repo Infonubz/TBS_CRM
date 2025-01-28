@@ -16,6 +16,7 @@ import { useDispatch } from "react-redux";
 import Direction from "../../../asserts/direction.png";
 // import Pagination from "../Common/Pagination";
 import { CiImageOff } from "react-icons/ci";
+import { capitalizeFirstLetter } from "../../Common/Captilization";
 
 export default function RedeemListView({
   currentData,
@@ -54,9 +55,9 @@ export default function RedeemListView({
   const showComment =
     typeId === "PRO101"
       ? offerFilter === "rejected" ||
-        offerFilter === "hold" ||
-        offerFilter === "approved" ||
-        offerFilter === "all"
+      offerFilter === "hold" ||
+      offerFilter === "approved" ||
+      offerFilter === "all"
       : false;
 
   const CloseStatusModal = () => {
@@ -78,11 +79,11 @@ export default function RedeemListView({
   const handleStatusChange = async (id) => {
     setId(id);
     if ((id === 3 || id === 4) && (!comment || comment.trim().length === 0)) {
-      setError("Reason required for On Hold or Reject");
+      setError("Reason required for Hold or Reject");
       return;
     }
 
-    ChangeRedeemStatus(id, offId, dispatch, offerFilter);
+    ChangeRedeemStatus(id, offId, dispatch, offerFilter, comment);
     GetRedeemOffersData(dispatch, offerFilter);
     console.log("call 1");
     setStatusModal(false);
@@ -168,14 +169,20 @@ export default function RedeemListView({
               >
                 <div className="border-[0.1vw] border-[#1F487C] rounded-[0.5vw]">
                   <div className="border-dashed text-[1vw]  font-bold bg-[#1F4B7F] border-white border-[0.2vw] rounded-[0.5vw] text-white w-[10vw] flex items-center justify-center">
-                    {`${row?.code?.slice(0, 15)}...`}{" "}
+                    {`${row?.code?.charAt(0) === row?.code?.charAt(0)?.toLowerCase()
+                      ? capitalizeFirstLetter(row?.code).slice(0, 15)
+                      : row?.code?.slice(0, 15)}...`}
                   </div>
                 </div>
               </Tooltip>
             ) : (
               <div className="border-[0.1vw] border-[#1F487C] rounded-[0.5vw]">
                 <div className="border-dashed text-[1.1vw] font-bold bg-[#1F4B7F] border-white border-[0.2vw] rounded-[0.5vw] text-white w-[10vw] flex items-center justify-center ">
-                  {row?.code?.slice(0, 15)}
+                  {
+                    row?.code?.charAt(0) === row?.code?.charAt(0)?.toLowerCase()
+                      ? capitalizeFirstLetter(row?.code).slice(0, 15)
+                      : row?.code?.slice(0, 15)
+                  }
                 </div>
               </div>
             )}
@@ -240,8 +247,8 @@ export default function RedeemListView({
           <div>
             <p className="text-[1vw] text-[#1F487C] flex pl-[1vw]">{`${dayjs(
               row?.start_date
-            ).format("MMM DD")} - ${dayjs(row?.expiry_date).format(
-              "MMM DD"
+            ).format("DD MMM")} - ${dayjs(row?.expiry_date).format(
+              "DD MMM"
             )}`}</p>
           </div>
         );
@@ -273,47 +280,47 @@ export default function RedeemListView({
     },
     ...(showComment
       ? [
-          {
-            title: (
-              <h1 className="text-[1.1vw] font-semibold text-center  flex items-center justify-center">
-                Comments
-              </h1>
-            ),
-            width: "9vw",
-            render: (row) => {
-              return (
-                <>
-                  {row.comments ? (
-                    <div className="flex items-center pl-[1vw]">
-                      {row?.comments?.length > 10 ? (
-                        <Tooltip
-                          placement="bottom"
-                          title={row?.comments}
-                          className="cursor-pointer text-[#1F487C]"
-                          color="white"
-                          overlayInnerStyle={{
-                            color: "#1F487C",
-                          }}
-                        >
-                          <p className="text-[1vw] text-[#1F487C]">
-                            {" "}
-                            {`${row?.comments?.slice(0, 10)}...`}
-                          </p>
-                        </Tooltip>
-                      ) : (
-                        <h1 className="text-[1vw] text-[#1F487C]">
-                          {row?.comments?.slice(0, 10)}
-                        </h1>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center">-</div>
-                  )}
-                </>
-              );
-            },
+        {
+          title: (
+            <h1 className="text-[1.1vw] font-semibold text-center  flex items-center justify-center">
+              Comments
+            </h1>
+          ),
+          width: "9vw",
+          render: (row) => {
+            return (
+              <>
+                {row.comments ? (
+                  <div className="flex items-center pl-[1vw]">
+                    {row?.comments?.length > 10 ? (
+                      <Tooltip
+                        placement="bottom"
+                        title={row?.comments}
+                        className="cursor-pointer text-[#1F487C]"
+                        color="white"
+                        overlayInnerStyle={{
+                          color: "#1F487C",
+                        }}
+                      >
+                        <p className="text-[1vw] text-[#1F487C]">
+                          {" "}
+                          {`${row?.comments?.slice(0, 10)}...`}
+                        </p>
+                      </Tooltip>
+                    ) : (
+                      <h1 className="text-[1vw] text-[#1F487C]">
+                        {row?.comments?.slice(0, 10)}
+                      </h1>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center">-</div>
+                )}
+              </>
+            );
           },
-        ]
+        },
+      ]
       : ""),
     {
       title: (
@@ -326,23 +333,28 @@ export default function RedeemListView({
         return (
           <div className="flex items-center justify-center">
             <button
-              onClick={() => statusUpdate(row?.status_id, row?.tbs_offer_id)}
-              className={`${
-                row?.status_id == 2
-                  ? "bg-[#34AE2A]"
-                  : row?.status_id == 0
+              onClick={() => {
+                statusUpdate(row?.status_id, row?.tbs_offer_id)
+                setComment(row?.comments)
+              }}
+              className={`${row?.status_id == 2
+                ? "bg-[#34AE2B]"
+                : row?.status_id == 0
                   ? "bg-[#646262]"
                   : row?.status_id == 1
-                  ? "bg-[#FF6B00]"
-                  : row?.status_id == 3
-                  ? "bg-[#2A99FF]"
-                  : "bg-[#FF0000]"
-              } rounded-[0.5vw] text-[1vw]  font-extrabold shadow-md shadow-black text-white w-[7vw] py-[0.2vw]`}
+                    ? "bg-[#FF9900]"
+                    : row?.status_id == 3
+                      ? "bg-[#2A99FF]"
+                      : "bg-[#FD3434]"
+                } rounded-[0.5vw] text-[1vw]  font-extrabold shadow-md shadow-black text-white w-[7vw] py-[0.2vw]`}
             >
-              {typeId === "PRO101"
+              {/* {typeId === "PRO101"
                 ? row?.req_status_id === 1
                   ? row?.req_status
                   : row?.status
+                : row?.status} */}
+              {typeId === "PRO101" && row?.req_status_id === 6
+                ? row?.req_status
                 : row?.status}
             </button>
           </div>
@@ -445,7 +457,7 @@ export default function RedeemListView({
               />
               {error && (
                 <span className="text-[.9vw] text-red-600 absolute bottom-[-1.2vw] left-[.5vw]">
-                  Comments is required for Reject and On Hold
+                  Comments is required for Reject and Hold
                 </span>
               )}
             </div>
@@ -462,7 +474,7 @@ export default function RedeemListView({
                 Hold
               </button>
               <button
-                className="items-center text-[1vw] text-white shadow-md shadow-black font-extrabold space-x-[0.7vw] px-[0.8vw] w-[7vw] h-[2vw]  bg-[#34AE2A] rounded-[0.5vw]"
+                className="items-center text-[1vw] text-white shadow-md shadow-black font-extrabold space-x-[0.7vw] px-[0.8vw] w-[7vw] h-[2vw]  bg-[#34AE2B] rounded-[0.5vw]"
                 // onClick={() => {
                 //   handlechange(5, "Approved");
                 // }}
@@ -471,7 +483,7 @@ export default function RedeemListView({
                 Active
               </button>
               <button
-                className="items-center text-[1vw] text-white font-extrabold shadow-md shadow-black space-x-[0.7vw] px-[0.8vw] w-[7vw] h-[2vw] bg-[#FF1100] rounded-[0.5vw]"
+                className="items-center text-[1vw] text-white font-extrabold shadow-md shadow-black space-x-[0.7vw] px-[0.8vw] w-[7vw] h-[2vw] bg-[#FD3434] rounded-[0.5vw]"
                 // onClick={() => {
                 //   handlechange(6, "Rejected");
                 // }}

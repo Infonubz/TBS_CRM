@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 // import Backdrop from "../../asserts/CRMbg.png";
 // import axios from "axios";
 //import { PiUserLight } from "react-icons/pi";
@@ -44,6 +44,31 @@ export default function Notification() {
     return `rgb(${r}, ${g}, ${b})`;
   };
 
+  const [scrollY, setScrollY] = useState(0);
+  const scrollContainerRef = useRef(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (scrollContainerRef.current) {
+        setScrollY(scrollContainerRef.current.scrollTop);
+        setActiveTooltip(null)
+      }
+    };
+
+    // Add event listener to the scrollable element
+    const scrollContainer = scrollContainerRef.current;
+    if (scrollContainer) {
+      scrollContainer.addEventListener('scroll', handleScroll);
+    }
+
+    // Cleanup the event listener when the component unmounts
+    return () => {
+      if (scrollContainer) {
+        scrollContainer.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, [scrollContainerRef,setScrollY,scrollY]);
+
   const handleClick = async (itemId) => {
     setActiveTooltip((prev) => (prev === itemId ? null : itemId));
     try {
@@ -77,6 +102,25 @@ export default function Notification() {
       setBgColor(colors);
     }
   }, [getnotificationlist]);
+  const handleKeyDown = (e) => {
+    // Allow control keys like Backspace, Delete, ArrowLeft, ArrowRight, Tab
+    const isControlKey = [
+      "Backspace",
+      "Tab",
+      "ArrowLeft",
+      "ArrowRight",
+      "Delete",
+    ].includes(e.key);
+  
+    if (isControlKey) {
+      return; // If it's a control key, do nothing and allow it to execute
+    }
+  
+    // Allow only alphabets (A-Z, a-z), numbers (0-9), and space
+    if (!/^[A-Za-z0-9\s]$/.test(e.key)) {
+      e.preventDefault(); // Prevent the key if it's not an alphabet, number, or space
+    }
+  };
 
   return (
     <div>
@@ -92,6 +136,7 @@ export default function Notification() {
             type="text"
             className="bg-white outline-none pl-[2vw] pr-[3vw] w-full h-[5vh] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw] border-r-[0.2vw] border-b-[0.2vw]"
             placeholder="Search Notifications"
+            onKeyDown={handleKeyDown}
             onChange={(e) => {
               SearchNotification(e.target.value, dispatch);
             }}
@@ -126,7 +171,7 @@ export default function Notification() {
       {/* <div onClick={handleOnClick}>click me</div> */}
       {/* <div className="overflow-auto mt-3 max-h-[25vw] sm:max-[25vw]: md:max-h-[25vw] lg:max-h-[25vw] xl:max-[25vw] 2xl:max-[25vw] "> */}
       {getnotificationlist && getnotificationlist.length > 0 ? (
-        <div className="overflow-auto mt-[1vw] max-h-[20vw]">
+        <div  ref={scrollContainerRef} className="overflow-auto mt-[1vw] h-[20vw]">
           {getnotificationlist.length > 0 &&
             getnotificationlist?.map((item, index) => (
               <div
@@ -296,7 +341,6 @@ export default function Notification() {
         //   </div>
         // </div>
         <div>
-          <hr></hr>
           <div className="text-center  text-gray-400 p-[2vw]">
             No Notification Found
           </div>

@@ -11,6 +11,7 @@ import {
 } from "../../Api/ForgotPassword/ForgotPassword";
 import { toast } from "react-toastify";
 import "../../App.css";
+import { Spin } from "antd";
 const validationSchema = Yup.object().shape({
   email_id: Yup.string()
     .matches(
@@ -38,6 +39,7 @@ const ProductOwnerForgotPassword = ({
   setLoginHide,
   setShowComponent,
   setForgotPassword,
+  typeID
 }) => {
   const [otpEnabled, setOtpEnabled] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
@@ -45,32 +47,46 @@ const ProductOwnerForgotPassword = ({
   const [value, setValue] = useState([]);
   const [otpDigits, setOtpDigits] = useState(["", "", "", "", "", ""]);
   const [showPassword, setShowPassword] = useState(false);
+  const [storeMail,setStoreMail] = useState("")
+  const [spinning,setSpinning] = useState(false)
   const [showConfirmPassword, setshowConfirmPassword] = useState(false);
 
   const handleSendOTP = async (values) => {
-    console.log(values, "values emailid");
+    console.log(values ,typeID, "values emailid");
+    // setOtpEnabled(true);
+    setSpinning(true)
     try {
-      const otpMail = values;
-      const response = await SendOTP(otpMail);
-      console.log(response, "-----response emailid");
-      toast.success(response?.data?.message);
+      const otpMail = values.email_id;
+      setStoreMail(otpMail)
+      const response = await SendOTP(otpMail,typeID,setSpinning);
       setOtpEnabled(true);
+      console.log(response, "-----response emailid");
+      // toast.success(response?.data?.message);
     } catch (error) {
       console.error("Error sending OTP", error);
     }
   };
 
-  const handleResendOTP = () => {
+  const handleResendOTP = async() => {
     console.log("Resending OTP...");
+    try {
+      const response = await SendOTP(storeMail,typeID,setSpinning);
+      setOtpEnabled(true);
+      console.log(response, "-----response emailid");
+      // toast.success(response?.data?.message);
+    } catch (error) {
+      console.error("Error sending OTP", error);
+    }
   };
-
   const handleSubmit = async (values) => {
     try {
-      const response = await ResetPassword(values);
-      toast.success(response?.data?.message);
+      setSpinning(true)
+      const response = await ResetPassword(values ,typeID,setSpinning);
+      setForgotPassword(false)
       setLoginHide(true);
       setShowComponent(false);
-      navigation("/");
+      // navigation("/");
+      // toast.success(response?.data?.message);
     } catch (error) {
       console.error("Error resetting password", error);
     }
@@ -86,6 +102,11 @@ const ProductOwnerForgotPassword = ({
   console.log(otpEnabled, "otpEnabled");
   return (
     <div className="absolute right-0 top-0 bg-[#E5FFF1] h-full w-[38vw] rounded-tr-[2vw] rounded-br-[2vw] bg-opacity-80 flex flex-col items-center justify-center">
+       {spinning === true ? (
+              <div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-5  z-30">
+                <Spin size="large" />
+              </div>
+            ) : "" }
       <label className="text-[#1F487C] font-bold text-[2vw] ">
         {otpEnabled ? "Create New Password" : "Forgot Password"}
       </label>
@@ -100,6 +121,8 @@ const ProductOwnerForgotPassword = ({
           return !otpEnabled ? validationSchema : validationFullSchema;
         }}
         onSubmit={(values, { setSubmitting }) => {
+          console.log(values,"iufhdxkjfhkjdhfkjdhf");
+          
           if (!otpEnabled) {
             handleSendOTP(values);
           } else {
@@ -151,13 +174,13 @@ const ProductOwnerForgotPassword = ({
                   >
                     Resend OTP
                   </button>
-                  <div className="col-span-1">
+                  <div className="col-span-1 relative">
                     <div className="relative flex items-center">
                       <Field
                         type={showPassword ? "text" : "password"}
                         name="newPassword"
                         placeholder="Enter New Password"
-                        className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                        className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                         />
                       <div
                         className="absolute right-[1vw] cursor-pointer"
@@ -174,16 +197,16 @@ const ProductOwnerForgotPassword = ({
                     <ErrorMessage
                       name="newPassword"
                       component="div"
-                      className="text-red-500 text-[0.8vw]"
+                      className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[.3vw]"
                     />
                   </div>
-                  <div className="col-span-1">
+                  <div className="col-span-1 relative">
                     <div className="relative flex items-center">
                       <Field
                         type={showConfirmPassword ? "text" : "password"}
                         name="confirm"
                         placeholder="Enter Confirm Password"
-                        className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                        className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                       />
                       <div
                         className="absolute right-[1vw] cursor-pointer"
@@ -200,7 +223,7 @@ const ProductOwnerForgotPassword = ({
                     <ErrorMessage
                       name="confirm"
                       component="div"
-                      className="text-red-500 text-[0.8vw]"
+                      className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[.3vw]"
                     />
                   </div>
                   <div className="pt-[1vw]">
@@ -222,8 +245,8 @@ const ProductOwnerForgotPassword = ({
                 </>
               ) : (
                 <>
-                  <div className="col-span-1">
-                    <label className="text-[#1F487C] text-[1.1vw] ">
+                  <div className="col-span-1 relative">
+                    <label className="text-[#1F487C] text-[1.3vw] ">
                       Email ID
                       <span className="text-[1vw] text-red-600 pl-[0.2vw]">
                         *
@@ -233,19 +256,19 @@ const ProductOwnerForgotPassword = ({
                       type="text"
                       name="email_id"
                       placeholder="Enter Email Address"
-                      className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                      className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                     />
                     <ErrorMessage
                       name="email_id"
                       component="div"
-                      className="text-red-500 text-[0.8vw]"
+                      className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[.3vw]"
                     />
                   </div>
                   <div className="flex justify-center">
                     {!otpEnabled ? (
                       <button
                         type="submit"
-                        onClick={handleSendOTP}
+                        // onClick={handleSendOTP}
                         className="w-full flex justify-center py-2 px-2 border border-transparent rounded-md shadow-sm text-[1vw] font-medium text-white bg-[#1F487C]"
                       >
                         Send OTP

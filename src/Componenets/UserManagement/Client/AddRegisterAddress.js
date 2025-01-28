@@ -96,7 +96,7 @@ export default function AddRegisterAddress({
       <div className="border-l-[0.1vw] px-[2vw] umselect border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] relative rounded-[1vw] mt-[1.5vw] border-[#1f4b7f]">
         <div className="h-[4vw] w-full flex items-center justify-between ">
           <label className="text-[1.5vw] font-semibold text-[#1f4b7f] ">
-            Registered Address
+          Address Details
           </label>
           {updatedata && clientAddress?.address != null || gstback ? (
             <button
@@ -277,7 +277,7 @@ export default function AddRegisterAddress({
                             Select: {
                               optionActiveBg: '#aebed1',
                               optionSelectedColor: '#FFF',
-                              optionSelectedBg: '#aebed1',
+                              optionSelectedBg: '#e5e5e5',
                               optionHeight: '2',
                             },
                           },
@@ -301,7 +301,7 @@ export default function AddRegisterAddress({
                           listHeight={190}
                           className={`${updatedata && clientAddress?.address != null || gstback
                             ? enable == false
-                              ? " cursor-not-allowed"
+                              ? " cursor-not-allowed bg-[#FAFAFA]"
                               : ""
                             : ""
                             } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
@@ -414,7 +414,7 @@ export default function AddRegisterAddress({
                             Select: {
                               optionActiveBg: '#aebed1',
                               optionSelectedColor: '#FFF',
-                              optionSelectedBg: '#aebed1',
+                              optionSelectedBg: '#e5e5e5',
                               optionHeight: '2',
                             },
                           },
@@ -438,7 +438,7 @@ export default function AddRegisterAddress({
                           name="temp_state"
                           className={`${updatedata && clientAddress?.address != null || gstback
                             ? enable == false
-                              ? " cursor-not-allowed"
+                              ? " cursor-not-allowed bg-[#FAFAFA]"
                               : ""
                             : ""
                             } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
@@ -566,7 +566,7 @@ export default function AddRegisterAddress({
                             Select: {
                               optionActiveBg: '#aebed1',
                               optionSelectedColor: '#FFF',
-                              optionSelectedBg: '#aebed1',
+                              optionSelectedBg: '#e5e5e5',
                               optionHeight: '2',
                             },
                           },
@@ -590,7 +590,7 @@ export default function AddRegisterAddress({
                           name="region"
                           className={`${updatedata && clientAddress?.address != null || gstback
                             ? enable == false
-                              ? " cursor-not-allowed"
+                              ? " cursor-not-allowed bg-[#FAFAFA]"
                               : ""
                             : ""
                             } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
@@ -711,7 +711,7 @@ export default function AddRegisterAddress({
                             Select: {
                               optionActiveBg: '#aebed1',
                               optionSelectedColor: '#FFF',
-                              optionSelectedBg: '#aebed1',
+                              optionSelectedBg: '#e5e5e5',
                               optionHeight: '2',
                             },
                           },
@@ -735,7 +735,7 @@ export default function AddRegisterAddress({
                           name="country"
                           className={`${updatedata && clientAddress?.address != null || gstback
                             ? enable == false
-                              ? " cursor-not-allowed"
+                              ? " cursor-not-allowed bg-[#FAFAFA]"
                               : ""
                             : ""
                             } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}

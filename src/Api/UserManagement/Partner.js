@@ -7,10 +7,12 @@ const api = axios.create({
   },
 });
 const apiUrl = process.env.REACT_APP_API_URL;
+const user = sessionStorage.getItem("USER_ID");
 
 export const GetPartnerData = async (dispatch) => {
   try {
-    const response = await api.get(`${apiUrl}/all-partner_details`);
+    // const response = await api.get(`${apiUrl}/all-partner_details`);
+    const response = await api.get(`${apiUrl}/partner_details_userId/${user}`);
     dispatch({ type: GET_PARTNER_LIST, payload: response.data });
     return response.data;
   } catch (error) {
@@ -23,7 +25,7 @@ export const handlePartnerSearch = async (e, dispatch) => {
   try {
     if (e.target.value) {
       const response = await api.get(
-        `${apiUrl}/partner-search/${e.target.value}`
+        `${apiUrl}/partner-search/${user}/${e.target.value}`
       );
       dispatch({ type: GET_PARTNER_LIST, payload: response.data });
       return response.data[0];
@@ -56,6 +58,7 @@ export const GetPartnerProfile = async (PartnerID, dispatch) => {
 export const SubmitPartnerExcel = async (file, dispatch) => {
   const formData = new FormData();
   formData.append("file", file);
+  formData.append("tbs_user_id",user)
 
   const excelEndpoint = `${apiUrl}/import-partner-details`;
   const method = "post";
@@ -82,6 +85,7 @@ export const SubmitPartnerExcel = async (file, dispatch) => {
 export const PartnerStatusUpdateApi = async (
   partnerStatusId,
   PartnerID,
+  setSpinning,
   dispatch
 ) => {
   // const payload = {
@@ -117,6 +121,9 @@ export const PartnerStatusUpdateApi = async (
   } catch (error) {
     handleError(error);
     return null;
+  }
+  finally{
+    setSpinning && setSpinning(false)
   }
 };
 
@@ -174,6 +181,7 @@ export const submitPartnerPersonalData = async (
   formData.append('alternate_phone', personalvalues.alt_phone);
   formData.append('date_of_birth', personalvalues.dob);
   formData.append('gender', personalvalues.gender);
+  formData.append("tbs_user_id",user)
   if (fileList[0]?.originFileObj) {
     formData.append('profile_img', fileList[0].originFileObj)
 }

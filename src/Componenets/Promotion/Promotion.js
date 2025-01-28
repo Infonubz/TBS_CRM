@@ -9,6 +9,7 @@ import { BsExclamationCircle } from "react-icons/bs";
 import { CiImageOff } from "react-icons/ci";
 import { CgImport } from "react-icons/cg";
 import {
+  FaCloudUploadAlt,
   //FaCloudUploadAlt,
   FaPlus,
 } from "react-icons/fa";
@@ -51,6 +52,9 @@ import StatusUpdateModal from "./StatusUpdateModal";
 import { GetPromotionById } from "../../Api/Promotion/Promotion";
 import { Tooltip } from "antd";
 import { TiThMenu } from "react-icons/ti";
+import Dragger from "antd/es/upload/Dragger";
+import { MdOutlineDownloading } from "react-icons/md";
+import { GetExcelTemplateById } from "../../Api/UserManagement/UserManagement";
 
 export default function Promotion() {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -76,6 +80,7 @@ export default function Promotion() {
   const [ownerName, setOwnerName] = useState("");
   const [eyeModalIsOpen, setEyeModalIsOpen] = useState(false);
   const [promoImage, setPromoImage] = useState("");
+   const [importModal, setImportModal] = useState(false);
   const itemsPerPage = 10; // Number of items to display per page
   //const [promotionDataList, setpromotionDataList] = useState({});
   const type_Id = sessionStorage.getItem("type_id");
@@ -99,6 +104,8 @@ export default function Promotion() {
     SetUpdateData(null);
     setStatusUpdateModal(false);
     setPromoData("");
+    setImportModal(false)
+    setExcelData("")
     setPromotionId(null);
     dispatch({
       type: PROMO_BG_IMAGE,
@@ -125,11 +132,11 @@ export default function Promotion() {
     },
     {
       title: "Created Date",
-      description: "MMM DD (e.g. 01 Jan) - Format",
+      description: "DD MMM (e.g. 01 Jan) - Format",
     },
     {
       title: "Duration",
-      description: "MMM DD (e.g. 01 Jan) - Format",
+      description: "DD MMM (e.g. 01 Jan) - Format",
     },
   ];
 
@@ -180,13 +187,12 @@ export default function Promotion() {
   //   }
   // };
 
-  const handleOnClick = async (file) => {
-    console.log(file, "adfdsfadsfa");
+  const handleOnClick = async () => {
+    console.log(excelData, "adfdsfadsfa");
     try {
-      const response = await SubmitPromoExcel(file, dispatch);
-      // toast.success(response);
-      GetPromotionDataByStatus(dispatch, CurrentTab);
-      console.log("praveeen");
+      const response = await SubmitPromoExcel(excelData, dispatch);
+      GetPromotionDataByStatus(dispatch, CurrentTab,listType);
+      setImportModal(false)
     } catch (error) {
       console.error("Error uploading file:", error);
       // toast.error("Failed to upload file");
@@ -220,11 +226,15 @@ export default function Promotion() {
     }
   }, [currentItems, setActivePage, activePage]);
 
+  useEffect(()=>{
+SetCurrentTab("All")
+  },[listType,setListType])
   useEffect(() => {
     if (type_Id === "OP101" && listType === "employee") {
       GetPromoDataByEmp(dispatch, CurrentTab);
     } else {
-      GetPromotionDataByStatus(dispatch, CurrentTab);
+      GetPromotionDataByStatus(dispatch, CurrentTab,listType);
+      // alert("hoooo")
     }
   }, [CurrentTab, dispatch, listType, type_Id]);
 
@@ -239,6 +249,77 @@ export default function Promotion() {
   }, [promotionId]);
   console.log(promodata, "promodata");
 
+  const fetchPromoTemp = async() => {
+    try {
+        const response = await GetExcelTemplateById("promotion")
+        setExcelData(response.data[0])
+        console.log(response.data[0], 'fetch_optemp')
+        return response.data
+      } catch (error) {
+        console.log(error)
+      }
+  }
+
+  const handleDownloadExcel = () => {
+    if (excelData?.length === 0) {
+      console.log('error')
+    } else {
+      const fileUrl = `${apiImgUrl}${excelData?.upload_files}`;
+      const a = document.createElement("a");
+      a.href = fileUrl;
+      a.download = "";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+  }
+  const handleFileUpload = (file) => {
+    // Handle the file (e.g., read the Excel file, process it, etc.)
+    setExcelData(file);
+    console.log(file, "filesfiles"); // Log the file to the console
+  };
+
+
+  const uploadProps = {
+    name: 'file', // The field name to send the file
+    accept: '.xls,.xlsx', // File type restrictions
+    // onChange: handleChange, // Event handler for file status changes
+    beforeUpload: (file) => {
+      // Process file before upload (e.g., validate file format)
+      handleFileUpload(file);
+      return false; // Prevent automatic upload, you can handle upload yourself
+    },
+    showUploadList: false
+  };
+
+
+  useEffect(()=>{
+    fetchPromoTemp()
+  },[])
+  
+  console.log(CurrentTab,"currentabtba");
+
+  const handleKeyDown = (e) => {
+  // Allow control keys like Backspace, Delete, ArrowLeft, ArrowRight, Tab
+  const isControlKey = [
+    "Backspace",
+    "Tab",
+    "ArrowLeft",
+    "ArrowRight",
+    "Delete",
+  ].includes(e.key);
+
+  if (isControlKey) {
+    return; // If it's a control key, do nothing and allow it to execute
+  }
+
+  // Allow only alphabets (A-Z, a-z), numbers (0-9), and space
+  if (!/^[A-Za-z0-9\s]$/.test(e.key)) {
+    e.preventDefault(); // Prevent the key if it's not an alphabet, number, or space
+  }
+};
+  
   return (
     <>
       <div className="mb-[5vw]">
@@ -257,7 +338,7 @@ export default function Promotion() {
               </h1>
               <div className="pb-[0.5vw] flex justify-between h-full items-center">
                 <div className="flex items-center gap-x-[1vw]">
-                  <div className="flex border-[#1F4B7F] h-[2.4vw]">
+                  <div className="flex border-[#1F4B7F] h-[5vh]">
                     <Tooltip
                       placement="top"
                       title={
@@ -327,18 +408,19 @@ export default function Promotion() {
                   </div>
                   <div className="relative flex items-center w-[13.85vw]">
                     <LiaSearchSolid
-                      className="absolute left-[0.8vw] top-[50%] transform -translate-y-1/2"
+                      className="absolute left-[0.7vw] top-[50%] transform -translate-y-1/2"
                       size={"1vw"}
                       color="#9CA3AF"
                     />
 
                     <input
                       type="text"
-                      className="bg-white placeholder-[#9CA3AF] text-[#1F487C] outline-none pl-[3vw] pr-[3vw] w-full h-[5vh] text-[1vw] placeholder:text-[1vw] border-[#1F487C] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.75vw] border-r-[0.25vw] border-b-[0.25vw]"
+                      className="bg-white placeholder-[#9CA3AF] text-[#1F487C] outline-none pl-[2vw] pr-[2vw] w-full h-[5vh] text-[1vw] placeholder:text-[1vw] border-[#1F487C] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.75vw] border-r-[0.25vw] border-b-[0.25vw]"
                       placeholder="Search..."
                       onChange={(e) =>
                         handlePromosearch(e, dispatch, CurrentTab)
                       }
+                      onKeyDown={handleKeyDown}
                     />
 
                     <Popover
@@ -417,11 +499,11 @@ export default function Promotion() {
                     </div>
                     <div
                       className={` cursor-pointer ${
-                        CurrentTab === "OnHold"
+                        CurrentTab === "Hold"
                           ? "border-b-[0.25vw] font-bold border-[#1f487c]"
                           : ""
                       } `}
-                      onClick={() => SetCurrentTab("OnHold")}
+                      onClick={() => SetCurrentTab("Hold")}
                     >
                       <div className="text-[1.3vw] text-[#1f487c] text-center">
                         Hold
@@ -453,10 +535,25 @@ export default function Promotion() {
                         </div>
                       </div>
                     )}
+                    {type_Id === "OP101" &&  listType === "employee" && (
+                      <div
+                      className={` cursor-pointer ${
+                        CurrentTab === "Repost"
+                          ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                          : ""
+                      } `}
+                      onClick={() => SetCurrentTab("Repost")}
+                    >
+                      <div className="text-[1.3vw] text-[#1f487c] text-center">
+                        Repost
+                      </div>
+                    </div>  
+                    )}
                   </div>
                 </div>
 
-                <div className="flex items-center gap-x-[1vw] h-[2vw]">
+                <div className={`flex ${listType === "operator" ? "items-center" : "items-center"}  gap-x-[1vw] h-[2vw]`}>
+                {/* <div className="flex justify-between w-[38vw] items-center gap-x-[1vw] h-[2vw]"> */}
                   {type_Id === "OP101" && (
                     <div className="flex relative items-center pl-[2vw]">
                       <div
@@ -490,11 +587,73 @@ export default function Promotion() {
                     </div>
                   )}
                   <ExportButton dataArray={currentItems} />
+                  {listType === "employee" ? "" : 
+
+<>
+                  <ModalPopup
+                    show={importModal}
+                    onClose={closeModal}
+                    height="23.3vw"
+                    width="28vw"
+                    closeicon={false}
+                  >
+                    <div>
+                      <div className="text-[#1F4B7F] font-semibold text-center text-[1.28vw]">Import & Download Promotion Template</div>
+                      <button onClick={handleDownloadExcel} className="w-full px-[1vw] text-[#1F4B7F] shadow-[#00000054] shadow-lg   text-[1.2vw] h-[2.5vw] rounded-[.5vw]  my-[1.5vw]  bg-white flex justify-center items-center gap-x-[1vw]">
+                        <MdOutlineDownloading className="text-[#1F4B7F] text-[1.4vw]" />{" "}
+                        <span>Download  Template</span>
+                      </button>
+                      <ConfigProvider
+                        theme={{
+                          token: {
+                            colorBorder: "#1F4B7F",
+                          colorPrimary: "#1F4B7F",
+                          },
+                          components: {
+                            Upload: {
+                              actionsColor: "#1F4B7F"
+                            }
+                          }
+                        }}>
+                        <Dragger height={"9.2vw"} {...uploadProps}>
+                  
+                          <div className="text-[#1F4B7F] text-[1vw]">
+                            {excelData?.name ? (
+                              excelData?.name
+                            ) : (
+                              <div className="flex flex-col items-center text-[1vw] justify-center">
+                                <FaCloudUploadAlt className="text-[2.5vw] ml-[.5vw]" />
+                                <span className="font-bold ">+ Upload</span>
+                              </div>
+                            )}
+                          </div>
+                        </Dragger>
+                      </ConfigProvider>
+                      <div className="flex justify-center mt-[1.3vw] ">
+                        <button
+                          className="bg-[#1F4B7F]  flex px-[1vw]  justify-center h-[2.5vw] items-center rounded-[0.5vw]"
+                          onClick={() =>
+                            // document.getElementById("xlsxFile").click()
+                            handleOnClick()
+                          }
+                        >
+                          <span>
+                            {/* <CgImport size={"1.2vw"} color="white" /> */}
+                          </span>
+                          <span className="text-white font-bold text-[1.1vw]">
+                            submit
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                  </ModalPopup>
+
                   <div>
-                    <input
+                    {/* <input
                       id="xlsxFile"
                       name="xlsxFile"
-                      type="file"
+                       type="file"
+                    accept=".xls,.xlsx"
                       style={{ display: "none" }}
                       onChange={(event) => {
                         const file = event.target.files[0];
@@ -502,11 +661,12 @@ export default function Promotion() {
                         setExcelData(file);
                         handleOnClick(file);
                       }}
-                    />
+                    /> */}
                     <button
                       className="bg-[#1F4B7F] shadow-sm shadow-black flex px-[0.75vw] h-[5vh] justify-center gap-[0.5vw] items-center rounded-[0.5vw]"
                       onClick={() =>
-                        document.getElementById("xlsxFile").click()
+                        // document.getElementById("xlsxFile").click()
+                        setImportModal(true)
                       }
                     >
                       {" "}
@@ -524,7 +684,7 @@ export default function Promotion() {
                         className=""
                       /> */}
                     </button>
-                  </div>
+                  </div> 
                   
                   {/* 
                   <div className="flex border-[#1F4B7F] h-[2.5vw] border-l-[0.1vw] border-t-[0.1vw] rounded-l-[0.5vw] rounded-r-[0.5vw] border-r-[0.2vw] border-b-[0.2vw]">
@@ -574,6 +734,7 @@ export default function Promotion() {
                   <button
                     className="bg-[#1F4B7F] shadow-sm shadow-black flex px-[1vw] h-[5vh] justify-center gap-[0.5vw] items-center rounded-[0.5vw]"
                     onClick={() => {
+                      setPromotionId("")
                       setPromoData("");
                       setModalIsOpen(true);
                       SetUpdateData(null);
@@ -586,6 +747,8 @@ export default function Promotion() {
                       Add
                     </span>
                   </button>
+                  </>
+}
                 </div>
               </div>
             </div>
@@ -720,6 +883,7 @@ export default function Promotion() {
             CurrentTab={CurrentTab}
             setPromotionId={setPromotionId}
             ownerName={ownerName}
+            listType={listType}
             // setPromolist={setPromolist}
             // promolist={promolist}
           />
@@ -738,6 +902,7 @@ export default function Promotion() {
             api={`${apiUrl}/promo/${promotionId}`}
             module={"promotion"}
             CurrentTab={CurrentTab}
+            listType={listType}
           />
         </ModalPopup>
 

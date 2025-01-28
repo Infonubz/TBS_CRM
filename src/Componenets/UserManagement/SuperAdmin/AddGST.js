@@ -51,7 +51,7 @@ head_office: Yup.string()
         : value && SUPPORTED_FORMATS.includes(value.type)
     ),
     
-  ctc: Yup.string().required("GST is required"),
+  ctc: Yup.string().required("Aggregate turnover is required"),
 });
 
 export default function AddGST({
@@ -94,6 +94,7 @@ export default function AddGST({
   const [previewImage, setPreviewImage] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
   const [inputPreview, setInputPreview] = useState()
+  const [reset,setReset]= useState(false)
   // const [superadmingstdata, setSuperAdminGSTData] = useState("");
   const updateId = operatorID ? operatorID : operator_id;
 
@@ -210,12 +211,12 @@ console.log(clientID,"ididididdhgfsudfgusfgb");
         <div>
           <Formik
             initialValues={{
-              gst: superadmingstdata?.gstin || "",
-              state_code: superadmingstdata?.state_code_number || "",
-              state: superadmingstdata?.state_name || "",
-              head_office: superadmingstdata?.head_office || "",
-              gst_file: superadmingstdata?.upload_gst || null,
-              ctc: superadmingstdata?.aggregate_turnover_exceeded == true ? 1 : superadmingstdata?.aggregate_turnover_exceeded == false ? 0 :"" || "",
+              gst:reset ? "" : superadmingstdata?.gstin || "",
+              state_code: reset ? "" : superadmingstdata?.state_code_number || "",
+              state: reset ? "" : superadmingstdata?.state_name || "",
+              head_office: reset ? "" : superadmingstdata?.head_office || "",
+              gst_file: reset ? "" : superadmingstdata?.upload_gst || null,
+              ctc: reset ? "" : superadmingstdata?.aggregate_turnover_exceeded == true ? 1 : superadmingstdata?.aggregate_turnover_exceeded == false ? 0 :"" || "",
             }}
             validationSchema={validationSchema}
             onSubmit={(values) => {
@@ -268,7 +269,7 @@ console.log(clientID,"ididididdhgfsudfgusfgb");
                     </div>
                     <div className="col-span-1 relative">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
-                       Gst State code
+                      State Code
                         <span className="text-[1vw] text-red-600 pl-[0.2vw]">
                           *
                         </span>
@@ -320,7 +321,7 @@ console.log(clientID,"ididididdhgfsudfgusfgb");
                             Select: {
                               optionActiveBg: '#aebed1',
                               optionSelectedColor: '#FFF',
-                              optionSelectedBg: '#aebed1',
+                              optionSelectedBg: '#e5e5e5',
                               optionHeight: '2',
                             },
                           },
@@ -650,7 +651,10 @@ console.log(clientID,"ididididdhgfsudfgusfgb");
                       <button
                         type="button"
                         className="border-[#1F487C] w-[5vw] font-semibold text-[1vw] h-[2vw] rounded-full border-r-[0.2vw]  border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw]"
-                        onClick={resetForm}>
+                        onClick={()=>{
+                          setReset(true)
+                          setInputPreview("")
+                        }}>
                         Reset
                       </button>
                       <button

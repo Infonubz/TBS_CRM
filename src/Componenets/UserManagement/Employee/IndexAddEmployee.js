@@ -112,6 +112,7 @@ export default function AddEmployee({
       }
     } else {
       // If no file, just update the file list
+      setProfileImage(false);
       setFileList(newFileList);
       setSelectedFile(newFileList)
     }
@@ -246,12 +247,14 @@ useEffect(()=>{
       
     }}>
     <Upload
+    className="umimgupload"
       action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
       listType="picture-card"
       fileList={fileList}
       onChange={handleChange}
       onPreview={handlePreview}
       disabled={enableUpload}
+      accept=".jpg,.jpeg,.png" 
     >
       {fileList?.length < 1 && "+ Upload"}
     </Upload>
@@ -311,7 +314,7 @@ useEffect(()=>{
                             : "bottom-0"
                         }`}
                     >
-                          <img src={pencilshape} alt='icon' className="h-[1.2vw] w-[3.4vw]" />
+                          <img src={pencilshape} alt='icon' className="h-[1.2vw] select-none w-[3.4vw]"/>
                     </div>
                   </div>
                 </div>
@@ -349,6 +352,7 @@ useEffect(()=>{
                   setEnableUpload={setEnableUpload}
                   selectedFile={selectedFile}
                   enableUpload={enableUpload}
+                  setSelectedFile={setSelectedFile}
                 />
               ) : currentpage == 2 ? (
                 // <AddRegisterAddress

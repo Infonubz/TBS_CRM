@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Grid, Space, Table, Tooltip } from "antd";
+import { Button, Grid, Space, Spin, Table, Tooltip } from "antd";
 import { render } from "@testing-library/react";
 import { MdModeEditOutline, MdPadding } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
@@ -43,7 +43,8 @@ const ClientTableView = ({
   const get_operator_list = useSelector((state) => state.crm.operator_list);
   const [viewmodal, setViewModal] = useState(false);
   const [statusclientid, setStatusClientId] = useState(null);
-  const [userName,setUserName] = useState("")
+  const [userName, setUserName] = useState("")
+  const [spinning, setSpinning] = useState(false);
 
   const columns = [
     {
@@ -64,7 +65,7 @@ const ClientTableView = ({
                 ? `${apiImgUrl}${row?.company_logo}`
                 : UserProfile
                 } `}
-                 alt="Profile"
+              alt="Profile"
               className="w-[2.15vw] h-[2.15vw] object-cover rounded-[0.2vw]"
             />
           </div>
@@ -79,7 +80,7 @@ const ClientTableView = ({
       width: "7vw",
       render: (text, row) => {
         return (
-          <div className="flex items-center pl-[1vw]">
+          <div className="flex items-center justify-center">
             <p className="text-[1vw] text-[#1F4B7F] font-bold">{row.tbs_client_id}</p>
           </div>
         );
@@ -100,11 +101,23 @@ const ClientTableView = ({
           {
             row?.company_name?.length > 18 ? (
               <Tooltip color="white"
-              overlayInnerStyle={{ color: "#1F4B7F" }} title={capitalizeFirstLetter(row?.company_name)}>
-                <span>{`${capitalizeFirstLetter(row?.company_name).slice(0, 18)}...`}</span>
+                overlayInnerStyle={{ color: "#1F4B7F" }} title={capitalizeFirstLetter(row?.company_name)}>
+                <span>
+                  {row?.company_name.charAt(0) === row?.company_name.charAt(0)?.toLowerCase()
+                    ? `${capitalizeFirstLetter(row?.company_name).slice(0, 18)}...`
+                    : `${row?.company_name.slice(0, 18)}...`}
+                </span>
+
               </Tooltip>
             ) : (
-              <span>{capitalizeFirstLetter(row?.company_name)}</span>
+              // <span>{capitalizeFirstLetter(row?.company_name)}</span>
+              <span>
+                {row?.company_name.charAt(0) === row?.company_name.charAt(0)?.toLowerCase()
+                  ? capitalizeFirstLetter(row?.company_name)
+                  : row?.company_name}
+              </span>
+
+
             )
           }
         </div>
@@ -125,11 +138,21 @@ const ClientTableView = ({
           {
             row?.owner_name?.length > 18 ? (
               <Tooltip color="white"
-              overlayInnerStyle={{ color: "#1F4B7F" }} title={capitalizeFirstLetter(row?.owner_name)}>
-                <span>{`${capitalizeFirstLetter(row?.owner_name).slice(0, 18)}...`}</span>
+                overlayInnerStyle={{ color: "#1F4B7F" }} title={capitalizeFirstLetter(row?.owner_name)}>
+                <span>
+                  {`${row?.owner_name?.charAt(0) === row?.owner_name?.charAt(0).toLowerCase()
+                    ? capitalizeFirstLetter(row?.owner_name).slice(0, 18)
+                    : row?.owner_name?.slice(0, 18)}...`}
+                </span>
+
               </Tooltip>
             ) : (
-              <span>{capitalizeFirstLetter(row?.owner_name)}</span>
+              <span>
+              {row?.owner_name?.charAt(0) === row?.owner_name?.charAt(0).toLowerCase() 
+                ? capitalizeFirstLetter(row?.owner_name) 
+                : row?.owner_name}
+            </span>
+            
             )
           }
         </div>
@@ -156,12 +179,12 @@ const ClientTableView = ({
           {
             row?.business_background?.length > 22 ? (
               <Tooltip color="white"
-              overlayInnerStyle={{ color: "#1F4B7F" }} title={capitalizeFirstLetter(row?.business_background)}>
+                overlayInnerStyle={{ color: "#1F4B7F" }} title={capitalizeFirstLetter(row?.business_background)}>
                 <span>{`${capitalizeFirstLetter(row?.business_background).slice(0, 22)}...`}</span>
               </Tooltip>
-            ) : (
+            ) : row?.business_background ? (
               <span>{capitalizeFirstLetter(row?.business_background)}</span>
-            )
+            ) : (<div className="font-bold text-center flex justify-center w-full">-</div>)
           }
         </div>
       )
@@ -181,7 +204,7 @@ const ClientTableView = ({
       render: (text, row) => {
         return (
           <div className="flex items-center justify-center">
-            <p className="text-[1vw] text-[#1F4B7F]">{row.phone}</p>
+            <p className="text-[1vw] text-[#1F4B7F]">{row.phone ? row.phone : (<span className="font-bold">-</span>)}</p>
           </div>
         );
       },
@@ -206,25 +229,25 @@ const ClientTableView = ({
           //   <p className="text-[1.1vw] text-[#1F4B7F]">{row.emailid}</p>
           // </div>
           <div >
-          {row?.emailid?.length > 20 ? (
-            <Tooltip
-            color="white"
-              overlayInnerStyle={{ color: "#1F4B7F" }}
-              placement="top"
-              title={row?.emailid}
-              className="cursor-pointer"
-            >
-              <div className="text-[1vw] pl-[1vw]  text-[#1f4b7f]">
-                {" "}
-                {`${row?.emailid?.slice(0, 20)}...`}
+            {row?.emailid?.length > 20 ? (
+              <Tooltip
+                color="white"
+                overlayInnerStyle={{ color: "#1F4B7F" }}
+                placement="top"
+                title={row?.emailid}
+                className="cursor-pointer"
+              >
+                <div className="text-[1vw] pl-[1vw]  text-[#1f4b7f]">
+                  {" "}
+                  {`${row?.emailid?.slice(0, 20)}...`}
+                </div>
+              </Tooltip>
+            ) : row?.emailid ? (
+              <div className="text-[1vw] pl-[1vw] text-[#1f4b7f]">
+                {row?.emailid?.slice(0, 20)}
               </div>
-            </Tooltip>
-          ) : (
-            <div className="text-[1vw] pl-[1vw] text-[#1f4b7f]">
-              {row?.emailid?.slice(0, 20)}
-            </div>
-          )}
-        </div>
+            ) : (<div className="font-bold text-center text-[1vw] flex justify-center w-full">-</div>)}
+          </div>
         );
       },
     },
@@ -261,7 +284,7 @@ const ClientTableView = ({
                 className={`${row.status_id == 0
                   ? "bg-[#646262]"
                   : row.status_id == 1
-                    ? "bg-[#38ac2c]"
+                    ? "bg-[#34AE2B]"
                     : row.status_id == 2
                       ? "bg-[#FD3434]"
                       : "bg-[#2A99FF]"
@@ -365,6 +388,11 @@ const ClientTableView = ({
 
   return (
     <>
+      {spinning === true ? (
+        <div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-20  z-10">
+          <Spin size="large" />
+        </div>
+      ) : ""}
       <Table
         columns={columns}
         dataSource={currentData}
@@ -397,6 +425,7 @@ const ClientTableView = ({
         <ClientStatusUpdate
           clientid={statusclientid}
           setViewModal={setViewModal}
+          setSpinning={setSpinning}
         />
       </ModalPopup>
     </>

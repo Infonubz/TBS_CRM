@@ -14,7 +14,7 @@ const typeId = sessionStorage.getItem("type_id");
 const user = sessionStorage.getItem("USER_ID");
 export const GetEmployeeData = async (dispatch) => {
   const endpoint = user?.startsWith("tbs-pro")
-    ? `${apiUrl}/pro-All-emp-details`
+    ? `${apiUrl}/pro-All-emp-details/${user}`
     : `${apiUrl}/All-emp-details/${user}`;
 
   try {
@@ -32,7 +32,7 @@ export const handleEmployeeSearch = async (e, dispatch) => {
   try {
     if (e.target.value) {
       const response = user?.startsWith("tbs-pro") ? await api.get(
-        `${apiUrl}/proemp-search/${e.target.value}`) : await api.get(
+        `${apiUrl}/proemp-search/${user}/${e.target.value}`) : await api.get(
           `${apiUrl}/employee-search/${user}/${e.target.value}`)
       dispatch({ type: GET_EMPLOYEE_LIST, payload: response.data });
       return response.data[0];
@@ -48,6 +48,7 @@ export const EmployeeStatusUpdateApi = async (
   valueid,
   value,
   employeeid,
+  setSpinning,
   dispatch
 ) => {
   const payload = {
@@ -77,6 +78,9 @@ export const EmployeeStatusUpdateApi = async (
   } catch (error) {
     handleError(error);
     return null;
+  }
+  finally{
+    setSpinning && setSpinning(false)
   }
 };
 
@@ -124,14 +128,14 @@ export const submitPersonalData = async (
     formData.append("profile_img", fileList[0].originFileObj);
   }
 
-  if(typeId === "PRO101"){
+  // if(typeId === "PRO101")
+  if(user.startsWith("tbs-pro"))
+    {
     formData.append("owner_id", sessionStorage.getItem("USER_ID"));
   }
   else{
     formData.append("tbs_operator_id", sessionStorage.getItem("USER_ID"))
   }
-
-  // Now `formData` is ready to be used
 
   // const url = updatedata
   //   ? `${apiUrl}/operator_details/${updatedata}`
@@ -143,7 +147,7 @@ export const submitPersonalData = async (
     : `${apiUrl}/emp-personal-details`;
   const updateurl = user?.startsWith("tbs-pro")
     ? `${apiUrl}/pro-emp-personal-details/${EmployeeID}`
-    : `${apiUrl}/emp-personal-detail/${EmployeeID}`;
+    : `${apiUrl}/emp-personal-details/${EmployeeID}`;
 
   const method = enable ? "put" : "post";
   const url = enable ? updateurl : submiturl;
@@ -526,7 +530,14 @@ export const GetOwnerEmployeeProfile = async (EmployeeID) => {
 export const SubmitEmployeeExcel = async (file) => {
   const formData = new FormData();
   formData.append("xlsxFile", file);
-  const excelEndpoint = `${apiUrl}/pro-employee-importExcel`;
+  formData.append("tbs_user_id",user)
+  if(user.startsWith("tbs-op")){
+    formData.append("tbs_operator_id",user)
+  }
+  else{
+    formData.append("owner_id",user)
+  }
+  const excelEndpoint = user.startsWith("tbs-pro") ? `${apiUrl}/pro-employee-importExcel` : `${apiUrl}/opemployee-importExcel`
   const method = "post";
 
   try {

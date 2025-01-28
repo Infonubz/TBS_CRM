@@ -7,12 +7,13 @@ const api = axios.create({
   },
 });
 const apiUrl = process.env.REACT_APP_API_URL;
+const user = sessionStorage.getItem("USER_ID");
 
 export const GetRedeemOffersData = async (dispatch, filter) => {
   try {
     // const response = await axios.get(`${apiUrl}/redeem-offers-deals`);
     const response = await api.get(
-      `${apiUrl}/request-offerStatus/${
+      `${apiUrl}/request-offerStatus/${user}/${
         filter == "all"
           ? 5
           : filter == "pending"
@@ -83,7 +84,8 @@ export const SubmitRedeemOffersData = async (
   updatedata,
   offerlist,
   offerBackGround,
-  offerFilter
+  offerFilter,
+  noValToStatus
 ) => {
   console.log(promotionvalues, "promotionvalues");
   const formData = new FormData();
@@ -91,7 +93,7 @@ export const SubmitRedeemOffersData = async (
     "offer_name",
     promotionvalues.offer_name ? promotionvalues.offer_name : null
   );
-  formData.append("code", promotionvalues.code ? promotionvalues.code : null);
+  formData.append("code", promotionvalues.code ? promotionvalues?.code?.toUpperCase() : null);
   formData.append(
     "start_date",
     promotionvalues.start_date ? promotionvalues.start_date : new Date()
@@ -101,6 +103,9 @@ export const SubmitRedeemOffersData = async (
     promotionvalues.expiry_date ? promotionvalues.expiry_date : new Date()
   );
   formData.append("usage", offerlist.usage ? offerlist.usage : null);
+
+  if(noValToStatus===false) {
+
   formData.append(
     "status",
     promotionvalues.status ? promotionvalues.status : null
@@ -122,16 +127,18 @@ export const SubmitRedeemOffersData = async (
       ? "Draft"
       : promotionvalues.status == "Posted"
       ? "Pending"
-      : "Approved"
+      : "Active"
   );
   formData.append(
     "req_status_id",
     promotionvalues.status == "Draft"
       ? 0
       : promotionvalues.status == "Posted"
-      ? 1
+      ? 6
       : 2
   );
+  formData.append("tbs_user_id", sessionStorage.getItem("USER_ID"));
+}
 
   formData.append(
     "offer_desc",
@@ -161,7 +168,7 @@ export const SubmitRedeemOffersData = async (
       : ""
   );
   formData.append("theme", offerBackGround);
-  formData.append("tbs_user_id", sessionStorage.getItem("USER_ID"));
+
 
   console.log(updatedata, "ADD_UPDATE_OFFERS_DATA");
   const url = updatedata
@@ -202,12 +209,12 @@ export const ChangeRedeemStatus = async (
     status:
       id === 2 ? "Active" : id === 3 ? "Hold" : id === 4 ? "Rejected" : "",
     status_id: id,
-    comments: cmnt,
+    comments:id === 2 ? null : cmnt,
   };
 
   const url = `${apiUrl}/request-management-offer/${currentid}`;
   const method = "put";
-
+  console.log(payload, "commentresponse");
   try {
     const response = await api({
       method,
@@ -219,7 +226,7 @@ export const ChangeRedeemStatus = async (
     });
     toast.success("Status Updated");
     GetRedeemOffersData(dispatch, filterid);
-    console.log(response, "responseresponse");
+    
     return response.data;
   } catch (error) {
     handleError(error);

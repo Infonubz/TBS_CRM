@@ -59,9 +59,9 @@ const validationSchema = Yup.object().shape({
     .matches(/^[A-Za-z\s]+$/, "contains only letters and spaces").max(50,"Maximum 50 characters only"),
   qualification: Yup.string()
     .required("Qualification is required")
-    .matches(/^[A-Za-z\s]+$/, "contains only letters and spaces")
-    .min(3,"Minimum 3 characters long")
-    .max(50,"Maximum 50 characters only"),
+    // .matches(/^[A-Za-z\s]+$/, "contains only letters and spaces")
+    // .min(3,"Minimum 3 characters long")
+    // .max(50,"Maximum 50 characters only"),
 });
 
 export default function AddProfessionalDetails({
@@ -187,6 +187,93 @@ export default function AddProfessionalDetails({
 
   const RolesOptions = [defaultRolesData,...getEmpRoles]
 
+  const Qualificationval = [
+    { value: "Primary School Certificate", label: "Primary School Certificate" },
+    { value: "Secondary School Certificate (SSC)", label: "Secondary School Certificate (SSC)" },
+    { value: "High School Certificate (HSC)", label: "High School Certificate (HSC)" },
+    { value: "Bachelor of Arts (BA)", label: "Bachelor of Arts (BA)" },
+    { value: "Bachelor of Science (BSc)", label: "Bachelor of Science (BSc)" },
+    { value: "Bachelor of Commerce (BCom)", label: "Bachelor of Commerce (BCom)" },
+    { value: "Bachelor of Engineering (BE)", label: "Bachelor of Engineering (BE)" },
+    { value: "Bachelor of Technology (BTech)", label: "Bachelor of Technology (BTech)" },
+    { value: "Bachelor of Business Administration (BBA)", label: "Bachelor of Business Administration (BBA)" },
+    { value: "Bachelor of Computer Applications (BCA)", label: "Bachelor of Computer Applications (BCA)" },
+    { value: "Bachelor of Fine Arts (BFA)", label: "Bachelor of Fine Arts (BFA)" },
+    { value: "Bachelor of Architecture (BArch)", label: "Bachelor of Architecture (BArch)" },
+    { value: "Bachelor of Education (BEd)", label: "Bachelor of Education (BEd)" },
+    { value: "Bachelor of Law (LLB)", label: "Bachelor of Law (LLB)" },
+    { value: "Master of Arts (MA)", label: "Master of Arts (MA)" },
+    { value: "Master of Science (MSc)", label: "Master of Science (MSc)" },
+    { value: "Master of Commerce (MCom)", label: "Master of Commerce (MCom)" },
+    { value: "Master of Business Administration (MBA)", label: "Master of Business Administration (MBA)" },
+    { value: "Master of Technology (MTech)", label: "Master of Technology (MTech)" },
+    { value: "Master of Computer Applications (MCA)", label: "Master of Computer Applications (MCA)" },
+    { value: "Master of Fine Arts (MFA)", label: "Master of Fine Arts (MFA)" },
+    { value: "Master of Architecture (MArch)", label: "Master of Architecture (MArch)" },
+    { value: "Master of Education (MEd)", label: "Master of Education (MEd)" },
+    { value: "Master of Law (LLM)", label: "Master of Law (LLM)" },
+    { value: "Doctor of Philosophy (PhD)", label: "Doctor of Philosophy (PhD)" },
+    { value: "Doctor of Medicine (MD)", label: "Doctor of Medicine (MD)" },
+    { value: "Doctor of Education (EdD)", label: "Doctor of Education (EdD)" },
+    { value: "Chartered Accountant (CA)", label: "Chartered Accountant (CA)" },
+    { value: "Company Secretary (CS)", label: "Company Secretary (CS)" },
+    { value: "Cost and Management Accountant (CMA)", label: "Cost and Management Accountant (CMA)" },
+    { value: "Bachelor of Medicine, Bachelor of Surgery (MBBS)", label: "Bachelor of Medicine, Bachelor of Surgery (MBBS)" },
+    { value: "Bachelor of Dental Surgery (BDS)", label: "Bachelor of Dental Surgery (BDS)" },
+    { value: "Bachelor of Pharmacy (BPharm)", label: "Bachelor of Pharmacy (BPharm)" },
+    { value: "Master of Pharmacy (MPharm)", label: "Master of Pharmacy (MPharm)" },
+    { value: "Diplomate of National Board (DNB)", label: "Diplomate of National Board (DNB)" },
+    { value: "Diploma in Engineering", label: "Diploma in Engineering" },
+    { value: "Postgraduate Diploma in Management (PGDM)", label: "Postgraduate Diploma in Management (PGDM)" },
+    { value: "Certificate in Computer Applications", label: "Certificate in Computer Applications" },
+    { value: "Advanced Diploma in Software Engineering", label: "Advanced Diploma in Software Engineering" },
+    { value: "Diploma in Nursing", label: "Diploma in Nursing" },
+    { value: "Diploma in Education (DEd)", label: "Diploma in Education (DEd)" }
+]
+// const getQualification = Qualificationval?.map((value,ind) =>({
+//   value: value.value,
+//   label: (
+//     <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+//       {value.label}
+//     </div>
+//   ),
+//   id:ind
+
+// }))
+
+const getQualification = Qualificationval?.map((value, ind) => ({
+  value: value.value,
+  label: (
+    <div
+      className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]"
+      title={value.label} // This will show full text on hover
+      style={{
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        maxWidth: '28ch', // Ensure truncation if text is too long
+      }}
+    >
+      {value.label?.length > 28 ? `${value.label.substring(0, 28)}...` : value.label}
+    </div>
+  ),
+  id: ind,
+}));
+
+ const defaultQualification = {
+    value: '',
+    label: (
+      <div className="text-[1vw] px-[0.2vw] pb-[0.1vw] text-gray-400">
+        Select Qualification
+      </div>
+    ),
+    disabled: true,
+  };
+
+  const qualOption = [defaultQualification,...getQualification]
+  
+
+
   useEffect(() => {
     GetRoles();
   }, []);
@@ -194,7 +281,7 @@ export default function AddProfessionalDetails({
   return (
     <div className="mt-[1.5vw] relative">
         <div className="w-[5vw]  h-[5vw] bg-white shadow-lg rounded-full absolute left-[16.6vw] top-[-2.5vw] flex justify-center items-center z-[1]"><img className="" src={umbuslogo} alt="buslogo"/></div>
-      <div className="border-l-[0.1vw] px-[2vw]  h-[28vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f]">
+      <div className="border-l-[0.1vw] pl-[2vw] pr-[1.5vw]  h-[28vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f]">
         <div className="h-[4vw] w-full flex items-center justify-between ">
           <label className="text-[1.5vw] font-semibold text-[#1f4b7f] ">
             Professional Details
@@ -267,7 +354,7 @@ export default function AddProfessionalDetails({
                 ) : (
                 <div className="gap-y-[1.5vw] flex-col flex">
                   <div className="overflow-y-scroll gap-y-[1.5vw] flex-col flex h-[18vw] pb-[1vw] ">
-                  <div className="grid grid-cols-2 w-full gap-x-[2vw]">
+                  <div className="grid grid-cols-2 w-full gap-x-[2vw] pr-[.5vw]">
               
                     <div className="col-span-1 relative">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
@@ -363,7 +450,7 @@ export default function AddProfessionalDetails({
                             Select: {
                               optionActiveBg: '#aebed1',
                               optionSelectedColor: '#FFF',
-                              optionSelectedBg: '#aebed1',
+                              optionSelectedBg: '#e5e5e5',
                               optionHeight: '2',
                             },
                           },
@@ -390,7 +477,7 @@ export default function AddProfessionalDetails({
                           name="role"
                           className={`${updatedata && empproffesionaldata.designation !=null || documentback
                             ? enable == false
-                              ? " cursor-not-allowed"
+                              ? " cursor-not-allowed bg-[#FAFAFA]"
                               : ""
                             : ""
                             } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
@@ -415,7 +502,7 @@ export default function AddProfessionalDetails({
                       />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 w-full umselect gap-x-[2vw]">
+                  <div className="grid grid-cols-2 w-full umselect gap-x-[2vw] pr-[.5vw]">
                   <div className="col-span-1 relative">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         Department
@@ -554,7 +641,7 @@ export default function AddProfessionalDetails({
                       />
                     </div> */}
                   </div>
-                  <div className="grid grid-cols-2 w-full gap-x-[2vw]">
+                  <div className="grid grid-cols-2 w-full gap-x-[2vw] pr-[.5vw]">
                     {/* <div className="col-span-1">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         Year of Experiance
@@ -661,7 +748,7 @@ export default function AddProfessionalDetails({
                       />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 w-full gap-x-[2vw]">
+                  <div className="grid grid-cols-2 w-full gap-x-[2vw] pr-[.5vw]">
                     <div className="col-span-1 relative">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         Qualification
@@ -669,7 +756,7 @@ export default function AddProfessionalDetails({
                           *
                         </span>
                       </label>
-                      <Field
+                      {/* <Field
                         type="text"
                         name="qualification"
                         autoComplete="off"
@@ -689,7 +776,58 @@ export default function AddProfessionalDetails({
                               : ""
                             : ""
                         } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
-                      />
+                      /> */}
+                              <ConfigProvider
+                        theme={{
+                          components: {
+                            Select: {
+                              optionActiveBg: '#aebed1',
+                              optionSelectedColor: '#FFF',
+                              optionSelectedBg: '#e5e5e5',
+                              optionHeight: '2',
+                            },
+                          },
+                        }}
+                      >
+                        <Select
+                          showSearch
+                          value={values.qualification || ""}
+                          placement="topRight"
+                          listHeight={190}
+                          onChange={(value,id) => {
+                            handleChange({ target: { name: 'qualification', value } })
+                            console.log(id.id,"idididisdfsdf");
+                            setCurrentRoleId(id.id)
+                            
+                          }}
+                          disabled={
+                            updatedata && empproffesionaldata.designation !=null || documentback
+                              ? enable
+                                ? false
+                                : true
+                              : false
+                          }
+                          name="role"
+                          className={`${updatedata && empproffesionaldata.designation !=null || documentback
+                            ? enable == false
+                              ? " cursor-not-allowed bg-[#FAFAFA]"
+                              : ""
+                            : ""
+                            } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          // className="custom-select bg-white outline-none w-full mt-[0.5vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
+                          placeholder="Select role"
+                          filterOption={(input, option) => 
+                            option?.value?.toLowerCase()?.includes(input.toLowerCase()) // Make it case-insensitive
+                          }
+                          optionFilterProp="value"
+                          suffixIcon={<span style={{ fontSize: '1vw', color: '#1f487c' }}>
+                            <IoMdArrowDropup size="2vw" />
+                          </span>}
+                          style={{ padding: 4 }}
+                          options={qualOption}
+                             
+                        />
+                      </ConfigProvider>
                       <ErrorMessage
                         name="qualification"
                         component="div"

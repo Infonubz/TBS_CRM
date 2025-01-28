@@ -29,9 +29,9 @@ const validationSchema = Yup.object().shape({
         .matches(/^[^!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+$/, 'Special characters are not allowed'),
     password: Yup.string(),
     aadhar: Yup.string()
-        .matches(/^[0-9]{12}$/, "Aadhar number must be exactly 12 digits")
-        .required("Aadhar Number is required")
-        .max(12, "Aadhar number must be exactly 12 digits"),
+        .matches(/^[0-9]{12}$/, "Aadhaar number must be exactly 12 digits")
+        .required("Aadhaar Number is required")
+        .max(12, "Aadhaar number must be exactly 12 digits"),
     pan: Yup.string()
         .matches(
             /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
@@ -219,7 +219,7 @@ const CompanyProfile = ({ fileList, isEdit, setIsEdit }) => {
                             </div>
                             <div className=''>
                                 <label className="text-[#1F4B7F] text-[1vw] font-bold">
-                                    Aadhar Card Number
+                                Aadhaar Card Number
                                 </label>
                                 <span className="text-red-500 text-[1vw] pl-[0.2vw]">
                                     *
@@ -229,7 +229,7 @@ const CompanyProfile = ({ fileList, isEdit, setIsEdit }) => {
                                         type="text"
                                         id="aadhar"
                                         name="aadhar"
-                                        placeholder='Enter your Aadhar Number'
+                                        placeholder='Enter your Aadhaar Number'
                                         onChange={(e) => {
                                             handleChange(e);
                                         }}

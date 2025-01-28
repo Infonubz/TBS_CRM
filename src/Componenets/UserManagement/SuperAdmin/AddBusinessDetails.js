@@ -151,11 +151,30 @@ export default function AddBusinessDetails({
   const businessOptions = [defaultBusinessData, ...getBusinessData]
 
 
-  const getCurrencyOptions = CurrencyData.map(currency => ({
+  // const getCurrencyOptions = CurrencyData.map(currency => ({
+  //   value: currency.code,
+  //   label: (
+  //     <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
+  //       {currency.value}
+  //     </div>
+  //   ),
+  //   search: currency.value
+  // }));
+
+  const getCurrencyOptions = CurrencyData?.map((currency) => ({
     value: currency.code,
     label: (
-      <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
-        {currency.value}
+      <div
+        className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]"
+        title={currency.value} // This will show full text on hover
+        style={{
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          maxWidth: '28ch', // Ensure truncation if text is too long
+        }}
+      >
+        {currency.value?.length > 28 ? `${currency.value.substring(0, 28)}...` : currency.value}
       </div>
     ),
     search: currency.value
@@ -302,7 +321,7 @@ export default function AddBusinessDetails({
                               Select: {
                                 optionActiveBg: '#aebed1',
                                 optionSelectedColor: '#FFF',
-                                optionSelectedBg: '#aebed1',
+                                optionSelectedBg: '#e5e5e5',
                                 optionHeight: '2',
                               },
                             },
@@ -331,7 +350,7 @@ export default function AddBusinessDetails({
                             listHeight={190}
                             className={`${updatedata && superadminbusinessdata.msme_number !=null || documentback
                               ? enable == false
-                                ? " cursor-not-allowed"
+                                ? " cursor-not-allowed bg-[#FAFAFA]"
                                 : ""
                               : ""
                               } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
@@ -446,7 +465,7 @@ export default function AddBusinessDetails({
                               Select: {
                                 optionActiveBg: '#aebed1',
                                 optionSelectedColor: '#FFF',
-                                optionSelectedBg: '#aebed1',
+                                optionSelectedBg: '#e5e5e5',
                                 optionHeight: '2',
                               },
                             },
@@ -545,7 +564,7 @@ export default function AddBusinessDetails({
                               Select: {
                                 optionActiveBg: '#aebed1',
                                 optionSelectedColor: '#FFF',
-                                optionSelectedBg: '#aebed1',
+                                optionSelectedBg: '#e5e5e5',
                                 optionHeight: '2',
                               },
                             },
@@ -574,7 +593,7 @@ export default function AddBusinessDetails({
                             listHeight={190}
                             className={`${updatedata && superadminbusinessdata.msme_number !=null || documentback
                               ? enable == false
-                                ? " cursor-not-allowed"
+                                ? " cursor-not-allowed bg-[#FAFAFA]"
                                 : ""
                               : ""
                               } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
@@ -739,7 +758,7 @@ export default function AddBusinessDetails({
                               Select: {
                                 optionActiveBg: '#aebed1',
                                 optionSelectedColor: '#FFF',
-                                optionSelectedBg: '#aebed1',
+                                optionSelectedBg: '#e5e5e5',
                                 optionHeight: '2',
                               },
                             },
@@ -769,7 +788,7 @@ export default function AddBusinessDetails({
                             placement="topRight"
                             className={`${updatedata && superadminbusinessdata.msme_number !=null || documentback
                               ? enable == false
-                                ? " cursor-not-allowed"
+                                ? " cursor-not-allowed bg-[#FAFAFA]"
                                 : ""
                               : ""
                               } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
@@ -861,7 +880,7 @@ export default function AddBusinessDetails({
                           className="text-red-500 text-[0.8vw] absolute left-[.2vw] bottom-[-1.2vw]"
                         />
                       </div>
-                      <div className="col-span-1 relative ">
+                      <div className="col-span-1 relative umselect ">
                         <label className="text-[#1F4B7F] text-[1.1vw] ">
                           Currency Code
                           <span className="text-[1vw] text-red-600 pl-[0.2vw]">
@@ -912,7 +931,7 @@ export default function AddBusinessDetails({
                               Select: {
                                 optionActiveBg: '#aebed1',
                                 optionSelectedColor: '#FFF',
-                                optionSelectedBg: '#aebed1',
+                                optionSelectedBg: '#e5e5e5',
                                 optionHeight: '2',
                               },
                               searchInput: {

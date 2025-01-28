@@ -968,8 +968,10 @@ import { IoMdMenu } from "react-icons/io";
 import { RiComputerFill } from "react-icons/ri";
 import AdsListView from "./AdsListView";
 import AdsGridView from "./AdsGridView";
+import { useLocation } from "react-router";
 
 export default function Advertisement() {
+  const location = useLocation()
   const [isView, setIsView] = useState('List')
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentAd, setCurrentAd] = useState({});
@@ -981,14 +983,18 @@ export default function Advertisement() {
   const [openPopovers, setOpenPopovers] = useState({});
   const [toggleDelete, settoggleDelete] = useState(false);
   const [deleteData, SetDeleteData] = useState();
-  const [tabType, setTabType] = useState("Web");
+  const [tabType, setTabType] = useState(location?.state?.tabIndex || "Web");
   const [showPagenation,setShowPagenation]= useState(false)
   const apiUrl = process.env.REACT_APP_API_URL;
   const getadlist = useSelector((state) => state.crm.ad_list);
   const getMobileadlist = useSelector((state) => state.crm.mobile_adsList);
+ 
 
 
+useEffect(()=>{
+  setTabType(location?.state?.tabIndex || "Web")
 
+},[location.state])
 console.log(getadlist,"listofads");
 
 
@@ -1553,6 +1559,26 @@ console.log(getadlist,"listofads");
 
   },[currentItems,mobileAds])
 
+  const handleKeyDown = (e) => {
+    // Allow control keys like Backspace, Delete, ArrowLeft, ArrowRight, Tab
+    const isControlKey = [
+      "Backspace",
+      "Tab",
+      "ArrowLeft",
+      "ArrowRight",
+      "Delete",
+    ].includes(e.key);
+  
+    if (isControlKey) {
+      return; // If it's a control key, do nothing and allow it to execute
+    }
+  
+    // Allow only alphabets (A-Z, a-z), numbers (0-9), and space
+    if (!/^[A-Za-z0-9\s]$/.test(e.key)) {
+      e.preventDefault(); // Prevent the key if it's not an alphabet, number, or space
+    }
+  };
+
   return (
     <>
       <div
@@ -1596,6 +1622,7 @@ console.log(getadlist,"listofads");
                     type="text"
                     className="bg-white outline-none pl-[2vw] w-[17.25vw] h-[5vh] text-[#1F4B7F] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.3vw] border-b-[0.3vw]"
                     placeholder="Search Ads"
+                    onKeyDown={handleKeyDown}
                     onChange={(e) => {
                       Search(e);
                     }}

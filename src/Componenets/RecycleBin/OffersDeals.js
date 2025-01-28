@@ -61,12 +61,20 @@ export default function OffersDeals({
               >
                 <p className="text-[1vw]">
                   {" "}
-                  {`${capitalizeFirstLetter(row?.deleted_data.offer_name?.slice(0, 15))}...`}
+                  <span>
+                    {`${row?.deleted_data?.offer_name?.charAt(0) === row?.deleted_data?.offer_name?.charAt(0).toLowerCase()
+                      ? capitalizeFirstLetter(row?.deleted_data?.offer_name.slice(0, 15))
+                      : row?.deleted_data?.offer_name.slice(0, 15)}...`}
+                  </span>
                 </p>
               </Tooltip>
             ) : (
               <h1 className="text-[1vw] font-bold">
-                {capitalizeFirstLetter(row?.deleted_data.offer_name?.slice(0, 15))}
+                <span>
+                  {row?.deleted_data?.offer_name?.charAt(0) === row?.deleted_data?.offer_name?.charAt(0).toLowerCase()
+                    ? capitalizeFirstLetter(row?.deleted_data?.offer_name.slice(0, 15))
+                    : row?.deleted_data?.offer_name.slice(0, 15)}
+                </span>
               </h1>
             )}
           </div>
@@ -101,34 +109,34 @@ export default function OffersDeals({
           //     </button>
           //   )}
           // </div>
-             <div className="flex items-center justify-center">
-                      {row?.deleted_data?.code?.length > 15 ? (
-                        <Tooltip
-                          placement="right"
-                          title={row?.deleted_data?.code}
-                          className="cursor-pointer"
-                          color="white"
-                          overlayInnerStyle={{
-                            color: "#1F487C",
-                          }}
-                        >
-                          <div className="border-[0.1vw] border-[#1F487C] rounded-[0.5vw]">
-                            <div className="border-dashed text-[1vw] bg-[#1F4B7F] border-white border-[0.2vw] rounded-[0.5vw] text-white w-[10vw] flex items-center justify-center">
-                              {`${row?.deleted_data?.code?.slice(0, 15)}...`}{" "}
-                            </div>
-                          </div>
-                        </Tooltip>
-                      ) : (
-                        <div className="border-[0.1vw] border-[#1F487C] rounded-[0.5vw]">
-                          <div className="border-dashed text-[1.1vw] bg-[#1F4B7F] border-white border-[0.2vw] rounded-[0.5vw] text-white w-[10vw] flex items-center justify-center ">
-                            {row?.deleted_data?.code?.slice(0, 15)}
-                          </div>
-                        </div>
-                      )}
-                      {/* <button className="border-dashed text-[1.1vw] bg-[#1F4B7F] border-white border-[0.2vw] rounded-[0.5vw] text-white w-[14vw] ">
+          <div className="flex items-center justify-center">
+            {row?.deleted_data?.code?.length > 15 ? (
+              <Tooltip
+                placement="right"
+                title={row?.deleted_data?.code}
+                className="cursor-pointer"
+                color="white"
+                overlayInnerStyle={{
+                  color: "#1F487C",
+                }}
+              >
+                <div className="border-[0.1vw] border-[#1F487C] rounded-[0.5vw]">
+                  <div className="border-dashed text-[1vw] bg-[#1F4B7F] border-white border-[0.2vw] rounded-[0.5vw] text-white w-[10vw] flex items-center justify-center">
+                    {`${row?.deleted_data?.code?.slice(0, 15)}...`}{" "}
+                  </div>
+                </div>
+              </Tooltip>
+            ) : (
+              <div className="border-[0.1vw] border-[#1F487C] rounded-[0.5vw]">
+                <div className="border-dashed text-[1.1vw] bg-[#1F4B7F] border-white border-[0.2vw] rounded-[0.5vw] text-white w-[10vw] flex items-center justify-center ">
+                  {row?.deleted_data?.code?.slice(0, 15)}
+                </div>
+              </div>
+            )}
+            {/* <button className="border-dashed text-[1.1vw] bg-[#1F4B7F] border-white border-[0.2vw] rounded-[0.5vw] text-white w-[14vw] ">
                         {row.code}
                       </button> */}
-                    </div>
+          </div>
         );
       },
     },
@@ -193,17 +201,16 @@ export default function OffersDeals({
         return (
           <div className="flex justify-center  text-[#1F4B7F] ">
             <button
-              className={`${
-                row.deleted_data.status_id === 0
-                  ? "bg-[#646262]"
-                  : row.deleted_data.status_id === 1
+              className={`${row.deleted_data.status_id === 0
+                ? "bg-[#646262]"
+                : row.deleted_data.status_id === 1
                   ? "bg-[#FF9900]"
                   : row.deleted_data.status_id === 2
-                  ? "bg-[#38ac2c]"
-                  : row.deleted_data.status_id === 3
-                  ? "bg-[#2A99FF]"
-                  : "bg-[#FD3434]"
-              } h-[1.8vw] shadow-md shadow-[black] font-extrabold text-[1vw] cursor-not-allowed text-white w-[7vw] rounded-[0.5vw]`}
+                    ? "bg-[#34AE2b]"
+                    : row.deleted_data.status_id === 3
+                      ? "bg-[#2A99FF]"
+                      : "bg-[#FD3434]"
+                } h-[1.8vw] shadow-md shadow-[black] font-extrabold text-[1vw] cursor-not-allowed text-white w-[7vw] rounded-[0.5vw]`}
             >
               {row.deleted_data.status}
             </button>
@@ -278,7 +285,7 @@ export default function OffersDeals({
           title={
             <>
               want to delete{" "}
-              <span style={{ fontWeight: "bold" }}>{rowName}</span> offer
+              <span style={{ fontWeight: "bold" }}>{capitalizeFirstLetter(rowName)}</span> offer
               Permenantly
             </>
           }
@@ -300,7 +307,7 @@ export default function OffersDeals({
           title={
             <>
               want to restore{" "}
-              <span style={{ fontWeight: "bold" }}>{rowName}</span> offer
+              <span style={{ fontWeight: "bold" }}>{capitalizeFirstLetter(rowName)}</span> offer
             </>
           }
           id={tbsId}

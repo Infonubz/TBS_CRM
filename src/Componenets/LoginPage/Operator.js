@@ -4,6 +4,7 @@ import Operator_bg from "../../asserts/Operator-bg.png";
 import logo from "../../asserts/crmlogo.png";
 import OperatorForgotPassword from "../ForgotPassword/Operator";
 import Operator from "../Login/Operator";
+import ProductOwnerForgotPassword from "../ForgotPassword/ProductOwner";
 
 export default function OperatorLoginPage({ setAuthtoken }) {
 
@@ -41,8 +42,14 @@ export default function OperatorLoginPage({ setAuthtoken }) {
                 setForgotPassword={setForgotPassword}
               />
             ) : (
-              <OperatorForgotPassword
-                setForgotPassword={setForgotPassword}
+              // <OperatorForgotPassword
+              //   setForgotPassword={setForgotPassword}
+              //   typeID={"OP101"}
+
+              // />
+              <ProductOwnerForgotPassword 
+              setForgotPassword={setForgotPassword}
+              typeID={"OP101"}
               />
             )}
           </div>

@@ -7,10 +7,12 @@ const api = axios.create({
   },
 });
 const apiUrl = process.env.REACT_APP_API_URL;
+const user = sessionStorage.getItem("USER_ID");
 
 export const GetClientData = async (dispatch) => {
   try {
-    const response = await api.get(`${apiUrl}/All-client-details`);
+    // const response = await api.get(`${apiUrl}/All-client-details`);
+    const response = await api.get(`${apiUrl}/client-details-userId/${user}`);
     dispatch({ type: CLIENT_DATA, payload: response.data });
     return response.data;
   } catch (error) {
@@ -22,7 +24,7 @@ export const GetClientData = async (dispatch) => {
 export const handleClientSearch = async (e, dispatch) => {
   try {
     if (e.target.value) {
-      const response = await api.get(`${apiUrl}/client-search/${e.target.value}`);
+      const response = await api.get(`${apiUrl}/client-search/${user}/${e.target.value}`);
       dispatch({ type: CLIENT_DATA, payload: response.data })
       return response.data[0];
     }
@@ -37,6 +39,7 @@ export const handleClientSearch = async (e, dispatch) => {
 export const SubmitClientExcel = async (file) => {
   const formData = new FormData();
   formData.append("file", file);
+  formData.append("tbs_user_id",user)
 
   const excelEndpoint = `${apiUrl}/upload`;
   const method = "post";
@@ -91,6 +94,7 @@ export const submitClientComapanyData = async (
   formData.append("type_of_constitution", companyvalues.constitution);
   formData.append("business_background", companyvalues.business);
   formData.append("web_url", companyvalues.web_url);
+  formData.append("tbs_user_id",user)
   if (fileList[0]?.originFileObj) {
     formData.append("company_logo", fileList[0].originFileObj);
 }
@@ -456,6 +460,7 @@ export const ClientStatusUpdateApi = async (
   valueid,
   value,
   currentid,
+  setSpinning,
   dispatch
 ) => {
   const payload = {
@@ -481,6 +486,9 @@ export const ClientStatusUpdateApi = async (
   } catch (error) {
     handleError(error);
     return null;
+  }
+  finally{
+    setSpinning && setSpinning(false)
   }
 };
 

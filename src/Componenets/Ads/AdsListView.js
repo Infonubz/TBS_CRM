@@ -124,7 +124,25 @@ const AdsListView = ({
           <div>
             <div className="flex">
               <h1 className="text-[1.25vw] text-[#1F4B7F] font-bold uppercase">
-                {row?.client_details}
+                {
+                  row?.client_details?.length > 15 ? (
+                    <Tooltip color="white"
+                      overlayInnerStyle={{ color: "#1F4B7F" }} title={capitalizeFirstLetter(row?.client_details)}>
+                      <span>
+                        {`${row?.client_details?.charAt(0) === row?.client_details?.charAt(0)?.toLowerCase()
+                          ? capitalizeFirstLetter(row?.client_details).slice(0, 15)
+                          : row?.client_details?.slice(0, 15)}...`}
+                      </span>
+
+                    </Tooltip>
+                  ) : (
+                    <span>
+                      {row?.client_details?.charAt(0) === row?.client_details?.charAt(0)?.toLowerCase()
+                        ? capitalizeFirstLetter(row?.client_details)
+                        : row?.client_details}
+                    </span>
+                  )
+                }
               </h1>
             </div>
             <div className="flex items-center  gap-x-[0.5vw]">
@@ -180,14 +198,14 @@ const AdsListView = ({
                     {/* <div className="text-[1vw] text-[#1F4B7F] ">
                       {`${row?.emailid?.slice(0, 25)}...`}
                     </div> */}
-                     <div className="flex items-center gap-x-[0.5vw]">
-                    <span className="flex items-center ">
-                      <MdMail size={"1vw"} color="#1F4B7F" />
-                    </span>
-                    <p className="text-[1vw] text-[#1F4B7F]">
-                      {`${row?.emailid?.slice(0, 20)}...`}
-                    </p>
-                  </div>
+                    <div className="flex items-center gap-x-[0.5vw]">
+                      <span className="flex items-center ">
+                        <MdMail size={"1vw"} color="#1F4B7F" />
+                      </span>
+                      <p className="text-[1vw] text-[#1F4B7F]">
+                        {`${row?.emailid?.slice(0, 20)}...`}
+                      </p>
+                    </div>
                   </Tooltip>
                 ) : (
                   <div className="flex items-center gap-x-[0.5vw]">
@@ -229,12 +247,18 @@ const AdsListView = ({
                     color="#1F487C"
                   >
                     <div className="text-[1.1vw] text-[#1F4B7F]  uppercase">
-                      {`${row?.ad_title?.slice(0, 15)}...`}
+                      {`${row?.ad_title?.charAt(0) === row?.ad_title?.charAt(0).toLowerCase()
+                        ? capitalizeFirstLetter(row?.ad_title).slice(0, 15)
+                        : row?.ad_title?.slice(0, 15)}...`}
                     </div>
                   </Tooltip>
                 ) : (
                   <div className="text-[1.1vw] text-[#1F4B7F] uppercase">
-                    {row?.ad_title?.slice(0, 15)}
+                    {
+                      row?.ad_title?.charAt(0) === row?.ad_title?.charAt(0).toLowerCase()
+                        ? capitalizeFirstLetter(row?.ad_title).slice(0, 15)
+                        : row?.ad_title?.slice(0, 15)
+                    }
                   </div>
                 )}
               </div>
@@ -272,12 +296,12 @@ const AdsListView = ({
             <div className="pt-[1vw] flex flex-col items-end content-end">
               <button
                 className={`${row?.ads_status_id == 2
-                    ? "bg-[#34AE2A]"
-                    : row?.ads_status_id == 4
-                      ? "bg-[#FD3434]"
-                      : row?.ads_status_id == 1
-                        ? "bg-[#FF9900]"
-                        : row?.ads_status_id == 3 ? "bg-[#2A99FF]" : "bg-[#646262]"
+                  ? "bg-[#34AE2A]"
+                  : row?.ads_status_id == 4
+                    ? "bg-[#FD3434]"
+                    : row?.ads_status_id == 1
+                      ? "bg-[#FF9900]"
+                      : row?.ads_status_id == 3 ? "bg-[#2A99FF]" : "bg-[#646262]"
                   } rounded-t-xl text-[1.1vw] font-semibold w-[11vw] text-white px-[1vw] `}
               >
                 {capitalizeFirstLetter(row?.ads_status)}
@@ -329,6 +353,7 @@ const AdsListView = ({
               <FontAwesomeIcon
                 icon={faEllipsisVertical}
                 color="#1f487c"
+                className="cursor-pointer"
                 style={{
                   height: "1.25vw",
                   width: "1.25vw",
@@ -462,20 +487,20 @@ const AdsListView = ({
                     {/* <div className="text-[1vw] text-[#1F4B7F] ">
                       {`${row?.emailid?.slice(0, 20)}...`}
                     </div> */}
-                      <div className="flex items-center gap-x-[0.5vw]">
-                    <span className="flex items-center ">
-                      <MdMail size={"1vw"} color="#1F4B7F" />
-                    </span>
-                    <p className="text-[1vw] text-[#1F4B7F]">
-                      {`${row?.emailid?.slice(0, 20)}...`}
-                    </p>
-                  </div>
+                    <div className="flex items-center gap-x-[0.5vw]">
+                      <span className="flex items-center ">
+                        <MdMail size={"1vw"} color="#1F4B7F" />
+                      </span>
+                      <p className="text-[1vw] text-[#1F4B7F]">
+                        {`${row?.emailid?.slice(0, 20)}...`}
+                      </p>
+                    </div>
                   </Tooltip>
                 ) : (
                   // <div className="text-[1vw] text-[#1F4B7F]">
                   //   {row?.emailid?.slice(0, 20)}
                   // </div>
-                    <div className="flex items-center gap-x-[0.5vw]">
+                  <div className="flex items-center gap-x-[0.5vw]">
                     <span className="flex items-center ">
                       <MdMail size={"1vw"} color="#1F4B7F" />
                     </span>
@@ -626,124 +651,125 @@ const AdsListView = ({
         //   </div>
         // </div>
         <div className="w-full flex gap-x-[0.25vw] h-[21.4vh] justify-between   ">
-        <div className="order-first flex flex-col justify-between">
-          <div className="pt-[1vw] h-[16vh]  justify-center content-center items-center">
-            <div className="flex w-full justify-between items-center font-bold pt-[.5vw]">
-              {row?.mobad_title?.length > 15 ? (
-                <Tooltip
-                  placement="top"
-                  title={row?.mobad_title}
-                  className="cursor-pointer"
-                  color="#1F487C"
-                >
-                  <div className="text-[1.1vw] text-[#1F4B7F]  uppercase">
-                    {`${row?.mobad_title?.slice(0, 15)}...`}
-                  </div>
-                </Tooltip>
-              ) : (
-                <div className="text-[1.1vw] text-[#1F4B7F] uppercase">
-                  {row?.mobad_title?.slice(0, 15)}
-                </div>
-              )}
-            </div>
-            <div>
-              <p className="text-[0.9vw] pt-[0.25vw] text-[#1F4B7F] ">
-                {row?.mobad_description?.length > 20 ? (
+          <div className="order-first flex flex-col justify-between">
+            <div className="pt-[1vw] h-[16vh]  justify-center content-center items-center">
+              <div className="flex w-full justify-between items-center font-bold pt-[.5vw]">
+                {row?.mobad_title?.length > 15 ? (
                   <Tooltip
-                    placement="bottom"
-                    title={row?.mobad_description}
+                    placement="top"
+                    title={row?.mobad_title}
                     className="cursor-pointer"
                     color="#1F487C"
                   >
-                    <div className="text-[1vw] text-[#1F4B7F] ">
-                      {`${row?.mobad_description?.slice(0, 20)}...`}
+                    <div className="text-[1.1vw] text-[#1F4B7F]  uppercase">
+                      {`${row?.mobad_title?.slice(0, 15)}...`}
                     </div>
                   </Tooltip>
                 ) : (
-                  <div className="text-[0.9vw] text-[#1F4B7F] ">
-                    {row?.mobad_description?.slice(0, 20)}
+                  <div className="text-[1.1vw] text-[#1F4B7F] uppercase">
+                    {row?.mobad_title?.slice(0, 15)}
                   </div>
                 )}
-              </p>
+              </div>
+              <div>
+                <p className="text-[0.9vw] pt-[0.25vw] text-[#1F4B7F] ">
+                  {row?.mobad_description?.length > 20 ? (
+                    <Tooltip
+                      placement="bottom"
+                      title={row?.mobad_description}
+                      className="cursor-pointer"
+                      color="#1F487C"
+                    >
+                      <div className="text-[1vw] text-[#1F4B7F] ">
+                        {`${row?.mobad_description?.slice(0, 20)}...`}
+                      </div>
+                    </Tooltip>
+                  ) : (
+                    <div className="text-[0.9vw] text-[#1F4B7F] ">
+                      {row?.mobad_description?.slice(0, 20)}
+                    </div>
+                  )}
+                </p>
+              </div>
+              <div className="flex items-center pt-[0.5vw] gap-x-[0.5vw]">
+                <span>
+                  <MdDateRange size={"1vw"} color="#1F4B7F" />
+                </span>
+                <p className="text-[0.9vw]  font-semibold text-[#1F4B7F] ">
+                  {`${dayjs(row?.start_date).format("DD MMM, YY")}`} -{" "}
+                  {`${dayjs(row?.end_date).format("DD MMM, YY")}`}
+                </p>
+              </div>
             </div>
-            <div className="flex items-center pt-[0.5vw] gap-x-[0.5vw]">
-              <span>
-                <MdDateRange size={"1vw"} color="#1F4B7F" />
-              </span>
-              <p className="text-[0.9vw]  font-semibold text-[#1F4B7F] ">
-                {`${dayjs(row?.start_date).format("DD MMM, YY")}`} -{" "}
-                {`${dayjs(row?.end_date).format("DD MMM, YY")}`}
-              </p>
-            </div>
-          </div>
-          {/* <div className="  absolute bottom-[-0.2vw]"> */}
-          <div className="pt-[1vw] flex flex-col items-end content-end">
-            <button
-              className={`${row?.ads_status_id == 2
+            {/* <div className="  absolute bottom-[-0.2vw]"> */}
+            <div className="pt-[1vw] flex flex-col items-end content-end">
+              <button
+                className={`${row?.ads_status_id == 2
                   ? "bg-[#34AE2A]"
                   : row?.ads_status_id == 4
                     ? "bg-[#FD3434]"
                     : row?.ads_status_id == 1
                       ? "bg-[#FF9900]"
                       : row?.ads_status_id == 3 ? "bg-[#2A99FF]" : "bg-[#646262]"
-                } rounded-t-xl text-[1.1vw] font-semibold w-[11vw] text-white px-[1vw] `}
-            >
-              {capitalizeFirstLetter(row?.ads_status)}
-            </button>
+                  } rounded-t-xl text-[1.1vw] font-semibold w-[11vw] text-white px-[1vw] `}
+              >
+                {capitalizeFirstLetter(row?.ads_status)}
+              </button>
+            </div>
           </div>
-        </div>
-        <div className="py-[1vw] order-last">
-          <Popover
-            placement="bottomRight"
-            content={
-              <div className="flex flex-col">
-                <div>
-                <a
+          <div className="py-[1vw] order-last">
+            <Popover
+              placement="bottomRight"
+              content={
+                <div className="flex flex-col">
+                  <div>
+                    <a
                       onClick={() => handleMbleEdit(row.tbs_mobad_id)}
                       className="flex items-center cursor-pointer text-[1vw] text-[#1F4B7F] hover:text-[#1f487c]"
                     >
-                    <FontAwesomeIcon
-                      icon={faEdit}
-                      className="mr-1"
-                      color="#1f487c"
-                    />
-                    Edit
-                  </a>
-                </div>
-                <div>
-                
-                <a
+                      <FontAwesomeIcon
+                        icon={faEdit}
+                        className="mr-1"
+                        color="#1f487c"
+                      />
+                      Edit
+                    </a>
+                  </div>
+                  <div>
+
+                    <a
                       onClick={() => {
                         handleMbleDelete(row.tbs_mobad_id)
                         setFieldName(row.mobad_title)
                       }}
                       className="flex pt-[1vw] items-center cursor-pointer text-[1vw] text-[#1F4B7F] hover:text-[#1f487c]"
                     >
-                    <FontAwesomeIcon
-                      icon={faTrash}
-                      className="mr-1"
-                      color="#1f487c"
-                    />
-                    Delete
-                  </a>
+                      <FontAwesomeIcon
+                        icon={faTrash}
+                        className="mr-1"
+                        color="#1f487c"
+                      />
+                      Delete
+                    </a>
+                  </div>
                 </div>
-              </div>
-            }
-            trigger="click"
-            open={openPopovers[row.tbs_mobad_id] || false}
-            onOpenChange={() => togglePopover(row.tbs_mobad_id)}
-          >
-            <FontAwesomeIcon
-              icon={faEllipsisVertical}
-              color="#1f487c"
-              style={{
-                height: "1.25vw",
-                width: "1.25vw",
-              }}
-            />
-          </Popover>
+              }
+              trigger="click"
+              open={openPopovers[row.tbs_mobad_id] || false}
+              onOpenChange={() => togglePopover(row.tbs_mobad_id)}
+            >
+              <FontAwesomeIcon
+                icon={faEllipsisVertical}
+                className="cursor-pointer"
+                color="#1f487c"
+                style={{
+                  height: "1.25vw",
+                  width: "1.25vw",
+                }}
+              />
+            </Popover>
+          </div>
         </div>
-      </div>
       ),
     },
     {
@@ -790,7 +816,7 @@ const AdsListView = ({
   ];
 
   // const AdsList = tabType === "Web" ? currentItems  : mobileAds;
-  const AdsList = tabType === "Web" ? Array.isArray(currentItems) ? currentItems : []  : mobileAds;
+  const AdsList = tabType === "Web" ? Array.isArray(currentItems) ? currentItems : [] : mobileAds;
 
   const columns = tabType === "Web" ? webColumns : mobileColumns;
 

@@ -63,7 +63,7 @@ export default function SystemSettingList() {
 
 
   return (
-    <div className="scroll-container ">
+    <div className="scroll-container pr-[3vw] ">
       {/* {sessionStorage.getItem("type_id") == "SPA101" ? ( */}
       {sessionStorage.getItem("type_id") == "SPA101" ? (
         <>

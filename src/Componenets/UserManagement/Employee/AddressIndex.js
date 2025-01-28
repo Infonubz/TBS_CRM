@@ -88,10 +88,10 @@ const AddressIndex = ({
   return (
     <div className="mt-[1.5vw] relative">
         <div className="w-[5vw] h-[5vw] bg-white shadow-lg rounded-full absolute left-[16.6vw] top-[-2.5vw] flex justify-center items-center z-[1]"><img className="" src={umbuslogo} alt="buslogo"/></div>
-      <div className="border-l-[0.1vw]   px-[2vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f]">
+      <div className="border-l-[0.1vw]   pl-[2vw] pr-[1.5vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f]">
         <div className="h-[3vw] w-full flex items-center justify-between ">
           <label className="text-[1.5vw] font-semibold text-[#1f4b7f] ">
-            Registered Address
+          Address Details
           </label>
           {/* {PartnerID || proffesionaback ? (
             <button

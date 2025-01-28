@@ -19,7 +19,7 @@ const SUPPORTED_FORMATS = [
 
 const validationSchema = Yup.object().shape({
     aadhar_front: Yup.mixed()
-        .required("Aadhar Front Page is required")
+        .required("Aadhaar Front Page is required")
         .test("fileSize", "File too large", (value) =>
             typeof value === "string" ? true : value && value.size <= FILE_SIZE
         )
@@ -29,7 +29,7 @@ const validationSchema = Yup.object().shape({
                 : value && SUPPORTED_FORMATS.includes(value.type)
         ),
     aadhar_back: Yup.mixed()
-        .required("Aadhar Back Page is required")
+        .required("Aadhaar Back Page is required")
         .test("fileSize", "File too large", (value) =>
             typeof value === "string" ? true : value && value.size <= FILE_SIZE
         )
@@ -210,7 +210,7 @@ const Documents = ({ operatorData }) => {
                             <div className="grid grid-cols-2 gap-[1vw]">
                                 <div className="">
                                     <label className="text-[#1F4B7F] text-[1vw] font-bold">
-                                        Aadhar Card Front Doc
+                                        Aadhaar Card Front Doc
                                         <span className="text-[1vw] text-red-600 pl-[0.2vw]">
                                             *
                                         </span>
@@ -243,7 +243,7 @@ const Documents = ({ operatorData }) => {
                                         >
                                             {values.aadhar_front ? (
                                                 <div
-                                                     className={`${isEdit === false ? 'cursor-not-allowed' : ''}  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
+                                                    className={`${isEdit === false ? 'cursor-not-allowed' : ''}  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
                                                 >
                                                     {values.aadhar_front.name
                                                         ? values.aadhar_front.name
@@ -278,7 +278,7 @@ const Documents = ({ operatorData }) => {
                                 </div>
                                 <div className="">
                                     <label className="text-[#1F4B7F] text-[1vw] font-bold">
-                                        Aadhar Card Back Doc
+                                        Aadhaar Card Back Doc
                                         <span className="text-[1vw] text-red-600 pl-[0.2vw]">*</span>
                                     </label>
                                     <div className="relative">
@@ -306,7 +306,7 @@ const Documents = ({ operatorData }) => {
                                             {values.aadhar_back ? (
                                                 <div
 
-                                                     className={`${isEdit === false ? 'cursor-not-allowed' : ''}  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
+                                                    className={`${isEdit === false ? 'cursor-not-allowed' : ''}  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
                                                 >
                                                     {values.aadhar_back.name
                                                         ? values.aadhar_back.name
@@ -315,7 +315,7 @@ const Documents = ({ operatorData }) => {
                                                 </div>
                                             )
                                                 :
-                                                <span className="opacity-50">Upload Aadhar Back</span>}
+                                                <span className="opacity-50">Upload Aadhaar Back</span>}
 
                                         </button>
                                         {inputPreview?.aadharback?.startsWith("blob") ? (
@@ -379,7 +379,7 @@ const Documents = ({ operatorData }) => {
                                             {values.pan_front ? (
                                                 <div
 
-                                                className={`${isEdit === false ? 'cursor-not-allowed' : ''}  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
+                                                    className={`${isEdit === false ? 'cursor-not-allowed' : ''}  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
                                                 >
                                                     {values.pan_front.name
                                                         ? values.pan_front.name
@@ -452,7 +452,7 @@ const Documents = ({ operatorData }) => {
                                                 (
                                                     <div
 
-                                                    className={`${isEdit === false ? 'cursor-not-allowed' : ''}  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
+                                                        className={`${isEdit === false ? 'cursor-not-allowed' : ''}  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
                                                     >
                                                         {values.pan_back.name
                                                             ? values.pan_back.name
@@ -524,7 +524,7 @@ const Documents = ({ operatorData }) => {
                                             {values.msme_docs ? (
                                                 <div
 
-                                                className={`${isEdit === false ? 'cursor-not-allowed' : ''}  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
+                                                    className={`${isEdit === false ? 'cursor-not-allowed' : ''}  underline-offset-1 underline text-[#1F4B7F] text-[0.9vw]`}
                                                 >
                                                     {values.msme_docs.name
                                                         ? values.msme_docs.name

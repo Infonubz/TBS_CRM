@@ -142,7 +142,7 @@ export const ReqPromoStatusChange = async (valueid, value, currentid) => {
     return null;
   }
 };
-export const userStatusActivate = async (statusId, currentid, dispatch) => {
+export const userStatusActivate = async (statusId, currentid, dispatch,setSpinning) => {
   // console.log("call 2", valuedata, currentid);
   // const payload = {
   //   req_status: valuedata,
@@ -184,6 +184,9 @@ export const userStatusActivate = async (statusId, currentid, dispatch) => {
   } catch (error) {
     handleError(error);
     return null;
+  }
+  finally{
+    setSpinning && setSpinning(false)
   }
 };
 

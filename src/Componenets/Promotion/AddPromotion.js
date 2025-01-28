@@ -50,6 +50,7 @@ export default function AddPromotion({
   CurrentTab,
   ownerName,
   operatorName,
+  setNoValToStatus
 }) {
   const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const { Dragger } = Upload;
@@ -151,7 +152,7 @@ export default function AddPromotion({
   }, []);
 
   useEffect(() => {
-    GetPromotionDataByStatus(dispatch, CurrentTab);
+    // GetPromotionDataByStatus(dispatch, CurrentTab);
     GetOperatorName(dispatch);
     console.log(getOperatorName, "getOperatorName");
   }, []);
@@ -291,14 +292,14 @@ export default function AddPromotion({
                   Select: {
                     optionActiveBg: "#aebed1",
                     optionSelectedColor: "#FFF",
-                    optionSelectedBg: "#aebed1",
+                    optionSelectedBg: '#e5e5e5',
                     optionHeight: "2",
                   },
                 },
               }}
             >
               <Select
-                showSearch
+                sh owSearch
                 className="custom-select bg-white outline-none w-full mt-[0.2vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw] border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
                 placeholder="Select Role"
                 filterOption={(input, option) =>
@@ -325,8 +326,8 @@ export default function AddPromotion({
                   {
                     value: "",
                     label: (
-                      <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#a9a9a9]">
-                        Select Role
+                      <div className="text-[1vw]  px-[0.2vw] pb-[0.1vw] text-[#a9a9a9]">
+                        Select operator
                       </div>
                     ),
                     disabled: true,
@@ -427,55 +428,112 @@ export default function AddPromotion({
           </label>
           <Field name="date_range">
             {({ field }) => (
-              <ConfigProvider
-                theme={{
-                  token: {
-                    fontSize: 13,
-                    lineHeight: 0,
-                  },
-                  components: {
-                    DatePicker: {
-                      cellWidth: 25,
-                      cellHeight: "1.2vw",
+//               <ConfigProvider
+//                 theme={{
+//                   token: {
+//                     fontSize: ".9vw",
+//                     lineHeight: 0,
+//                     colorPrimary: "#1F487C",
+//                   },
+//                   components: {
+//                     DatePicker: {
+//                       activeBorderColor: "#1F487C",
+//                       hoverBorderColor: "#1F487C",
+//                       activeShadow: "#1F487C",
+//                       cellWidth: 21,
+//                       cellHeight: 20,
+//                     },
+//                   },
+//                 }}
+//               >
+//                 <RangePicker
+//                   allowClear={true}
+//                   autoFocus={false}
+//                   format={"DD MMM, YYYY"}
+//                   onChange={(dates) => {
+//                     const [startDate, endDate] = dates || [null, null];
+//                     setFieldValue(
+//                       "start_date",
+//                       startDate ? startDate.format("YYYY-MM-DD") : ""
+//                     );
+//                     setFieldValue(
+//                       "expiry_date",
+//                       endDate ? endDate.format("YYYY-MM-DD") : ""
+//                     );
+//                   }}
+//                   value={[
+//                     values.start_date ? dayjs(values.start_date) : null,
+//                     values.expiry_date ? dayjs(values.expiry_date) : null,
+//                   ]}
+//                   className="ads-date border-r-[0.25vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-blue border-[#1F487C]
+// text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw] placeholder-[#1F487C]"
+//                   // disabledDate={(current) => {
+//                   //   // Disable dates outside the current month to next 3 months
+//                   //   const startOfCurrentMonth = dayjs().startOf("month");
+//                   //   const endOfAllowedRange = dayjs()
+//                   //     .add(2, "month")
+//                   //     .endOf("month");
+//                   //   return (
+//                   //     current &&
+//                   //     (current < startOfCurrentMonth ||
+//                   //       current > endOfAllowedRange)
+//                   //   );
+//                   // }}
+//                   disabledDate={(current) => {
+//                     // Disable dates before today
+//                     const maxDate = dayjs().add(3, "months"); // 3 months from today
+//                     return (
+//                       current < dayjs().startOf("day") || current > maxDate
+//                     ); // Disable past dates and dates beyond 3 months
+//                   }}
+//                 />
+//               </ConfigProvider>
+     <ConfigProvider
+                  theme={{
+                    token: {
+                      fontSize: ".9vw",
+                      lineHeight: 0,
+                      colorPrimary: "#1F487C",
                     },
-                  },
-                }}
-              >
-                <RangePicker
-                  allowClear={true}
-                  autoFocus={false}
-                  format={"DD MMM, YYYY"}
-                  onChange={(dates) => {
-                    const [startDate, endDate] = dates || [null, null];
-                    setFieldValue(
-                      "start_date",
-                      startDate ? startDate.format("YYYY-MM-DD") : ""
-                    );
-                    setFieldValue(
-                      "expiry_date",
-                      endDate ? endDate.format("YYYY-MM-DD") : ""
-                    );
+                    components: {
+                      DatePicker: {
+                        activeBorderColor: "#1F487C",
+                        hoverBorderColor: "#1F487C",
+                        activeShadow: "#1F487C",
+                        cellWidth: 21,
+                        cellHeight: 20,
+                      },
+                    },
                   }}
-                  value={[
-                    values.start_date ? dayjs(values.start_date) : null,
-                    values.expiry_date ? dayjs(values.expiry_date) : null,
-                  ]}
-                  className="ads-date border-r-[0.25vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-blue border-[#1F487C]
-text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw] placeholder-[#1F487C]"
-                  // disabledDate={(current) => {
-                  //   // Disable dates outside the current month to next 3 months
-                  //   const startOfCurrentMonth = dayjs().startOf("month");
-                  //   const endOfAllowedRange = dayjs()
-                  //     .add(2, "month")
-                  //     .endOf("month");
-                  //   return (
-                  //     current &&
-                  //     (current < startOfCurrentMonth ||
-                  //       current > endOfAllowedRange)
-                  //   );
-                  // }}
-                />
-              </ConfigProvider>
+                >
+                  <RangePicker
+                    allowClear={true}
+                    autoFocus={false}
+                    onChange={(dates) => {
+                      const [startDate, endDate] = dates || [null, null];
+                      setFieldValue(
+                        "start_date",
+                        startDate ? startDate.format("YYYY-MM-DD") : ""
+                      );
+                      setFieldValue(
+                        "expiry_date",
+                        endDate ? endDate.format("YYYY-MM-DD") : ""
+                      );
+                    }}
+                    value={[
+                      values.start_date ? dayjs(values.start_date) : null,
+                      values.expiry_date ? dayjs(values.expiry_date) : null,
+                    ]}
+                    className="ads-date border-r-[0.25vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-full rounded-[0.5vw] outline-none px-[1vw] placeholder:text-[1vw]"
+                    disabledDate={(current) => {
+                      // Disable dates before today
+                      const maxDate = dayjs().add(3, "months"); // 3 months from today
+                      return (
+                        current < dayjs().startOf("day") || current > maxDate
+                      ); // Disable past dates and dates beyond 3 months
+                    }}
+                  />
+                </ConfigProvider>
             )}
           </Field>
           <div className="flex absolute mt-[5vw]">
@@ -608,11 +666,10 @@ text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1v
 
               <div className="flex items-center justify-center border-b-[0.2vw] border-r-[0.2vw] mt-[0.2vw]  border-t-[0.1vw] rounded-l-none rounded-[0.5vw] border-[#1F487C] text-[1.2vw]">
                 <div
-                  className={` w-[3vw] h-full flex items-center justify-center ${
-                    values.value_symbol === "₹"
+                  className={` w-[3vw] h-full flex items-center justify-center ${values.value_symbol === "₹"
                       ? "bg-[#1F487C] text-white font-semibold"
                       : "bg-white text-[#1F487C]"
-                  } `}
+                    } `}
                   onClick={() => {
                     setFieldValue("value_symbol", "₹");
                   }}
@@ -620,11 +677,10 @@ text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1v
                   ₹
                 </div>
                 <div
-                  className={` w-[3vw] h-full flex items-center justify-center ${
-                    values.value_symbol === "%"
+                  className={` w-[3vw] h-full flex items-center justify-center ${values.value_symbol === "%"
                       ? "bg-[#1F487C] text-white font-semibold rounded-r-[0.3vw]"
                       : "bg-white text-[#1F487C] rounded-r-[0.5vw]"
-                  } `}
+                    } `}
                   onClick={() => {
                     setFieldValue("value_symbol", "%");
                   }}
@@ -654,6 +710,7 @@ text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1v
             value={values.promo_code.toUpperCase()}
             onChange={(e) => {
               handleChange(e);
+              console.log(e.target.value,"promocode");
               // sessionStorage.setItem("promo_code", e.target.value);
               // setCurrentPromodata({
               //   ...currentPromodata,
@@ -698,7 +755,7 @@ text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1v
                 Select: {
                   optionActiveBg: "#aebed1",
                   optionSelectedColor: "#FFF",
-                  optionSelectedBg: "#aebed1",
+                  optionSelectedBg: '#e5e5e5',
                   optionHeight: "2",
                 },
               },
@@ -708,6 +765,7 @@ text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1v
               showSearch
               className="custom-select bg-white outline-none w-full mt-[0.2vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw] border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
               placeholder="Select Status"
+              disabled={type_Id==="OP101" && promodata?.tbs_user_id?.startsWith("tbs-op_emp") ? true : type_Id ==="PRO101" && promodata?.tbs_user_id?.startsWith("tbs-op") ? true : false }
               optionFilterProp="value"
               value={values.status} // Update this line to reflect the current selection
               onChange={(value, option) => {
@@ -722,6 +780,7 @@ text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1v
                 setError("");
                 setFieldValue("status", value);
                 console.log(value, "vaue");
+                setNoValToStatus(false)
               }}
               suffixIcon={
                 <span style={{ fontSize: "1vw", color: "#1f487c" }}>
@@ -731,14 +790,14 @@ text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1v
               style={{
                 padding: 4,
               }}
-              filterOption={(input, option) => 
+              filterOption={(input, option) =>
                 option?.value?.toLowerCase()?.includes(input.toLowerCase()) // Make it case-insensitive
               }
               options={[
                 {
                   value: "",
                   label: (
-                    <div className="text-[1vw] font-semibold px-[0.2vw] pb-[0.1vw] text-[#a9a9a9]">
+                    <div className="text-[1vw]  px-[0.2vw] pb-[0.1vw] text-[#a9a9a9]">
                       Select Status
                     </div>
                   ),
@@ -778,12 +837,14 @@ text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1v
             value={values.promotion_description}
             onChange={(e) => {
               handleChange(e);
+             
+              
               // sessionStorage.setItem("promotion_description", e.target.value);
             }}
             rows="5"
             cols="50"
             style={{ resize: "none" }}
-            className="border-r-[0.25vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] w-[100%] h-[7.5vw] rounded-[0.5vw] outline-none px-[1vw]"
+            className="border-r-[0.25vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] w-[100%] h-[7.5vw] rounded-[0.5vw] outline-none py-[1vw] px-[1vw]"
           />
 
           <ErrorMessage
@@ -800,8 +861,15 @@ text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1v
           <Field name="file">
             {() => (
               <>
+               <ConfigProvider
+                              theme={{
+                                token:{
+                                  colorBorder: "rgba(255, 255, 255, 0)",  // Fully invisible border
+                                  colorPrimary: "rgba(255, 255, 255, 0)",
+                                }
+                              }}>
                 <Dragger
-                accept=".jpeg, .jpg, .png"
+                  accept=".jpeg, .jpg, .png"
                   height={"7.2vw"}
                   onChange={() => {
                     setDraggerImage(true);
@@ -843,11 +911,10 @@ text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1v
                   <div
                     className="absolute top-0 left-0 w-full h-full"
                     style={{
-                      backgroundImage: `url(${
-                        draggerImage
+                      backgroundImage: `url(${draggerImage
                           ? previewUrl
                           : `${apiImgUrl}${promodata.promo_image}`
-                      })`,
+                        })`,
                       backgroundSize: "cover",
                       backgroundPosition: "center",
                       opacity: "30%",
@@ -855,18 +922,19 @@ text-[#1F487C] text-[0.8vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1v
                     }}
                   ></div>
                 </Dragger>
+                </ConfigProvider>
               </>
             )}
           </Field>
-          {fileName ? (
+          {/* {fileName ? (
             <p className="text-[#1F4B7F] text-[0.8vw] mt-2">{fileName}</p>
-          ) : (
+          ) : ( */}
             <ErrorMessage
               name="file"
               component="div"
               className="text-red-500 text-[0.8vw] bottom-[-1.2vw]"
             />
-          )}
+          {/* )} */}
         </div>
         {/* <div className="col-span-1 flex flex-col">
                 <button

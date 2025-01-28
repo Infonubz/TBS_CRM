@@ -51,15 +51,15 @@ export default function IndexAddOffer({
         .min(5, "Min 5 characters required")
         .max(17, "Max 17 characters only"),
       offer_desc: Yup.string()
-        .required("Promotion Description is required")
+        .required("Offer Description is required")
         .min(20, "Min 20 characters needed")
         .max(53, "Max 53 characters only"),
       status: Yup.string().required("Status field is required"),
-      occupation: Yup.string().required("Occupation field is required"),
+      occupation: Yup.string().required("Category field is required"),
       code: Yup.string()
         .required("Offer Code is required")
         .min(5, "Min 5 characters required")
-        .max(18, "Max 18 characters only"),
+        .max(15, "Max 15 characters only"),
       value: Yup.number()
         .typeError("Must be a number")
         .required("Offer Value is required"),
@@ -118,6 +118,7 @@ export default function IndexAddOffer({
   const [CurrentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [value, setValue] = useState();
+  const [noValToStatus, setNoValToStatus] = useState(true)
 
   console.log(value, "value_value");
   console.log(offerBackGround, "view_offer_type");
@@ -194,7 +195,8 @@ export default function IndexAddOffer({
                 updatedata,
                 offerlist,
                 offerBackGround,
-                offerFilter
+                offerFilter,
+                noValToStatus
               )
             : await SubmitRedeemOffersData(
                 dispatch,
@@ -202,7 +204,8 @@ export default function IndexAddOffer({
                 updatedata,
                 offerlist,
                 offerBackGround,
-                offerFilter
+                offerFilter,
+                noValToStatus
               );
 
         if (data?.message) {
@@ -369,20 +372,22 @@ export default function IndexAddOffer({
           // status: offerdata ? offerdata.status_id === 3 || 4 || 1 ? "Draft": "",
 
           status:
-            typeid === "PRO101"
-              ? offerdata.status_id === 4 ||
-                offerdata.status_id === 3 ||
-                offerdata.status_id === 1 ||
-                offerdata.status_id === 0
-                ? "Draft"
-                : offerdata.status_id === 2
-                ? "Active"
-                : ""
-              : offerdata.status_id === 3 || offerdata.status_id === 4
-              ? "Draft"
-              : offerdata
-              ? offerdata.status
-              : "",
+            // typeid === "PRO101"
+            //   ? offerdata.status_id === 4 ||
+            //     offerdata.status_id === 3 ||
+            //     offerdata.status_id === 1 ||
+            //     offerdata.status_id === 0
+            //     ? "Draft"
+            //     : offerdata.status_id === 2
+            //     ? "Active"
+            //     : ""
+            //   : offerdata.status_id === 3 || offerdata.status_id === 4
+            //   ? "Draft"
+            //   : offerdata
+            //   ? offerdata.status
+            //   : "",
+            typeid === "PRO101" ? offerdata.req_status : typeid === "PROEMP101" ? offerdata.status : offerdata.status
+            ,
           value:
             offerType === "discount"
               ? offerdata
@@ -476,6 +481,7 @@ export default function IndexAddOffer({
                   setFileName={setFileName}
                   errors={errors}
                   offerFilter={offerFilter}
+                  setNoValToStatus={setNoValToStatus}
                 />
               ) : (
                 <BackgroundView

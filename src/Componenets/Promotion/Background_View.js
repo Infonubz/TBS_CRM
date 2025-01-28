@@ -294,6 +294,7 @@ const Background_View = ({
             />
           )}
         </div>
+        <div className="border-dashed border-l-[.18vw]  h-[13vw] border-white absolute top-[0vw] left-[7.8vw]"></div>
         {updatedata && draggerImage === false ? (
           <img
             alt="promoimage"

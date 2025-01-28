@@ -44,6 +44,7 @@ export default function AddOffer({
   fileName,
   setFileName,
   errors,
+  setNoValToStatus
 }) {
   const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
 
@@ -301,7 +302,7 @@ export default function AddOffer({
                   Select: {
                     optionActiveBg: "#aebed1",
                     optionSelectedColor: "#FFF",
-                    optionSelectedBg: "#aebed1",
+                    optionSelectedBg: '#e5e5e5',
                     optionHeight: "2vw",
                   },
                 },
@@ -313,6 +314,7 @@ export default function AddOffer({
                 placeholder="Select Categories"
                 optionFilterProp="label"
                 listHeight={190}
+                // disabled={true}
                 dropdownStyle={{
                   // minHeight: "10vw",
                   overflowY: "auto",
@@ -388,7 +390,7 @@ export default function AddOffer({
                   Select: {
                     optionActiveBg: "#aebed1",
                     optionSelectedColor: "#FFF",
-                    optionSelectedBg: "#aebed1",
+                    optionSelectedBg: '#e5e5e5',
                     optionHeight: "2",
                   },
                 },
@@ -398,7 +400,8 @@ export default function AddOffer({
                 showSearch
                 className="custom-select mt-[0.5vw] bg-white outline-none w-full h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw] border-r-[0.25vw] border-b-[0.25vw] placeholder-[#1F487C]"
                 placeholder="Select Status"
-                optionFilterProp="label"
+                optionFilterProp="value"
+                disabled={typeid==="PRO101" && offerdata?.tbs_user_id?.startsWith("tbs-pro_emp") ? true :false}
                 value={values.status} // Update this line to reflect the current selection
                 onChange={(value, option) => {
                   // const selectedOperator = getOperatorName?.find(
@@ -411,6 +414,7 @@ export default function AddOffer({
                   // // });
                   setError("");
                   setFieldValue("status", value);
+                  setNoValToStatus(false)
                 }}
                 suffixIcon={
                   <span style={{ fontSize: "1vw", color: "#1f487c" }}>
@@ -460,7 +464,7 @@ export default function AddOffer({
                 <ConfigProvider
                   theme={{
                     token: {
-                      fontSize: "1vw",
+                      fontSize: ".9vw",
                       lineHeight: 0,
                       colorPrimary: "#1F487C",
                     },
@@ -624,6 +628,13 @@ export default function AddOffer({
             <Field name="file">
               {() => (
                 <>
+                <ConfigProvider
+                theme={{
+                  token:{
+                    colorBorder: "rgba(255, 255, 255, 0)",  // Fully invisible border
+                    colorPrimary: "rgba(255, 255, 255, 0)",
+                  }
+                }}>
                   <Dragger
                     accept=".jpeg, .jpg, .png"
                     onChange={() => setDraggerImage(true)}
@@ -680,6 +691,7 @@ export default function AddOffer({
                       }}
                     ></div>
                   </Dragger>
+                  </ConfigProvider>
 
                   {/* {fileName && (
                             <p className="text-[#1F4B7F] text-[0.8vw] mt-2 absolute bottom-[0.3vw]">

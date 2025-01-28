@@ -26,7 +26,8 @@ import {
 
 const validationSchema = Yup.object().shape({
   phone: Yup.string()
-    .matches(/^[0-9]+$/, "Phone number must be a number")
+    // .matches(/^[0-9]+$/, "Phone number must be a number")
+    .matches(/^[6-9]\d{9}$/, "Enter a 10-digit number starting with 6-9")
     .min(10, "Phone number must be at least 10 digits")
     .max(10, "Phone number maximum 10 digits only")
     .required("Phone number is required"),
@@ -37,12 +38,19 @@ const validationSchema = Yup.object().shape({
     )
     .required("Email is required"),
   owner_name: Yup.string().required("Client name is required")
-  .min(3,"minimum 3 characters long")
-    .max(30, "Maximum 30 characters only"),
+  .min(3,"Minimum 3 characters long")
+    .max(30, "Maximum 30 characters only")
+    .matches(/^[A-Za-z\s]+$/,
+      "Only letters and spaces are allowed"),
   company_name: Yup.string().required("Company name is required")
-  .min(3,"minimum 3 characters long")
-    .max(30, "Maximum 30 characters only"),
+  .min(3,"Minimum 3 characters long")
+    .max(30, "Maximum 30 characters only")
+    .matches(
+      /^[A-Za-z0-9\s]+$/,
+      "Only letters, numbers, spaces are allowed"
+    ),
   // web_url: Yup.string().required("Web URL is required"),
+  web_url: Yup.string().url('Please enter a valid URL ex(https://www.google.com)'),
   business: Yup.string().required("Business is required"),
   constitution: Yup.string().required("Constitution is required"),
   // company_logo: Yup.mixed()
@@ -88,7 +96,8 @@ export default function AddCompanyDetails({
   updatedata,
   setEnableUpload,
   selectedFile,
-  enableUpload
+  enableUpload,
+  setSelectedFile
 }) {
   const [enable, setEnable] = useState(false);
   // const [profileImage, setProfileImage] = useState("");
@@ -404,7 +413,7 @@ export default function AddCompanyDetails({
 
   return (
     <div>
-      <div className="border-l-[0.1vw] h-[28vw] umselect  px-[2vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f] mt-[1.5vw]">
+      <div className="border-l-[0.1vw] h-[28vw] umselect  pl-[2vw] pr-[1.5vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f] mt-[1.5vw]">
         <div className="h-[4vw] w-full flex items-center justify-between ">
           <label className="text-[1.5vw] font-semibold text-[#1f4b7f] ">
             Company Details
@@ -451,8 +460,12 @@ export default function AddCompanyDetails({
               // if (profileImage === true || updatedata) {
               //   handleSubmit(values, setFieldError);
               // }
-              if (profileImage === true && selectedFile != null || updatedata && selectedFile != null) {
+              if (profileImage === true && selectedFile != null || updatedata && selectedFile?.length > 0) {
                 handleSubmit(values,setFieldError);
+              }
+              else if(selectedFile?.length <= 0){
+                setProfileImage(false)
+                setSelectedFile(null)
               }
             }}
             enableReinitialize
@@ -476,7 +489,7 @@ export default function AddCompanyDetails({
                 ) : (
                   <div className="gap-y-[1.5vw] flex-col flex">
                     <div className="overflow-y-auto h-[18.3vw] gap-y-[1.5vw] flex-col flex pb-[1vw]">
-                      <div className="grid grid-cols-2 w-full gap-x-[2vw]">
+                      <div className="grid grid-cols-2 w-full gap-x-[2vw] pr-[.5vw]">
                         <div className="col-span-1 relative">
                           <label className="text-[#1F4B7F] text-[1.1vw] ">
                             Company Name
@@ -556,7 +569,7 @@ export default function AddCompanyDetails({
                           />
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 w-full gap-x-[2vw]">
+                      <div className="grid grid-cols-2 w-full gap-x-[2vw] pr-[.5vw]">
                         <div className="col-span-1 relative">
                           <label className="text-[#1F4B7F] text-[1.1vw] ">
                             Phone
@@ -642,7 +655,7 @@ export default function AddCompanyDetails({
                           />
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 w-full gap-x-[2vw]">
+                      <div className="grid grid-cols-2 w-full gap-x-[2vw] pr-[.5vw]">
                         <div className="col-span-1 relative">
                           <label className="text-[#1F4B7F] text-[1.1vw] ">
                             Type of Constitution
@@ -705,7 +718,7 @@ export default function AddCompanyDetails({
                                 Select: {
                                   optionActiveBg: "#aebed1",
                                   optionSelectedColor: "#FFF",
-                                  optionSelectedBg: "#aebed1",
+                                  optionSelectedBg: "#e5e5e5",
                                   optionHeight: "2",
                                 },
                               },
@@ -732,12 +745,12 @@ export default function AddCompanyDetails({
                               className={`${
                                 updatedata || addressback
                                   ? enable == false
-                                    ? " cursor-not-allowed"
+                                    ? " cursor-not-allowed bg-[#FAFAFA]"
                                     : ""
                                   : ""
-                              } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                              } custom-select border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                               // className="custom-select bg-white outline-none w-full mt-[0.5vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
-                              placeholder="Select constitution"
+                              placeholder="Select constitutionssssssssssssssss"
                               filterOption={
                                 (input, option) =>
                                   option?.value
@@ -757,11 +770,11 @@ export default function AddCompanyDetails({
                                 {
                                   value: "",
                                   label: (
-                                    <div className="text-[1vw] px-[0.2vw] pb-[0.1vw] text-gray-400">
+                                    <div className="text-[1.03vw] px-[0.2vw] pb-[0.1vw] text-[#B5B5B5]">
                                       Select Constitution
                                     </div>
                                   ),
-                                  disabled: true,
+                      
                                 },
                                 {
                                   value: "Proprietorship",
@@ -942,7 +955,7 @@ export default function AddCompanyDetails({
                                 Select: {
                                   optionActiveBg: "#aebed1",
                                   optionSelectedColor: "#FFF",
-                                  optionSelectedBg: "#aebed1",
+                                  optionSelectedBg: "#e5e5e5",
                                   optionHeight: "2",
                                 },
                               },
@@ -969,7 +982,7 @@ export default function AddCompanyDetails({
                               className={`${
                                 updatedata || addressback
                                   ? enable == false
-                                    ? " cursor-not-allowed"
+                                    ? " cursor-not-allowed bg-[#FAFAFA]"
                                     : ""
                                   : ""
                               } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
@@ -1000,7 +1013,7 @@ export default function AddCompanyDetails({
                           />
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 w-full gap-x-[2vw]">
+                      <div className="grid grid-cols-2 w-full gap-x-[2vw] pr-[.5vw]">
                         <div className="col-span-2 relative">
                           <label className="text-[#1F4B7F] text-[1.1vw] ">
                             Web URL

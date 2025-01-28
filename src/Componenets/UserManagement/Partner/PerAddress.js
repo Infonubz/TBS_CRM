@@ -54,7 +54,7 @@ const PerAddress = ({
     }
   };
   return (
-    <div className="umselect">
+    <div className="umselect pr-[.5vw]">
       <Formik
         initialValues={{
           per_address: perAddress.address || "",
@@ -188,7 +188,7 @@ const PerAddress = ({
                       Select: {
                         optionActiveBg: '#aebed1',
                         optionSelectedColor: '#FFF',
-                        optionSelectedBg: '#aebed1',
+                        optionSelectedBg: '#e5e5e5',
                         optionHeight: '2',
                       },
                     },
@@ -212,7 +212,7 @@ const PerAddress = ({
                     name="per_city"
                     className={`${updatedata && empaddressdata?.perm_add != null || documentback
                       ? enable == false
-                        ? " cursor-not-allowed"
+                        ? " cursor-not-allowed bg-[#FAFAFA]"
                         : ""
                       : ""
                       } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
@@ -308,7 +308,7 @@ const PerAddress = ({
                       Select: {
                         optionActiveBg: '#aebed1',
                         optionSelectedColor: '#FFF',
-                        optionSelectedBg: '#aebed1',
+                        optionSelectedBg: '#e5e5e5',
                         optionHeight: '2',
                       },
                     },
@@ -332,7 +332,7 @@ const PerAddress = ({
                     name="per_state"
                     className={`${updatedata && empaddressdata?.perm_add != null || documentback
                       ? enable == false
-                        ? " cursor-not-allowed"
+                        ? " cursor-not-allowed bg-[#FAFAFA]"
                         : ""
                       : ""
                       } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
@@ -469,7 +469,7 @@ const PerAddress = ({
                       Select: {
                         optionActiveBg: '#aebed1',
                         optionSelectedColor: '#FFF',
-                        optionSelectedBg: '#aebed1',
+                        optionSelectedBg: '#e5e5e5',
                         optionHeight: '2',
                       },
                     },
@@ -493,7 +493,7 @@ const PerAddress = ({
                     name="per_region"
                     className={`${updatedata && empaddressdata?.perm_add != null || documentback
                       ? enable == false
-                        ? " cursor-not-allowed"
+                        ? " cursor-not-allowed bg-[#FAFAFA]"
                         : ""
                       : ""
                       } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
@@ -606,7 +606,7 @@ const PerAddress = ({
                       Select: {
                         optionActiveBg: '#aebed1',
                         optionSelectedColor: '#FFF',
-                        optionSelectedBg: '#aebed1',
+                        optionSelectedBg: '#e5e5e5',
                         optionHeight: '2',
                       },
                     },
@@ -629,8 +629,8 @@ const PerAddress = ({
                     }
                     name="per_country"
                     className={`${updatedata && empaddressdata?.perm_add != null || documentback
-                      ? enable == false
-                        ? " cursor-not-allowed"
+                      ? enable == false 
+                        ? " cursor-not-allowed bg-[#FAFAFA]"
                         : ""
                       : ""
                       } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}

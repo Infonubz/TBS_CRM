@@ -3,7 +3,7 @@ import image from "../../asserts/promotion_image.png";
 import "../../App.css";
 import dayjs from "dayjs";
 import userimg from "../../asserts/userprofile.png";
-import { FaPhone } from "react-icons/fa";
+import { FaPhone, FaPhoneAlt } from "react-icons/fa";
 import { TbMailFilled } from "react-icons/tb";
 import ModalPopup from "../Common/Modal/Modal";
 import { Modal, Popover } from "antd";
@@ -53,31 +53,31 @@ export default function PartnerGridView({
     setPartnerDeleteModalIsOpen(true);
   };
 
-   const [isModalOpen, setIsModalOpen] = useState(false);
-    const [modalImage, setModalImage] = useState(null);
-  
-    const openModal = (event) => {
-      // Get the image source (src) using `getElementById`
-      const imageSrc = event.target.getAttribute('src');
-  
-      // Set the modal image source
-      setModalImage(imageSrc);
-  
-      // Open the modal
-      setIsModalOpen(true);
-    };
-    const closeModal = () => {
-      setIsModalOpen(false);
-    };
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalImage, setModalImage] = useState(null);
+
+  const openModal = (event) => {
+    // Get the image source (src) using `getElementById`
+    const imageSrc = event.target.getAttribute('src');
+
+    // Set the modal image source
+    setModalImage(imageSrc);
+
+    // Open the modal
+    setIsModalOpen(true);
+  };
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
   return (
     <>
       <div className="pt-[0.5vw]">
         <div className="grid grid-cols-5 w-full gap-x-[3vw] gap-y-[1vw]">
-          {currentData.map((item) => {
-            const fullname = `${capitalizeFirstLetter(
-              item?.partner_first_name
-            )} ${item.partner_last_name}`;
+          {currentData.length > 0 && currentData.map((item) => {
+            const fullname = `${item?.partner_first_name.charAt(0) === item?.partner_first_name.charAt(0).toLowerCase()
+              ? capitalizeFirstLetter(item?.partner_first_name)
+              : item?.partner_first_name} ${item?.partner_last_name}`;
             return (
               <div
                 className={` bg-white h-[33.5vh] border-[#1f4b7f] border-l-[0.1vw]  border-r-[0.3vw] border-b-[0.3vw] border-t-[0.1vw] rounded-[0.5vw]`}
@@ -106,7 +106,7 @@ export default function PartnerGridView({
                     <Popover
                       placement="bottomRight"
                       content={
-                        <div className="flex flex-col p-[.5vw]">
+                        <div className="flex flex-col p-[.5vw] border-[.1vw] border-[#1f487c] rounded-[.5vw]">
                           <div>
                             <a
                               onClick={() => {
@@ -207,10 +207,10 @@ export default function PartnerGridView({
                           transition: "ease-out 1s",
                         }}
                       >
-                        <FaPhone size="1vw" color={`${"#1f487c"}`} />
+                        <FaPhoneAlt size="1vw" color={`${"#1f487c"}`} />
                       </div>
                       <div className="text-[0.9vw] text-[#1f4b7f]">
-                        {item.phone}
+                        {item?.phone === null || item?.phone?.length <= 0 ? "Not Available" : item.phone}
                       </div>
                     </div>
                     <div className="flex flex-row items-center space-x-[0.5vw] ">
@@ -239,7 +239,8 @@ export default function PartnerGridView({
                         </Tooltip>
                       ) : (
                         <div className="text-[0.9vw] text-[#1f4b7f]">
-                          {item?.emailid?.slice(0, 18)}
+                          {/* {item?.emailid?.slice(0, 18)} */}
+                          {item?.emailid === null || item?.emailid?.length <= 0 ? "Not Available" : item?.emailid?.slice(0, 18)}
                         </div>
                       )}
                     </div>

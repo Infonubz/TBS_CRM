@@ -18,9 +18,9 @@ const Language = () => {
         {languages.map((language, index) => (
           <li
             key={index}
-            className="text-lg text-gray-800 cursor-pointer hover:bg-[#1F487C] rounded-[0.5vw] transition py-[1vw] px-[0.5vw] duration-200 w-1/2"
+            className="text-lg text-gray-800 cursor-pointer hover:bg-[#1F487C] hover:text-white rounded-[0.5vw] transition py-[1vw] px-[0.5vw] duration-200 w-1/2"
           >
-            <span className=" hover:text-white">{language}</span>
+            <span className=" ">{language}</span>
           </li>
         ))}
       </ul>

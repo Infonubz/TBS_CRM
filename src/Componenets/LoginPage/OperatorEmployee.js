@@ -41,8 +41,9 @@ export default function OperatorEmployeeLoginPage({ setAuthtoken }) {
                 setForgotPassword={setForgotPassword}
               />
             ) : (
-              <ProductOwnerForgotPassword
-                setForgotPassword={setForgotPassword}
+              <ProductOwnerForgotPassword 
+              setForgotPassword={setForgotPassword}
+              typeID={"OPEMP101"}
               />
             )}
           </div>

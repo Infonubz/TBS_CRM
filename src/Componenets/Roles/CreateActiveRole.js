@@ -37,7 +37,7 @@ export default function CreateActiveRole({
     .required("Role type is required"),
     description: Yup.string()
     .min(5, "Description must be greater than 1 character")
-    .max(15, "Description should not be greater than 50 characters")
+    .max(50,"Description should not be greater than 50 characters")
     .required("Description is required"),
   });
   //const [selectedPermissions, setSelectedPermissions] = useState([]);

@@ -112,7 +112,48 @@ export const GetOperatorDataById = async (
   }
 };
 
+export const GetExcelTemplateById = async (value, setSpinning) => {
+  console.log(value, "get_value_by_id");
+  let field_id;
+  console.log(field_id, "check_field_id_export");
 
+  switch (value) {
+    case "super_admin":
+      field_id = 1;
+      break;
+    case "partner":
+      field_id = 2;
+      break;
+    case "employee":
+      field_id = 3;
+      break;
+    case "client":
+      field_id = 4;
+      break;
+    case "discount":
+      field_id = 5;
+      break;
+    case "redeem":
+      field_id = 6;
+      break;
+    case "promotion":
+      field_id = 7;
+      break;
+    default:
+      field_id = 0;
+  }
+  try {
+    const response = await api.get(`${apiUrl}/impdata/${field_id}`);
+    console.log(response?.data, "responseresponse");
+    // dispatch({ type: IMPORT_DATA_LIST, payload: response.data });
+    return response;
+  } catch (error) {
+    handleError(error);
+    return null;
+  } finally {
+    setSpinning && setSpinning(false);
+  }
+};
 
 const handleError = (error) => {
   console.error("Error details:", error);

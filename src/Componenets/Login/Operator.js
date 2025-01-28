@@ -60,7 +60,7 @@ export default function Operator({ setForgotPassword, setAuthtoken }) {
         {({ isSubmitting, handleSubmit, handleChange }) => (
           <Form>
             <div className="gap-y-[1.5vw] flex-col flex">
-              <div className="col-span-1">
+              <div className="col-span-1 relative">
                 <label className="text-[#1F487C] text-[1.1vw] ">
                   Email / Phone
                   <span className="text-[1vw] text-red-600 pl-[0.2vw]">*</span>
@@ -78,10 +78,10 @@ export default function Operator({ setForgotPassword, setAuthtoken }) {
                 <ErrorMessage
                   name="emailid"
                   component="div"
-                  className="text-red-500 text-[0.8vw]"
+                  className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]"
                 />
               </div>
-              <div className="col-span-1 ">
+              <div className="col-span-1 relative ">
                 <label className="text-[#1F487C] text-[1.1vw] ">
                   Password
                   <span className="text-[1vw] text-red-600 pl-[0.2vw]">*</span>
@@ -111,7 +111,7 @@ export default function Operator({ setForgotPassword, setAuthtoken }) {
                 <ErrorMessage
                   name="password"
                   component="div"
-                  className="text-red-500 text-[0.8vw]"
+                  className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]"
                 />
               </div>
               <div className="flex justify-between items-center">

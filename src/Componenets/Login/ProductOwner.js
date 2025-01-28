@@ -127,10 +127,10 @@ export default function ProductOwner({ setAuthtoken, setForgotPassword }) {
                   className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                 />
                 <ErrorMessage
-                    name="emailid_phone"
-                    component="div"
-                    className="text-red-500 text-[0.8vw] absolute bottom-[-1.5vw]"
-                  />
+                  name="emailid_phone"
+                  component="div"
+                  className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]"
+                />
               </div>
               <div className="col-span-1 ">
                 <label className="text-[#1F487C] text-[1.1vw] ">
@@ -157,18 +157,21 @@ export default function ProductOwner({ setAuthtoken, setForgotPassword }) {
                   <ErrorMessage
                     name="password"
                     component="div"
-                    className="text-red-500 text-[0.8vw] absolute bottom-[-1.5vw]"
+                    className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]"
                   />
                 </div>
               </div>
               <div className="flex justify-between items-center">
-                <div>
-                  <Checkbox
+                <div className="flex justify-between items-center gap-[0.75vw]">
+                  <input
+                    type="checkbox"
                     onChange={(e) => { }}
-                    className="text-[#1F4B7F] text-[1vw] "
-                  >
+
+                  />
+                  <span className="text-[#1F4B7F] text-[1vw] ">
                     Remember me
-                  </Checkbox>
+                  </span>
+                  {/* </Checkbox> */}
                 </div>
                 <div>
                   <p

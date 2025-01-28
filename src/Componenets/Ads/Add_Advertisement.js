@@ -649,6 +649,7 @@ const Ad_Advertisement = ({
                               token: {
                                 fontSize: 13,
                                 lineHeight: 0,
+                                colorPrimary:'#1F487C'
                               },
                               components: {
                                 DatePicker: {

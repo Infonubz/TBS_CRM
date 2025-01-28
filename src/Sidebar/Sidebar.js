@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   RiAdvertisementFill,
   RiDashboardFill,
@@ -18,6 +18,7 @@ import { useNavigate } from "react-router";
 import {
   //IoIosLogOut,
   IoIosNotifications,
+  IoMdArrowDropup,
   IoMdSettings,
 } from "react-icons/io";
 //import { HiOutlineClipboardDocumentList } from "react-icons/hi2";
@@ -26,7 +27,7 @@ import {
   //MdOutlineSpeakerNotes,
   MdSubscriptions,
 } from "react-icons/md";
-import { Popover, Tooltip } from "antd";
+import { ConfigProvider, Popover, Select, Tooltip } from "antd";
 import promotionicon from "../asserts/Promotion.png";
 import request_management from "../asserts/Request_Managment.png";
 //import { LiaSave } from "react-icons/lia";
@@ -35,6 +36,8 @@ import Support from "../Componenets/Support/Support";
 import NotificationPopup from "../Componenets/Notification/NotificationPopup";
 import { CgProfile } from "react-icons/cg";
 import { useSelector } from "react-redux";
+import { capitalizeFirstLetter } from "../Componenets/Common/Captilization";
+import { debounce } from "lodash";
 
 export default function Sidebar() {
   //const unreadCounts = 0;
@@ -50,6 +53,7 @@ export default function Sidebar() {
   const [searchInput, setSearchInput] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isSupportOpen, setIsSupportOpen] = useState(false);
+  const [selectedValue, setSelectedValue] = useState("Search..")
 
   const storedModulePermissions = sessionStorage.getItem("module_permission");
   const currenttypeid = sessionStorage.getItem("type_id");
@@ -109,8 +113,337 @@ export default function Sidebar() {
     }
   }, [getnotificationlist]);
 
+  function splitString(str) {
+    if (str?.length > 9 && !str.slice(0, 10).includes(' ')) {
+      return capitalizeFirstLetter(str.slice(0, 9)) + ' ' + str.slice(9);
+    } else {
+      return capitalizeFirstLetter(str);
+    }
+  }
+
+  const options = [
+    { value: "dashboard", label: "Dashboard" },
+    // { value: "user management", label: "User Management" },
+    { value: "operator", label: "Operator" },
+    { value: "partner", label: "Partner" },
+    { value: "client", label: "Client" },
+    { value: "employee", label: "Employee" },
+    { value: "request management", label: "Request Management" },
+    { value: "discount offers", label: "Discount Offers" },
+    { value: "redeem offers", label: "Redeem Offers" },
+    { value: "mobile advertisement", label: "Mobile Advertisement" },
+    { value: "web advertisement", label: "Web Advertisement" },
+    { value: "promotion", label: "Promotion" },
+    { value: "roles", label: "Roles" },
+    { value: "subscription", label: "Subscription" },
+    { value: "company settings", label: "Company Settings" },
+    { value: "user settings", label: "User Settings" },
+    { value: "Configuration", label: "Configuration" },
+    { value: "product integrations", label: "Product Integrations" },
+    { value: "recycle bin", label: "Recycle Bin" },
+  ];
+  const [query, setQuery] = useState('');
+  const [filteredOptions, setFilteredOptions] = useState([]);
+  const [focusedIndex, setFocusedIndex] = useState(-1);
+
+  // Handle input change and filter options based on query
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setQuery(value);
+    if (value) {
+      setFilteredOptions(options.filter(option =>
+        option.label.toLowerCase().includes(value.toLowerCase())
+      ));
+    } else {
+      setFilteredOptions([]);
+    }
+  };
+
+  // const handleOptionSelect = (selectedOption) => {
+  //   alert(selectedOption.value)
+  //   setQuery(selectedOption.label); // Show label in the input box
+  //   setFilteredOptions([]); // Clear the options after selection
+  //   setFocusedIndex(-1); // Reset focus
+  // };
+
+  // Handle keyboard navigation (arrow keys and enter)
+  // const handleKeyDown = (e) => {
+  //   if (e.key === 'ArrowDown') {
+  //     setFocusedIndex((prevIndex) => Math.min(prevIndex + 1, filteredOptions.length - 1));
+  //   } else if (e.key === 'ArrowUp') {
+  //     setFocusedIndex((prevIndex) => Math.max(prevIndex - 1, 0));
+  //   } else if (e.key === 'Enter' && focusedIndex >= 0) {
+  //     handleOptionSelect(filteredOptions[focusedIndex]);
+  //   } else if (e.key === 'Escape') {
+  //     setFilteredOptions([]); // Close the dropdown
+  //     setFocusedIndex(-1); // Reset focus
+  //   }
+  // };
+
+  const handleKeyDown = (e) => {
+    // Allow control keys like Backspace, Delete, ArrowLeft, ArrowRight, Tab
+    const isControlKey = [
+      "Backspace",
+      "Tab",
+      "ArrowLeft",
+      "ArrowRight",
+      "Delete",
+    ].includes(e.key);
+  
+    if (isControlKey) {
+      return; // If it's a control key, do nothing and allow it to execute
+    }
+  
+    // Allow only alphabetic characters (A-Z, a-z)
+    if (!/^[A-Za-z\s]$/.test(e.key)) {
+      e.preventDefault(); // Prevent the key if it's not an alphabet or space
+    }
+  
+    // Handle dropdown navigation keys
+    if (e.key === "ArrowDown") {
+      setFocusedIndex((prevIndex) => Math.min(prevIndex + 1, filteredOptions.length - 1));
+    } else if (e.key === "ArrowUp") {
+      setFocusedIndex((prevIndex) => Math.max(prevIndex - 1, 0));
+    } else if (e.key === "Enter" && focusedIndex >= 0) {
+      handleOptionSelect(filteredOptions[focusedIndex]);
+    } else if (e.key === "Escape") {
+      setFilteredOptions([]); // Close the dropdown
+      setFocusedIndex(-1); // Reset focus
+    }
+  };
+  
+
+  // const handleChange = (value) => {
+  //   if (value === "requestmanagement") {
+  //     navigation('/requestmanagement')
+  //     setSelectedIcon("request")
+  //   } 
+  //   else if (value === "dashboard") {
+  //     navigation('/dashboard')
+  //     setSelectedIcon('dashboard')
+
+  //   }
+  //   else if (value === "usermanagement") {
+  //     navigation('/usermanagement')
+  //     setSelectedIcon('users')
+
+  //   }
+  //   else if (value === "offers") {
+  //     navigation('/discounts')
+  //     setSelectedIcon("discount")
+  //   }
+  //   else if (value === "advertisement") {
+  //     navigation('/ads')
+  //     setSelectedIcon("advertisement")
+  //   }
+  //   else if (value === "promotion") {
+  //     navigation('/promotion')
+  //     setSelectedIcon("Promotion")
+  //   }
+  //   else if (value === "rolesandresponsiblities") {
+  //     navigation('/roles')
+  //     setSelectedIcon("userGear")
+  //   }
+  //   else if (value === "subscription") {
+  //     navigation('/subscription')
+  //     setSelectedIcon("subscription")
+  //   }
+  //   else if (value === "settings") {
+  //     navigation("/settings")
+  //     setSelectedIcon("settings")
+  //   }
+  //   else if (value === "recyclebin") {
+  //     navigation("/recyclebin")
+  //     setSelectedIcon("recycle")
+  //   }
+  // }
+
+  // const handleChange = useCallback(
+  //   debounce((value) => {
+  //     try {
+  //       if (value === 'request management') {
+  //         navigation('/requestmanagement');
+  //         setSelectedIcon('request');
+  //       } else if (value === 'dashboard') {
+  //         navigation('/dashboard');
+  //         setSelectedIcon('dashboard');
+  //       } else if (value === 'user management') {
+  //         navigation('/usermanagement');
+  //         setSelectedIcon('users');
+  //       } else if (value === 'redeem offers') {
+  //         navigation('/discounts', { state: { tabIndex: 'redeem' } });
+  //         setSelectedIcon('discount');
+  //       } else if (value === 'discount offers') {
+  //         navigation('/discounts', { state: { tabIndex: 'discount' } });
+  //         setSelectedIcon('discount');
+  //       }
+  //       else if (value === 'advertisement') {
+  //         navigation('/ads');
+  //         setSelectedIcon('advertisement');
+  //       } else if (value === 'promotion') {
+  //         navigation('/promotion');
+  //         setSelectedIcon('promotion');
+  //       } else if (value === 'roles and responsiblities') {
+  //         navigation('/roles');
+  //         setSelectedIcon('userGear');
+  //       } else if (value === 'subscription') {
+  //         navigation('/subscription');
+  //         setSelectedIcon('subscription');
+  //       }
+  //       else if (value === 'settings - company settings') {
+  //         navigation('/settings', { state: { tabIndex: "system" } });
+  //         setSelectedIcon('settings');
+  //       } else if (value === 'settings - Configuration') {
+  //         navigation('/settings', { state: { tabIndex: "configuration" } });
+  //         setSelectedIcon('settings');
+  //       }
+  //       else if (value === 'settings - user settings') {
+  //         navigation('/settings', { state: { tabIndex: "user" } });
+  //         setSelectedIcon('settings');
+  //       }
+  //       else if (value === 'settings - product integrations') {
+  //         navigation('/settings', { state: { tabIndex: "integrations" } });
+  //         setSelectedIcon('settings');
+  //       }
+  //       else if (value === 'recycle bin') {
+  //         navigation('/recyclebin');
+  //         setSelectedIcon('recycle');
+  //       }
+  //       else{
+  //         navigation('');
+  //         setSelectedIcon("")
+  //       }
+  //       // Optionally reset selected value after navigation
+  //       setSelectedValue('Search..');
+  //     } catch (e) {
+  //       console.error(e); // Error handling
+  //     }
+  //   }, 200), // Adjust debounce delay as needed
+  //   [] // Dependency array
+  // );
+  const handleOptionSelect = useCallback(
+    debounce((selectedOption) => {
+     const {value} = selectedOption
+      // alert(selectedOption.value)
+      setQuery(selectedOption.label); // Show label in the input box
+      setFilteredOptions([]); // Clear the options after selection
+      setFocusedIndex(-1);
+      try {
+        switch (value) {
+          case 'request management':
+            navigation('/requestmanagement');
+            setSelectedIcon('request');
+            break;
+          case 'operator':
+            navigation('/usermanagement', { state: { tabIndex: 'super_admin' } });
+            setSelectedIcon('users');
+            break;
+          case 'partner':
+            navigation('/usermanagement', { state: { tabIndex: 'partner' } });
+            setSelectedIcon('users');
+            break;
+          case 'client':
+            navigation('/usermanagement', { state: { tabIndex: 'client' } });
+            setSelectedIcon('users');
+            break;
+          case 'employee':
+            navigation('/usermanagement', { state: { tabIndex: 'employee' } });
+            setSelectedIcon('users');
+            break;
+          case 'dashboard':
+            navigation('/dashboard');
+            setSelectedIcon('dashboard');
+            break;
+          case 'user management':
+            navigation('/usermanagement');
+            setSelectedIcon('users');
+            break;
+          case 'redeem offers':
+            navigation('/discounts', { state: { tabIndex: 'redeem' } });
+            setSelectedIcon('discount');
+            break;
+          case 'discount offers':
+            navigation('/discounts', { state: { tabIndex: 'discount' } });
+            setSelectedIcon('discount');
+            break;
+            case 'web advertisement':
+            navigation('/ads',{state : {tabIndex: 'Web'}});
+            setSelectedIcon('advertisement');
+            break;
+          case 'mobile advertisement':
+            navigation('/ads' ,{state : {tabIndex: "Mobile"}});
+            setSelectedIcon('advertisement');
+            break;
+          case 'promotion':
+            navigation('/promotion');
+            setSelectedIcon('Promotion');
+            break;
+          case 'roles':
+            navigation('/roles');
+            setSelectedIcon('userGear');
+            break;
+          case 'subscription':
+            navigation('/subscription');
+            setSelectedIcon('subscription');
+            break;
+          case 'company settings':
+            navigation('/settings', { state: { tabIndex: "system" } });
+            setSelectedIcon('settings');
+            break;
+          case 'Configuration':
+            navigation('/settings', { state: { tabIndex: "configuration" } });
+            setSelectedIcon('settings');
+            break;
+          case 'user settings':
+            navigation('/settings', { state: { tabIndex: "user" } });
+            setSelectedIcon('settings');
+            break;
+          case 'product integrations':
+            navigation('/settings', { state: { tabIndex: "integrations" } });
+            setSelectedIcon('settings');
+            break;
+          case 'recycle bin':
+            navigation('/recyclebin');
+            setSelectedIcon('recycle');
+            break;
+          default:
+            navigation('');
+            setSelectedIcon('');
+        }
+
+        // Optionally reset selected value after navigation
+        setSelectedValue('Search..');
+      } catch (e) {
+        console.error(e); // Error handling
+      }
+    }, 200),
+    [] // Dependency array
+  );
+
+
+    const searchBoxRef = useRef(null);
+
+  // Close search input if clicked outside of the component
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchBoxRef.current && !searchBoxRef.current.contains(event.target)) {
+        // setSearchInput(false);
+        setFilteredOptions([]); // Close the input if the click is outside
+      }
+    };
+
+    // Attach the event listener to the document
+    document.addEventListener('mousedown', handleClickOutside);
+
+    // Clean up the event listener when the component unmounts
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+
   return (
-    <div className="fixed w-full px-[2.5vw]">
+    <div className="fixed w-full px-[2.5vw]" >
       <div className="relative ">
         {/* rounded-t-full */}
         <div className="absolute h-[8vh] bottom-0  pl-[2.5vw]  flex items-center rounded-t-full  bg-[#1F4B7F] w-full">
@@ -119,9 +452,8 @@ export default function Sidebar() {
             <div className="flex items-center gap-[2vw]">
               <Tooltip title="Dashboard" color="#1F4B7F">
                 <div
-                  className={`icon-container ${
-                    selectedIcon === "dashboard" ? "selected" : ""
-                  }`}
+                  className={`icon-container ${selectedIcon === "dashboard" ? "selected" : ""
+                    }`}
                   onClick={() => handleIconClick("dashboard", "dashboard")}
                 >
                   <RiDashboardFill color="white" size={"2.5vw"} />
@@ -148,58 +480,62 @@ export default function Sidebar() {
                   <IoSearch size={"1.5vw"} color="white" />
                 </div>
               )} */}
-              <Tooltip
-                width="20vw"
-                title={
-                  <div
-                    className="search-container"
-                    onMouseLeave={() => setSearchInput(false)}
-                  >
-                    <input
-                      type="text"
-                      className="search-input outline-none pl-[5vw]"
-                      placeholder="Search"
-                    />
-                    <IoSearch className="search-icon" />
-                  </div>
-                }
-                color="#1F4B7F"
-                placement="topLeft"
-                className="w-[20vw]"
-                style={{
-                  width: "20vw",
-                }}
-              >
-                <div
-                  className="search-button"
-                  onMouseEnter={() => setSearchInput(true)}
-                  onMouseLeave={() => setSearchInput(false)}
-                >
-                  <IoSearch size={"1.5vw"} color="white" />
+<div className="flex items-center gap-x-[.3vw]" >
+
+<div className="relative w-[13vw]" ref={searchBoxRef}>
+<div className=" left-[.5vw] top-[.5vw] absolute">
+                  <IoSearch size={"1.3vw"} color="white" />
                 </div>
-              </Tooltip>
+
+      <input
+        className="h-[2.5vw] pl-[2.3vw] pr-[.4vw] bg-[#57789f] placeholder:text-white text-[1vw] w-full rounded-[.4vw] outline-none text-[white]"
+        type="text"
+        value={query}
+        onChange={handleInputChange}
+        onKeyDown={handleKeyDown}
+        placeholder="Search..."
+      />
+      {filteredOptions.length > 0 && (
+        <ul
+          className="absolute w-[13vw]   bg-white shadow-md rounded-[.4vw] mt-1 max-h-[12vw] overflow-auto text-[1vw] text-[#1F4B7F]"
+          // style={{ top: 'calc(100% + 5px)' }}
+          // style={{top:"-125px"}}
+          style={{ bottom: "calc(100% + 4px)" }}
+        >
+          {filteredOptions.map((option, index) => (
+            <li
+              key={index}
+              className={`p-[.5vw] text-[1vw]  hover:bg-[#f0f0f0] cursor-pointer ${index === focusedIndex ? 'bg-[#e0e0e0]' : ''}`}
+              onClick={() => handleOptionSelect(option)} // Select option
+            >
+              {option.label}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+    </div>
+                
               {(showClient ||
                 showEmployee ||
                 showPartner ||
                 currenttypeid === "PRO101" ||
                 currenttypeid === "OP101") && (
-                <Tooltip title="User Management" color="#1F4B7F">
-                  <div
-                    className={`icon-container ${
-                      selectedIcon === "users" ? "selected" : ""
-                    }`}
-                    onClick={() => handleIconClick("users", "usermanagement")}
-                  >
-                    <FaUsers color="white" size={"2.5vw"} />
-                  </div>
-                </Tooltip>
-              )}
+                  <Tooltip title="User Management" color="#1F4B7F">
+                    <div
+                      className={`icon-container ${selectedIcon === "users" ? "selected" : ""
+                        }`}
+                      onClick={() => handleIconClick("users", "usermanagement")}
+                    >
+                      <FaUsers color="white" size={"2.5vw"} />
+                    </div>
+                  </Tooltip>
+                )}
               {currenttypeid === "PRO101" && (
                 <Tooltip title="Request Management" color="#1F4B7F">
                   <div
-                    className={`icon-container ${
-                      selectedIcon === "request" ? "selected" : ""
-                    }`}
+                    className={`icon-container ${selectedIcon === "request" ? "selected" : ""
+                      }`}
                     onClick={() =>
                       handleIconClick("request", "requestmanagement")
                     }
@@ -211,7 +547,8 @@ export default function Sidebar() {
                     <img
                       src={request_management}
                       alt="request management"
-                      className="h-[2vw] w-[2vw]"
+                      className={`h-[2.38vw] w-[2.38vw] p-[.2vw] ${selectedIcon === "request" ? "" : ""
+                      } `}
                     />
                   </div>
                 </Tooltip>
@@ -219,9 +556,8 @@ export default function Sidebar() {
               {(showOffers || currenttypeid === "PRO101") && (
                 <Tooltip title="Offers & Deals" color="#1F4B7F">
                   <div
-                    className={`icon-container ${
-                      selectedIcon === "discount" ? "selected" : ""
-                    }`}
+                    className={`icon-container ${selectedIcon === "discount" ? "selected" : ""
+                      }`}
                     onClick={() => handleIconClick("discount", "discounts")}
                   >
                     <RiDiscountPercentFill color="white" size={"2.5vw"} />
@@ -231,9 +567,8 @@ export default function Sidebar() {
               {(showAdvertisement || currenttypeid === "PRO101") && (
                 <Tooltip title="Advertisement" color="#1F4B7F">
                   <div
-                    className={`icon-container ${
-                      selectedIcon === "advertisement" ? "selected" : ""
-                    }`}
+                    className={`icon-container ${selectedIcon === "advertisement" ? "selected" : ""
+                      }`}
                     onClick={() => handleIconClick("advertisement", "ads")}
                   >
                     <RiAdvertisementFill color="white" size={"2.5vw"} />
@@ -243,36 +578,34 @@ export default function Sidebar() {
               {(showPromotionsIcon ||
                 currenttypeid === "PRO101" ||
                 currenttypeid === "OP101") && (
-                <Tooltip title="Promotion" color="#1F4B7F">
-                  <div
-                    className={`icon-container ${
-                      selectedIcon === "Promotion" ? "selected" : ""
-                    }`}
-                    onClick={() => handleIconClick("Promotion", "promotion")}
-                  >
-                    {/* <MdOutlineSpeakerNotes color="white" size={"2.5vw"} /> */}
-                    <img
-                      src={promotionicon}
-                      alt="promotion icon"
-                      className="h-[2.5vw] w-[2.5vw]"
-                    />
-                  </div>
-                </Tooltip>
-              )}
+                  <Tooltip title="Promotion" color="#1F4B7F">
+                    <div
+                      className={`icon-container ${selectedIcon === "Promotion" ? "selected" : ""
+                        }`}
+                      onClick={() => handleIconClick("Promotion", "promotion")}
+                    >
+                      {/* <MdOutlineSpeakerNotes color="white" size={"2.5vw"} /> */}
+                      <img
+                        src={promotionicon}
+                        alt="promotion icon"
+                        className="h-[2.5vw] w-[2.5vw]"
+                      />
+                    </div>
+                  </Tooltip>
+                )}
               {(showRoles ||
                 currenttypeid === "PRO101" ||
                 currenttypeid === "OP101") && (
-                <Tooltip title="Roles & Responsibilities" color="#1F4B7F">
-                  <div
-                    className={`icon-container ${
-                      selectedIcon === "userGear" ? "selected" : ""
-                    }`}
-                    onClick={() => handleIconClick("userGear", "roles")}
-                  >
-                    <FaUserGear color="white" size={"2.5vw"} />
-                  </div>
-                </Tooltip>
-              )}
+                  <Tooltip title="Roles & Responsibilities" color="#1F4B7F">
+                    <div
+                      className={`icon-container ${selectedIcon === "userGear" ? "selected" : ""
+                        }`}
+                      onClick={() => handleIconClick("userGear", "roles")}
+                    >
+                      <FaUserGear color="white" size={"2.5vw"} />
+                    </div>
+                  </Tooltip>
+                )}
               {/* <Tooltip title="Report" color="#1F4B7F">
                 <div
                   className={`icon-container ${
@@ -286,9 +619,8 @@ export default function Sidebar() {
               {currenttypeid === "PRO101" && (
                 <Tooltip title="Subscription" color="#1F4B7F">
                   <div
-                    className={`icon-container ${
-                      selectedIcon === "subscription" ? "selected" : ""
-                    }`}
+                    className={`icon-container ${selectedIcon === "subscription" ? "selected" : ""
+                      }`}
                     onClick={() =>
                       handleIconClick("subscription", "subscription")
                     }
@@ -301,9 +633,8 @@ export default function Sidebar() {
             <div className="flex items-center gap-[1vw]">
               <Tooltip title="Settings" color="#1F4B7F">
                 <div
-                  className={`icon-container ${
-                    selectedIcon === "settings" ? "selected" : ""
-                  }`}
+                  className={`icon-container ${selectedIcon === "settings" ? "selected" : ""
+                    }`}
                   onClick={() => handleIconClick("settings", "settings")}
                 >
                   <IoMdSettings color="white" size={"2.5vw"} />
@@ -311,9 +642,8 @@ export default function Sidebar() {
               </Tooltip>
               <Tooltip title="Notification" color="#1F4B7F">
                 <div
-                  className={`icon-container ${
-                    selectedIcon === "notification" ? "selected" : ""
-                  }`}
+                  className={`icon-container ${selectedIcon === "notification" ? "selected" : ""
+                    }`}
                   onClick={
                     openNotification
                     // handleIconClick("notification", "notification")
@@ -337,9 +667,8 @@ export default function Sidebar() {
               </Tooltip>
               <Tooltip title="Support" color="#1F4B7F">
                 <div
-                  className={`icon-container ${
-                    selectedIcon === "support" ? "selected" : ""
-                  }`}
+                  className={`icon-container ${selectedIcon === "support" ? "selected" : ""
+                    }`}
                   onClick={
                     openSupport
                     // handleIconClick("support", "support")
@@ -350,26 +679,26 @@ export default function Sidebar() {
               </Tooltip>
               <Tooltip title="Recycle Bin" color="#1F4B7F">
                 <div
-                  className={`icon-container ${
-                    selectedIcon === "recycle" ? "selected" : ""
-                  }`}
+                  className={`icon-container ${selectedIcon === "recycle" ? "selected" : ""
+                    }`}
                   onClick={() => handleIconClick("recycle", "recyclebin")}
                 >
                   <RiDeleteBin5Fill color="white" size={"2.5vw"} />
                 </div>
               </Tooltip>
               <div className="border-r-[0.2vw] border-white h-[2.5vw]"></div>
-              <div className="w-[10vw]">
+              <div className="w-[11vw]">
                 <Popover
+                  color="#1F4B7F"
                   placement="top"
                   content={
                     <div className="flex flex-col w-[8vw]">
-                      <div className="flex items-center">
+                      <div className="flex items-center p-[.5vw]">
                         <span>
-                          <MdLogout size={"2vw"} />
+                          <MdLogout size={"2vw"} color="#FFFFFF" />
                         </span>
                         <label
-                          className="text-[1.2vw] pl-[0.5vw] text-black cursor-pointer font-semibold"
+                          className="text-[1.2vw] pl-[0.5vw] text-white cursor-pointer font-semibold"
                           onClick={() => {
                             sessionStorage.removeItem("token");
                             sessionStorage.removeItem("selectedIcon");
@@ -385,13 +714,22 @@ export default function Sidebar() {
                     </div>
                   }
                   trigger="click"
-                  // open={openPopovers[row.ad_id] || false}
-                  // onOpenChange={() => togglePopover(row.ad_id)}
+                // open={openPopovers[row.ad_id] || false}
+                // onOpenChange={() => togglePopover(row.ad_id)}
                 >
                   <div className="flex items-center cursor-pointer">
-                    <label className="text-[1.2vw] text-white cursor-pointer  font-semibold">
-                      {sessionStorage.getItem("user_name")}
+                    <label className="text-[1.2vw] max-w-[6.5vw] text-wrap text-white cursor-pointer  font-semibold">
                       {/* {sessionStorage.getItem("user_name")} */}
+                      {/* {sessionStorage.getItem("user_name")?.length > 16 ? <><Tooltip color="white"
+                        overlayInnerStyle={{ color: "#1F4B7F" }}
+                        placement="top" title={<span className="text-[1.1vw] font-semibold">{sessionStorage.getItem("user_name")}</span>}> {`${splitString(sessionStorage.getItem("user_name")).slice(0,16)}..`}</Tooltip></> : <>{splitString(sessionStorage.getItem("user_name"))}</>} */}
+                      {/* vikramgane */}
+
+
+                      {sessionStorage.getItem("user_name")?.length > 9 ? <><Tooltip color="white"
+                        overlayInnerStyle={{ color: "#1F4B7F" }}
+                        placement="top" title={<span className="text-[1.1vw] font-semibold">{sessionStorage.getItem("user_name")}</span>}> {`${capitalizeFirstLetter(sessionStorage.getItem("user_name").slice(0, 8))}..`}</Tooltip></> : <>{capitalizeFirstLetter(sessionStorage.getItem("user_name"))}</>}
+                      {/* { splitString("vikram ganesa")} */}
                     </label>
                     <span className="pl-[0.5vw]">
                       <CgProfile
@@ -410,8 +748,8 @@ export default function Sidebar() {
               closeicon={false}
               onClose={closeNotification}
               module={"notification"}
-              // height="90%"
-              // width="30vw"
+            // height="90%"
+            // width="30vw"
             >
               {/* <div className="overflow-auto mt-6 max-h-[70vh]">
         {content.map((item, index) => (
@@ -430,8 +768,8 @@ export default function Sidebar() {
             closeicon={false}
             onClose={colseSupport}
             module={"support"}
-            // height="90%"
-            // width="30vw"
+          // height="90%"
+          // width="30vw"
           >
             {/* <div>
         <div className="flex justify-center text-[#1f487c] font-bold"><h1>GEt In Touch</h1></div>

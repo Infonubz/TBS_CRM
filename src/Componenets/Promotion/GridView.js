@@ -72,11 +72,11 @@ export default function GridView({
 
   return (
     <div className="pt-[0.1vw]">
-      <div className="grid grid-cols-5 w-full gap-x-[2vw] gap-y-[1.2vw] ">
+      <div className="grid grid-cols-5 w-full gap-x-[2vw] gap-y-[.8vw] ">
         {dataArr?.map((item) => (
           <div
             key={item.promo_id}
-            className={` bg-white text-[#1f4b7f] h-[17vw] w-[16vw] relative border-[#1f4b7f] border-l-[0.1vw] border-r-[0.3vw] border-b-[0.3vw] border-t-[0.1vw] rounded-[0.5vw]`}
+            className={` bg-white text-[#1f4b7f] h-[16.3vw] w-[16vw] relative border-[#1f4b7f] border-l-[0.1vw] border-r-[0.3vw] border-b-[0.3vw] border-t-[0.1vw] rounded-[0.5vw]`}
             onMouseEnter={() => setHoverId(item.promo_id)}
             onMouseLeave={() => setHoverId("")}
             style={{
@@ -88,8 +88,8 @@ export default function GridView({
             }}
           >
             <div className="flex items-center justify-center py-[0.5vw] ">
-              { item.background_image != null ? (
-                  <img
+              {item.background_image != null ? (
+                <img
                   src={
                     item.background_image != null
                       ? `${apiImgUrl}${item.background_image}`
@@ -99,22 +99,22 @@ export default function GridView({
                     setPromoImage(item.background_image);
                     setEyeModalIsOpen(true);
                   }}
-                  className="h-[4.5vw] w-[9vw] cursor-pointer rounded-[0.5vw] flex items-center justify-center"
+                  className="h-[4vw] w-[8vw] cursor-pointer rounded-[0.5vw] flex items-center justify-center"
                 />
               )
-              : (
-               <div className="flex flex-col items-center justify-center w-auto mb-[1vw] px-[1vw] h-[5vw] ">
-                  <CiImageOff size={"4vw"} color="#A9A9A9" />
-                </div>
-             )
+                : (
+                  <div className="flex flex-col items-center justify-center w-auto mb-[1vw] px-[1vw] h-[5vw] ">
+                    <CiImageOff size={"4vw"} color="#A9A9A9" />
+                  </div>
+                )
               }
-             
+
               <div className=" " key={item.promo_id}>
                 <Popover
                   placement="bottomRight"
                   className=""
                   content={
-                    <div className="flex flex-col border-[0.1vw] border-[#1F4B7F] px-[1vw] py-[0.5vw] rounded-[0.5vw]">
+                    <div className="flex flex-col border-[0.1vw] border-[#1F4B7F] px-[.5vw]  rounded-[0.5vw]">
                       {/* <div className="flex items-center gap-x-[0.5vw] py-[0.25vw] border-b-[0.1vw] border-[#1F487C]">
                   <span>
                     <FaEye
@@ -141,19 +141,59 @@ export default function GridView({
                 </div> */}
                       <div className="flex items-center gap-x-[0.5vw] py-[0.25vw] border-b-[0.1vw] border-[#1F487C]">
                         <span>
-                          <MdEdit
+                          {/* <MdEdit
                             size={"1.2vw"}
                             color="#1F4B7F"
                             className="cursor-pointer"
                             onClick={() => handleEdit(item.promo_id)}
-                          />
+                          /> */}
+                          {(type_Id === "PRO101") ? (
+                            <div className="flex items-center gap-x-[0.5vw] py-[0.25vw]  ">    <span> <MdEdit
+                              size={"1.3vw"}
+                              color="#1F4B7F"
+                              className=" cursor-pointer"
+                              onClick={() => {
+                                setPromotionId(item.promo_id);
+                                SetUpdateData(item.promo_id);
+                                setModalIsOpen(true);
+                              }}
+                            /> </span>
+                              <a
+                                onClick={() => handleEdit(item.promo_id)}
+                                className="flex font-semibold items-center cursor-pointer text-[1vw] text-[#1F4B7F] hover:text-[#1f487c]"
+                              >
+                                Edit
+                              </a>
+
+                            </div>
+                          ) : (type_Id === "OP101" && [2, 3, 4].includes(item.promo_status_id) && item.promo_status_id === item.user_status_id) ? null : (type_Id === "OPEMP101" && [2, 5, 3, 4, 6].includes(item.promo_status_id)) ? null : (
+                            <div className="flex items-center gap-x-[0.5vw] py-[0.25vw] ">   <span> <MdEdit
+                              size={"1.3vw"}
+                              color="#1F4B7F"
+                              className="cursor-pointer"
+                              onClick={() => {
+                                console.log(type_Id === "OPEMP101" && [2, 5].includes(item.promo_status_id), "conditionconditionnnnnn")
+                                setPromotionId(item.promo_id);
+                                SetUpdateData(item.promo_id);
+                                sessionStorage.setItem("currenttbsuserid", item.tbs_user_id)
+                                setModalIsOpen(true);
+                              }}
+                            /> </span>
+                              <a
+                                onClick={() => handleEdit(item.promo_id)}
+                                className="flex font-semibold items-center cursor-pointer text-[1vw] text-[#1F4B7F] hover:text-[#1f487c]"
+                              >
+                                Edit
+                              </a>
+                            </div>
+                          )}
                         </span>
-                        <a
+                        {/* <a
                           onClick={() => handleEdit(item.promo_id)}
                           className="flex font-semibold items-center cursor-pointer text-[1vw] text-[#1F4B7F] hover:text-[#1f487c]"
                         >
                           Edit
-                        </a>
+                        </a> */}
                       </div>
                       <div className="flex items-center gap-x-[0.5vw] py-[0.25vw]">
                         <span>
@@ -200,10 +240,15 @@ export default function GridView({
                     className="cursor-pointer"
                     color="#1F487C"
                   >
-                    {`${item.operator_details?.slice(0, 15)}...`}
+                    {`${item?.operator_details?.charAt(0) === item?.operator_details?.charAt(0)?.toLowerCase()
+                      ? capitalizeFirstLetter(item?.operator_details?.slice(0, 15))
+                      : item?.operator_details?.slice(0, 15)}...`}
+
                   </Tooltip>
                 ) : (
-                  item.operator_details?.slice(0, 15)
+                  item?.operator_details?.charAt(0) === item?.operator_details?.charAt(0)?.toLowerCase() 
+                  ? capitalizeFirstLetter(item?.operator_details?.slice(0, 15)) 
+                  : item?.operator_details?.slice(0, 15)
                 )}
               </label>
               <h1 className="flex text-[0.9vw]  px-[1vw]">
@@ -238,41 +283,39 @@ export default function GridView({
                 ).format("MMM DD")}`}
               </h1>
               <div className="px-[0.5vw] items-center justify-center">
-              <div
-                    className={`${
-                      item.promo_status_id == 2
-                        ? " border-[0.1vw] border-[#34AE2A]"
-                        : item.promo_status_id == 0
+                <div
+                  className={`${item.promo_status_id == 2
+                      ? " border-[0.1vw] border-[#34AE2B]"
+                      : item.promo_status_id == 0
                         ? "border-[0.1vw] border-[#646262]"
                         : item.promo_status_id == 3
-                        ? "border-[0.1vw] border-[#2A99FF]"
-                        : item.promo_status_id == 4
-                        ? "border-[#FF0000] border-[0.1vw]"
-                        : "border-[#FF9900] border-[0.1vw]"
+                          ? "border-[0.1vw] border-[#2A99FF]"
+                          : item.promo_status_id == 4
+                            ? "border-[#FF0000] border-[0.1vw]"
+                            : "border-[#FF9900] border-[0.1vw]"
                     } rounded-full `}
-                  >
-                <div
-                  className={`${
-                    item?.promo_status_id === 0
-                      ? "bg-[#777575]"
-                      : item?.promo_status_id === 1
-                      ? "bg-[#FF9900]"
-                      : item?.promo_status_id === 2
-                      ? "bg-[#34AE2A]"
-                      : item?.promo_status_id === 3
-                      ? "bg-[#2A99FF]"
-                      : item?.promo_status_id === 4
-                      ? "bg-[#FD3434]"
-                      : item?.promo_status_id === 5
-                      ? "bg-[#FF9900]"
-                      : "bg-[#646262]"
-                  } border-dashed  border-white border-[0.2vw] text-[1vw] rounded-full text-white  py-[0.2vw] w-[11vw] flex items-center justify-center `}
+                >
+                  <div
+                    className={`${item?.promo_status_id === 0
+                        ? "bg-[#777575]"
+                        : item?.promo_status_id === 1
+                          ? "bg-[#FF9900]"
+                          : item?.promo_status_id === 2
+                            ? "bg-[#34AE2B]"
+                            : item?.promo_status_id === 3
+                              ? "bg-[#2A99FF]"
+                              : item?.promo_status_id === 4
+                                ? "bg-[#FD3434]"
+                                : item?.promo_status_id === 5
+                                  ? "bg-[#FF9900]"
+                                  : "bg-[#646262]"
+                      } border-dashed  border-white border-[0.2vw] text-[1vw] rounded-full text-white  py-[0.2vw] w-[11vw] flex items-center justify-center `}
                   // onClick={() => {
                   //   handleStatus(item);
                   // }}
-                >
-                  {item.promo_code}
-                </div>
+                  >
+                    {item.promo_code}
+                  </div>
                 </div>
               </div>
             </div>

@@ -111,7 +111,7 @@ const ProfessionalDetails = () => {
             join_date: empProfessional
               ? dayjs(empProfessional.date_of_birth).format("YYYY-MM-DD")
               : "",
-            role: empProfessional ? empProfessional.role : "",
+            role: empProfessional ? empProfessional.role_type : "",
             designation: empProfessional ? empProfessional.designation : "",
             department: empProfessional ? empProfessional.department : "",
             report_manager: empProfessional
@@ -193,14 +193,14 @@ const ProfessionalDetails = () => {
                         <Select
                           showSearch
                           className={`custom-select border-r-[0.25vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none ${
-                            isEdit === false ? "cursor-not-allowed" : ""
+                            isEdit === false ? "cursor-not-allowed" : "cursor-not-allowed"
                           }`}
                           placeholder="Select Role"
                           value={values.role}
                           onChange={(value) => {
                             setFieldValue("role", value);
                           }}
-                          disabled={isEdit === false}
+                          disabled={true}
                           suffixIcon={
                             <span style={{ fontSize: "1vw", color: "#1f487c" }}>
                               <IoMdArrowDropdown size="2vw" />

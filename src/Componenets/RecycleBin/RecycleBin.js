@@ -32,17 +32,18 @@ export default function RecycleBin() {
   const dispatch = useDispatch();
   useEffect(() => {
     setSpinning(true);
-    GetBinData(dispatch, typeId === "PRO101" ? 1 : 2, setSpinning);
+    GetBinData(dispatch, typeId === "PRO101" ? 5 : 2, setSpinning);
   }, []);
 
   const getBin = useSelector((state) => state.crm.bin_data);
 
   console.log(getBin, "hhdfjkhdkfjd");
-  const [selectedTab, setSelectedTab] = useState(typeId === "PRO101" ? 1 : 2);
+  const [selectedTab, setSelectedTab] = useState(typeId === "PRO101" ? 5 : 2);
 
   const onChange = (value) => {
     setSelectedTab(value);
     setSpinning(true);
+    setActivePage(1);
     GetBinData(dispatch, value, setSpinning);
   };
 
@@ -79,7 +80,7 @@ export default function RecycleBin() {
     2: "(Promotions)",
     3: "(Advertisements - Web)",
     4: "(Advertisements - Mobile)",
-    5: "(BusOperator)",
+    5: "(Operator)",
     6: "(Operator - Employee)",
     7: "(Client)",
     8: "(ProductOwner - Employee)",
@@ -93,25 +94,50 @@ export default function RecycleBin() {
   };
   const options = [
     {
-      value: 1,
+      value: 5,
       label: (
-        <div className="text-[1vw] text-[#1F4B7F] font-semibold pl-[0.7vw] pb-[0.1vw]">
-          Offers & Deals
+        <div className="text-[1vw] text-[#1F4B7F]  font-semibold pl-[0.2vw] ">
+          User Management - Operator
         </div>
       ),
     },
     {
-      value: 2,
+      value: 9,
       label: (
-        <div className="text-[1vw] text-[#1F4B7F]   font-semibold pl-[0.7vw] pb-[0.1vw]">
-          Promotions
+        <div className="text-[1vw] text-[#1F4B7F]  font-semibold pl-[0.2vw] ">
+          User Management - Partner
+        </div>
+      ),
+    },
+    {
+      value: 7,
+      label: (
+        <div className="text-[1vw] text-[#1F4B7F]  font-semibold pl-[0.2vw] ">
+          User Management - Client
+        </div>
+      ),
+    },
+    {
+      value: 8,
+      label: (
+        <div className="text-[1vw] text-[#1F4B7F]  font-semibold pl-[0.2vw] ">
+          {/* ProductOwner-Employee */}
+          User Management - Employee
+        </div>
+      ),
+    },
+    {
+      value: 1,
+      label: (
+        <div className="text-[1vw] text-[#1F4B7F] font-semibold pl-[0.2vw]  ">
+          Offers & Deals
         </div>
       ),
     },
     {
       value: 3,
       label: (
-        <div className="text-[1vw] text-[#1F4B7F]  font-semibold pl-[0.7vw] pb-[0.1vw]">
+        <div className="text-[1vw] text-[#1F4B7F]  font-semibold pl-[0.2vw] ">
           Advertisements - Web
         </div>
       ),
@@ -119,32 +145,16 @@ export default function RecycleBin() {
     {
       value: 4,
       label: (
-        <div className="text-[1vw] text-[#1F4B7F]  font-semibold pl-[0.7vw] pb-[0.1vw]">
+        <div className="text-[1vw] text-[#1F4B7F]  font-semibold pl-[0.2vw] ">
           Advertisements - Mobile
         </div>
       ),
     },
     {
-      value: 5,
+      value: 2,
       label: (
-        <div className="text-[1vw] text-[#1F4B7F]  font-semibold pl-[0.7vw] pb-[0.1vw]">
-          UserManagement - BusOperator
-        </div>
-      ),
-    },
-    {
-      value: 7,
-      label: (
-        <div className="text-[1vw] text-[#1F4B7F]  font-semibold pl-[0.7vw] pb-[0.1vw]">
-          UserManagement - Client
-        </div>
-      ),
-    },
-    {
-      value: 8,
-      label: (
-        <div className="text-[1vw] text-[#1F4B7F]  font-semibold pl-[0.7vw] pb-[0.1vw]">
-          ProductOwner-Employee
+        <div className="text-[1vw] text-[#1F4B7F]   font-semibold pl-[0.2vw] ">
+          Promotions
         </div>
       ),
     },
@@ -156,20 +166,12 @@ export default function RecycleBin() {
     //     </div>
     //   ),
     // },
-    {
-      value: 9,
-      label: (
-        <div className="text-[1vw] text-[#1F4B7F]  font-semibold pl-[0.7vw] pb-[0.1vw]">
-          UserManagement - Partner
-        </div>
-      ),
-    },
   ];
   const operatorOptions = [
     {
       value: 2,
       label: (
-        <div className="text-[1vw] text-[#1F4B7F]   font-semibold pl-[0.7vw] pb-[0.1vw]">
+        <div className="text-[1vw] text-[#1F4B7F]   font-semibold  ">
           Promotions
         </div>
       ),
@@ -177,25 +179,31 @@ export default function RecycleBin() {
     {
       value: 6,
       label: (
-        <div className="text-[1vw] text-[#1F4B7F]  font-semibold pl-[0.7vw] pb-[0.1vw]">
-          Operator-Employee
+        <div className="text-[1vw] text-[#1F4B7F]  font-semibold ">
+          Employee
         </div>
       ),
     },
   ];
 
   const defaultvalues = {
-    value: 1,
-    label: (
-      <div className="text-[1vw] text-[#1F4B7F] font-semibold pl-[0.7vw] pb-[0.1vw]">
-        Offers & Deals
-      </div>
-    ),
+    // value: 1,
+    // label: (
+    //   <div className="text-[1vw] text-[#1F4B7F] font-semibold  ">
+    //     Offers & Deals
+    //   </div>
+    // ),
+      value: 5,
+      label: (
+        <div className="text-[1vw] text-[#1F4B7F]  font-semibold pl-[0.2vw] ">
+          User Management - Operator
+        </div>
+      ),
   };
   const operatorDefaultvalues = {
     value: 2,
     label: (
-      <div className="text-[1vw] text-[#1F4B7F]   font-semibold pl-[0.7vw] pb-[0.1vw]">
+      <div className="text-[1vw] text-[#1F4B7F]   font-semibold ">
         Promotions
       </div>
     ),
@@ -227,35 +235,35 @@ export default function RecycleBin() {
       { title: "Name" },
       { title: "Mobile" },
       { title: "Email" },
-      { title: "Deleted Date" },
+      // { title: "Deleted Date" },
       { title: "status" },
     ],
     7: [
       { title: "Name" },
       { title: "Mobile" },
       { title: "Email" },
-      { title: "Deleted Date" },
+      // { title: "Deleted Date" },
       { title: "status" },
     ],
     8: [
       { title: "Name" },
       { title: "Mobile" },
       { title: "Email" },
-      { title: "Deleted Date" },
+      // { title: "Deleted Date" },
       { title: "status" },
     ],
     9: [
       { title: "Name" },
       { title: "Mobile" },
       { title: "Email" },
-      { title: "Deleted Date" },
+      // { title: "Deleted Date" },
       { title: "status" },
     ],
     7: [
       { title: "Name" },
       { title: "Mobile" },
       { title: "Email" },
-      { title: "Deleted Date" },
+      // { title: "Deleted Date" },
       { title: "status" },
     ],
   };
@@ -263,6 +271,25 @@ export default function RecycleBin() {
   const currentArray = data[selectedTab];
 
   console.log(selectedTab, "currenttabs");
+  const handleKeyDown = (e) => {
+    // Allow control keys like Backspace, Delete, ArrowLeft, ArrowRight, Tab
+    const isControlKey = [
+      "Backspace",
+      "Tab",
+      "ArrowLeft",
+      "ArrowRight",
+      "Delete",
+    ].includes(e.key);
+  
+    if (isControlKey) {
+      return; // If it's a control key, do nothing and allow it to execute
+    }
+  
+    // Allow only alphabets (A-Z, a-z), numbers (0-9), and space
+    if (!/^[A-Za-z0-9\s]$/.test(e.key)) {
+      e.preventDefault(); // Prevent the key if it's not an alphabet, number, or space
+    }
+  };
 
   return (
     <div
@@ -279,7 +306,7 @@ export default function RecycleBin() {
             <div className="h-[12vh] mb-[.2vw] w-full items-center">
               <div className="flex items-center">
                 <h1 className="text-[#1F4B7F] text-[1.8vw] font-bold flex items-center justify-center">
-                  <span className="pr-[.3vw]">RecycleBin</span>{" "}
+                  <span className="pr-[.3vw]">Recycle Bin</span>{" "}
                   <span className="text-[1vw]">-</span>
                   <span className="text-[1vw] pl-[.5vw]">{selectedTitle}</span>
                 </h1>
@@ -288,11 +315,12 @@ export default function RecycleBin() {
                 <div className="relative flex items-center ">
                   <input
                     type="text"
-                    className="bg-white outline-none text-[#1F4B7F] pl-[2vw] w-[17vw] h-[5vh] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.75vw] border-r-[0.25vw] border-b-[0.25vw]"
+                    className="bg-white outline-none text-[#1F4B7F] px-[2vw] w-[17vw] h-[5vh] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.75vw] border-r-[0.25vw] border-b-[0.25vw]"
                     placeholder="Search.."
+                    onKeyDown={handleKeyDown}
                     onChange={(e) => handleSearch(e.target.value)}
                   />
-                  <div className="absolute right-[1vw] ">
+                  <div className="absolute inline-block align-text-bottom  right-[1vw] ">
                     <Popover
                       color="white"
                       title={
@@ -321,8 +349,8 @@ export default function RecycleBin() {
                     </Popover>
                   </div>
                   <LiaSearchSolid
-                    className="absolute left-[0.5vw] top-[0.6vw]"
-                    size={"1vw"}
+                    className="absolute left-[0.5vw] pb-[.1vw] "
+                    size={"1.1vw"}
                     color="#9CA3AF"
                   />
                 </div>
@@ -445,7 +473,7 @@ export default function RecycleBin() {
                       Select: {
                         optionActiveBg: "#aebed1",
                         optionSelectedColor: "#FFF",
-                        optionSelectedBg: "#aebed1",
+                        optionSelectedBg: '#e5e5e5',
                         optionHeight: "2",
                       },
                     },
@@ -468,7 +496,7 @@ export default function RecycleBin() {
                     }}
                     optionFilterProp="value"
                     suffixIcon={
-                      <span style={{ fontSize: "1vw", color: "#1f487c" }}>
+                      <span style={{ color: "#1f487c" }}>
                         <IoMdArrowDropdown size="2vw" />
                       </span>
                     }
@@ -476,9 +504,17 @@ export default function RecycleBin() {
                     defaultValue={
                       typeId === "PRO101"
                         ? defaultvalues
+                        : typeId === "PROEMP101"
+                        ? defaultvalues
                         : operatorDefaultvalues
                     }
-                    options={typeId === "PRO101" ? options : operatorOptions}
+                    options={
+                      typeId === "PRO101"
+                        ? options
+                        : typeId === "PROEMP101"
+                        ? options
+                        : operatorOptions
+                    }
                   />
                 </ConfigProvider>
               </div>

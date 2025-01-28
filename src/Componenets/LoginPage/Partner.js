@@ -44,6 +44,7 @@ export default function ParnterLoginPage({ setAuthtoken }) {
             ) : (
               <ProductOwnerForgotPassword
                 setForgotPassword={setForgotPassword}
+                typeID={"PART101"}
               />
             )}
           </div>

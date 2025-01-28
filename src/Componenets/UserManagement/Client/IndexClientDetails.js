@@ -114,6 +114,7 @@ export default function ClientIndex({
       }
     } else {
       // If no file, just update the file list
+      setProfileImage(false)
       setFileList(newFileList);
       setSelectedFile(newFileList)
     }
@@ -278,12 +279,14 @@ console.log(process.env.REACT_SERVER_IMAGE_URL,"urlrurlrurlrurlrurlrurl");
                     onImageCrop={(file) => {}}
                   >
                     <Upload
+                    className="umimgupload"
                       action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
                       listType="picture-card"
                       fileList={fileList}
                       onChange={handleChange}
                       onPreview={handlePreview}
                       disabled={enableUpload}
+                      accept=".jpg,.jpeg,.png" 
                     >
                       {fileList?.length < 1 && "+ Upload"}
                     </Upload>
@@ -401,6 +404,7 @@ console.log(process.env.REACT_SERVER_IMAGE_URL,"urlrurlrurlrurlrurlrurl");
                   setEnableUpload={setEnableUpload}
                   selectedFile={selectedFile}
                   enableUpload={enableUpload}
+                  setSelectedFile={setSelectedFile}
                 />
               ) : currentpage == 2 ? (
                 <AddRegisterAddress

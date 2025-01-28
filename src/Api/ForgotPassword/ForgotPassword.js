@@ -15,11 +15,18 @@ const typeId = sessionStorage.getItem("type_id")
   : localStorage.getItem("type_id");
 const userID = sessionStorage.getItem("USER_ID");
 
-export const SendOTP = async (otpMail, setSpinning) => {
+export const SendOTP = async (otpMail,typeID, setSpinning) => {
+  // alert(typeID)
+  console.log(typeID,"ididid");
+  
+  // const key =
+  //   typeId === "PRO101" || typeId === "PROEMP101" || typeId === "OPEMP101"
+  //     ? "email_id"
+  //     : "emailid";
   const key =
-    typeId === "PRO101" || typeId === "PROEMP101" || typeId === "OPEMP101"
-      ? "email_id"
-      : "emailid";
+  typeID === "PRO101" || typeID === "PROEMP101" || typeID === "OPEMP101"
+    ? "email_id"
+    : "emailid";
 
   const payload = {
     [key]: otpMail,
@@ -33,7 +40,7 @@ export const SendOTP = async (otpMail, setSpinning) => {
     PART101: "partner-forgot-password",
   };
 
-  const Login = loginMap[typeId] || "";
+  const Login = loginMap[typeID] || "";
   console.log(payload, "---new otp");
   const url = `${apiUrl}/${Login}`;
   const method = "post";
@@ -56,11 +63,15 @@ export const SendOTP = async (otpMail, setSpinning) => {
   }
 };
 
-export const ResetPassword = async (newValues, setSpinning) => {
+export const ResetPassword = async (newValues,typeID, setSpinning) => {
+  // const key =
+  //   typeId === "PRO101" || typeId === "PROEMP101" || typeId === "OPEMP101"
+  //     ? "email_id"
+  //     : "emailid";
   const key =
-    typeId === "PRO101" || typeId === "PROEMP101" || typeId === "OPEMP101"
-      ? "email_id"
-      : "emailid";
+  typeID === "PRO101" || typeID === "PROEMP101" || typeID === "OPEMP101"
+    ? "email_id"
+    : "emailid";
 
   const loginMap = {
     PRO101: "proreset-password",
@@ -70,7 +81,7 @@ export const ResetPassword = async (newValues, setSpinning) => {
     PART101: "partner-reset-password",
   };
 
-  const Login = loginMap[typeId] || "";
+  const Login = loginMap[typeID] || "";
 
   const payload = {
     [key]: newValues.email_id,
@@ -91,7 +102,8 @@ export const ResetPassword = async (newValues, setSpinning) => {
       },
     });
     toast.success(response?.data.message);
-    return response;
+    return  response
+    ;
   } catch (error) {
     throw error;
   } finally {

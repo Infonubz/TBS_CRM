@@ -20,9 +20,9 @@ const SUPPORTED_FORMATS = [
 
 const validationSchema = Yup.object().shape({
     aadhar_number: Yup.string()
-        .required("Aadhar number is required")
-        .length(12, "Aadhar number must be exactly 12 digits")
-        .matches(/^\d{12}$/, "Aadhar must be a valid 12-digit number"),
+        .required("Aadhaar number is required")
+        .length(12, "Aadhaar number must be exactly 12 digits")
+        .matches(/^\d{12}$/, "Aadhaar must be a valid 12-digit number"),
     pan_number: Yup.string()
         .required("PAN number is required")
         .length(10, "PAN number must be exactly 10 characters")
@@ -32,7 +32,7 @@ const validationSchema = Yup.object().shape({
         ),
 
     aadhar_fr_doc: Yup.mixed()
-        .required("Aadhar Front Page is required")
+        .required("Aadhaar Front Page is required")
         .test("fileSize", "File too large", (value) =>
             typeof value === "string" ? true : value && value.size <= FILE_SIZE
         )
@@ -42,7 +42,7 @@ const validationSchema = Yup.object().shape({
                 : value && SUPPORTED_FORMATS.includes(value.type)
         ),
     aadhar_bk_doc: Yup.mixed()
-        .required("Aadhar Back Page is required")
+        .required("Aadhaar Back Page is required")
         .test("fileSize", "File too large", (value) =>
             typeof value === "string" ? true : value && value.size <= FILE_SIZE
         )
@@ -187,7 +187,7 @@ const Documents = () => {
                         <div className="grid grid-cols-2 gap-[1vw]">
                             <div className="col-span-1 relative">
                                 <label className="text-[#1F4B7F] text-[1vw] font-bold ">
-                                    Aadhar Card Number
+                                Aadhaar Card Number
                                     <span className="text-[1vw] text-red-600 pl-[0.2vw]">
                                         *
                                     </span>
@@ -196,7 +196,7 @@ const Documents = () => {
                                     <Field
                                         type="text"
                                         name="aadhar_number"
-                                        placeholder="Enter Aadhar Number"
+                                        placeholder="Enter Aadhaar Number"
                                         value={values.aadhar_number}
                                         className={`border-r-[0.25vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none ${isEdit === false ? 'cursor-not-allowed' : ''}`}
                                         disabled={isEdit === false}
@@ -242,7 +242,7 @@ const Documents = () => {
                             </div>
                             <div className="col-span-1 relative">
                                 <label className="text-[#1F4B7F] text-[1vw] font-bold">
-                                    Aadhar Card Front Doc
+                                Aadhaar Card Front Doc
                                     <span className="text-[1vw] text-red-600 pl-[0.2vw]">
                                         *
                                     </span>
@@ -317,7 +317,7 @@ const Documents = () => {
                             </div>
                             <div className="col-span-1 relative">
                                 <label className="text-[#1F4B7F] text-[1vw] font-bold">
-                                    Aadhar Card Back Doc
+                                Aadhaar Card Back Doc
                                     <span className="text-[1vw] text-red-600 pl-[0.2vw]">
                                         *
                                     </span>
@@ -359,7 +359,7 @@ const Documents = () => {
                                                     : values.aadhar_bk_doc}
                                             </div>
                                         ) : <span className="opacity-50">
-                                            Upload Aadar Back Doc
+                                            Upload Aadhaar Back Doc
                                         </span>}
                                         {/* <MdOutlineModeEditOutline
                                             color='#1F487C'

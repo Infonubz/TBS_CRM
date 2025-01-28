@@ -40,11 +40,13 @@ const validationSchema = Yup.object().shape({
   firstname: Yup.string()
     .required("First name is required")
     .min(3,"Minimum 3 characters long")
-    .max(30, "Maximum 30 characters only"),
+    .max(30, "Maximum 30 characters only")
+    .matches(/^[A-Za-z\s]+$/,"Only letters and spaces are allowed"),
   lastname: Yup.string()
     .required("Last name is required")
     .min(1,"Minimum 1 characters long")
-    .max(30, "Maximum 30 characters only"),
+    .max(30, "Maximum 30 characters only")
+    .matches(/^[A-Za-z\s]+$/,"Only letters and spaces are allowed"),
   blood: Yup.string()
     .required("Blood group is required")
     .matches(/^(A|B|AB|O)[+-]$/, "Valid blood type (e.g., A+, B-, AB+, O-)"),
@@ -89,6 +91,7 @@ export default function AddPersonalDetails({
   setEnableUpload,
   selectedFile,
   enableUpload,
+  setSelectedFile
 }) {
   const [enable, setEnable] = useState(false);
   const [spinning, setSpinning] = useState(false);
@@ -284,7 +287,7 @@ export default function AddPersonalDetails({
       <div className="w-[5vw] h-[5vw] bg-white shadow-lg rounded-full absolute left-[16.6vw] top-[-2.5vw] flex justify-center items-center z-[1]">
         <img className="" src={umbuslogo} alt="buslogo" />
       </div>
-      <div className="border-l-[0.1vw] h-[28vw]  px-[2vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f] ">
+      <div className="border-l-[0.1vw] h-[28vw]  pl-[2vw] pr-[1.5vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f] ">
         <div className="h-[4vw] w-full flex items-center justify-between ">
           <label className="text-[1.5vw] font-semibold text-[#1f4b7f] ">
             Personal Details
@@ -330,10 +333,14 @@ export default function AddPersonalDetails({
             onSubmit={(values, { setFieldError }) => {
               if (
                 (profileImage == true && selectedFile != null) ||
-                (updatedata && selectedFile != null)
+                (updatedata && selectedFile?.length > 0)
               ) {
                 console.log("ihere");
                 handleSubmit(values, setFieldError);
+              }
+              else if(selectedFile?.length <= 0){
+                setProfileImage(false)
+                setSelectedFile(null)
               }
             }}
             enableReinitialize
@@ -357,7 +364,7 @@ export default function AddPersonalDetails({
                 ) : (
                   <div className="gap-y-[1.5vw] flex-col flex">
                     <div className="overflow-y-auto gap-y-[1.5vw] flex-col flex h-[18.5vw] pb-[1vw]">
-                      <div className="grid grid-cols-2 w-full gap-x-[2vw]">
+                      <div className="grid grid-cols-2 w-full gap-x-[2vw] pr-[.5vw]">
                         <div className="col-span-1 relative">
                           <label className="text-[#1F4B7F] text-[1.1vw] ">
                             First Name
@@ -437,7 +444,7 @@ export default function AddPersonalDetails({
                           />
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 w-full gap-x-[2vw]">
+                      <div className="grid grid-cols-2 w-full gap-x-[2vw] pr-[.5vw]">
                         <div className="col-span-1 relative ">
                           <label className="text-[#1F4B7F] text-[1.1vw] ">
                             Phone
@@ -522,7 +529,7 @@ export default function AddPersonalDetails({
                           />
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 w-full gap-x-[2vw]">
+                      <div className="grid grid-cols-2 w-full gap-x-[2vw] pr-[.5vw]">
                         <div className="col-span-1 relative">
                           <label className="text-[#1F4B7F] text-[1.1vw] ">
                             Email ID
@@ -607,7 +614,7 @@ export default function AddPersonalDetails({
                           />
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 w-full gap-x-[2vw]  relative">
+                      <div className="grid grid-cols-2 w-full gap-x-[2vw] pr-[.5vw] relative">
                         <div className="col-span-1 relative">
                           <label className="text-[#1F4B7F] text-[1.1vw] ">
                             Gender
@@ -648,14 +655,14 @@ export default function AddPersonalDetails({
                                 Select: {
                                   optionActiveBg: "#aebed1",
                                   optionSelectedColor: "#FFF",
-                                  optionSelectedBg: "#aebed1",
+                                  optionSelectedBg: "#e5e5e5",
                                   optionHeight: "2",
                                 },
                               },
                             }}
                           >
                             <Select
-                              // showSearch
+                              showSearch
                               value={values.gender}
                               onChange={(value) => {
                                 handleChange({
@@ -676,7 +683,7 @@ export default function AddPersonalDetails({
                               className={`${
                                 EmployeeID || addressback
                                   ? enable == false
-                                    ? " cursor-not-allowed"
+                                    ? " cursor-not-allowed bg-[#FAFAFA]"
                                     : ""
                                   : ""
                               } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
@@ -746,6 +753,7 @@ export default function AddPersonalDetails({
                             name="blood"
                             placeholder="Enter Blood Group"
                             autoComplete="off"
+                            onChange={(e) => setFieldValue("blood", e.target.value.toUpperCase())}
                             // value={values.firstname}
                             disabled={
                               EmployeeID || addressback

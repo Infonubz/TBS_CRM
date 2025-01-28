@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Table, Tooltip } from "antd";
+import { Spin, Table, Tooltip } from "antd";
 import dayjs from "dayjs";
 import { MdDelete, MdEdit } from "react-icons/md";
 import ModalPopup from "../Common/Modal/Modal";
@@ -19,6 +19,7 @@ export default function Operator({ data, tabfilter }) {
   const [openStatusModal, setOpenStatusModal] = useState("");
   const [statusFromEdit, SetStatusFromEdit] = useState(false);
   const [isUpdateStatus, setIsUpdateStatus] = useState(false);
+  const [spinning, setSpinning] = useState(false)
   const [comments, setComments] = useState("");
 
   const columns = [
@@ -37,9 +38,8 @@ export default function Operator({ data, tabfilter }) {
         return (
           <div className="flex justify-center items-center">
             <img
-              src={`${
-                row?.profileimg ? `${apiImgUrl}${row?.profileimg}` : UserProfile
-              } `}
+              src={`${row?.profileimg ? `${apiImgUrl}${row?.profileimg}` : UserProfile
+                } `}
               alt="Photo"
               className="w-[2.15vw] h-[2.15vw] object-cover rounded-[0.2vw]"
             />
@@ -85,12 +85,16 @@ export default function Operator({ data, tabfilter }) {
                 // title={row?.owner_name}
                 title={row.company_name}
                 className="cursor-pointer"
-                // color="#1F487C"
+              // color="#1F487C"
               >
-                {`${row?.company_name?.slice(0, 15)}...`}
+                {`${row?.company_name?.charAt(0) === row?.company_name?.charAt(0)?.toLowerCase()
+                  ? capitalizeFirstLetter(row?.company_name).slice(0, 15)
+                  : row?.company_name?.slice(0, 15)}...`}
               </Tooltip>
             ) : (
-              row?.company_name?.slice(0, 15)
+              row?.company_name?.charAt(0) === row?.company_name?.charAt(0)?.toLowerCase()
+                ? capitalizeFirstLetter(row?.company_name).slice(0, 15)
+                : row?.company_name?.slice(0, 15)
             )}
           </div>
         );
@@ -116,12 +120,17 @@ export default function Operator({ data, tabfilter }) {
                 // title={row?.owner_name}
                 title={row.owner_name}
                 className="cursor-pointer"
-                // color="#1F487C"
+              // color="#1F487C"
               >
-                {`${row?.owner_name?.slice(0, 15)}...`}
+                {`${row?.owner_name?.charAt(0) === row?.owner_name?.charAt(0).toLowerCase()
+                  ? capitalizeFirstLetter(row?.owner_name).slice(0, 15)
+                  : row?.owner_name.slice(0, 15)}...`}
+
               </Tooltip>
             ) : (
-              row?.owner_name?.slice(0, 15)
+              row?.owner_name?.charAt(0) === row?.owner_name?.charAt(0).toLowerCase()
+                ? capitalizeFirstLetter(row?.owner_name).slice(0, 15)
+                : row?.owner_name?.slice(0, 15)
             )}
           </div>
         );
@@ -278,15 +287,15 @@ export default function Operator({ data, tabfilter }) {
                 //         ? "bg-[#e60f00]"
                 //         : "bg-[#646262]"
                 row?.req_status_id == 1
-                  ? "bg-[#FF9900]"
+                  ? "bg-[#FF9900] cursor-not-allowed"
                   : row?.req_status_id == 4
-                  ? "bg-[#2A99FF]"
-                  : row?.req_status_id == 5
-                  ? "bg-[#34AE2A]"
-                  : row?.req_status_id == 6
-                  ? "bg-[#e60f00]"
-                  : "bg-[#646262]"
-              } rounded-[0.5vw] text-[1vw]  font-extrabold shadow-md shadow-black text-white w-[7vw] py-[0.2vw]`}
+                    ? "bg-[#2A99FF]"
+                    : row?.req_status_id == 5
+                      ? "bg-[#34AE2A]"
+                      : row?.req_status_id == 6
+                        ? "bg-[#FD3434]"
+                        : "bg-[#646262]"
+                } rounded-[0.5vw] text-[1vw]  font-extrabold shadow-md shadow-black text-white w-[7vw] py-[0.2vw]`}
             >
               {capitalizeFirstLetter(row?.req_status)}
             </button>
@@ -442,15 +451,20 @@ export default function Operator({ data, tabfilter }) {
 
   return (
     <>
+      {spinning === true ? (
+        <div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-20  z-10">
+          <Spin size="large" />
+        </div>
+      ) : ""}
       <div className="">
         <Table
           className="custom-table"
           pagination={false}
           dataSource={data}
           columns={columns}
-          // rowClassName={(record, index) =>
-          //   index % 2 === 1 ? "bg-white" : "bg-[#1F487C]/[10%]"
-          // }
+        // rowClassName={(record, index) =>
+        //   index % 2 === 1 ? "bg-white" : "bg-[#1F487C]/[10%]"
+        // }
         />
       </div>
 
@@ -471,14 +485,15 @@ export default function Operator({ data, tabfilter }) {
           statusFromEdit={statusFromEdit}
           comments={comments}
           tabfilter={tabfilter}
+          setSpinning={setSpinning}
         />
       </ModalPopup>
       <ModalPopup
-        className="border border-[#1f487c] border-b-8 border-r-8 border-b-[#1f487c] border-r-[#1f487c] rounded-md"
+        className="border border-[#1f487c] border-b-8 border-r-8 p-[1vw] border-b-[#1f487c] border-r-[#1f487c] rounded-md"
         show={isUpdateStatus}
         closeicon={false}
         onClose={closeModal}
-        height="22vw"
+        height="auto"
         width="auto"
       >
         <Status_Update_Modal
@@ -491,6 +506,7 @@ export default function Operator({ data, tabfilter }) {
           setIsVerifyModal={setIsVerifyModal}
           comments={comments}
           tabfilter={tabfilter}
+          setSpinning={setSpinning}
         />
       </ModalPopup>
 

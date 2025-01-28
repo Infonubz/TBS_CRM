@@ -20,7 +20,9 @@ import ImageCropper from "./ImageCropper";
 
 const validationSchema = Yup.object().shape({
   phone: Yup.string()
-    .matches(/^[0-9]+$/, "Phone number must be a number")
+    // .matches(/^[6-9]\d{9}$/, "Phone number must start with 6, 7, 8, or 9")
+    // .matches(/^[0-9]+$/, "Phone number must be a number")
+    .matches(/^[6-9]\d{9}$/, "Enter a 10-digit number starting with 6-9")
     .min(10, "Phone number must be at least 10 digits")
     .max(10, "Phone number maximum 10 digits only")
     .required("Phone Number is required"),
@@ -50,8 +52,9 @@ const validationSchema = Yup.object().shape({
     .max(30, "Maximum 30 characters only")
     .required("Company Name is required")
     .matches(
-      /^[A-Za-z\s]+$/,
-      "Only letters and spaces are allowed"),
+      /^[A-Za-z0-9\s]+$/,
+      "Only letters, numbers, spaces are allowed"
+    ),
    
   ownername: Yup.string()
     .required("Owner Name is required")
@@ -70,7 +73,7 @@ const validationSchema = Yup.object().shape({
       /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
       "PAN number format must be: ABCDE1234F"
     )
-    .required("Pan Number is required"),
+    .required("PAN Number is required"),
   // profileimg: Yup.mixed()
   //   .required("File is empty")
   //   .test("required", "A file is required", function (value) {
@@ -118,6 +121,7 @@ export default function AddSuperAdmin({
   setEnableUpload,
   selectedFile,
   enableUpload,
+  setSelectedFile
 }) {
   const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const dispatch = useDispatch();
@@ -389,6 +393,9 @@ export default function AddSuperAdmin({
     }));
   };
 
+  console.log(selectedFile,"fileleieisijfdjfdjf");
+  
+
   return (
     <div>
       <div className="border-l-[0.1vw] px-[2vw] border-t-[0.1vw] mt-[1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f] relative">
@@ -460,9 +467,13 @@ export default function AddSuperAdmin({
 
               if (
                 (profileImage === true && selectedFile != null) ||
-                (updatedata && selectedFile != null)
+                (updatedata && selectedFile?.length > 0)
               ) {
                 handleSubmit(values, setFieldError);
+              }
+              else if(selectedFile?.length <= 0){
+                setProfileImage(false)
+                setSelectedFile(null)
               }
             }}
             enableReinitialize
@@ -723,7 +734,7 @@ export default function AddSuperAdmin({
                     <div className="grid grid-cols-2 w-full gap-x-[2vw] relative mb-[.7vw]">
                       <div className="col-span-1 relative">
                         <label className="text-[#1F4B7F] text-[1.1vw] ">
-                          Aadhar Card Number
+                        Aadhaar Card Number
                           <span className="text-[1vw] text-red-600 pl-[0.2vw]">
                             *
                           </span>
@@ -737,7 +748,7 @@ export default function AddSuperAdmin({
                           <Field
                             type="text"
                             name="aadhar"
-                            placeholder="Enter Aadhar Number"
+                            placeholder="Enter Aadhaar Number"
                             autoComplete="aadhar-field"
                             // value={values.firstname}
                             disabled={
@@ -768,7 +779,7 @@ export default function AddSuperAdmin({
                       </div>
                       <div className="col-span-1 relative">
                         <label className="text-[#1F4B7F] text-[1.1vw] ">
-                          Pan Card Number
+                          PAN Card Number
                           <span className="text-[1vw] text-red-600 pl-[0.2vw]">
                             *
                           </span>

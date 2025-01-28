@@ -34,7 +34,7 @@ const Index = () => {
   console.log(active, 'active_KEY');
 
   return (
-    <div>
+    <div className="pr-[0.3vw]">
       <Collapse
         activeKey={active}
         onChange={() => handleCollapseChange("1")}

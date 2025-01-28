@@ -10,14 +10,15 @@ import { CgExport } from "react-icons/cg";
 
 const ExportButton = ({ dataArray }) => {
   const exportToExcel = () => {
-    if (dataArray.length === 0) {
+    console.log(dataArray,"dataarrardataarray")
+    if (dataArray?.length <= 0) {
       alert("No data to export!");
       return;
     }
 
-    const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.json_to_sheet(dataArray);
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet 1");
+    const workbook = XLSX?.utils?.book_new();
+    const worksheet = XLSX?.utils?.json_to_sheet(dataArray);
+    XLSX?.utils?.book_append_sheet(workbook, worksheet, "Sheet 1");
 
     const excelBuffer = XLSX.write(workbook, {
       bookType: "xlsx",

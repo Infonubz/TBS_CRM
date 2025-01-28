@@ -9,7 +9,7 @@ import { Spin } from "antd";
 const TableListStatusChange = ({ statusId, userId, setStatusModal,setSpinning}) => {
   const dispatch = useDispatch();
   const handleClick = async () => {
-    // setSpinning(true)
+    setSpinning(true)
     userStatusActivate(statusId, userId, dispatch,setSpinning);
     // GetRequestManagementData(dispatch);
     console.log("call 1");
@@ -24,7 +24,7 @@ const TableListStatusChange = ({ statusId, userId, setStatusModal,setSpinning}) 
         </div>
         <div className="flex justify-around mt-[1vw]">
           <button
-            className={`text-[1vw] text-white shadow-md font-extrabold shadow-black  space-x-[0.7vw] px-[0.8vw] w-[8vw] h-[2vw] ${statusId === 2 ? "bg-[#FF1100]":"bg-[#38ac2c]"} rounded-[0.5vw]`}
+            className={`text-[1vw] text-white shadow-md font-extrabold shadow-black  space-x-[0.7vw] px-[0.8vw] w-[8vw] h-[2vw] ${statusId === 2 ? "bg-[#FD3434]":"bg-[#34AE2B]"} rounded-[0.5vw]`}
             onClick={handleClick}
           >
            {statusId === 2 ? "Inactive" : "Active"}

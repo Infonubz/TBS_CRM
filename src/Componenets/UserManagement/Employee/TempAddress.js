@@ -189,7 +189,7 @@ const TempAddress = ({
           return (
             <Form onSubmit={handleSubmit}>
               <div className="overflow-y-auto h-[15.5vw] pb-[1vw] umselect">
-              <div className="grid grid-cols-2 w-full gap-x-[2vw] pt-[1vw]">
+              <div className="grid grid-cols-2 w-full gap-x-[2vw] pr-[.5vw] pt-[1vw]">
                 <div className="col-span-1 relative">
                   <label className="text-[#1F4B7F] text-[1.1vw] ">
                     Address
@@ -270,7 +270,7 @@ const TempAddress = ({
                 </div>
               
               </div>
-              <div className="grid grid-cols-2 w-full gap-x-[2vw] pt-[1vw]">
+              <div className="grid grid-cols-2 w-full gap-x-[2vw] pr-[.5vw] pt-[1vw]">
                 
                 <div className="col-span-1 relative">
                   <label className="text-[#1F4B7F] text-[1.1vw] ">
@@ -317,7 +317,7 @@ const TempAddress = ({
                             Select: {
                               optionActiveBg: '#aebed1',
                               optionSelectedColor: '#FFF',
-                              optionSelectedBg: '#aebed1',
+                              optionSelectedBg: '#e5e5e5',
                               optionHeight: '2',
                             },
                           },
@@ -341,7 +341,7 @@ const TempAddress = ({
                           name="temp_city"
                           className={`${updatedata && empaddressdata?.perm_add != null || proffesionaback
                             ? enable == false
-                              ? " cursor-not-allowed"
+                              ? " cursor-not-allowed bg-[#FAFAFA]"
                               : ""
                             : ""
                             } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
@@ -455,7 +455,7 @@ const TempAddress = ({
                             Select: {
                               optionActiveBg: '#aebed1',
                               optionSelectedColor: '#FFF',
-                              optionSelectedBg: '#aebed1',
+                              optionSelectedBg: '#e5e5e5',
                               optionHeight: '2',
                             },
                           },
@@ -479,7 +479,7 @@ const TempAddress = ({
                           name="temp_state"
                           className={`${updatedata && empaddressdata?.perm_add != null || proffesionaback
                             ? enable == false
-                              ? " cursor-not-allowed"
+                              ? " cursor-not-allowed bg-[#FAFAFA]"
                               : ""
                             : ""
                             } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
@@ -553,7 +553,7 @@ const TempAddress = ({
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-2 w-full gap-x-[2vw] pt-[1vw]">
+              <div className="grid grid-cols-2 w-full gap-x-[2vw] pr-[.5vw] pt-[1vw]">
               <div className="col-span-1 relative">
                   <label className="text-[#1F4B7F] text-[1.1vw] ">
                     Region
@@ -617,7 +617,7 @@ const TempAddress = ({
                             Select: {
                               optionActiveBg: '#aebed1',
                               optionSelectedColor: '#FFF',
-                              optionSelectedBg: '#aebed1',
+                              optionSelectedBg: '#e5e5e5',
                               optionHeight: '2',
                             },
                           },
@@ -641,7 +641,7 @@ const TempAddress = ({
                           name="temp_region"
                           className={`${updatedata && empaddressdata?.perm_add != null || proffesionaback
                             ? enable == false
-                              ? " cursor-not-allowed"
+                              ? " cursor-not-allowed bg-[#FAFAFA]"
                               : ""
                             : ""
                             } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
@@ -757,7 +757,7 @@ const TempAddress = ({
                             Select: {
                               optionActiveBg: '#aebed1',
                               optionSelectedColor: '#FFF',
-                              optionSelectedBg: '#aebed1',
+                              optionSelectedBg: '#e5e5e5',
                               optionHeight: '2',
                             },
                           },
@@ -781,7 +781,7 @@ const TempAddress = ({
                           name="temp_country"
                           className={`${updatedata && empaddressdata?.perm_add != null || proffesionaback
                             ? enable == false
-                              ? " cursor-not-allowed"
+                              ? " cursor-not-allowed bg-[#FAFAFA]"
                               : ""
                             : ""
                             } custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}

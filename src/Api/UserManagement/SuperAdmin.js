@@ -17,7 +17,9 @@ const user = sessionStorage.getItem("USER_ID");
 
 export const GetOperatorData = async (dispatch) => {
   try {
-    const response = await axios.get(`${apiUrl}/Operators-withAll-data`);
+    // const response = await axios.get(`${apiUrl}/Operators-withAll-data`);
+    const response = await axios.get(`${apiUrl}/get-operators/${user}`);
+
     dispatch({ type: OPERATOR_LIST, payload: response.data });
     return response.data;
   } catch (error) {
@@ -30,7 +32,7 @@ export const GetOperatorData = async (dispatch) => {
 export const handleOperatorSearch = async (e, dispatch) => {
   try {
     if (e.target.value) {
-      const response = await api.get(`${apiUrl}/operators-search/${e.target.value}`);
+      const response = await api.get(`${apiUrl}/operators-search/${user}/${e.target.value}`);
       dispatch({ type: OPERATOR_LIST, payload: response.data })
       return response.data;
     }
@@ -46,7 +48,7 @@ export const handleOperatorSearch = async (e, dispatch) => {
 export const SubmitOperatorExcel = async (file) => {
   const formData = new FormData();
   formData.append("xlsxFile", file);
-
+  formData.append("tbs_user_id",user)
   const excelEndpoint = `${apiUrl}/excelupload`;
   const method = "post";
 
@@ -71,7 +73,9 @@ export const SubmitOperatorExcel = async (file) => {
 
 export const GetSuperAdminData = async (dispatch) => {
   try {
-    const response = await api.get(`${apiUrl}/Operators-withAll-data`);
+    // const response = await api.get(`${apiUrl}/Operators-withAll-data`);
+    const response = await axios.get(`${apiUrl}/get-operators/${user}`);
+
     dispatch({ type: SUPER_ADMIN_LIST, payload: response.data });
     return response.data;
   } catch (error) {
@@ -100,6 +104,7 @@ export const SubmitCompanyData = async (
   formData.append('alternate_emailid', companyvalue.emailid);
   formData.append('aadharcard_number', companyvalue.aadhar);
   formData.append('pancard_number', companyvalue.pan);
+  formData.append("tbs_user_id",user)
   if(enable === false){
   formData.append('user_status', 'Draft');
   formData.append('req_status', 'Draft');

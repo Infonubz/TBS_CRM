@@ -41,7 +41,7 @@ const TableList = ({
   const [statusId, setStatusId] = useState();
   const [userId, setUserId] = useState();
   const [userName, setUserName] = useState();
-    const [spinning, setSpinning] = useState(false);
+  const [spinning, setSpinning] = useState(false);
   const handleChange = (pagination, filters, sorter) => {
     console.log("Various parameters", pagination, filters, sorter);
 
@@ -74,9 +74,8 @@ const TableList = ({
         return (
           <div className="flex justify-center items-center">
             <img
-              src={`${
-                row?.profileimg ? `${apiImgUrl}${row?.profileimg}` : UserProfile
-              } `}
+              src={`${row?.profileimg ? `${apiImgUrl}${row?.profileimg}` : UserProfile
+                } `}
               alt="Profile"
               className="w-[2.15vw] h-[2.15vw] object-cover rounded-[0.2vw]"
             />
@@ -140,13 +139,19 @@ const TableList = ({
               placement="top"
               title={capitalizeFirstLetter(row?.company_name)}
             >
-              <span>{`${capitalizeFirstLetter(row?.company_name).slice(
-                0,
-                17
-              )}...`}</span>
+              <span>
+                {row?.company_name?.charAt(0) === row?.company_name?.charAt(0)?.toLowerCase()
+                  ? `${capitalizeFirstLetter(row?.company_name)?.slice(0, 17)}...`
+                  : `${row?.company_name?.slice(0, 17)}...`}
+              </span>
             </Tooltip>
           ) : (
-            <span>{capitalizeFirstLetter(row?.company_name)}</span>
+            // <span>{capitalizeFirstLetter(row?.company_name)}</span>
+            <span>
+              {row?.company_name.charAt(0) === row?.company_name?.charAt(0)?.toLowerCase()
+                ? capitalizeFirstLetter(row?.company_name)
+                : row?.company_name}
+            </span>
           )}
         </div>
       ),
@@ -181,13 +186,21 @@ const TableList = ({
               placement="top"
               title={capitalizeFirstLetter(row?.owner_name)}
             >
-              <span>{`${capitalizeFirstLetter(row?.owner_name).slice(
+              {/* <span>{`${capitalizeFirstLetter(row?.owner_name).slice(
                 0,
                 17
-              )}...`}</span>
+              )}...`}</span> */}
+                <span>
+                {row?.owner_name?.charAt(0) === row?.owner_name?.charAt(0)?.toLowerCase()
+                  ? `${capitalizeFirstLetter(row?.owner_name)?.slice(0, 17)}...`
+                  : `${row?.owner_name?.slice(0, 17)}...`}
+              </span>
             </Tooltip>
           ) : (
-            <span>{capitalizeFirstLetter(row?.owner_name)}</span>
+            // <span>{capitalizeFirstLetter(row?.owner_name)}</span>
+            row?.owner_name.charAt(0) === row?.owner_name?.charAt(0)?.toLowerCase()
+              ? capitalizeFirstLetter(row?.owner_name)
+              : row?.owner_name
           )}
         </div>
       ),
@@ -254,7 +267,7 @@ const TableList = ({
       render: (text, row) => {
         return (
           <div className="flex items-center justify-center">
-            <p className="text-[1vw] text-[#1F4B7F]">{row.phone}</p>
+            <p className={`text-[1vw] text-[#1F4B7F] ${!row?.phone && "font-bold"}`}> {row?.phone ? row?.phone : "-"}</p>
           </div>
         );
       },
@@ -296,8 +309,8 @@ const TableList = ({
                 </div>
               </Tooltip>
             ) : (
-              <div className="text-[1vw]  text-[#1f4b7f]">
-                {row?.emailid?.slice(0, 20)}
+              <div className={`text-[1vw] text-[#1f4b7f] ${!row?.emailid ? 'text-center font-bold' : ''}`}>
+                {row?.emailid ? row?.emailid?.slice(0, 20) : "-"}
               </div>
             )}
           </div>
@@ -349,13 +362,13 @@ const TableList = ({
                 row.user_status_id == 0
                   ? " bg-[#646262]  cursor-not-allowed"
                   : row.user_status_id == 1
-                  ? " bg-[#FF9900] cursor-not-allowed "
-                  : row.user_status_id == 2
-                  ? " bg-[#38ac2c] "
-                  : row.user_status_id == 3
-                  ? " bg-[#FD3434]"
-                  : "bg-[#2A99FF] cursor-not-allowed"
-              } h-[1.8vw] text-[1vw] text-white w-[7vw] font-extrabold rounded-[0.5vw]`}
+                    ? " bg-[#FF9900] cursor-not-allowed "
+                    : row.user_status_id == 2
+                      ? " bg-[#34AE2B] "
+                      : row.user_status_id == 3
+                        ? " bg-[#FD3434]"
+                        : "bg-[#2A99FF] cursor-not-allowed"
+                } h-[1.8vw] text-[1vw] text-white w-[7vw] font-extrabold rounded-[0.5vw]`}
               // onClick={()=>UpdateStatus(row.user_status_id,row.tbs_operator_id)}
               onClick={() => {
                 if (row.user_status_id === 2 || row.user_status_id === 3) {
@@ -447,50 +460,50 @@ const TableList = ({
   console.log(currentData, "operatorIDoperatorID");
   return (
     <>
-     {spinning === true ? (
-              <div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-20  z-10">
-                <Spin size="large" />
-              </div>
-            ) : "" }
-    <>
-      <Table
-        columns={columns}
-        dataSource={currentData}
-        onChange={handleChange}
-        pagination={false}
-        className="custom-table"
-      />
+      {spinning === true ? (
+        <div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-20  z-10">
+          <Spin size="large" />
+        </div>
+      ) : ""}
+      <>
+        <Table
+          columns={columns}
+          dataSource={currentData}
+          onChange={handleChange}
+          pagination={false}
+          className="custom-table"
+        />
 
-      <ModalPopup
-        show={statusModal}
-        onClose={CloseStatusModal}
-        height="17vw"
-        width="30vw"
-        closeicon={false}
-      >
-        <TableListStatusChange
-          statusId={statusId}
-          userId={userId}
-          setStatusModal={setStatusModal}
-          setSpinning={setSpinning}
-        />
-      </ModalPopup>
-      <ModalPopup
-        show={deleteOpmodalIsOpen}
-        onClose={closeDeleteModal}
-        height="20vw"
-        width="30vw"
-        closeicon={false}
-      >
-        <DeleteList
-          setDeleteModalIsOpen={setDeleteOpModalIsOpen}
-          title={`Want to delete this Operator ${capitalizeFirstLetter(
-            userName
-          )}`}
-          api={`${apiUrl}/operators/${operatorID}`}
-          module={"operator"}
-        />
-      </ModalPopup>
+        <ModalPopup
+          show={statusModal}
+          onClose={CloseStatusModal}
+          height="17vw"
+          width="30vw"
+          closeicon={false}
+        >
+          <TableListStatusChange
+            statusId={statusId}
+            userId={userId}
+            setStatusModal={setStatusModal}
+            setSpinning={setSpinning}
+          />
+        </ModalPopup>
+        <ModalPopup
+          show={deleteOpmodalIsOpen}
+          onClose={closeDeleteModal}
+          height="20vw"
+          width="30vw"
+          closeicon={false}
+        >
+          <DeleteList
+            setDeleteModalIsOpen={setDeleteOpModalIsOpen}
+            title={`Want to delete this Operator ${capitalizeFirstLetter(
+              userName
+            )}`}
+            api={`${apiUrl}/operators/${operatorID}`}
+            module={"operator"}
+          />
+        </ModalPopup>
       </>
     </>
   );

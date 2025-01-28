@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Table, Pagination, Popover, Spin, ConfigProvider } from "antd";
+import { Table, Pagination, Popover, Spin, ConfigProvider, Tooltip } from "antd";
 import { IoEyeOutline } from "react-icons/io5";
 import { IoSearch } from "react-icons/io5";
 import { DownOutlined } from "@ant-design/icons";
@@ -29,6 +29,7 @@ import { DatePicker } from "antd";
 import { IoIosArrowDropdownCircle } from "react-icons/io";
 import { IoIosArrowDropupCircle } from "react-icons/io";
 import moment from "moment";
+import { capitalizeFirstLetter } from "../Common/Captilization";
 
 export default function Subscription({}) {
   const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
@@ -59,11 +60,11 @@ export default function Subscription({}) {
     },
     {
       title: "Activated Date",
-      description: "MMM DD (e.g. Jan 01) - Format",
+      description: "DD MMM (e.g. 01 Jan) - Format",
     },
     {
       title: "Expiry Date",
-      description: "MMM DD (e.g. Jan 01) - Format",
+      description: "DD MMM (e.g. 01 Jan) - Format",
     },
   ];
 
@@ -182,7 +183,28 @@ export default function Subscription({}) {
         const pageNo = (activePage - 1) * itemsPerPage + index + 1;
         return (
           <div className="flex pl-[3vw] text-[#1F4B7F] font-bold  text-[1vw]">
-            <h1 className="">{row.company_name}</h1>
+            <h1 className="">{row.company_name}
+            {
+            row?.company_name?.length > 18 ? (
+              <Tooltip color="white"
+                overlayInnerStyle={{ color: "#1F4B7F" }} title={capitalizeFirstLetter(row?.company_name)}>
+                <span>
+                  {`${row?.company_name?.charAt(0) === row?.company_name?.charAt(0).toLowerCase()
+                    ? capitalizeFirstLetter(row?.company_name).slice(0, 18)
+                    : row?.company_name?.slice(0, 18)}...`}
+                </span>
+
+              </Tooltip>
+            ) : (
+              <span>
+              {row?.company_name?.charAt(0) === row?.company_name?.charAt(0).toLowerCase() 
+                ? capitalizeFirstLetter(row?.company_name) 
+                : row?.company_name}
+            </span>
+            
+            )
+          }
+            </h1>
           </div>
         );
       },
@@ -467,6 +489,26 @@ export default function Subscription({}) {
       GetSubscriptionList(dispatch, setSpinning);
     }
   };
+  const handleKeyDown = (e) => {
+    // Allow control keys like Backspace, Delete, ArrowLeft, ArrowRight, Tab
+    const isControlKey = [
+      "Backspace",
+      "Tab",
+      "ArrowLeft",
+      "ArrowRight",
+      "Delete",
+    ].includes(e.key);
+  
+    if (isControlKey) {
+      return; // If it's a control key, do nothing and allow it to execute
+    }
+  
+    // Allow only alphabets (A-Z, a-z), numbers (0-9), and space
+    if (!/^[A-Za-z0-9\s]$/.test(e.key)) {
+      e.preventDefault(); // Prevent the key if it's not an alphabet, number, or space
+    }
+  };
+  
   return (
     <div
       className="h-screen w-screen"
@@ -486,14 +528,15 @@ export default function Subscription({}) {
         <div className="flex justify-between">
           <div className="relative flex items-center pb-[0.5vw]">
             <LiaSearchSolid
-              className="absolute left-[0.5vw] top-[0.6vw]"
-              size={"1vw"}
+              className="absolute left-[0.5vw] inline-block  pb-[.1vw]"
+              size={"1.1vw"}
               color="#9CA3AF"
             />
             <input
               type="text"
               className="bg-white outline-none pl-[2vw] w-[17vw] text-[#1f487c] h-[5vh] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.75vw] border-r-[0.25vw] border-b-[0.25vw]"
               placeholder="Search..."
+              onKeyDown={handleKeyDown}
               onChange={(e) => {
                 Search(e);
               }}
@@ -531,25 +574,31 @@ export default function Subscription({}) {
           <div className="order-last">
             <div className="reqman">
               <ConfigProvider
-                theme={{
-                  token: {
-                    fontSize: 13,
-                    lineHeight: 0,
-                  },
-                  components: {
-                    DatePicker: {
-                      cellWidth: 21,
-                      cellHeight: 20,
-                    },
-                  },
-                }}
-              >
+                                theme={{
+                                  token: {
+                                    fontSize: ".9vw",
+                                    lineHeight: 0,
+                                    colorPrimary: "#1F487C",
+                                  },
+                                  components: {
+                                    DatePicker: {
+                                      activeBorderColor: "#1F487C",
+                                      hoverBorderColor: "#1F487C",
+                                      activeShadow: "#1F487C",
+                                      cellWidth: 25,
+                                      cellHeight: 20,
+                                    },
+                                  },
+                                }}
+                              >
                 <RangePicker
                   allowClear={true}
                   autoFocus={false}
                   onChange={datefilter}
                   value={dateClear}
-                  className="custom-range-picker bg-white outline-none pl-[1.5vw] w-[17vw] h-[2.5vw] text-[0.9vw] border-[#1F4B7F] border-l-[0.1vw] px-[1vw] border-t-[0.1vw] rounded-[0.75vw] border-r-[0.2vw] border-b-[0.2vw]"
+                   className="ads-date1 border-r-[0.75vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-blue border-[#1F487C]
+                        text-[#1F487C] text-[0.8vw] h-[5vh] w-[100%] rounded-[0.5vw] outline-none px-[1vw] placeholder-[#1F487C]"
+                  // className="custom-range-picker bg-white outline-none pl-[1.5vw] w-[17vw] h-[2.5vw] text-[0.9vw] border-[#1F4B7F] border-l-[0.1vw] px-[1vw] border-t-[0.1vw] rounded-[0.75vw] border-r-[0.2vw] border-b-[0.2vw]"
                   // disabledDate={(current) => current < dayjs().startOf("day")}
                 />
               </ConfigProvider>

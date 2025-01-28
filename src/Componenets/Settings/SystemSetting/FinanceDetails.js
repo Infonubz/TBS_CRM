@@ -240,7 +240,7 @@ const FinanceDetails = ({ companyData, setCompanyData }) => {
                             Select: {
                               optionActiveBg: "#aebed1",
                               optionSelectedColor: "#FFF",
-                              optionSelectedBg: "#aebed1",
+                              optionSelectedBg: '#e5e5e5',
                               optionHeight: "2",
                             },
                             searchInput: {
@@ -367,18 +367,18 @@ const FinanceDetails = ({ companyData, setCompanyData }) => {
                   </span>
                 </div>
               </div>
-              <div className="flex items-center justify-center pt-[2vw] pb-[0.5vw]">
+              <div className="flex text-[1.2vw] items-center justify-center pt-[2vw] pb-[0.5vw]">
                 {isEdit === false ? (
                   <div
                     onClick={() => setIsEdit(true)}
-                    className="cursor-pointer text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[10vw] text-center"
+                    className="cursor-pointer text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[9vw] text-center"
                   >
                     Edit
                   </div>
                 ) : (
                   <button
                     type="submit"
-                    className="text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[10vw]"
+                    className="text-white bg-[#1F4B7F] px-[2vw] gap-[0.5vw] py-[0.5vw] rounded-[0.7vw] w-[9vw]"
                   >
                     Update
                   </button>

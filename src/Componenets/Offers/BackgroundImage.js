@@ -436,6 +436,7 @@ export default function BackgroundView({
             {currentofferdata.offer_name}
           </h1>
         </div>
+        {/* <div className="border-l-[.2vw] h-[13vw] border-dashed absolute top-[0vw] left-[7.6vw] border-white"></div> */}
         <p className="text-white font-extrabold text-[1vw]  absolute top-[4vw] left-[9vw]">
           {currentofferdata.offer_desc}
         </p>
@@ -444,7 +445,7 @@ export default function BackgroundView({
         ).format("DD MMM")}`}</p>
         <div className="bg-white bg-opacity-30 border-dashed border-[0.1vw] border-white px-[1vw]  py-[0.2vw] absolute top-[10vw] left-[9vw]">
           <p className="text-white font-bold text-[1vw]">
-            {currentofferdata.code}
+            {currentofferdata?.code?.toUpperCase()}
           </p>
         </div>
       </div>

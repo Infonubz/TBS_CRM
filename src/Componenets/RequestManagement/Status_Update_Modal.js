@@ -23,6 +23,7 @@ export default function Status_Update_Modal({
   requestData,
   comments,
   tabfilter,
+  setSpinning
 }) {
   const [isActivate, setIsActivate] = useState(false);
   const [showError, setShowError] = useState();
@@ -61,7 +62,7 @@ export default function Status_Update_Modal({
           toast.success(data);
           console.log(data, "check_toast_message");
           GetRequestManagementData(dispatch, tabfilter);
-          setIsVerifyModal(false);
+          // setIsVerifyModal(false);
           console.log(data);
         } catch (error) {
           console.error("Error uploading data", error);
@@ -77,6 +78,7 @@ export default function Status_Update_Modal({
           toast.success(data);
           GetReqPartnerData(dispatch, tabfilter);
           setIsVerifyModal(false);
+          setIsSaveModal(false)
         } catch (err) {
           console.log(err);
         }
@@ -124,7 +126,6 @@ export default function Status_Update_Modal({
   useEffect(() => {
     if (verifyData != null && verifyData.startsWith("tbs-op")) {
       fetchGetRequest();
-     
     } else if (verifyData != null && verifyData.startsWith("tbs-pat")) {
       fetchPartnerData();
     }
@@ -160,38 +161,39 @@ export default function Status_Update_Modal({
             {showError === false && (
               <span className="text-[.9vw] text-red-600 absolute bottom-[-1.2vw] left-[.5vw]">
                 {" "}
-                Comments is required for Reject and On Hold
+                Comments is required for Reject and Hold
               </span>
             )}
           </div>
 
-          <div className="flex gap-2 mt-[1.6vw]">
+          <div className="flex justify-between gap-2 mt-[1.6vw] w-full">
             <button
-              className="items-center text-[0.9vw] text-white  space-x-[0.7vw] px-[0.8vw] w-[8vw] h-[2vw] bg-[#2A99FF] rounded-[0.5vw]"
+              className="items-center text-[1vw] text-white shadow-md font-extrabold shadow-black space-x-[0.7vw] px-[0.8vw] w-[7vw] h-[2vw] bg-[#2A99FF] rounded-[0.5vw] cursor-pointer"
               onClick={() => {
-                handlechange(4, "On Hold");
+                handlechange(4, "Hold");
                 // setIsSaveModal(false);
               }}
             >
-              On Hold
+              Hold
             </button>
             <button
-              className="items-center text-[0.9vw] text-white  space-x-[0.7vw] px-[0.8vw] w-[10vw] h-[2vw]  bg-[#34AE2A] rounded-[0.5vw]"
+              className="items-center text-[1vw] text-white font-extrabold shadow-md font-bold shadow-black space-x-[0.7vw] px-[0.8vw] w-[7vw] h-[2vw]  bg-[#34AE2B] rounded-[0.5vw] cursor-pointer"
               // onClick={() => setIsActivate(true)}
               onClick={() => {
                 handlechange(5, "Approved");
                 // setInputValue("All Documents are Good")
                 if (currentid.startsWith("tbs-op")) {
                   setIsActivate(true);
-                } else {
-                  setIsSaveModal(false);
                 }
+                //  else {
+                //   setIsSaveModal(false);
+                // }
               }}
             >
               Approved
             </button>
             <button
-              className="items-center text-[0.9vw] text-white  space-x-[0.7vw] px-[0.8vw] w-[8vw] h-[2vw] bg-[#FF1100] rounded-[0.5vw]"
+              className="items-center text-[1vw] text-white font-extrabold shadow-md shadow-black space-x-[0.7vw] px-[0.8vw] w-[7vw] h-[2vw] bg-[#FF1100] rounded-[0.5vw] cursor-pointer"
               onClick={() => {
                 handlechange(6, "Rejected");
                 // setIsSaveModal(false);
@@ -211,18 +213,19 @@ export default function Status_Update_Modal({
           setRequestData={setRequestData}
           requestData={requestData}
           setIsVerifyModal={setIsVerifyModal}
+          setSpinning={setSpinning}
         />
       )}
 
       {/* 
-      <ModalPopup
+<ModalPopup
         className="border border-[#1f487c] border-b-8 border-r-8 border-b-[#1f487c] border-r-[#1f487c] rounded-md"
         show={isActivate}
         closeicon={false}
         onClose={closeModal}
         height="300px"
         width="600px"
-      > */}
+> */}
       {/* <Activate_Modal
           isActivate={setIsActivate}
           currentid={currentid}

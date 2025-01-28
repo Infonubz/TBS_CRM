@@ -189,7 +189,7 @@ const EditProfile = () => {
                         name="owner_name"
                         placeholder="Enter your Name"
                         // value={getUserSettingsEdit.owner_name}
-                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none ${
+                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none ${
                           isEdit === false ? "cursor-not-allowed" : ""
                         }`}
                         disabled={isEdit === false}
@@ -218,7 +218,7 @@ const EditProfile = () => {
                         placeholder="Enter your Email"
                         // value={getUserSettingsEdit.email_id}
                         readOnly
-                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none ${
+                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none ${
                           isEdit === false
                             ? "cursor-not-allowed"
                             : "cursor-not-allowed"
@@ -329,7 +329,7 @@ const EditProfile = () => {
                         placeholder="Enter Phone Number"
                         // value={getUserSettingsEdit.phone}
                         readOnly
-                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none ${
+                        className={`border-r-[0.2vw] relative flex items-center text-[1vw] justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] h-[3vw] w-[100%] rounded-[0.5vw] outline-none ${
                           isEdit === false
                             ? "cursor-not-allowed"
                             : "cursor-not-allowed"
@@ -375,7 +375,7 @@ const EditProfile = () => {
                         name="password"
                         placeholder="Enter your password"
                         readOnly
-                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none ${
+                        className={`border-r-[0.2vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none ${
                           isEdit === false
                             ? "cursor-not-allowed"
                             : "cursor-not-allowed"
@@ -390,9 +390,9 @@ const EditProfile = () => {
                       <button
                         type="button"
                         onClick={handleTogglePassword}
-                        className="absolute right-2 text-[#1F487C] top-1/2 transform -translate-y-1/2"
+                        className="absolute right-[1vw] text-[#1F487C] top-1/2 transform -translate-y-1/2"
                       >
-                        {showPassword ? <FaEye /> : <FaEyeSlash />}
+                        {showPassword ? <FaEye size={"1.2vw"} /> : <FaEyeSlash size={"1.2vw"} />}
                       </button>
                     </div>
 
@@ -476,7 +476,7 @@ const EditProfile = () => {
                 />
               </div> */}
                   </div>
-                  <div className="flex items-center justify-center pt-[2vw] pb-[0.5vw]">
+                  <div className="flex items-center justify-center text-[1vw] pt-[2vw] pb-[0.5vw]">
                     {isEdit === false ? (
                       <div
                         onClick={() => setIsEdit(true)}

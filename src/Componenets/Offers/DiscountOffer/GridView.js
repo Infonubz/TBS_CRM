@@ -16,6 +16,7 @@ import ModalPopup from "../../Common/Modal/Modal";
 import { FaEye } from "react-icons/fa";
 import { CiImageOff } from "react-icons/ci";
 import { MdDelete, MdEdit } from "react-icons/md";
+import { capitalizeFirstLetter } from "../../Common/Captilization";
 
 export default function GridView({
   currentData,
@@ -26,7 +27,7 @@ export default function GridView({
   setOfferView,
   offerview,
   setValueSymbol,
-  offerFilter
+  offerFilter,
 }) {
   const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
 
@@ -37,6 +38,7 @@ export default function GridView({
   const closeDeleteModal = () => {
     setDeleteModalIsOpen(false);
   };
+  const typeId = sessionStorage.getItem("type_id");
 
   const [openPopovers, setOpenPopovers] = useState({});
 
@@ -78,16 +80,65 @@ export default function GridView({
               <Popover
                 placement="bottomRight"
                 content={
-                  <div className="flex flex-col px-[0.5vw]">
-                    <div className="flex items-center gap-x-[0.5vw] py-[0.25vw] border-b-[0.1vw] border-[#1F487C]">
+                  <div className="flex flex-col border-[.1vw] border-[#1F487C] rounded-[.5vw] px-[0.5vw]">
+                    <div className=" items-center gap-x-[0.5vw] py-[0.25vw] border-b-[0.1vw] border-[#1F487C]">
                       <span>
-                        <MdEdit
+                        {/* <MdEdit
                           size={"1.2vw"}
                           color="#1F4B7F"
                           className=" cursor-pointer"
-                        />
+                        /> */}
+
+                        {typeId === "PROEMP101" ? (
+                          item.status_id === 0 || item.status_id === 1 ? (
+                            <div onClick={() => {
+                              setModalIsOpen(true);
+                              SetUpdateData(item.tbs_offer_id);
+                              handleOptionClick(item.tbs_offer_id);
+                            }} className="flex items-center gap-x-[0.5vw]">
+                              <div >
+                                <MdEdit
+                                  size={"1.2vw"}
+                                  color="#1F4B7F"
+                                  className=" cursor-pointer"
+                                />
+                              </div>
+                              <div>
+                                <a
+                                  className="flex font-semibold items-center cursor-pointer text-[1vw] text-[#1F4B7F] hover:text-[#1f487c]"
+                                >
+                                  Edit
+                                </a>
+                              </div>
+                            </div>
+                          ) : (
+                            ""
+                          )
+                        ) : (
+                          <div onClick={() => {
+                            setModalIsOpen(true);
+                            SetUpdateData(item.tbs_offer_id);
+                            handleOptionClick(item.tbs_offer_id);
+                          }} className="flex items-center gap-x-[0.5vw]">
+                            <div >
+                              <MdEdit
+                                size={"1.2vw"}
+                                color="#1F4B7F"
+                                className=" cursor-pointer"
+                              />
+                            </div>
+                            <div>
+                              <a
+
+                                className="flex font-semibold items-center cursor-pointer text-[1vw] text-[#1F4B7F] hover:text-[#1f487c]"
+                              >
+                                Edit
+                              </a>
+                            </div>
+                          </div>
+                        )}
                       </span>
-                      <a
+                      {/* <a
                         onClick={() => {
                           setModalIsOpen(true);
                           SetUpdateData(item.tbs_offer_id);
@@ -96,26 +147,26 @@ export default function GridView({
                         className="flex font-semibold items-center cursor-pointer text-[1vw] text-[#1F4B7F] hover:text-[#1f487c]"
                       >
                         Edit
-                      </a>
+                      </a> */}
                     </div>
-                    <div className="flex items-center gap-x-[0.5vw] py-[0.25vw]">
+                    <div onClick={() => {
+                      setDeleteModalIsOpen(true);
+                      setPromoId(item);
+                      handleOptionClick(item.tbs_offer_id);
+                      setValueSymbol("₹");
+                    }} className="flex items-center gap-x-[0.5vw] py-[0.25vw]">
                       <span>
                         <MdDelete
                           size={"1.2vw"}
                           color="#1F4B7F"
                           className=" cursor-pointer"
-                          // onClick={() => {
-                          //   handleDelete(row.promo_id);
-                          // }}
+                        // onClick={() => {
+                        //   handleDelete(row.promo_id);
+                        // }}
                         />
                       </span>
                       <a
-                        onClick={() => {
-                          setDeleteModalIsOpen(true);
-                          setPromoId(item);
-                          handleOptionClick(item.tbs_offer_id);
-                          setValueSymbol("₹");
-                        }}
+
                         className="flex font-semibold items-center cursor-pointer text-[1vw] text-[#1F4B7F] hover:text-[#1f487c]"
                       >
                         Delete
@@ -157,9 +208,8 @@ export default function GridView({
                     setOfferImage(item.theme);
                     handleOptionClick(item.tbs_offer_id);
                   }}
-                  className={`h-[5vw] w-auto rounded-[0.5vw] ${
-                    item?.theme ? "cursor-pointer" : ""
-                  }`}
+                  className={`h-[5vw] w-auto rounded-[0.5vw] ${item?.theme ? "cursor-pointer" : ""
+                    }`}
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center w-auto px-[1vw] h-[5vw] ">
@@ -168,7 +218,12 @@ export default function GridView({
               )}
 
               <div className="flex flex-col w-full items-center justify-center gap-y-[0.25vw] mt-[0.1vw]">
-                <div className="font-bold text-[0.9vw] ">{item.offer_name}</div>
+                <div className="font-bold text-[0.9vw] ">{
+                  item?.offer_name?.charAt(0) === item?.offer_name?.charAt(0)?.toLowerCase()
+                    ? capitalizeFirstLetter(item?.offer_name)
+                    : item?.offer_name
+                }
+                </div>
                 <div className="text-[0.9vw] flex">
                   <span className="font-semibold pr-[0.5vw] ">Usage: </span>
                   <span className="">{`0/${item.usage}`}</span>
@@ -195,30 +250,28 @@ export default function GridView({
                 </div>
                 <div className="px-[1.5vw] w-full">
                   <div
-                    className={`${
-                      item.req_status_id == 2
-                        ? " border-[0.1vw] border-[#34AE2A]"
-                        : item.req_status_id == 0
+                    className={`${item.req_status_id == 2
+                      ? " border-[0.1vw] border-[#34AE2B]"
+                      : item.req_status_id == 0
                         ? "border-[0.1vw] border-[#646262]"
                         : item.req_status_id == 3
-                        ? "border-[0.1vw] border-[#2A99FF]"
-                        : item.req_status_id == 4
-                        ? "border-[#FF0000] border-[0.1vw]"
-                        : "border-[#FF9900] border-[0.1vw]"
-                    } rounded-full `}
+                          ? "border-[0.1vw] border-[#2A99FF]"
+                          : item.req_status_id == 4
+                            ? "border-[#FD3434] border-[0.1vw]"
+                            : "border-[#FF9900] border-[0.1vw]"
+                      } rounded-full `}
                   >
                     <div
-                      className={`${
-                        item.req_status_id == 2
-                          ? "bg-[#34AE2A]"
-                          : item.req_status_id == 0
+                      className={`${item.req_status_id == 2
+                        ? "bg-[#34AE2B]"
+                        : item.req_status_id == 0
                           ? "bg-[#646262]"
                           : item.req_status_id == 3
-                          ? "bg-[#2A99FF]"
-                          : item.req_status_id == 4
-                          ? "bg-[#FF0000]"
-                          : "bg-[#FF9900]"
-                      } border-dashed  border-white border-[0.2vw] text-[1.1vw] rounded-full text-white  py-[0.2vw] w-full flex items-center justify-center `}
+                            ? "bg-[#2A99FF]"
+                            : item.req_status_id == 4
+                              ? "bg-[#FD3434]"
+                              : "bg-[#FF9900]"
+                        } border-dashed  border-white border-[0.2vw] text-[1.1vw] rounded-full text-white  py-[0.2vw] w-full flex items-center justify-center `}
                     >
                       {item.code}
                     </div>

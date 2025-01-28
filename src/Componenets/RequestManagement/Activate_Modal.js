@@ -24,6 +24,7 @@ export default function Activate_Modal({
   setRequestData,
   requestData,
   setIsVerifyModal,
+  setSpinning
 }) {
   const [isActivateModal, setIsActivateModal] = useState(false);
   const dispatch = useDispatch();
@@ -32,8 +33,9 @@ export default function Activate_Modal({
 
   const handlechange = async (valuedata) => {
     console.log(valuedata, currentid, "currentidcurrentid");
+    setSpinning(true)
     try {
-      const data = await userStatusActivate(valuedata, currentid, dispatch);
+      const data = await userStatusActivate(valuedata, currentid, dispatch,setSpinning);
       console.log(valuedata, currentid, "currentidcurrentid");
       toast.success(data?.message);
       GetRequestManagementData(dispatch);
@@ -76,36 +78,36 @@ export default function Activate_Modal({
           <div className="scroll-bar ">
             <div className="grid grid-cols-3 gap-[1.5vw]">
               <div className="">
-                <label className="text-[1.25vw] font-bold">Operator Id</label>
+                <label className="text-[1.1vw] font-bold">Operator Id</label>
                 <div className="flex items-center  gap-[0.5vw]">
                   <FaRegAddressCard size={"1.2vw"} color="#1F487C" />
-                  <p className="font-semibold text-[1.1vw] text-[#1F487C]">
+                  <p className=" text-[1vw] text-[#1F487C]">
                     {requestData?.tbs_operator_id}
                   </p>
                 </div>
               </div>
               <div className="">
-                <label className="text-[1.25vw] font-bold">Operator Name</label>
+                <label className="text-[1.1vw] font-bold">Operator Name</label>
                 <div className="flex items-center  gap-[0.5vw]">
                   <PiUserFill size={"1.2vw"} color="#1F487C" />
-                  <p className="font-semibold text-[1.1vw] text-[#1F487C]">
+                  <p className=" text-[1vw] text-[#1F487C]">
                     {requestData?.owner_name}
                   </p>
                 </div>
               </div>
               <div className="">
-                <label className="text-[1.25vw] font-bold">
+                <label className="text-[1.1vw] font-bold">
                   Operator Phone
                 </label>
-                <div className="flex items-center  gap-[0.5vw]">
+                <div className="flex items-center text-[#1F487C]  gap-[0.5vw]">
                   <FaPhoneAlt size={"1.1vw"} color="#1F487C" />
-                  <p className="font-semibold text-[1.1vw] text-[#1F487C]">
+                  <p className=" text-[1vw] text-[#1F487C]">
                     {requestData?.phone}
                   </p>
                 </div>
               </div>
               <div className="">
-                <label className="text-[1.25vw] font-semibold">
+                <label className="text-[1.1vw] font-semibold">
                   Operator Email ID
                 </label>
                 <Tooltip
@@ -125,9 +127,9 @@ export default function Activate_Modal({
                     color: "#1F487C",
                   }}
                 >
-                  <div className="flex items-center  gap-[0.5vw]">
+                  <div className="flex items-center text-[#1F487C]  gap-[0.5vw]">
                     <TfiEmail size={"1.1vw"} color="#1F487C" />
-                    <p className="font-semibold  text-[1.1vw] text-[#1F487C]">
+                    <p className=" text-[1vw] 1F487C ">
                       {requestData?.emailid?.length > 15
                         ? `${requestData?.emailid.slice(0, 12)}...`
                         : requestData?.emailid}
@@ -136,21 +138,21 @@ export default function Activate_Modal({
                 </Tooltip>
               </div>
               <div className=" ">
-                <label className="text-[1.25vw] font-bold">
+                <label className="text-[1.1vw]  font-semibold">
                   Requested Date
                 </label>
-                <div className="flex items-center  gap-[0.5vw]">
-                  <BsCalendar2DateFill size={"1.1vw"} color="#1F487C" />
-                  <p className="font-semibold text-[#1F487C] text-[1.1vw]">{`${dayjs(
+                <div className="flex items-center text-[#1F487C]  gap-[0.5vw]">
+                  <BsCalendar2DateFill size={"1.1vw"} />
+                  <p className=" text-[1vw] ">{`${dayjs(
                     requestData?.created_date
                   ).format("DD MMM, YY")}`}</p>
                 </div>
               </div>
               <div className=" ">
-                <label className="text-[1.25vw] font-bold">Documents</label>
+                <label className="text-[1.1vw] font-bold">Documents</label>
                 <div className="flex items-center  gap-[0.5vw]">
                   <HiClipboardDocumentList size={"1.2vw"} color="#1F487C" />
-                  <p className="font-semibold text-[#1F487C] text-[1.1vw]">
+                  <p className="text-[#1F487C] text-[1vw]">
                     {requestData?.req_status}
                   </p>
                 </div>
@@ -158,16 +160,16 @@ export default function Activate_Modal({
             </div>
 
             {/* <div className="col-span-4">
-                <p className="font-bold pt-[0.3vw] text-[1vw] text-[#28C76F]">
+<p className="font-bold pt-[0.3vw] text-[1vw] text-[#28C76F]">
                   Generate Key
-                </p>
-              </div> */}
+</p>
+</div> */}
             {/* <div className="col-span-1">
-                <TbCircleArrowRightFilled
+<TbCircleArrowRightFilled
                   color="#0D99FF"
                   className="h-[2vw] w-[2vw]"
                 />
-              </div> */}
+</div> */}
 
             <div className=" flex items-center justify-center mt-[2vw]">
               <button className=" bg-[#34AE2A] rounded-[0.5vw]  px-[1.5vw] py-[0.25vw]">

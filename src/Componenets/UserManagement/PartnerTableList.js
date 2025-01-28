@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Grid, Space, Table, Tooltip } from "antd";
+import { Button, Grid, Space, Spin, Table, Tooltip } from "antd";
 import { render } from "@testing-library/react";
 import { MdModeEditOutline, MdPadding } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
@@ -31,14 +31,15 @@ const PartnerTableList = ({
   PartnerID,
   setPartnerID,
   get_partner_list,
-  updatedata
+  updatedata,
 }) => {
   const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const apiUrl = process.env.REACT_APP_API_URL;
   const [sortedInfo, setSortedInfo] = useState({});
   const [viewmodal, setViewModal] = useState(false);
-  const [userName,setUserName] = useState()
-  const [partnerStatusId,setPartnerStatusId]= useState()
+  const [userName, setUserName] = useState();
+  const [partnerStatusId, setPartnerStatusId] = useState();
+  const [spinning, setSpinning] = useState(false);
 
   const handleChange = (pagination, filters, sorter) => {
     console.log("Various parameters", pagination, filters, sorter);
@@ -56,7 +57,9 @@ const PartnerTableList = ({
   const columns = [
     {
       title: (
-        <div className="flex items-center justify-center font-bold text-[1.1vw]">Profile</div>
+        <div className="flex items-center justify-center font-bold text-[1.1vw]">
+          Profile
+        </div>
       ),
       // dataIndex: "photo",
       // key: "photo",
@@ -69,11 +72,12 @@ const PartnerTableList = ({
         return (
           <div className="flex justify-center items-center">
             <img
-              src={`${row?.profile_img
-                ? `${apiImgUrl}${row?.profile_img}`
-                : UserProfile
-                } `}
-                 alt="Profile"
+              src={`${
+                row?.profile_img
+                  ? `${apiImgUrl}${row?.profile_img}`
+                  : UserProfile
+              } `}
+              alt="Profile"
               className="w-[2.15vw] h-[2.15vw] object-cover rounded-[0.2vw]"
             />
           </div>
@@ -82,20 +86,30 @@ const PartnerTableList = ({
       width: "5vw",
     },
     {
-      title: <div className="flex items-center justify-center font-bold text-[1.1vw]">Partner Id</div>,
+      title: (
+        <div className="flex items-center justify-center font-bold text-[1.1vw]">
+          Partner Id
+        </div>
+      ),
       key: "id",
       ellipsis: true,
       width: "9vw",
       render: (text, row) => {
         return (
           <div className="flex items-center justify-center">
-            <p className="text-[1vw] text-[#1F4B7F] font-bold">{row.tbs_partner_id}</p>
+            <p className="text-[1vw] text-[#1F4B7F] font-bold">
+              {row.tbs_partner_id}
+            </p>
           </div>
         );
       },
     },
     {
-      title: <div className="flex items-center justify-center  font-bold text-[1.1vw]">Partner Name</div>, // dataIndex: "name",
+      title: (
+        <div className="flex items-center justify-center  font-bold text-[1.1vw]">
+          Partner Name
+        </div>
+      ), // dataIndex: "name",
       key: "name",
       sorter: (a, b) => {
         const nameA =
@@ -112,26 +126,48 @@ const PartnerTableList = ({
       //   </div>
       // ),
       render: (row) => {
-        const fullname = `${capitalizeFirstLetter(row?.partner_first_name)} ${row.partner_last_name}`
+        // const fullname = `${capitalizeFirstLetter(row?.partner_first_name)} ${
+        //   row.partner_last_name
+        // }`;
+        const fullname = `${row?.partner_first_name.charAt(0) === row?.partner_first_name.charAt(0).toLowerCase() 
+                  ? capitalizeFirstLetter(row?.partner_first_name) 
+                  : row?.partner_first_name} ${row?.partner_last_name}`;
         return (
           <div className="flex items-center pl-[1vw]">
-            <p className="text-[1vw] text-[#1F4B7F] font-bold">{
-              fullname?.length > 18 ? <Tooltip placement="top" color="white"
-              overlayInnerStyle={{ color: "#1F4B7F" }}
-                title={`${capitalizeFirstLetter(row?.partner_first_name)} ${row.partner_last_name}`}
-                className="cursor-pointer">{fullname?.slice(0, 18) + ".."}</Tooltip> : fullname
-            }</p>
+            <p className="text-[1vw] text-[#1F4B7F] font-bold">
+              {fullname?.length > 18 ? (
+                <Tooltip
+                  placement="top"
+                  color="white"
+                  overlayInnerStyle={{ color: "#1F4B7F" }}
+                  title={`${capitalizeFirstLetter(row?.partner_first_name)} ${
+                    row.partner_last_name
+                  }`}
+                  className="cursor-pointer"
+                >
+                  {fullname?.slice(0, 18) + ".."}
+                </Tooltip>
+              ) : (
+                fullname
+              )}
+            </p>
           </div>
-        )
-      }
+        );
+      },
     },
     {
-      title: <div className="flex items-center justify-center  font-bold text-[1.1vw]">Occupation</div>,
+      title: (
+        <div className="flex items-center justify-center  font-bold text-[1.1vw]">
+          Occupation
+        </div>
+      ),
       // dataIndex: "email",
       key: "occupation",
       // sorter: (a, b) => a.occupation?.length - b.occupation?.length,
-      sorter: (a, b) => a.occupation?.toLowerCase().localeCompare(b.occupation?.toLowerCase()),
-      sortOrder: sortedInfo.columnKey === "occupation" ? sortedInfo.order : null,
+      sorter: (a, b) =>
+        a.occupation?.toLowerCase().localeCompare(b.occupation?.toLowerCase()),
+      sortOrder:
+        sortedInfo.columnKey === "occupation" ? sortedInfo.order : null,
       ellipsis: true,
       width: "10vw",
       render: (row) => {
@@ -140,54 +176,72 @@ const PartnerTableList = ({
           //   <p className="text-[1.1vw] text-[#1F4B7F]">{row.emailid}</p>
           // </div>
           <div>
-          {row?.occupation?.length > 18 ? (
-            <Tooltip
-              placement="top"
-              color="white"
-              overlayInnerStyle={{ color: "#1F4B7F" }}
-              title={row?.occupation}
-              className="cursor-pointer"
-            >
-              <div className="text-[1vw] pl-[1vw] font-bold  text-[#1f4b7f]">
-                {" "}
-                {`${capitalizeFirstLetter(row?.occupation?.slice(0, 18))}...`}
+            {row?.occupation?.length > 18 ? (
+              <Tooltip
+                placement="top"
+                color="white"
+                overlayInnerStyle={{ color: "#1F4B7F" }}
+                title={row?.occupation}
+                className="cursor-pointer"
+              >
+                <div className="text-[1vw] pl-[1vw] font-bold  text-[#1f4b7f]">
+                  {" "}
+                  {`${capitalizeFirstLetter(row?.occupation?.slice(0, 18))}...`}
+                </div>
+              </Tooltip>
+            ) : (
+              <div
+                className={`text-[1vw] pl-[1vw] font-bold ${
+                  !row?.occupation && "text-center"
+                } text-[#1f4b7f]`}
+              >
+                {row?.occupation
+                  ? capitalizeFirstLetter(row?.occupation?.slice(0, 18))
+                  : "-"}
               </div>
-            </Tooltip>
-          ) : (
-            <div className="text-[1vw] pl-[1vw] font-bold text-[#1f4b7f]">
-              {capitalizeFirstLetter(row?.occupation?.slice(0, 18))}
-            </div>
-          )}
-        </div>
+            )}
+          </div>
         );
       },
     },
     {
-      title: <div className="flex items-center justify-center  font-bold text-[1.1vw]">Age / Gender</div>,
-      // dataIndex: "created",
-      // key: "created",
-      // sorter: (a, b) => a.gender?.length - b?.gender.length,
-      // sortOrder: sortedInfo.columnKey === "created" ? sortedInfo.order : null,
+      title: (
+        <div className="flex items-center justify-center font-bold text-[1.1vw]">
+          Age / Gender
+        </div>
+      ),
       ellipsis: true,
       width: "9vw",
       render: (row) => {
         return (
-          <div className="flex items-center pl-[2vw]">
-            <p className="text-[1vw] text-[#1F4B7F] flex justify-center ">
-            <div>{moment().diff(moment(row.date_of_birth), 'years')}</div>
-            <div className="px-[.3vw]">/</div>
-            <div>
-              {row?.gender === "Male" ? "M" : row?.gender === "Female" ? "F" :""}
-              </div>
-              {/* {dayjs(row.created_date).format("DD MMM, YY")} */}
+          <div className="flex items-center pl-[1.5vw]">
+            <p className={`text-[1vw] text-[#1F4B7F] flex justify-center`}>
+              {row.date_of_birth ? (
+                <>
+                  <div>{moment().diff(moment(row.date_of_birth), "years")}</div>
+                  <div className="px-[.3vw]">/</div>
+                  <div>
+                    {row?.gender === "Male"
+                      ? "M"
+                      : row?.gender === "Female"
+                      ? "F"
+                      : "O"}
+                  </div>
+                </>
+              ) : (
+                <div className="flex justify-center pl-[3vw]  font-bold w-full">-</div>
+              )}
             </p>
           </div>
         );
       },
     },
-
     {
-      title: <div className="flex items-center justify-center font-bold text-[1.1vw]">Mobile</div>,
+      title: (
+        <div className="flex items-center justify-center font-bold text-[1.1vw]">
+          Mobile
+        </div>
+      ),
       key: "mobile",
       sorter: (a, b) => {
         const phoneA = a.phone ? a.phone.replace(/\D/g, "") : "";
@@ -199,20 +253,33 @@ const PartnerTableList = ({
       width: "9vw",
       render: (text, row) => {
         return (
-          <div className="flex items-center pl-[1.5vw]">
-            <p className="text-[1vw] text-[#1F4B7F]">{row.phone}</p>
-          </div>
+          <div className="flex items-center w-full">
+        <p className="text-[1vw] text-[#1F4B7F] w-full flex justify-center">
+          {row.phone ? (
+            <span>{row.phone}</span>
+          ) : (
+            <div className="font-bold">-</div>
+          )}
+        </p>
+      </div>
         );
       },
     },
     {
-      title: <div className="flex items-center justify-center  font-bold text-[1.2vw]">Email</div>,
+      title: (
+        <div className="flex items-center justify-center  font-bold text-[1.2vw]">
+          Email
+        </div>
+      ),
       // dataIndex: "email",
       key: "email",
       // sorter: (a, b) => a.emailid.length - b.emailid.length,
       // sortOrder: sortedInfo.columnKey === "email" ? sortedInfo.order : null,
-       sorter: (a, b) => (a.emailid || "").toLowerCase().localeCompare((b.emailid || "").toLowerCase()), // Sort alphabetically
-  sortOrder: sortedInfo.columnKey === "email" ? sortedInfo.order : null,
+      sorter: (a, b) =>
+        (a.emailid || "")
+          .toLowerCase()
+          .localeCompare((b.emailid || "").toLowerCase()), // Sort alphabetically
+      sortOrder: sortedInfo.columnKey === "email" ? sortedInfo.order : null,
       ellipsis: true,
       width: "13vw",
       render: (row) => {
@@ -220,7 +287,7 @@ const PartnerTableList = ({
           // <div className="flex items-center justify-center">
           //   <p className="text-[1.1vw] text-[#1F4B7F]">{row.emailid}</p>
           // </div>
-          <div >
+          <div>
           {row?.emailid?.length > 20 ? (
             <Tooltip
               placement="top"
@@ -230,21 +297,27 @@ const PartnerTableList = ({
               className="cursor-pointer"
             >
               <div className="text-[1vw] pl-[1vw] text-[#1f4b7f]">
-                {" "}
                 {`${row?.emailid?.slice(0, 20)}...`}
               </div>
             </Tooltip>
-          ) : (
+          ) : row?.emailid ? (
             <div className="text-[1vw] pl-[1vw] text-[#1f4b7f]">
               {row?.emailid?.slice(0, 20)}
             </div>
+          ) : (
+            <div className="text-center text-[1vw] font-bold text-[#1f4b7f]">-</div>
           )}
         </div>
+        
         );
       },
     },
     {
-      title: <div className="flex items-center justify-center   font-bold text-[1.1vw]">Created</div>,
+      title: (
+        <div className="flex items-center justify-center   font-bold text-[1.1vw]">
+          Created
+        </div>
+      ),
       // dataIndex: "created",
       key: "created",
       sorter: (a, b) => new Date(a.created_date) - new Date(b.created_date),
@@ -263,7 +336,9 @@ const PartnerTableList = ({
     },
     {
       title: (
-        <div className="flex items-center justify-center font-bold text-[1.1vw]">Status</div>
+        <div className="flex items-center justify-center font-bold text-[1.1vw]">
+          Status
+        </div>
       ),
       // dataIndex: "status",
       // key: "status",
@@ -272,20 +347,24 @@ const PartnerTableList = ({
         return (
           <div className="flex items-center justify-center">
             <button
-              className={`${row.partner_status_id == 0
-                ? "bg-[#646262] cursor-not-allowed" 
-                 : row.partner_status_id == 1
+              className={`${
+                row.partner_status_id == 0
+                  ? "bg-[#646262] cursor-not-allowed"
+                  : row.partner_status_id == 1
                   ? "bg-[#FF9900] cursor-not-allowed"
-                : row.partner_status_id == 2
-                  ? "bg-[#38ac2c]"
+                  : row.partner_status_id == 2
+                  ? "bg-[#34AE2B]"
                   : row.partner_status_id == 3
-                    ? "bg-[#FD3434]"
-                    : "bg-[#2A99FF] cursor-not-allowed"
-                }  h-[1.8vw] shadow-md shadow-black font-extrabold text-[1vw] text-white w-[7vw] rounded-[0.5vw]`}
+                  ? "bg-[#FD3434]"
+                  : "bg-[#2A99FF] cursor-not-allowed"
+              }  h-[1.8vw] shadow-md shadow-black font-extrabold text-[1vw] text-white w-[7vw] rounded-[0.5vw]`}
               onClick={() => {
-                if (row.partner_status_id === 2 ||row.partner_status_id === 3 ) {
+                if (
+                  row.partner_status_id === 2 ||
+                  row.partner_status_id === 3
+                ) {
                   setViewModal(true);
-                  setPartnerStatusId(row.partner_status_id )
+                  setPartnerStatusId(row.partner_status_id);
                   setPartnerID(row?.tbs_partner_id);
                 }
               }}
@@ -298,7 +377,9 @@ const PartnerTableList = ({
     },
     {
       title: (
-        <div className="flex items-center justify-center font-bold text-[1.1vw]">Action</div>
+        <div className="flex items-center justify-center font-bold text-[1.1vw]">
+          Action
+        </div>
       ),
       // dataIndex: "action",
       // key: "action",
@@ -334,7 +415,11 @@ const PartnerTableList = ({
                 onClick={() => {
                   setDeleteModalIsOpen(true);
                   setPartnerID(row?.tbs_partner_id);
-                  setUserName(`${row?.partner_first_name} ${" "} ${row?.partner_last_name}`)
+                  setUserName(
+                    `${row?.partner_first_name} ${" "} ${
+                      row?.partner_last_name
+                    }`
+                  );
                 }}
               />
 
@@ -369,10 +454,14 @@ const PartnerTableList = ({
     setDeleteModalIsOpen(false);
   };
 
-
   console.log(currentData, "wefwefewfcew");
   return (
     <>
+        {spinning === true ? (
+              <div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-20  z-10">
+                <Spin size="large" />
+              </div>
+            ) : "" }
       <Table
         columns={columns}
         dataSource={currentData}
@@ -406,6 +495,7 @@ const PartnerTableList = ({
           PartnerID={PartnerID}
           setViewModal={setViewModal}
           partnerStatusId={partnerStatusId}
+          setSpinning={setSpinning}
         />
       </ModalPopup>
     </>

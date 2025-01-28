@@ -11,16 +11,19 @@ export default function PartnerStatusUpdate({
   clientid,
   PartnerID,
   setViewModal,
-  partnerStatusId
+  partnerStatusId,
+  setSpinning
 }) {
   const dispatch = useDispatch();
 
   const handlechange = async () => {
     console.log(PartnerID, "employeeid");
+    setSpinning(true)
     try {
       const data = await PartnerStatusUpdateApi(
         partnerStatusId,
         PartnerID,
+        setSpinning,
         dispatch
       );
      // console.log(valueid, valuedata, employeeid, "currentidcurrentid");
@@ -46,7 +49,7 @@ export default function PartnerStatusUpdate({
           Under review
         </button> */}
         <button
-          className={`items-center text-[1vw] shadow-md shadow-black font-extrabold text-white  space-x-[0.7vw] px-[0.8vw] w-[8vw] h-[2vw] ${partnerStatusId == 2 ? "bg-[#FF1100]" :"bg-[#34AE2A]"} rounded-[0.5vw]`}
+          className={`items-center text-[1vw] shadow-md shadow-black font-extrabold text-white  space-x-[0.7vw] px-[0.8vw] w-[8vw] h-[2vw] ${partnerStatusId == 2 ? "bg-[#FD3434]" :"bg-[#34AE2B]"} rounded-[0.5vw]`}
           onClick={handlechange}
         >
           {partnerStatusId == 2 ? "Inactive" : "Active"}

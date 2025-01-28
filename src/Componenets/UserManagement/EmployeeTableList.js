@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Grid, Space, Table, Tooltip } from "antd";
+import { Button, Grid, Space, Spin, Table, Tooltip } from "antd";
 import { render } from "@testing-library/react";
 import { MdModeEditOutline, MdPadding } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
@@ -36,6 +36,7 @@ const EmployeeTableList = ({
   const [sortedInfo, setSortedInfo] = useState({});
   const [viewmodal, setViewModal] = useState(false);
   const [userName, setUserName] = useState("")
+  const [spinning, setSpinning] = useState(false);
   const typeId = sessionStorage.getItem("type_id");
 
   const handleChange = (pagination, filters, sorter) => {
@@ -102,10 +103,13 @@ const EmployeeTableList = ({
         const nameB = `${b.emp_first_name} ${b.emp_last_name}`.toUpperCase();
         return nameA.localeCompare(nameB);
       },
-      width: "12vw",
+      width: "13vw",
       sortOrder: sortedInfo.columnKey === "name" && sortedInfo.order,
       render: (row) => {
-        const fullname = `${capitalizeFirstLetter(row?.emp_first_name)} ${row.emp_last_name}`
+        // const fullname = `${capitalizeFirstLetter(row?.emp_first_name)} ${row.emp_last_name}`
+        const fullname = `${row?.emp_first_name.charAt(0) === row?.emp_first_name.charAt(0)?.toLowerCase() 
+          ? capitalizeFirstLetter(row?.emp_first_name) 
+          : row?.emp_first_name} ${row?.emp_last_name}`;
         return (
           // <div className="flex items-center justify-center">
           //   <p className="text-[1.1vw] text-[#1F4B7F]">{`${capitalizeFirstLetter(row?.emp_first_name)} ${row.emp_last_name}`}</p>
@@ -135,13 +139,14 @@ const EmployeeTableList = ({
         // <div className="flex items-center pl-[1vw]">
         //   <p className="text-[1vw] text-[#1F4B7F]">{`${capitalizeFirstLetter(row?.role_type)}`}</p>
         // </div>
-        <div className="flex items-center pl-[1vw]">
-        <p className="text-[1vw] text-[#1F4B7F] font-bold">{
+        <div className="flex items-center ">
+          {row?.role_type ? ( <p className="text-[1vw] pl-[1vw] text-[#1F4B7F] font-bold">{
           row?.role_type?.length > 10 ? <Tooltip placement="top" color="white"
           overlayInnerStyle={{ color: "#1F4B7F" }}
             title={`${capitalizeFirstLetter(row?.role_type)}`}
-            className="cursor-pointer">{row?.role_type?.slice(0, 10) + ".."}</Tooltip> : row?.role_type ? row?.role_type : " - " 
-        }</p>
+            className="cursor-pointer">{row?.role_type?.slice(0, 10) + ".."}</Tooltip> : row?.role_type
+        }</p>):(<div className="font-bold flex justify-center text-[1vw] text-[#1f4b7f]  w-full">-</div>)}
+       
       </div>
       ),
     },
@@ -153,19 +158,20 @@ const EmployeeTableList = ({
         const nameB = `${b.designation} ${b.designation}`.toUpperCase();
         return nameA.localeCompare(nameB);
       },
-      width: "11vw",
+      width: "9vw",
       sortOrder: sortedInfo.columnKey === "Designation" && sortedInfo.order,
       render: (row) => (
         // <div className="flex items-center pl-[1vw]">
         //   <p className="text-[1vw] text-[#1F4B7F]">{`${capitalizeFirstLetter(row?.designation)}`}</p>
         // </div>
           <div className="flex items-center pl-[1vw]">
-          <p className="text-[1vw] text-[#1F4B7F] font-bold">{
+            { row?.designation ? (   <p className="text-[1vw] text-[#1F4B7F] font-bold">{
             row?.designation?.length > 17 ? <Tooltip placement="top" color="white"
             overlayInnerStyle={{ color: "#1F4B7F" }}
               title={`${capitalizeFirstLetter(row?.designation)}`}
-              className="cursor-pointer">{row?.designation?.slice(0, 17) + ".."}</Tooltip> : row?.designation ? row?.designation  : " - "
-          }</p>
+              className="cursor-pointer">{row?.designation?.slice(0, 17) + ".."}</Tooltip> : row?.designation 
+          }</p>): (<div className="flex justify-center w-full text-[1vw] text-[#1f4b7f]  font-bold">-</div>)}
+       
         </div>
       ),
     },
@@ -185,7 +191,13 @@ const EmployeeTableList = ({
       render: (text, row) => {
         return (
           <div className="flex items-center justify-center">
-            <p className="text-[1vw] text-[#1F4B7F]">{row.phone}</p>
+            {
+              row?.phone ? (
+                <p className="text-[1vw] text-[#1F4B7F]">{row.phone}</p>
+              ) :
+              (<div className="font-bold text-[1vw] text-[#1f4b7f] ">-</div>)
+            }
+         
           </div>
         );
       },
@@ -209,7 +221,7 @@ const EmployeeTableList = ({
           // <div className="flex items-center justify-center">
           //   <p className="text-[1.1vw] text-[#1F4B7F]">{row.email_id}</p>
           // </div>
-          <div flex items-center justify-center>
+          <div>
             {row?.email_id?.length > 20 ? (
               <Tooltip
               color="white"
@@ -223,11 +235,11 @@ const EmployeeTableList = ({
                   {`${row?.email_id?.slice(0, 20)}...`}
                 </div>
               </Tooltip>
-            ) : (
+            ) : row?.email_id ? (
               <div className="text-[1vw] pl-[1vw] text-[#1f4b7f]">
                 {row?.email_id?.slice(0, 20)}
               </div>
-            )}
+            ) : (<div className="font-bold text-[1vw] text-[#1f4b7f] text-center">-</div>)}
           </div>
         );
       },
@@ -265,7 +277,7 @@ const EmployeeTableList = ({
               className={`${row.emp_status_id == 0
                   ? "bg-[#646262]"
                   : row.emp_status_id == 1
-                    ? "bg-[#38ac2c]"
+                    ? "bg-[#34AE2B]"
                     : row.emp_status_id == 2
                       ? "bg-[#FD3434]"
                       : "bg-[#2A99FF]"
@@ -384,6 +396,11 @@ const EmployeeTableList = ({
 
   return (
     <>
+       {spinning === true ? (
+              <div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-20  z-10">
+                <Spin size="large" />
+              </div>
+            ) : "" }
       <Table
         columns={columns}
         dataSource={currentData}
@@ -420,6 +437,7 @@ const EmployeeTableList = ({
         <EmployeeStatusUpdate
           employeeid={employee_id}
           setViewModal={setViewModal}
+          setSpinning={setSpinning}
         />
       </ModalPopup>
     </>

@@ -291,7 +291,7 @@ export default function AddDocuments({
                     <div className="grid grid-cols-2 w-full  gap-x-[1.5vw]">
                       <div className="col-span-1">
                         <label className="text-[#1F4B7F] text-[1.1vw]">
-                          Aadhar Card Front Page
+                        Aadhaar Card Front Page
                           <span className="text-[1vw] text-red-600 pl-[0.2vw]">
                             *
                           </span>
@@ -344,7 +344,7 @@ export default function AddDocuments({
                             }}
                           >
                             <span className="opacity-50">
-                              Upload Aadhar Front
+                              Upload Aadhaar Front
                             </span>
                             {/* {inputPreview?.aadharfr  ? (
                           inputPreview?.aadharfr?.startsWith("blob") ? (
@@ -515,7 +515,7 @@ export default function AddDocuments({
                   </div> */}
                       <div className="col-span-1">
                         <label className="text-[#1F4B7F] text-[1.1vw]">
-                          Aadhar Card Back Page
+                        Aadhaar Card Back Page
                           <span className="text-[1vw] text-red-600 pl-[0.2vw]">
                             *
                           </span>
@@ -559,7 +559,7 @@ export default function AddDocuments({
                             }}
                           >
                             <span className="opacity-50">
-                              Upload Aadhar Back
+                              Upload Aadhaar Back
                             </span>
                             {/* {inputPreview.aadharbk ? (
                           <img
@@ -645,7 +645,7 @@ export default function AddDocuments({
                     <div className="grid grid-cols-2 gap-x-[1.5vw]">
                       <div className="col-span-1">
                         <label className="text-[#1F4B7F] text-[1.1vw]">
-                          Pancard Front Page
+                          PAN Card Front Page
                           <span className="text-[1vw] text-red-600 pl-[0.2vw]">
                             *
                           </span>
@@ -691,7 +691,7 @@ export default function AddDocuments({
                             }}
                           >
                             <span className="opacity-50">
-                              Upload Pancard Front
+                              Upload PAN Card Front
                             </span>
                             {/* {inputPreview.panfr ? (
                           <img
@@ -775,7 +775,7 @@ export default function AddDocuments({
                       </div>
                       <div className="col-span-1">
                         <label className="text-[#1F4B7F] text-[1.1vw]">
-                          Pancard Back Page
+                          PAN Card Back Page
                           <span className="text-[1vw] text-red-600 pl-[0.2vw]">
                             *
                           </span>

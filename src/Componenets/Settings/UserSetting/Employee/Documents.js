@@ -19,10 +19,10 @@ const SUPPORTED_FORMATS = [
 ];
 
 const validationSchema = Yup.object().shape({
-  aadhar_number: Yup.string().required("Aadhar number is required"),
+  aadhar_number: Yup.string().required("Aadhaar number is required"),
   pan_number: Yup.string().required("Pan Number is required"),
   aadhar_doc: Yup.mixed()
-    .required("Aadhar Front Page is required")
+    .required("Aadhaar Front Page is required")
     .test("fileSize", "File too large", (value) =>
       typeof value === "string" ? true : value && value.size <= FILE_SIZE
     )
@@ -32,7 +32,7 @@ const validationSchema = Yup.object().shape({
         : value && SUPPORTED_FORMATS.includes(value.type)
     ),
   aadhar_bk_doc: Yup.mixed()
-    .required("Aadhar Back Page is required")
+    .required("Aadhaar Back Page is required")
     .test("fileSize", "File too large", (value) =>
       typeof value === "string" ? true : value && value.size <= FILE_SIZE
     )
@@ -230,7 +230,7 @@ const Documents = () => {
               <div className="gap-[1vw] grid grid-cols-2">
                 <div className="col-span-1 relative">
                   <label className="text-[#1F4B7F] text-[1vw] font-bold ">
-                    Aadhar Card Number
+                  Aadhaar Card Number
                     <span className="text-[1vw] text-red-600 pl-[0.2vw]">
                       *
                     </span>
@@ -239,7 +239,7 @@ const Documents = () => {
                     <Field
                       type="text"
                       name="aadhar_number"
-                      placeholder="Enter Aadhar Number"
+                      placeholder="Enter Aadhaar Number"
                       accept=".png, .jpg, .jpeg, .pdf, .doc, .docx"
                       value={values.aadhar_number}
                       className={`border-r-[0.25vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-[#1F487C] border-[#1F487C] text-[#1F487C] text-[0.9vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none ${
@@ -292,7 +292,7 @@ const Documents = () => {
                 </div>
                 <div className="col-span-1 relative">
                   <label className="text-[#1F4B7F] text-[1vw] font-bold">
-                    Aadhar Card Front Doc
+                  Aadhaar Card Front Doc
                     <span className="text-[1vw] text-red-600 pl-[0.2vw]">
                       *
                     </span>
@@ -374,7 +374,7 @@ const Documents = () => {
                 </div>
                 <div className="col-span-1 relative">
                   <label className="text-[#1F4B7F] text-[1vw] font-bold">
-                    Aadhar Card Back Doc
+                  Aadhaar Card Back Doc
                     <span className="text-[1vw] text-red-600 pl-[0.2vw]">
                       *
                     </span>
@@ -423,7 +423,7 @@ const Documents = () => {
                         </div>
                       ) : (
                         <span className="opacity-50">
-                          Upload Aadhar Back Doc
+                          Upload Aadhaar Back Doc
                         </span>
                       )}
                       {/* <MdOutlineModeEditOutline

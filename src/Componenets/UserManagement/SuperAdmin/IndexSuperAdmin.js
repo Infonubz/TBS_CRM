@@ -9,7 +9,7 @@ import AddRegisterAddress from "./AddRegisterAddress";
 import AddBusinessDetails from "./AddBusinessDetails";
 import AddGSTDetails from "./AddGSTDetails";
 import AddDocuments from "./AddDocuments";
-import pencilshape from '../../../asserts/pencilicon.png'
+import pencilshape from "../../../asserts/pencilicon.png";
 import {
   GetOperatorProfile,
   GetSuperAdminById,
@@ -19,7 +19,7 @@ import {
 import { useLocation } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import USERPROFILE from '../../../asserts/Image.png'
+import USERPROFILE from "../../../asserts/Image.png";
 import { RiUser3Fill } from "react-icons/ri";
 import ImgCrop from "antd-img-crop";
 const getBase64 = (file) =>
@@ -35,7 +35,7 @@ export default function SuperAdminIndex({
   setOperatorID,
   operatorID,
   setModalIsOpen,
-  updatedata
+  updatedata,
 }) {
   const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   // const apiurl = process.env.REACT_APP_API_URL;
@@ -46,24 +46,19 @@ export default function SuperAdminIndex({
   const [previewTitle, setPreviewTitle] = useState("");
   const [fileList, setFileList] = useState([]);
   const [operator_id, setOperator_Id] = useState(null);
-  const [profileImage, setProfileImage] = useState(false)
-  const [enableUpload, setEnableUpload] = useState(false)
+  const [profileImage, setProfileImage] = useState(false);
+  const [enableUpload, setEnableUpload] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
-
-
 
   console.log("fileListfileLisfileListt", operatorID, updatedata);
 
-
   useEffect(() => {
     if (updatedata) {
-      setEnableUpload(true)
+      setEnableUpload(true);
+    } else {
+      setEnableUpload(false);
     }
-    else {
-      setEnableUpload(false)
-    }
-  }, [])
-
+  }, []);
 
   const handlePreview = async (file) => {
     if (!file.url && !file.preview) {
@@ -76,9 +71,9 @@ export default function SuperAdminIndex({
     );
   };
 
-  const operatorProfileImage = sessionStorage.getItem('OperatorProfileImg')
+  const operatorProfileImage = sessionStorage.getItem("OperatorProfileImg");
   // const operatorProfileImage = useSelector((state) => state.crm.operator_byid[0]?.profileimg)
-  console.log(operatorProfileImage, 'check_operator_profile_image')
+  console.log(operatorProfileImage, "check_operator_profile_image");
 
   const dispatch = useDispatch();
 
@@ -105,20 +100,19 @@ export default function SuperAdminIndex({
   // };
   const handleChange = async ({ fileList: newFileList }) => {
     const file = newFileList[0]?.originFileObj;
-    
+    console.log(file, "Filelistfilesisfjd");
     if (file) {
       // Check file size (5MB = 5 * 1024 * 1024 bytes)
       const fileSizeInMB = file.size / (1024 * 1024); // Convert bytes to MB
-      
       if (fileSizeInMB > 5) {
         // If the file size is greater than 5MB, alert the user
         // alert('File size exceeds 5MB limit!');
-        setProfileImage(false)
+        setProfileImage(false);
         // Remove the file from the list
-        newFileList.pop(); 
+        newFileList.pop();
       } else {
         setFileList(newFileList);
-        setSelectedFile(newFileList)
+        setSelectedFile(newFileList);
         if (newFileList?.length > 0) {
           setProfileImage(true);
         } else {
@@ -127,11 +121,11 @@ export default function SuperAdminIndex({
       }
     } else {
       // If no file, just update the file list
+      setProfileImage(false);
       setFileList(newFileList);
-      setSelectedFile(newFileList)
+      setSelectedFile(newFileList);
     }
   };
-  
 
   const handleCancel = () => setPreviewOpen(false);
 
@@ -186,7 +180,7 @@ export default function SuperAdminIndex({
   const [gstback, setGstback] = useState(false);
   const location = useLocation();
 
-  console.log(selectedFile, 'selected_file')
+  console.log(selectedFile, "selected_file");
 
   const getprofile = async () => {
     try {
@@ -205,30 +199,23 @@ export default function SuperAdminIndex({
     getprofile();
   }, [operatorID]);
 
+  console.log(apiImgUrl, "urlurlurlurlurlurlurlurl");
 
-
-  console.log(apiImgUrl,"urlurlurlurlurlurlurlurl");
-  
-
-  console.log(
-    `${apiImgUrl}${selectedFile}`,
-    "locationlocationlocation"
-  );
+  console.log(`${apiImgUrl}${selectedFile}`, "locationlocationlocation");
 
   console.log(enableUpload, "imagkjhdfkjdhfk");
-
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     setSelectedFile(file);
   };
 
-
   return (
     <div>
       <div
-        className={`w-full h-full ${location.pathname != "/settings" ? "py-0" : "py-[1vw] px-[1vw]"
-          }`}
+        className={`w-full h-full ${
+          location.pathname != "/settings" ? "py-0" : "py-[1vw] px-[1vw]"
+        }`}
       >
         {location.pathname != "/settings" ? (
           <div className="w-full h-[3vw] flex">
@@ -237,12 +224,12 @@ export default function SuperAdminIndex({
                 currentpage == 1
                   ? 20
                   : currentpage == 2
-                    ? 40
-                    : currentpage == 3
-                      ? 60
-                      : currentpage == 4
-                        ? 80
-                        : 100
+                  ? 40
+                  : currentpage == 3
+                  ? 60
+                  : currentpage == 4
+                  ? 80
+                  : 100
               }
               size="1.2vw"
               strokeColor="#1F4B7F"
@@ -286,40 +273,42 @@ export default function SuperAdminIndex({
                 </Upload> */}
 
                 <div className="relative">
-                  <ImgCrop showGrid rotationSlider showReset onImageCrop={(file) => {
-
-                  }}>
+                  <ImgCrop
+                    showGrid
+                    rotationSlider
+                    showReset
+                    onImageCrop={(file) => {}}
+                  >
                     <Upload
+                      className="umimgupload"
                       action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
                       listType="picture-card"
                       fileList={fileList}
                       onChange={handleChange}
                       onPreview={handlePreview}
                       disabled={enableUpload}
+                      accept=".jpg,.jpeg,.png"
                     >
                       {fileList?.length < 1 && "+ Upload"}
-
-
                     </Upload>
                   </ImgCrop>
 
-                  {fileList.length === 0 && selectedFile && (  // Check if there are no files in the fileList and selectedFile is set
-                    <img
-                      src={`${apiImgUrl}${selectedFile}`}
-                      alt="Profile"
-                      className="w-[5.9vw] h-[5.9vw] object-cover rounded-[0.2vw] top-[0vw] left-[0vw] absolute opacity-25 z-[1] pointer-events-none"
-                    />
-                  )}
-                  
+                  {fileList.length === 0 &&
+                    selectedFile && ( // Check if there are no files in the fileList and selectedFile is set
+                      <img
+                        src={`${apiImgUrl}${selectedFile}`}
+                        alt="Profile"
+                        className="w-[5.9vw] h-[5.9vw] object-cover rounded-[0.2vw] top-[0vw] left-[0vw] absolute opacity-25 z-[1] pointer-events-none"
+                      />
+                    )}
                 </div>
                 {updatedata && selectedFile != null
-                      ? " "
-                      : profileImage === false && (
-                          <span className="text-red-500 text-[.7vw] absolute bottom-[-1.2vw]">
-                            * Company Logo is required  -  (Max Size : 5MB)
-                          </span>
-                        )}
-
+                  ? " "
+                  : profileImage === false && (
+                      <span className="text-red-500 text-[.7vw] absolute bottom-[-1.2vw]">
+                        * Company Logo is required - (Max Size : 5MB)
+                      </span>
+                    )}
 
                 {/* {operatorProfileImage === 'null' || operatorProfileImage === null ? (
                   <div>
@@ -354,18 +343,23 @@ export default function SuperAdminIndex({
                 <div className="">
                   <div className="bg-[#D9D9D9] rounded-t-full rounded-b-full w-[0.7vw] h-[14vw] relative">
                     <div
-                      className={`absolute  h-[1.5vw] w-[3.4vw] ${currentpage == 1
-                        ? "top-[.2vw]"
-                        : currentpage == 2
+                      className={`absolute  h-[1.5vw] w-[3.4vw] ${
+                        currentpage == 1
+                          ? "top-[.2vw]"
+                          : currentpage == 2
                           ? "top-[3.4vw]"
                           : currentpage == 3
-                            ? "top-[6.5vw]"
-                            : currentpage == 4
-                              ? "top-[9.5vw]"
-                              : "bottom-[-.3vw]"
-                        }`}
+                          ? "top-[6.5vw]"
+                          : currentpage == 4
+                          ? "top-[9.5vw]"
+                          : "bottom-[-.3vw]"
+                      }`}
                     >
-                      <img src={pencilshape} alt='icon' className="h-[1.2vw] w-[3.4vw]" />
+                      <img
+                        src={pencilshape}
+                        alt="icon"
+                        className="h-[1.2vw] w-[3.4vw]"
+                      />
                     </div>
                     {/* <img src={pencilshape} alt='icon' 
                       className={`absolute h-[3vw] w-[5vw] ${currentpage == 1
@@ -423,6 +417,7 @@ export default function SuperAdminIndex({
                   setEnableUpload={setEnableUpload}
                   selectedFile={selectedFile}
                   enableUpload={enableUpload}
+                  setSelectedFile={setSelectedFile}
                 />
               ) : currentpage == 2 ? (
                 <AddRegisterAddress
@@ -487,6 +482,6 @@ export default function SuperAdminIndex({
           </div>
         </div>
       </div>
-    </div >
+    </div>
   );
 }

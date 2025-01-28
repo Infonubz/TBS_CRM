@@ -61,10 +61,19 @@ export default function Advertisement({ currentItems, selectedTab, activePage, i
             {
               row?.deleted_data?.client_details?.length > 20 ? (
                 <Tooltip color="white" overlayInnerStyle={{ color: "#1F4B7F" }} title={capitalizeFirstLetter(row?.deleted_data?.client_details)}>
-                  <span className="font-bold text-[1vw]">{`${capitalizeFirstLetter(row?.deleted_data?.client_details).slice(0, 20)}...`}</span>
+                  <span className="font-bold text-[1vw]"><span>
+                    {`${row?.deleted_data?.client_details?.charAt(0) === row?.deleted_data?.client_details?.charAt(0).toLowerCase()
+                      ? capitalizeFirstLetter(row?.deleted_data?.client_details.slice(0, 20))
+                      : row?.deleted_data?.client_details.slice(0, 20)}...`}
+                  </span>
+                  </span>
                 </Tooltip>
               ) : (
-                <span className="font-bold text-[1vw]">{capitalizeFirstLetter(row?.deleted_data?.client_details)}</span>
+                <span className="font-bold text-[1vw]">
+                {row?.deleted_data?.client_details?.charAt(0) === row?.deleted_data?.client_details?.charAt(0).toLowerCase() 
+                  ? capitalizeFirstLetter(row?.deleted_data?.client_details) 
+                  : row?.deleted_data?.client_details}
+              </span>              
               )
             }
 
@@ -130,14 +139,14 @@ export default function Advertisement({ currentItems, selectedTab, activePage, i
           <div className="flex justify-center">
             <button
               className={`${row.deleted_data.ads_status_id == 0
-                  ? "bg-[#646262]"
-                  : row.deleted_data.ads_status_id == 1
-                    ? " bg-[#FF9900]"
-                    : row.deleted_data.ads_status_id == 2
-                      ? "bg-[#38ac2c]"
-                      : row.deleted_data.ads_status_id == 3
-                        ? "bg-[#2A99FF]"
-                        : "bg-[#FD3434]"
+                ? "bg-[#646262]"
+                : row.deleted_data.ads_status_id == 1
+                  ? " bg-[#FF9900]"
+                  : row.deleted_data.ads_status_id == 2
+                    ? "bg-[#38ac2c]"
+                    : row.deleted_data.ads_status_id == 3
+                      ? "bg-[#2A99FF]"
+                      : "bg-[#FD3434]"
                 } h-[1.8vw] shadow-md shadow-[black] font-extrabold text-[1vw] cursor-not-allowed text-white w-[7vw] rounded-[0.5vw]`}
             >
               {row.deleted_data.ads_status}
@@ -262,7 +271,7 @@ export default function Advertisement({ currentItems, selectedTab, activePage, i
           // title={`want to delete ( ${rowName} ) Ad Permenantly`}
           title={
             <>
-              want to delete <span style={{ fontWeight: 'bold' }}>{rowName}</span> Ad Permenantly
+              want to delete <span style={{ fontWeight: 'bold' }}>{capitalizeFirstLetter(rowName)}</span> Ad Permenantly
             </>
           }
           id={tbsId}
@@ -282,7 +291,7 @@ export default function Advertisement({ currentItems, selectedTab, activePage, i
           // title={`want to restore ( ${rowName} ) Ad`}
           title={
             <>
-              want to restore <span style={{ fontWeight: 'bold' }}>{rowName}</span>
+              want to restore <span style={{ fontWeight: 'bold' }}>{capitalizeFirstLetter(rowName)}</span>
             </>
           }
           id={tbsId}
