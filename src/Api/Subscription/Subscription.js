@@ -11,7 +11,7 @@ const apiUrl = process.env.REACT_APP_API_URL;
 
 export const GetSubscriptionList = async (dispatch, setSpinning) => {
   try {
-    const response = await api.get(`${apiUrl}/`);
+    const response = await api.get(`${apiUrl}/subscription`);
     dispatch({ type: GET_SUBSCRIPTION, payload: response.data });
     console.log(response, "response response...");
     return response.data;
