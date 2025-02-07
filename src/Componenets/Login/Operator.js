@@ -19,7 +19,7 @@ export default function Operator({ setForgotPassword, setAuthtoken }) {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (values, setFieldError) => {
     const data = await OperatorLogin(values);
     try {
       toast.success(data);
@@ -27,10 +27,12 @@ export default function Operator({ setForgotPassword, setAuthtoken }) {
         console.log(data, "data2");
         navigate("/dashboard");
         window.location.reload();
+      } else {
+        setFieldError("password", "Invalid Username or Password");
       }
-  } catch (error) {
-    toast.error(error.message);
-  }
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   const togglePasswordVisibility = () => {
@@ -50,8 +52,8 @@ export default function Operator({ setForgotPassword, setAuthtoken }) {
           password: "",
         }}
         validationSchema={validationSchema}
-        onSubmit={(values) => {
-          handleSubmit(values);
+        onSubmit={(values, { setFieldError }) => {
+          handleSubmit(values, setFieldError);
         }}
         // validateOnChange={true}
         // validateOnBlur={true}
@@ -68,7 +70,7 @@ export default function Operator({ setForgotPassword, setAuthtoken }) {
                 <Field
                   type="text"
                   name="emailid"
-                  placeholder="Enter Email Address / Phone "
+                  placeholder="Enter Email / Phone Number "
                   onChange={(e) => {
                     handleChange(e);
                     sessionStorage.setItem("emailid", e.target.value);
@@ -115,13 +117,16 @@ export default function Operator({ setForgotPassword, setAuthtoken }) {
                 />
               </div>
               <div className="flex justify-between items-center">
-                <div>
-                  <Checkbox
+                <div className="flex justify-between items-center gap-[1vw]">
+                  <input
+                    type="checkbox"
                     onChange={(e) => {}}
-                    className="text-[#1F4B7F]  text-[1vw] "
-                  >
+                    className="text-[#1F4B7F]  text-[1vw] cursor-pointer "
+                  />
+                  <span className="text-[#1F4B7F]  text-[1vw] ">
                     Remember me
-                  </Checkbox>
+                  </span>
+                  {/* </Checkbox> */}
                 </div>
                 <div>
                   <p

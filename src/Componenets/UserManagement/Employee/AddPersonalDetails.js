@@ -788,7 +788,7 @@ export default function AddPersonalDetails({
                     <div className="flex items-center justify-between ">
                       <div>
                         <h1 className="text-[#1F4B7F] text-[0.7vw] font-semibold">
-                          *You must fill in all fields to be able to continue
+                          * You must fill in all fields to be able to continue
                         </h1>
                       </div>
                       <div className="flex items-center gap-x-[1vw]">

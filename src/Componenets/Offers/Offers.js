@@ -222,10 +222,10 @@ export default function Offers() {
 
   const [excelData, setExcelData] = useState(null);
 
-  const handleOnClick = async (file) => {
+  const handleOnClick = async () => {
 
-    try {
-      const response = await SubmitOfferExcel(file, dispatch);
+    try {   
+      const response = await SubmitOfferExcel(excelData, dispatch);
       // toast.success(response);
       GetOffersData(dispatch);
       setImportModal(false)
@@ -235,16 +235,16 @@ export default function Offers() {
     }
   };
 
-  const handleRedeemClick = async (file) => {
-    try {
-      const response = await SubmitRedeemExcel(file, dispatch);
-      // toast.success(response);
-      GetRedeemOffersData(dispatch);
-    } catch (error) {
-      console.error("Error uploading file:", error);
-      // toast.error("Failed to upload file");
-    }
-  };
+  // const handleRedeemClick = async (file) => {
+  //   try {
+  //     const response = await SubmitRedeemExcel(file, dispatch);
+  //     // toast.success(response);
+  //     GetRedeemOffersData(dispatch);
+  //   } catch (error) {
+  //     console.error("Error uploading file:", error);
+  //     // toast.error("Failed to upload file");
+  //   }
+  // };
 
   // const handleOnClick = async (file) => {
   //   console.log(file, "adfdsfadsfa_praveeen_007_00011");

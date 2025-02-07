@@ -23,7 +23,7 @@ const SUPPORTED_FORMATS = [
 
 const validationSchema = Yup.object().shape({
   aadhar_front: Yup.mixed()
-    .required("Aadhar Front Page is required")
+    .required("Aadhaar Front Page is required")
     .test("fileSize", "File too large max 5mb", (value) =>
       typeof value === "string" ? true : value && value.size <= FILE_SIZE
     )
@@ -33,7 +33,7 @@ const validationSchema = Yup.object().shape({
         : value && SUPPORTED_FORMATS.includes(value.type)
     ),
   aadhar_back: Yup.mixed()
-    .required("Aadhar Back Page is required")
+    .required("Aadhaar Back Page is required")
     .test("fileSize", "File too large max 5mb", (value) =>
       typeof value === "string" ? true : value && value.size <= FILE_SIZE
     )
@@ -43,7 +43,7 @@ const validationSchema = Yup.object().shape({
         : value && SUPPORTED_FORMATS.includes(value.type)
     ),
   pan_front: Yup.mixed()
-    .required("Pan Front Page is required")
+    .required("PAN Front Page is required")
     .test("fileSize", "File too large max 5mb", (value) =>
       typeof value === "string" ? true : value && value.size <= FILE_SIZE
     )
@@ -53,7 +53,7 @@ const validationSchema = Yup.object().shape({
         : value && SUPPORTED_FORMATS.includes(value.type)
     ),
   pan_back: Yup.mixed()
-    .required("Pan Back Page is required")
+    .required("PAN Back Page is required")
     .test("fileSize", "File too large max 5mb", (value) =>
       typeof value === "string" ? true : value && value.size <= FILE_SIZE
     )
@@ -166,7 +166,9 @@ export default function AddDocuments({
     try {
       if (
         (operatorID && enable == false && gstback == true) ||
-        (updatedata && superadmindocumentdata.aadar_front_doc != null && enable == false)
+        (updatedata &&
+          superadmindocumentdata.aadar_front_doc != null &&
+          enable == false)
       ) {
         setCurrentpage(5); // Assuming setCurrentPage is a function in your component
       } else {
@@ -229,13 +231,15 @@ export default function AddDocuments({
   useEffect(() => {
     if (operatorID != null || enable || gstback) {
       fetchGetUser();
-      setSpinning(true)
+      setSpinning(true);
     }
-  }, [operatorID,
-     setOperatorID, 
-     setSuperAdmindocumentData,
-      // enable,
-       gstback]);
+  }, [
+    operatorID,
+    setOperatorID,
+    setSuperAdmindocumentData,
+    // enable,
+    gstback,
+  ]);
   return (
     <div>
       <div className="border-l-[0.1vw]  relative  px-[2vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f] mt-[1vw] ">
@@ -246,7 +250,8 @@ export default function AddDocuments({
           <label className="text-[1.5vw] font-semibold text-[#1f4b7f]">
             Documents
           </label>
-          {updatedata && superadmindocumentdata.aadar_front_doc != null || gstback ? (
+          {(updatedata && superadmindocumentdata.aadar_front_doc != null) ||
+          gstback ? (
             <button
               className={`${
                 enable
@@ -291,7 +296,7 @@ export default function AddDocuments({
                     <div className="grid grid-cols-2 w-full  gap-x-[1.5vw]">
                       <div className="col-span-1">
                         <label className="text-[#1F4B7F] text-[1.1vw]">
-                        Aadhaar Card Front Page
+                          Aadhaar Card Front Page
                           <span className="text-[1vw] text-red-600 pl-[0.2vw]">
                             *
                           </span>
@@ -300,7 +305,7 @@ export default function AddDocuments({
                           <input
                             id="aadhar_front"
                             name="aadhar_front"
-                            accept=".jpg, .jpeg, .png" 
+                            accept=".jpg, .jpeg, .png"
                             type="file"
                             style={{ display: "none" }}
                             onChange={(event) => {
@@ -322,7 +327,10 @@ export default function AddDocuments({
                               // }))
                             }}
                             disabled={
-                              updatedata && superadmindocumentdata.aadar_front_doc != null || gstback
+                              (updatedata &&
+                                superadmindocumentdata.aadar_front_doc !=
+                                  null) ||
+                              gstback
                                 ? enable
                                   ? false
                                   : true
@@ -332,7 +340,10 @@ export default function AddDocuments({
                           <button
                             type="button"
                             className={`${
-                              updatedata && superadmindocumentdata.aadar_front_doc != null || gstback
+                              (updatedata &&
+                                superadmindocumentdata.aadar_front_doc !=
+                                  null) ||
+                              gstback
                                 ? enable == false
                                   ? " cursor-not-allowed"
                                   : ""
@@ -515,7 +526,7 @@ export default function AddDocuments({
                   </div> */}
                       <div className="col-span-1">
                         <label className="text-[#1F4B7F] text-[1.1vw]">
-                        Aadhaar Card Back Page
+                          Aadhaar Card Back Page
                           <span className="text-[1vw] text-red-600 pl-[0.2vw]">
                             *
                           </span>
@@ -524,7 +535,7 @@ export default function AddDocuments({
                           <input
                             id="aadhar_back"
                             name="aadhar_back"
-                            accept=".jpg, .jpeg, .png" 
+                            accept=".jpg, .jpeg, .png"
                             type="file"
                             style={{ display: "none" }}
                             onChange={(event) => {
@@ -537,7 +548,10 @@ export default function AddDocuments({
                               handleFileChange(event, "aadharbk");
                             }}
                             disabled={
-                              updatedata && superadmindocumentdata.aadar_front_doc != null || gstback
+                              (updatedata &&
+                                superadmindocumentdata.aadar_front_doc !=
+                                  null) ||
+                              gstback
                                 ? enable
                                   ? false
                                   : true
@@ -547,7 +561,10 @@ export default function AddDocuments({
                           <button
                             type="button"
                             className={`${
-                              updatedata && superadmindocumentdata.aadar_front_doc != null || gstback
+                              (updatedata &&
+                                superadmindocumentdata.aadar_front_doc !=
+                                  null) ||
+                              gstback
                                 ? enable == false
                                   ? "cursor-not-allowed"
                                   : ""
@@ -655,7 +672,7 @@ export default function AddDocuments({
                             id="pan_front"
                             name="pan_front"
                             type="file"
-                            accept=".jpg, .jpeg, .png" 
+                            accept=".jpg, .jpeg, .png"
                             style={{ display: "none" }}
                             onChange={(event) => {
                               const files = Array.from(event.target.files);
@@ -669,7 +686,10 @@ export default function AddDocuments({
                               handleFileChange(event, "panfr");
                             }}
                             disabled={
-                              updatedata && superadmindocumentdata.aadar_front_doc != null || gstback
+                              (updatedata &&
+                                superadmindocumentdata.aadar_front_doc !=
+                                  null) ||
+                              gstback
                                 ? enable
                                   ? false
                                   : true
@@ -679,7 +699,10 @@ export default function AddDocuments({
                           <button
                             type="button"
                             className={`${
-                              updatedata && superadmindocumentdata.aadar_front_doc != null || gstback
+                              (updatedata &&
+                                superadmindocumentdata.aadar_front_doc !=
+                                  null) ||
+                              gstback
                                 ? enable == false
                                   ? " cursor-not-allowed"
                                   : ""
@@ -785,7 +808,7 @@ export default function AddDocuments({
                             id="pan_back"
                             name="pan_back"
                             type="file"
-                            accept=".jpg, .jpeg, .png" 
+                            accept=".jpg, .jpeg, .png"
                             style={{ display: "none" }}
                             onChange={(event) => {
                               const files = Array.from(event.target.files);
@@ -799,7 +822,10 @@ export default function AddDocuments({
                               handleFileChange(event, "panbk");
                             }}
                             disabled={
-                              updatedata && superadmindocumentdata.aadar_front_doc != null || gstback
+                              (updatedata &&
+                                superadmindocumentdata.aadar_front_doc !=
+                                  null) ||
+                              gstback
                                 ? enable
                                   ? false
                                   : true
@@ -809,7 +835,10 @@ export default function AddDocuments({
                           <button
                             type="button"
                             className={`${
-                              updatedata && superadmindocumentdata.aadar_front_doc != null || gstback
+                              (updatedata &&
+                                superadmindocumentdata.aadar_front_doc !=
+                                  null) ||
+                              gstback
                                 ? enable == false
                                   ? " cursor-not-allowed"
                                   : ""
@@ -821,7 +850,7 @@ export default function AddDocuments({
                             }}
                           >
                             <span className="opacity-50">
-                              Upload Pancard Back
+                              Upload PAN Card Back
                             </span>
                             {/* {inputPreview.panbk ? (
                           <img
@@ -917,7 +946,7 @@ export default function AddDocuments({
                             id="msme_docs"
                             name="msme_docs"
                             type="file"
-                            accept=".jpg, .jpeg, .png" 
+                            accept=".jpg, .jpeg, .png"
                             style={{ display: "none" }}
                             onChange={(event) => {
                               const files = Array.from(event.target.files);
@@ -931,7 +960,10 @@ export default function AddDocuments({
                               handleFileChange(event, "msme");
                             }}
                             disabled={
-                              updatedata && superadmindocumentdata.aadar_front_doc != null || gstback
+                              (updatedata &&
+                                superadmindocumentdata.aadar_front_doc !=
+                                  null) ||
+                              gstback
                                 ? enable
                                   ? false
                                   : true
@@ -941,7 +973,10 @@ export default function AddDocuments({
                           <button
                             type="button"
                             className={`${
-                              updatedata && superadmindocumentdata.aadar_front_doc != null || gstback
+                              (updatedata &&
+                                superadmindocumentdata.aadar_front_doc !=
+                                  null) ||
+                              gstback
                                 ? enable == false
                                   ? " cursor-not-allowed"
                                   : ""
@@ -1057,7 +1092,9 @@ export default function AddDocuments({
                         type="submit"
                         // onClick={() => setCurrentpage(4)}
                       >
-                        {updatedata && superadmindocumentdata.aadar_front_doc != null || gstback
+                        {(updatedata &&
+                          superadmindocumentdata.aadar_front_doc != null) ||
+                        gstback
                           ? enable
                             ? "Update & Continue"
                             : "Continue"

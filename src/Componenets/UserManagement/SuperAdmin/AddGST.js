@@ -19,27 +19,27 @@ const SUPPORTED_FORMATS = [
 ];
 const validationSchema = Yup.object().shape({
   gst: Yup.string()
-  .matches(
-    /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[0-9]{1}[A-Z]{1}[0-9]{1}$/,
-    "Format should be 22AAAAA0000A1Z5."
-  )
-  .required("GST Number is required"),
+    .matches(
+      /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[0-9]{1}[A-Z]{1}[0-9]{1}$/,
+      "Format should be 22AAAAA0000A1Z5."
+    )
+    .required("GST Number is required"),
   // state_code: Yup.string().required("State Code is required"),
   state: Yup.string().required("State is required"),
   // head_office: Yup.string().required("Head Offcie is required"),
   state_code: Yup.string()
-  .matches(/^\d+$/, "State Code must be a number")  // Ensures only numbers
-  .required("State Code is required")
-  .max(2,"State code must be valid 2 digit number"),
+    .matches(/^\d+$/, "State Code must be a number") // Ensures only numbers
+    .required("State Code is required")
+    .max(2, "State code must be valid 2 digit number"),
 
-// state: Yup.string()
-//   .matches(/^[A-Za-z]+$/, "State must contain only alphabets")  // Ensures only alphabets
-//   .required("State is required"),
+  // state: Yup.string()
+  //   .matches(/^[A-Za-z]+$/, "State must contain only alphabets")  // Ensures only alphabets
+  //   .required("State is required"),
 
-head_office: Yup.string()
-  .matches(/^[A-Za-z]+$/, "Head Office must contain only alphabets")  // Ensures only alphabets
-  .required("Head Office is required")
-  .max(40,"maximum 40 characters only"),
+  head_office: Yup.string()
+    .matches(/^[A-Za-z]+$/, "Head Office must contain only alphabets") // Ensures only alphabets
+    .required("Head Office is required")
+    .max(40, "maximum 40 characters only"),
   gst_file: Yup.mixed()
     .required("GST Document is required")
     .test("fileSize", "File too large max 5mb", (value) =>
@@ -50,7 +50,7 @@ head_office: Yup.string()
         ? true
         : value && SUPPORTED_FORMATS.includes(value.type)
     ),
-    
+
   ctc: Yup.string().required("Aggregate turnover is required"),
 });
 
@@ -65,12 +65,10 @@ export default function AddGST({
   modalIsOpen1,
   clientID,
   superadmingstdata,
-  setSuperAdminGSTData
-
+  setSuperAdminGSTData,
 }) {
-
   const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
- 
+
   const props = {
     name: "file",
     action: "https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload",
@@ -93,14 +91,12 @@ export default function AddGST({
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
-  const [inputPreview, setInputPreview] = useState()
-  const [reset,setReset]= useState(false)
+  const [inputPreview, setInputPreview] = useState();
+  const [reset, setReset] = useState(false);
   // const [superadmingstdata, setSuperAdminGSTData] = useState("");
   const updateId = operatorID ? operatorID : operator_id;
 
-  console.log(superadmingstdata,"dhdhdhdhdhdh");
-  
-
+  console.log(superadmingstdata, "dhdhdhdhdhdh");
 
   const handlePreview = (file) => {
     const reader = new FileReader();
@@ -115,7 +111,13 @@ export default function AddGST({
   const handleSubmit = async (values) => {
     console.log("Subm65656", values);
     try {
-      const data = await SubmitGSTData(values, updateId, setSuperAdminGSTData,superadmingstdata , dispatch);
+      const data = await SubmitGSTData(
+        values,
+        updateId,
+        setSuperAdminGSTData,
+        superadmingstdata,
+        dispatch
+      );
       toast.success(data?.message);
       // setOperatorID(null);
       setmodalIsOpen1(false);
@@ -132,45 +134,42 @@ export default function AddGST({
   useEffect(() => {
     console.log("modalIsOpen1 state changed:", modalIsOpen1);
     console.log(updateId, "clientID111");
-    setInputPreview(superadmingstdata?.upload_gst)
+    setInputPreview(superadmingstdata?.upload_gst);
   }, [modalIsOpen1]);
-console.log(operatorID,"operatorIDoperatorID");
+  console.log(operatorID, "operatorIDoperatorID");
 
-const handleFileChange = (event) => {
-  const file = event?.currentTarget?.files[0];
+  const handleFileChange = (event) => {
+    const file = event?.currentTarget?.files[0];
 
-  // Check if the file is selected and it's a valid file
-  if (file) {
-    // Validate if the selected file is an actual file object
-    if (file instanceof File) {
-      setInputPreview(URL.createObjectURL(file));
+    // Check if the file is selected and it's a valid file
+    if (file) {
+      // Validate if the selected file is an actual file object
+      if (file instanceof File) {
+        setInputPreview(URL.createObjectURL(file));
+      } else {
+        console.error("Selected item is not a valid file.");
+      }
     } else {
-      console.error("Selected item is not a valid file.");
+      console.error("No file selected.");
     }
-  } else {
-    console.error("No file selected.");
-  }
-};
+  };
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalImage, setModalImage] = useState(null);
 
-const [isModalOpen, setIsModalOpen] = useState(false);
-const [modalImage, setModalImage] = useState(null);
+  const openModal = (event) => {
+    // Get the image source (src) using `getElementById`
+    const imageSrc = event.target.getAttribute("src");
 
-const openModal = (event) => {
-  // Get the image source (src) using `getElementById`
-  const imageSrc = event.target.getAttribute('src');
-  
-  // Set the modal image source
-  setModalImage(imageSrc);
-  
-  // Open the modal
-  setIsModalOpen(true);
-};
-const closeModal = () => {
-  setIsModalOpen(false);
-};
+    // Set the modal image source
+    setModalImage(imageSrc);
 
-
+    // Open the modal
+    setIsModalOpen(true);
+  };
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
   // const fetchGetUser = async () => {
   //   try {
@@ -184,7 +183,7 @@ const closeModal = () => {
   //     console.error("Error fetching additional user data", error);
   //   }
   // };
-console.log(clientID,"ididididdhgfsudfgusfgb");
+  console.log(clientID, "ididididdhgfsudfgusfgb");
 
   // useEffect(() => {
   //   if (operatorID != null || clientID ) {
@@ -199,7 +198,7 @@ console.log(clientID,"ididididdhgfsudfgusfgb");
       <div className="umselect">
         <div className="h-[4vw] w-full flex items-center justify-between ">
           <label className="text-[1.5vw] font-semibold text-[#1f4b7f] ">
-            Add GST
+            {superadmingstdata?.state_name ? "Update GSTIN" : "Add GSTIN"}
           </label>
           {/* <button className="rounded-full font-semibold w-[6vw] h-[2vw] flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] border-[#34AE2A] text-[1.1vw] text-[#34AE2A] ">
             Save
@@ -211,12 +210,20 @@ console.log(clientID,"ididididdhgfsudfgusfgb");
         <div>
           <Formik
             initialValues={{
-              gst:reset ? "" : superadmingstdata?.gstin || "",
-              state_code: reset ? "" : superadmingstdata?.state_code_number || "",
+              gst: reset ? "" : superadmingstdata?.gstin || "",
+              state_code: reset
+                ? ""
+                : superadmingstdata?.state_code_number || "",
               state: reset ? "" : superadmingstdata?.state_name || "",
               head_office: reset ? "" : superadmingstdata?.head_office || "",
               gst_file: reset ? "" : superadmingstdata?.upload_gst || null,
-              ctc: reset ? "" : superadmingstdata?.aggregate_turnover_exceeded == true ? 1 : superadmingstdata?.aggregate_turnover_exceeded == false ? 0 :"" || "",
+              ctc: reset
+                ? ""
+                : superadmingstdata?.aggregate_turnover_exceeded == true
+                ? 1
+                : superadmingstdata?.aggregate_turnover_exceeded == false
+                ? 0
+                : "" || "",
             }}
             validationSchema={validationSchema}
             onSubmit={(values) => {
@@ -233,7 +240,7 @@ console.log(clientID,"ididididdhgfsudfgusfgb");
               handleChange,
               errors,
               touched,
-              resetForm
+              resetForm,
             }) => (
               <Form onSubmit={handleSubmit}>
                 <div className="gap-y-[1.5vw] flex-col flex">
@@ -246,20 +253,22 @@ console.log(clientID,"ididididdhgfsudfgusfgb");
                         </span>
                       </label>
                       <input
-                          type="text"
-                          name="gst"
-                          style={{ display: "none" }}
-                        />
+                        type="text"
+                        name="gst"
+                        style={{ display: "none" }}
+                      />
                       <Field
                         type="text"
                         name="gst"
                         id="gst"
-                        // autoComplete="gst-field" 
-                        onChange={(e) => setFieldValue("gst", e.target.value?.toUpperCase())}
+                        // autoComplete="gst-field"
+                        onChange={(e) =>
+                          setFieldValue("gst", e.target.value?.toUpperCase())
+                        }
                         autoComplete="off"
                         placeholder="Enter GSTIN"
                         value={values.gst}
-                        className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                        className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder:text-[#9FA6B2] border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                       />
                       <ErrorMessage
                         name="gst"
@@ -269,23 +278,23 @@ console.log(clientID,"ididididdhgfsudfgusfgb");
                     </div>
                     <div className="col-span-1 relative">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
-                      State Code
+                        State Code
                         <span className="text-[1vw] text-red-600 pl-[0.2vw]">
                           *
                         </span>
                       </label>
                       <input
-                          type="text"
-                          name="state_code"
-                          style={{ display: "none" }}
-                        />
+                        type="text"
+                        name="state_code"
+                        style={{ display: "none" }}
+                      />
                       <Field
                         type="text"
                         name="state_code"
                         autoComplete="off"
                         placeholder="Enter State Code"
                         value={values.state_code}
-                        className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                        className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder:text-[#9FA6B2] border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                       />
                       <ErrorMessage
                         name="state_code"
@@ -315,19 +324,19 @@ console.log(clientID,"ididididdhgfsudfgusfgb");
                         <option label="Karnataka" value="Karnataka" />
                         <option label="Andhra" value="Andhra" />
                       </Field> */}
-                          <ConfigProvider
+                      <ConfigProvider
                         theme={{
                           components: {
                             Select: {
-                              optionActiveBg: '#aebed1',
-                              optionSelectedColor: '#FFF',
-                              optionSelectedBg: '#e5e5e5',
-                              optionHeight: '2',
+                              optionActiveBg: "#aebed1",
+                              optionSelectedColor: "#FFF",
+                              optionSelectedBg: "#e5e5e5",
+                              optionHeight: "2",
                             },
                           },
                         }}
                       >
-                         <input
+                        <input
                           type="text"
                           name="state"
                           style={{ display: "none" }}
@@ -338,33 +347,35 @@ console.log(clientID,"ididididdhgfsudfgusfgb");
                           listHeight={190}
                           autoComplete="state-field"
                           onChange={(value) => {
-                            handleChange({ target: { name: 'state', value } })
+                            handleChange({ target: { name: "state", value } });
                           }}
                           name="state"
                           className={`custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                           // className="custom-select bg-white outline-none w-full mt-[0.5vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
                           placeholder="Select state"
-                          optionFilterProp="value" 
+                          optionFilterProp="value"
                           // filterSort={(optionA, optionB) =>
                           //   (optionA?.label ?? '')?.toLowerCase()?.localeCompare((optionB?.label ?? '')?.toLowerCase())
                           // }
-                          // // optionFilterProp="children" 
-                          suffixIcon={<span style={{ fontSize: '1vw', color: '#1f487c' }}>
-                            <IoMdArrowDropdown size="2vw" />
-                          </span>}
+                          // // optionFilterProp="children"
+                          suffixIcon={
+                            <span style={{ fontSize: "1vw", color: "#1f487c" }}>
+                              <IoMdArrowDropdown size="2vw" />
+                            </span>
+                          }
                           style={{ padding: 4 }}
                           options={[
                             {
-                              value: '',
+                              value: "",
                               label: (
-                                <div className="text-[1vw] px-[0.2vw] pb-[0.1vw] text-gray-400">
+                                <div className="fontsanserif text-[1vw] px-[0.2vw]  text-[#9FA6B2]">
                                   Select State
                                 </div>
                               ),
                               disabled: true,
                             },
                             {
-                              value: 'Tamilnadu',
+                              value: "Tamilnadu",
                               label: (
                                 <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
                                   Tamilnadu
@@ -372,7 +383,7 @@ console.log(clientID,"ididididdhgfsudfgusfgb");
                               ),
                             },
                             {
-                              value: 'Kerala',
+                              value: "Kerala",
                               label: (
                                 <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
                                   Kerala
@@ -380,7 +391,7 @@ console.log(clientID,"ididididdhgfsudfgusfgb");
                               ),
                             },
                             {
-                              value: 'Karnataka',
+                              value: "Karnataka",
                               label: (
                                 <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
                                   Karnataka
@@ -388,7 +399,7 @@ console.log(clientID,"ididididdhgfsudfgusfgb");
                               ),
                             },
                             {
-                              value: 'Andhra',
+                              value: "Andhra",
                               label: (
                                 <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
                                   Andhra
@@ -402,7 +413,7 @@ console.log(clientID,"ididididdhgfsudfgusfgb");
                           //   { value: 'Kerala', label: 'Kerala' },
                           //   { value: 'Karnataka', label: 'Karnataka' },
                           //   { value: 'Andhra', label: 'Andhra' },
-                          // ]}             
+                          // ]}
                         />
                       </ConfigProvider>
 
@@ -420,17 +431,17 @@ console.log(clientID,"ididididdhgfsudfgusfgb");
                         </span>
                       </label>
                       <input
-                          type="text"
-                          name="head_office"
-                          style={{ display: "none" }}
-                        />
+                        type="text"
+                        name="head_office"
+                        style={{ display: "none" }}
+                      />
                       <Field
                         type="text"
                         name="head_office"
                         placeholder="Enter Head Office"
                         autoComplete="off"
                         value={values.head_office}
-                        className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                        className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder:text-[#9FA6B2] border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                       />
                       <ErrorMessage
                         name="head_office"
@@ -511,55 +522,56 @@ console.log(clientID,"ididididdhgfsudfgusfgb");
                             id="gst_file"
                             name="gst_file"
                             type="file"
-                            accept=".jpg, .jpeg, .png" 
+                            accept=".jpg, .jpeg, .png"
                             style={{ display: "none" }}
                             onChange={(event) => {
                               const file = event.currentTarget.files[0];
                               setFieldValue("gst_file", file);
                               // handlePreview(file); // If you want to preview the selected file
-                              handleFileChange(event)
+                              handleFileChange(event);
                             }}
                           />
                           <div className="relative">
-                          <button
-                            className="border-r-[0.3vw]  flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none"
-                            onClick={(event) => {
-                              event.preventDefault();
-                              document.getElementById("gst_file").click(); 
-                            }}
-                          >
-                            <span className="opacity-50">Upload GST Image</span>
-                            {/* <FaCloudUploadAlt
+                            <button
+                              className="border-r-[0.3vw]  flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw]  border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none"
+                              onClick={(event) => {
+                                event.preventDefault();
+                                document.getElementById("gst_file").click();
+                              }}
+                            >
+                              <span className="text-[#9FA6B2]">
+                                Upload GST Image
+                              </span>
+                              {/* <FaCloudUploadAlt
                               color="#1F487C"
                               size={"2vw"}
                               className="absolute right-[1vw]"
                             /> */}
-                       
-                          </button>
-                          {inputPreview  ? (
-                          inputPreview?.startsWith("blob") ? (
-                            <img
-                            src={inputPreview}
-                            className="h-[2.5vw] w-[2.5vw] absolute cursor-zoom-in top-[.15vw] right-[.3vw]"
-                            alt="Gst Image"
-                            onClick={openModal} 
-                          />
-                          ) : (
-                            <img
-                            src={`${apiImgUrl}${inputPreview}`}
-                            className="h-[2.5vw] w-[2.5vw] absolute cursor-zoom-in top-[.15vw]  right-[.3vw]"
-                            alt="Gst Image"
-                            onClick={openModal} 
-                          />
-                          )
-                        ) : (
-                          <FaCloudUploadAlt
-                            color="#1F487C"
-                            size="2vw"
-                            className="absolute right-[1vw] top-[.4vw] pointer-events-none"
-                          />
-                        )}
-                        </div>
+                            </button>
+                            {inputPreview ? (
+                              inputPreview?.startsWith("blob") ? (
+                                <img
+                                  src={inputPreview}
+                                  className="h-[2.5vw] w-[2.5vw] absolute cursor-zoom-in top-[.15vw] right-[.3vw]"
+                                  alt="Gst Image"
+                                  onClick={openModal}
+                                />
+                              ) : (
+                                <img
+                                  src={`${apiImgUrl}${inputPreview}`}
+                                  className="h-[2.5vw] w-[2.5vw] absolute cursor-zoom-in top-[.15vw]  right-[.3vw]"
+                                  alt="Gst Image"
+                                  onClick={openModal}
+                                />
+                              )
+                            ) : (
+                              <FaCloudUploadAlt
+                                color="#1F487C"
+                                size="2vw"
+                                className="absolute right-[1vw] top-[.4vw] pointer-events-none"
+                              />
+                            )}
+                          </div>
                           {/* {values.gst_file && (
                             <div
                               onClick={() => setPreviewOpen(true)}
@@ -633,7 +645,12 @@ console.log(clientID,"ididididdhgfsudfgusfgb");
                     </div>
                     <div className="grid grid-cols-2 w-full gap-x-[2vw] relative">
                       <div className="col-span-2">
-                        <Field type="radio" name="ctc" value="0" checked={values.ctc == "0"} />
+                        <Field
+                          type="radio"
+                          name="ctc"
+                          value="0"
+                          checked={values.ctc == "0"}
+                        />
                         <label className="text-[#1F4B7F] text-[0.8vw] pl-[1vw]">
                           My Aggregate Turnover (PAN India Total Turnover) has
                           not Exceeded 20 lakhs
@@ -651,10 +668,11 @@ console.log(clientID,"ididididdhgfsudfgusfgb");
                       <button
                         type="button"
                         className="border-[#1F487C] w-[5vw] font-semibold text-[1vw] h-[2vw] rounded-full border-r-[0.2vw]  border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw]"
-                        onClick={()=>{
-                          setReset(true)
-                          setInputPreview("")
-                        }}>
+                        onClick={() => {
+                          setReset(true);
+                          setInputPreview("");
+                        }}
+                      >
                         Reset
                       </button>
                       <button

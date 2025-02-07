@@ -22,7 +22,7 @@ const validationSchema = Yup.object().shape({
   password: Yup.string().required("Password is required"),
 });
 
-export default function Partner({setForgotPassword}) {
+export default function Partner({ setForgotPassword }) {
 
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -42,13 +42,13 @@ export default function Partner({setForgotPassword}) {
     const validationResult = validateInput(values.emailid_phone);
     try {
       const data = await PartnerLogin(values, validationResult);
-      console.log(data,"partnerdataata")
+      console.log(data, "partnerdataata")
       toast.warning(data?.message);
-        if (data?.token !== undefined) {
-          console.log(data, "data2");
-          navigate("/dashboard");
-          window.location.reload();
-        }
+      if (data?.token !== undefined) {
+        console.log(data, "data2");
+        navigate("/dashboard");
+        window.location.reload();
+      }
     } catch (error) {
       toast.error(error.message);
     }
@@ -59,13 +59,13 @@ export default function Partner({setForgotPassword}) {
   };
 
   return (
-          <div className="absolute left-0 top-0 bg-[#E5FFF1] h-full w-[35vw] rounded-tl-[2vw] rounded-bl-[2vw] bg-opacity-90 flex flex-col items-center justify-center">
-            <label className="text-[#1F487C] font-bold text-[2vw] ">
-              PARTNER
-            </label>
-            <p className="text-[#1F487C]  text-[1vw] py-[2vw]">
-              Welcome Back, Please sign in to your account
-            </p>
+    <div className="absolute left-0 top-0 bg-[#E5FFF1] h-full w-[35vw] rounded-tl-[2vw] rounded-bl-[2vw] bg-opacity-90 flex flex-col items-center justify-center">
+      <label className="text-[#1F487C] font-bold text-[2vw] ">
+        PARTNER
+      </label>
+      <p className="text-[#1F487C]  text-[1vw] py-[2vw]">
+        Welcome Back, Please sign in to your account
+      </p>
 
       <Formik
         initialValues={{
@@ -89,7 +89,7 @@ export default function Partner({setForgotPassword}) {
                 <Field
                   type="text"
                   name="emailid_phone"
-                  placeholder="Enter Email Address or Phone Number"
+                  placeholder="Enter Email / Phone Number"
                   className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                 />
                 <ErrorMessage
@@ -132,11 +132,21 @@ export default function Partner({setForgotPassword}) {
 
               {/* Remember Me and Forgot Password */}
               <div className="flex justify-between items-center">
-                <div>
-                  <Checkbox className="text-[#1F4B7F] text-[1vw]">
+                <div className="flex justify-between items-center gap-[1vw]">
+
+                  <input
+                    type="checkbox"
+                    onChange={(e) => { }}
+                    className="text-[#1F4B7F] text-[1vw] cursor-pointer"
+                  />
+                  <span className="text-[#1F4B7F]  text-[1vw] "
+                  >
                     Remember me
-                  </Checkbox>
+                  </span>
+                  {/* </Checkbox> */}
                 </div>
+                {/* </Checkbox> */}
+
                 <div>
                   <p onClick={() => setForgotPassword(true)} className="text-[#1F487C] text-[1vw]">Forgot Password</p>
                 </div>
@@ -157,6 +167,6 @@ export default function Partner({setForgotPassword}) {
           </Form>
         )}
       </Formik>
-          </div>
+    </div>
   );
 }

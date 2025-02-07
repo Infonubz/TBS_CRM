@@ -14,7 +14,7 @@ import {
   GetPatDocumentById,
   SubmitPatDocumentsData,
 } from "../../../Api/UserManagement/Partner";
-import umbuslogo from "../../../asserts/umbuslogo.png"
+import umbuslogo from "../../../asserts/umbuslogo.png";
 import { useDispatch } from "react-redux";
 
 const FILE_SIZE = 1024 * 1024 * 5; // 5MB
@@ -27,11 +27,11 @@ const SUPPORTED_FORMATS = [
 
 const validationSchema = Yup.object().shape({
   aadhar_number: Yup.string()
-    .required("Aadhar number is required")
-    .length(12, "Aadhar number must be exactly 12 digits")
-    .matches(/^\d{12}$/, "Aadhar must be a valid 12-digit number"),
+    .required("Aadhaar number is required")
+    .length(12, "Aadhaar number must be exactly 12 digits")
+    .matches(/^\d{12}$/, "Aadhaar must be a valid 12-digit number"),
   pan_number: Yup.string()
-    .required("Pan number is required")
+    .required("PAN number is required")
     .length(10, "PAN number must be exactly 10 characters")
     .matches(
       /[A-Z]{5}[0-9]{4}[A-Z]{1}/,
@@ -39,7 +39,7 @@ const validationSchema = Yup.object().shape({
     ),
 
   aadhar_fr_doc: Yup.mixed()
-    .required("Aadhar front page is required")
+    .required("Aadhaar front page is required")
     .test("fileSize", "File too large max 5mb", (value) =>
       typeof value === "string" ? true : value && value.size <= FILE_SIZE
     )
@@ -49,7 +49,7 @@ const validationSchema = Yup.object().shape({
         : value && SUPPORTED_FORMATS.includes(value.type)
     ),
   aadhar_bk_doc: Yup.mixed()
-    .required("Aadhar back page is required")
+    .required("Aadhaar back page is required")
     .test("fileSize", "File too large max 5mb", (value) =>
       typeof value === "string" ? true : value && value.size <= FILE_SIZE
     )
@@ -60,7 +60,7 @@ const validationSchema = Yup.object().shape({
     ),
 
   pan_fr_doc: Yup.mixed()
-    .required("Pan front page is required")
+    .required("PAN front page is required")
     .test("fileSize", "File too large max 5mb", (value) =>
       typeof value === "string" ? true : value && value.size <= FILE_SIZE
     )
@@ -70,7 +70,7 @@ const validationSchema = Yup.object().shape({
         : value && SUPPORTED_FORMATS.includes(value.type)
     ),
   pan_bk_doc: Yup.mixed()
-    .required("Pan back page is required")
+    .required("PAN back page is required")
     .test("fileSize", "File too large max 5mb", (value) =>
       typeof value === "string" ? true : value && value.size <= FILE_SIZE
     )
@@ -135,14 +135,14 @@ export default function AddDocuments({
   updatedata,
   addressback,
   PartnerID,
-  setModalIsOpen
+  setModalIsOpen,
 }) {
   const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
   const [enable, setEnable] = useState(false);
-  const [viewImg, setViewImg] = useState("")
+  const [viewImg, setViewImg] = useState("");
   const [spinning, setSpinning] = useState(false);
   const [inputPreview, setInputPreview] = useState({
     aadharfr: null,
@@ -151,13 +151,12 @@ export default function AddDocuments({
     panbk: null,
   });
 
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalImage, setModalImage] = useState(null);
 
   const openModal = (event) => {
     // Get the image source (src) using `getElementById`
-    const imageSrc = event.target.getAttribute('src');
+    const imageSrc = event.target.getAttribute("src");
 
     // Set the modal image source
     setModalImage(imageSrc);
@@ -168,7 +167,6 @@ export default function AddDocuments({
   const closeModal = () => {
     setIsModalOpen(false);
   };
-
 
   const handleFileChange = (event, key) => {
     const file = event?.currentTarget?.files[0];
@@ -229,20 +227,23 @@ export default function AddDocuments({
   //     }
   //   }
   // };
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const handleSubmit = async (values) => {
     console.log(values, "docvalues");
     if (updatedata) {
-      toast.success("Partner Updated Successfully")
+      toast.success("Partner Updated Successfully");
     }
 
-
     try {
-      if (enable === false && updatedata && empproffesionaldata?.aadhar_card_number != null) {
+      if (
+        enable === false &&
+        updatedata &&
+        empproffesionaldata?.aadhar_card_number != null
+      ) {
         setModalIsOpen(false); // Assuming setCurrentPage is a function in your component
       } else {
         const data = await SubmitPatDocumentsData(values, updatedata, dispatch); // Replace with actual API call function
-        toast.success(data)
+        toast.success(data);
         setModalIsOpen(false);
         // Assuming setCurrentPage is a function in your component
         // console.log(values,actions,"docvalues");
@@ -256,10 +257,9 @@ export default function AddDocuments({
   };
   console.log(currentpage, "currentpagecurrentpage");
   const handleCancel = () => {
-    setPreviewOpen(false)
-    if (updatedata)
-      setViewImg("")
-    setPreviewImage("")
+    setPreviewOpen(false);
+    if (updatedata) setViewImg("");
+    setPreviewImage("");
   };
   const [empproffesionaldata, setEmpProffesionalData] = useState("");
   const fetchGetUser = async () => {
@@ -281,7 +281,7 @@ export default function AddDocuments({
   useEffect(() => {
     if (updatedata != null) {
       fetchGetUser();
-      setSpinning(true)
+      setSpinning(true);
     }
   }, [EmployeeID, setEmployeeID, setEmpProffesionalData, updatedata]);
 
@@ -291,8 +291,8 @@ export default function AddDocuments({
       aadharbk: empproffesionaldata.aadhar_card_back,
       panfr: empproffesionaldata.pan_card_front,
       panbk: empproffesionaldata.pan_card_back,
-    })
-  }, [empproffesionaldata])
+    });
+  }, [empproffesionaldata]);
   return (
     <div>
       <div className="border-l-[0.1vw] relative  px-[2vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f] mt-[1.5vw]">
@@ -302,10 +302,11 @@ export default function AddDocuments({
           </label>
           {updatedata && empproffesionaldata?.aadhar_card_number != null ? (
             <button
-              className={`${enable
-                ? "bg-[#1f4b7f] text-white"
-                : "text-[#1f4b7f] bg-white border-[#1f4b7f]"
-                } rounded-full font-semibold w-[10vw] h-[2vw] flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] text-[1.1vw] `}
+              className={`${
+                enable
+                  ? "bg-[#1f4b7f] text-white"
+                  : "text-[#1f4b7f] bg-white border-[#1f4b7f]"
+              } rounded-full font-semibold w-[10vw] h-[2vw] flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] text-[1.1vw] `}
               onClick={() => {
                 setEnable(!enable);
               }}
@@ -365,14 +366,17 @@ export default function AddDocuments({
                           autocomplete="off"
                           placeholder="Enter Aadhaar Number"
                           value={values.aadhar_number}
-                          className={` ${updatedata && empproffesionaldata?.aadhar_card_number != null
-                            ? enable == false
-                              ? " cursor-not-allowed"
+                          className={` ${
+                            updatedata &&
+                            empproffesionaldata?.aadhar_card_number != null
+                              ? enable == false
+                                ? " cursor-not-allowed"
+                                : ""
                               : ""
-                            : ""
-                            } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                           disabled={
-                            updatedata && empproffesionaldata?.aadhar_card_number != null
+                            updatedata &&
+                            empproffesionaldata?.aadhar_card_number != null
                               ? enable
                                 ? false
                                 : true
@@ -396,17 +400,25 @@ export default function AddDocuments({
                           type="text"
                           name="pan_number"
                           autocomplete="off"
-                          placeholder="Enter Pan Number"
-                          onChange={(e) => setFieldValue("pan_number", e.target.value?.toUpperCase())}
+                          placeholder="Enter PAN Number"
+                          onChange={(e) =>
+                            setFieldValue(
+                              "pan_number",
+                              e.target.value?.toUpperCase()
+                            )
+                          }
                           value={values.pan_number}
-                          className={` ${updatedata && empproffesionaldata?.aadhar_card_number != null
-                            ? enable == false
-                              ? " cursor-not-allowed"
+                          className={` ${
+                            updatedata &&
+                            empproffesionaldata?.aadhar_card_number != null
+                              ? enable == false
+                                ? " cursor-not-allowed"
+                                : ""
                               : ""
-                            : ""
-                            } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                           disabled={
-                            updatedata && empproffesionaldata?.aadhar_card_number != null
+                            updatedata &&
+                            empproffesionaldata?.aadhar_card_number != null
                               ? enable
                                 ? false
                                 : true
@@ -446,31 +458,35 @@ export default function AddDocuments({
                               handleFileChange(event, "aadharfr");
                             }}
                             disabled={
-                              updatedata && empproffesionaldata?.aadhar_card_number != null
+                              updatedata &&
+                              empproffesionaldata?.aadhar_card_number != null
                                 ? enable
                                   ? false
                                   : true
                                 : false
                             }
-
                           />
                           <div className="relative">
                             <button
                               type="button"
-                              className={` ${updatedata && empproffesionaldata?.aadhar_card_number != null
-                                ? enable == false
-                                  ? " cursor-not-allowed"
+                              className={` ${
+                                updatedata &&
+                                empproffesionaldata?.aadhar_card_number != null
+                                  ? enable == false
+                                    ? " cursor-not-allowed"
+                                    : ""
                                   : ""
-                                : ""
-                                } border-r-[0.3vw] flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none`}
+                              } border-r-[0.3vw] flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none`}
                               onClick={(event) => {
                                 event.preventDefault();
-                                document.getElementById("aadhar_fr_doc").click();
+                                document
+                                  .getElementById("aadhar_fr_doc")
+                                  .click();
                                 // handlePreview(document.getElementById("aadhar_fr_doc").value[0])
                               }}
                             >
                               <span className="opacity-50 text-[1vw]">
-                                Upload Aadhar Front Doc
+                                Upload Aadhaar Front Doc
                               </span>
                               {/* <FaCloudUploadAlt
                           color="#1F487C"
@@ -499,7 +515,6 @@ export default function AddDocuments({
                             className="absolute right-[1vw]"
                           />
                         )} */}
-
                             </button>
                             {inputPreview?.aadharfr ? (
                               inputPreview?.aadharfr?.startsWith("blob") ? (
@@ -572,7 +587,8 @@ export default function AddDocuments({
                               handleFileChange(event, "aadharbk");
                             }}
                             disabled={
-                              updatedata && empproffesionaldata?.aadhar_card_number != null
+                              updatedata &&
+                              empproffesionaldata?.aadhar_card_number != null
                                 ? enable
                                   ? false
                                   : true
@@ -582,19 +598,23 @@ export default function AddDocuments({
                           <div className="relative">
                             <button
                               type="button"
-                              className={` ${updatedata && empproffesionaldata?.aadhar_card_number != null
-                                ? enable == false
-                                  ? " cursor-not-allowed"
+                              className={` ${
+                                updatedata &&
+                                empproffesionaldata?.aadhar_card_number != null
+                                  ? enable == false
+                                    ? " cursor-not-allowed"
+                                    : ""
                                   : ""
-                                : ""
-                                } border-r-[0.3vw]  flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none`}
+                              } border-r-[0.3vw]  flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none`}
                               onClick={(event) => {
                                 event.preventDefault();
-                                document.getElementById("aadhar_bk_doc").click();
+                                document
+                                  .getElementById("aadhar_bk_doc")
+                                  .click();
                               }}
                             >
                               <span className="opacity-50">
-                                Upload Aadar Back Doc
+                                Upload Aadhaar Back Doc
                               </span>
 
                               {/* <FaCloudUploadAlt
@@ -673,7 +693,8 @@ export default function AddDocuments({
                                 handleFileChange(event, "panfr");
                               }}
                               disabled={
-                                updatedata && empproffesionaldata?.aadhar_card_number != null
+                                updatedata &&
+                                empproffesionaldata?.aadhar_card_number != null
                                   ? enable
                                     ? false
                                     : true
@@ -682,24 +703,27 @@ export default function AddDocuments({
                             />
                             <button
                               type="button"
-                              className={` ${updatedata && empproffesionaldata?.aadhar_card_number != null
-                                ? enable == false
-                                  ? " cursor-not-allowed"
+                              className={` ${
+                                updatedata &&
+                                empproffesionaldata?.aadhar_card_number != null
+                                  ? enable == false
+                                    ? " cursor-not-allowed"
+                                    : ""
                                   : ""
-                                : ""
-                                } border-r-[0.3vw]  flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none`}
+                              } border-r-[0.3vw]  flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none`}
                               onClick={(event) => {
                                 event.preventDefault();
                                 document.getElementById("pan_fr_doc").click();
                               }}
                             >
-                              <span className="opacity-50">Upload PAN Front Doc</span>
+                              <span className="opacity-50">
+                                Upload PAN Front Doc
+                              </span>
                               {/* <FaCloudUploadAlt
                           color="#1F487C"
                           size={"2vw"}
                           className="absolute right-[1vw]"
                         /> */}
-
                             </button>
                             {inputPreview?.panfr ? (
                               inputPreview?.panfr?.startsWith("blob") ? (
@@ -771,7 +795,8 @@ export default function AddDocuments({
                               handleFileChange(event, "panbk");
                             }}
                             disabled={
-                              updatedata && empproffesionaldata?.aadhar_card_number != null
+                              updatedata &&
+                              empproffesionaldata?.aadhar_card_number != null
                                 ? enable
                                   ? false
                                   : true
@@ -781,18 +806,22 @@ export default function AddDocuments({
                           <div className="relative">
                             <button
                               type="button"
-                              className={` ${updatedata && empproffesionaldata?.aadhar_card_number != null
-                                ? enable == false
-                                  ? " cursor-not-allowed"
+                              className={` ${
+                                updatedata &&
+                                empproffesionaldata?.aadhar_card_number != null
+                                  ? enable == false
+                                    ? " cursor-not-allowed"
+                                    : ""
                                   : ""
-                                : ""
-                                } border-r-[0.3vw] flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none`}
+                              } border-r-[0.3vw] flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none`}
                               onClick={(event) => {
                                 event.preventDefault();
                                 document.getElementById("pan_bk_doc").click();
                               }}
                             >
-                              <span className="opacity-50">Upload PAN Back Doc</span>
+                              <span className="opacity-50">
+                                Upload PAN Back Doc
+                              </span>
                               {/* <FaCloudUploadAlt
                           color="#1F487C"
                           size={"2vw"}
@@ -923,19 +952,21 @@ export default function AddDocuments({
                       <button
                         className="bg-[#1F487C] font-semibold rounded-full w-[10vw] h-[2vw] text-[1vw] text-white"
                         type="submit"
-                      // onClick={() => setCurrentpage(4)}
-                      // onClick={()=>{
-                      //   if(updatedata){
-                      //     toast.success("Partner Updated Successfully")
-                      //   }
-                      //   else{
-                      //     toast.success("Partner Submitted Successfully")
-                      //   }
-                      // }}
+                        // onClick={() => setCurrentpage(4)}
+                        // onClick={()=>{
+                        //   if(updatedata){
+                        //     toast.success("Partner Updated Successfully")
+                        //   }
+                        //   else{
+                        //     toast.success("Partner Submitted Successfully")
+                        //   }
+                        // }}
                       >
-                        {updatedata && empproffesionaldata?.aadhar_card_number != null ? enable
-                          ? "Update & Submit"
-                          : "Submit"
+                        {updatedata &&
+                        empproffesionaldata?.aadhar_card_number != null
+                          ? enable
+                            ? "Update & Submit"
+                            : "Submit"
                           : "Submit"}
                       </button>
                     </div>

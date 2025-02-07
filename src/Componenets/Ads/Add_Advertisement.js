@@ -541,7 +541,7 @@ const Ad_Advertisement = ({
                         placeholder="Enter Title"
                         value={values?.ad_title}
                         onChange={handleChange}
-                        className="placeholder-[#1F487C] border-r-[0.175vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.175vw] placeholder-blue border-[#1F487C]
+                        className="placeholder-[#1F487C] border-r-[0.175vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.175vw] placeholder:text-[1vw] border-[#1F487C]
                      text-[#1F487C] text-[1vw] h-[2.7vw] w-[100%] rounded-[0.75vw] outline-none px-[1vw]"
                       />
                       <ErrorMessage
@@ -626,7 +626,7 @@ const Ad_Advertisement = ({
                         cols="50"
                         value={values?.ad_description}
                         onChange={handleChange}
-                        className=" pt-[0.5vw] placeholder-[#1F487C] border-r-[0.175vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.175vw] placeholder-blue border-[#1F487C]
+                        className=" pt-[0.5vw] placeholder-[#1F487C] placeholder:text-[1vw] border-r-[0.175vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.175vw] placeholder-blue border-[#1F487C]
                      text-[#1F487C] text-[1vw] h-[2.7vw] w-[100%] rounded-[0.75vw] outline-none px-[1vw]"
                       />
                       <ErrorMessage

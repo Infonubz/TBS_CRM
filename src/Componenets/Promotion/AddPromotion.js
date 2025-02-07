@@ -300,7 +300,7 @@ export default function AddPromotion({
             >
               <Select
                 sh owSearch
-                className="custom-select bg-white outline-none w-full mt-[0.2vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw] border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
+                className="custom-select bg-white outline-none w-full mt-[0.2vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw] border-r-[0.25vw] border-b-[0.25vw] placeholder-[#1F487C]"
                 placeholder="Select Role"
                 filterOption={(input, option) =>
                   option?.value?.toLowerCase()?.includes(input.toLowerCase())
@@ -379,7 +379,7 @@ export default function AddPromotion({
               //   promo_name: e.target.value,
               // });
             }}
-            className="border-r-[0.25vw] mt-[0.2vw] border-l-[0.05vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+            className="border-r-[0.25vw] mt-[0.2vw] border-l-[0.05vw] border-t-[0.1vw] border-b-[0.25vw] placeholder:text-[1vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
           />
           <ErrorMessage
             name="promotion_name"
@@ -524,7 +524,7 @@ export default function AddPromotion({
                       values.start_date ? dayjs(values.start_date) : null,
                       values.expiry_date ? dayjs(values.expiry_date) : null,
                     ]}
-                    className="ads-date border-r-[0.25vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-full rounded-[0.5vw] outline-none px-[1vw] placeholder:text-[1vw]"
+                    className="ads-date border-r-[0.25vw] border-b-[0.25vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw]  placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-full rounded-[0.5vw] outline-none px-[1vw] placeholder:text-[1vw]"
                     disabledDate={(current) => {
                       // Disable dates before today
                       const maxDate = dayjs().add(3, "months"); // 3 months from today
@@ -661,12 +661,12 @@ export default function AddPromotion({
                 onChange={(e) => {
                   handleChange(e);
                 }}
-                className=" border-r-[0.2vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] h-[3vw] w-[100%] text-[#1F487C] text-[1vw] outline-none px-[1vw] border-b-[0.2vw] border-[#1F487C] rounded-[0.5vw] rounded-r-none "
+                className=" border-r-[0.25vw] mt-[0.5vw] border-l-[0.1vw] placeholder:text-[1vw] border-t-[0.1vw] h-[3vw] w-[100%] text-[#1F487C] text-[1vw] outline-none px-[1vw] border-b-[0.25vw] border-[#1F487C] rounded-[0.5vw] rounded-r-none "
               />
 
-              <div className="flex items-center justify-center border-b-[0.2vw] border-r-[0.2vw] mt-[0.2vw]  border-t-[0.1vw] rounded-l-none rounded-[0.5vw] border-[#1F487C] text-[1.2vw]">
+              <div className="flex items-center mt-[0.5vw]  justify-center border-b-[0.25vw] border-r-[0.25vw]   border-t-[0.1vw] rounded-l-none rounded-[0.5vw] border-[#1F487C] text-[1.2vw]">
                 <div
-                  className={` w-[3vw] h-full flex items-center justify-center ${values.value_symbol === "₹"
+                  className={` w-[3vw] h-full   flex items-center justify-center ${values.value_symbol === "₹"
                       ? "bg-[#1F487C] text-white font-semibold"
                       : "bg-white text-[#1F487C]"
                     } `}
@@ -717,7 +717,7 @@ export default function AddPromotion({
               //   usage: e.target.value,
               // });
             }}
-            className="border-r-[0.25vw] mt-[0.2vw]  border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+            className="border-r-[0.25vw] mt-[0.2vw] placeholder:text-[1vw]  border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
           />
           <ErrorMessage
             name="promo_code"
@@ -763,7 +763,7 @@ export default function AddPromotion({
           >
             <Select
               showSearch
-              className="custom-select bg-white outline-none w-full mt-[0.2vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw] border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
+              className="custom-select bg-white outline-none w-full mt-[0.2vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw] border-r-[0.25vw] border-b-[0.25vw] placeholder-[#1F487C]"
               placeholder="Select Status"
               disabled={type_Id==="OP101" && promodata?.tbs_user_id?.startsWith("tbs-op_emp") ? true : type_Id ==="PRO101" && promodata?.tbs_user_id?.startsWith("tbs-op") ? true : false }
               optionFilterProp="value"
@@ -844,7 +844,7 @@ export default function AddPromotion({
             rows="5"
             cols="50"
             style={{ resize: "none" }}
-            className="border-r-[0.25vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] w-[100%] h-[7.5vw] rounded-[0.5vw] outline-none py-[1vw] px-[1vw]"
+            className="border-r-[0.25vw] mt-[0.2vw] border-l-[0.1vw] placeholder:text-[1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] w-[100%] h-[7.5vw] rounded-[0.5vw] outline-none py-[1vw] px-[1vw]"
           />
 
           <ErrorMessage
@@ -903,10 +903,10 @@ export default function AddPromotion({
                   }}
                 >
                   <label className="flex items-center justify-center relative z-10">
-                    <p className="text-[#1F4B7F] font-bold text-[1.1vw] pr-[1vw]">
+                    <p className="text-[#1F4B7F] font-bold text-[1vw] pr-[1vw]">
                       Drag and Drop
                     </p>
-                    <FaUpload color="#1F4B7F" size={"1.2vw"} />
+                    <FaUpload color="#1F4B7F" size={"1.1vw"} />
                   </label>
                   <div
                     className="absolute top-0 left-0 w-full h-full"

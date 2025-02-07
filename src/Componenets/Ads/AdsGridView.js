@@ -281,6 +281,7 @@ const AdsGridView = ({ activePage, tabType, mobileAds, currentItems, itemsPerPag
                               style={{
                                 borderRadius: "0 1.1vw 1.1vw 0",
                               }}
+                              draggable={false}
                             />
                           ) : (
                             <div className="react-player-wrapper">

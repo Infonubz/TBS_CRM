@@ -1,5 +1,11 @@
 import "./App.css";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
 import { useState, useEffect } from "react";
 import UserManagementList from "./Componenets/UserManagement/UserManagementList";
 import Sidebar from "./Sidebar/Sidebar";
@@ -37,7 +43,6 @@ import "slick-carousel/slick/slick-theme.css";
 function App() {
   // const [authtoken, setAuthtoken] = useState(sessionStorage.getItem("token"));
   const [authtoken, setAuthtoken] = useState(sessionStorage.getItem("token"));
-
   useEffect(() => {
     // const token = sessionStorage.getItem("token");
     const token = sessionStorage.getItem("token");
@@ -53,7 +58,27 @@ function App() {
   const searchby = ["Operator name", "Phone", "Email"];
   const [currentSearch, setCurrentSearch] = useState(searchby[0]);
 
-  
+  useEffect(() => {
+    // Function to reset localStorage when back navigation occurs
+    const resetLocalStorageOnBack = () => {
+      const historyState = window.history.state;
+      // Check if it's the last page or any other condition for final back navigation
+      if (historyState && historyState.idx === 0) {
+        localStorage.clear(); // Reset the localStorage here
+        sessionStorage.clear();
+        window.location.reload();
+        console.log("localStorage reset on last back navigation");
+      } 
+    };
+    // Add event listener for popstate event
+    window.addEventListener("popstate", resetLocalStorageOnBack);
+
+    // Cleanup event listener on component unmount
+    return () => {
+      window.removeEventListener("popstate", resetLocalStorageOnBack);
+    };
+  }, []);
+
   return (
     <Router>
       <ToastContainer />

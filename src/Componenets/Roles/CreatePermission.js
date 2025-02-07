@@ -572,7 +572,7 @@ export default function CreatePermission({
                       Select: {
                         optionActiveBg: "#aebed1",
                         optionSelectedColor: "#FFF",
-                        optionSelectedBg: '#e5e5e5',
+                        optionSelectedBg: "#e5e5e5",
                         optionHeight: "2",
                       },
                     },
@@ -663,7 +663,7 @@ export default function CreatePermission({
                     ); // Debug to confirm data
                     return (
                       <div className="rmsc mt-[0.5vw] ml-[0.5vw]">
-                        <div className="grid grid-cols-4 gap-[0.5vw]">
+                        <div className="grid grid-cols-4 gap-[0.5vw] ">
                           {crudPermissionOptions.map((option) => (
                             <div
                               key={option.value}
@@ -699,7 +699,7 @@ export default function CreatePermission({
                               />
                               <label
                                 htmlFor={option.value}
-                                className="text-[1vw] text-[#1F4B7F]"
+                                className="text-[1vw] cursor-pointer text-[#1F4B7F]"
                               >
                                 {option.label}
                               </label>
@@ -788,7 +788,7 @@ export default function CreatePermission({
                           />
                           <label
                             htmlFor={option.value}
-                            className="text-[1vw] text-[#1F4B7F] pl-[0.5vw]"
+                            className="text-[1vw] cursor-pointer text-[#1F4B7F] pl-[0.5vw]"
                           >
                             {option.label}
                           </label>
@@ -828,7 +828,7 @@ export default function CreatePermission({
                       }
                       className="w-[1vw] h-[1vw] accent-[#1F4B7F]"
                     />
-                    <span className="text-[#1F4B7F] text-[1.1vw] font-medium pl-[0.5vw]">
+                    <span className="text-[#1F4B7F] text-[1.1vw] cursor-pointer font-medium pl-[0.5vw]">
                       Yes
                     </span>
                   </label>
@@ -846,7 +846,7 @@ export default function CreatePermission({
                       }
                       className="w-[1vw] h-[1vw] accent-[#1F4B7F]"
                     />
-                    <span className="text-[#1F4B7F] text-[1.1vw] font-medium pl-[0.5vw]">
+                    <span className="text-[#1F4B7F] text-[1.1vw] cursor-pointer font-medium pl-[0.5vw]">
                       No
                     </span>
                   </label>

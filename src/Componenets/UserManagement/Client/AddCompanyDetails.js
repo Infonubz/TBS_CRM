@@ -37,20 +37,24 @@ const validationSchema = Yup.object().shape({
       "Invalid email address format"
     )
     .required("Email is required"),
-  owner_name: Yup.string().required("Client name is required")
-  .min(3,"Minimum 3 characters long")
+  owner_name: Yup.string()
+    .required("Client name is required")
+    .min(3, "Minimum 3 characters long")
     .max(30, "Maximum 30 characters only")
-    .matches(/^[A-Za-z\s]+$/,
-      "Only letters and spaces are allowed"),
-  company_name: Yup.string().required("Company name is required")
-  .min(3,"Minimum 3 characters long")
+    .matches(/^[A-Za-z\s]+$/, "Only letters and spaces are allowed"),
+  company_name: Yup.string()
+    .required("Company name is required")
+    .min(3, "Minimum 3 characters long")
     .max(30, "Maximum 30 characters only")
-    .matches(
-      /^[A-Za-z0-9\s]+$/,
-      "Only letters, numbers, spaces are allowed"
-    ),
+    .matches(/^[A-Za-z0-9\s]+$/, "Only letters, numbers, spaces are allowed"),
   // web_url: Yup.string().required("Web URL is required"),
-  web_url: Yup.string().url('Please enter a valid URL ex(https://www.google.com)'),
+  // web_url: Yup.string().url(
+  //   "Please enter a valid url ex: (https://www.google.com)"
+  // ),
+  web_url: Yup.string().matches(
+    /^(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/,
+    "Please enter a valid domain name (e.g., google.com)"
+  ),
   business: Yup.string().required("Business is required"),
   constitution: Yup.string().required("Constitution is required"),
   // company_logo: Yup.mixed()
@@ -97,7 +101,7 @@ export default function AddCompanyDetails({
   setEnableUpload,
   selectedFile,
   enableUpload,
-  setSelectedFile
+  setSelectedFile,
 }) {
   const [enable, setEnable] = useState(false);
   // const [profileImage, setProfileImage] = useState("");
@@ -106,7 +110,7 @@ export default function AddCompanyDetails({
   const [currentId, setCurrentId] = useState("");
   // const [businessData, setBusinessData] = useState([]);
   const [spinning, setSpinning] = useState(false);
-   const [reset,setReset] = useState(false)
+  const [reset, setReset] = useState(false);
   const [clicompanydata, setCliComapanyData] = useState({
     company_name: "",
     owner_name: "",
@@ -367,16 +371,16 @@ export default function AddCompanyDetails({
   // };
 
   const businessData = [
-    { value: 'retail_ecommerce', label: 'Retail and E-commerce' },
-    { value: 'food_beverage', label: 'Food and Beverage' },
-    { value: 'healthcare_wellness', label: 'Healthcare and Wellness' },
-    { value: 'education_training', label: 'Education and Training' },
-    { value: 'technology_it_services', label: 'Technology and IT Services' },
-    { value: 'finance_insurance', label: 'Finance and Insurance' },
-    { value: 'real_estate_property', label: 'Real Estate and Property' },
-    { value: 'travel_hospitality', label: 'Travel and Hospitality' },
-    { value: 'manufacturing_industry', label: 'Manufacturing and Industry' },
-    { value: 'entertainment_media', label: 'Entertainment and Media' }
+    { value: "retail_ecommerce", label: "Retail and E-commerce" },
+    { value: "food_beverage", label: "Food and Beverage" },
+    { value: "healthcare_wellness", label: "Healthcare and Wellness" },
+    { value: "education_training", label: "Education and Training" },
+    { value: "technology_it_services", label: "Technology and IT Services" },
+    { value: "finance_insurance", label: "Finance and Insurance" },
+    { value: "real_estate_property", label: "Real Estate and Property" },
+    { value: "travel_hospitality", label: "Travel and Hospitality" },
+    { value: "manufacturing_industry", label: "Manufacturing and Industry" },
+    { value: "entertainment_media", label: "Entertainment and Media" },
   ];
   const defaultBusinessData = {
     value: "",
@@ -442,30 +446,56 @@ export default function AddCompanyDetails({
         <div>
           <Formik
             initialValues={{
-              company_name:reset ? "" : clicompanydata ? clicompanydata?.company_name : "",
-              owner_name: reset ? "" : clicompanydata ? clicompanydata?.owner_name : "",
+              company_name: reset
+                ? ""
+                : clicompanydata
+                ? clicompanydata?.company_name
+                : "",
+              owner_name: reset
+                ? ""
+                : clicompanydata
+                ? clicompanydata?.owner_name
+                : "",
               phone: reset ? "" : clicompanydata ? clicompanydata?.phone : "",
-              emailid: reset ? "" : clicompanydata ? clicompanydata?.emailid : "",
-              constitution: reset ? "" : clicompanydata
+              emailid: reset
+                ? ""
+                : clicompanydata
+                ? clicompanydata?.emailid
+                : "",
+              constitution: reset
+                ? ""
+                : clicompanydata
                 ? clicompanydata?.type_of_constitution
                 : "",
-              business: reset ? "" : clicompanydata
+              business: reset
+                ? ""
+                : clicompanydata
                 ? clicompanydata?.business_background
                 : "",
-              web_url: reset ? "" : clicompanydata ? clicompanydata?.web_url : "",
-              company_logo: reset ? "" : clicompanydata ? clicompanydata?.company_logo : "",
+              web_url: reset
+                ? ""
+                : clicompanydata
+                ? clicompanydata?.web_url
+                : "",
+              company_logo: reset
+                ? ""
+                : clicompanydata
+                ? clicompanydata?.company_logo
+                : "",
             }}
             validationSchema={validationSchema}
             onSubmit={(values, { setFieldError }) => {
               // if (profileImage === true || updatedata) {
               //   handleSubmit(values, setFieldError);
               // }
-              if (profileImage === true && selectedFile != null || updatedata && selectedFile?.length > 0) {
-                handleSubmit(values,setFieldError);
-              }
-              else if(selectedFile?.length <= 0){
-                setProfileImage(false)
-                setSelectedFile(null)
+              if (
+                (profileImage === true && selectedFile != null) ||
+                (updatedata && selectedFile?.length > 0)
+              ) {
+                handleSubmit(values, setFieldError);
+              } else if (selectedFile?.length <= 0) {
+                setProfileImage(false);
+                setSelectedFile(null);
               }
             }}
             enableReinitialize
@@ -632,7 +662,12 @@ export default function AddCompanyDetails({
                             placeholder="Enter Email Address"
                             autoComplete="emailid-field"
                             value={values.emailid}
-                            onChange={(e) => setFieldValue("emailid", e.target.value.toLowerCase())}
+                            onChange={(e) =>
+                              setFieldValue(
+                                "emailid",
+                                e.target.value.toLowerCase()
+                              )
+                            }
                             disabled={
                               updatedata || addressback
                                 ? enable
@@ -774,7 +809,6 @@ export default function AddCompanyDetails({
                                       Select Constitution
                                     </div>
                                   ),
-                      
                                 },
                                 {
                                   value: "Proprietorship",
@@ -1064,25 +1098,25 @@ export default function AddCompanyDetails({
                               * Profile Image is required
                             </div>
                           )} */}
-                            {updatedata && selectedFile != null
+                      {updatedata && selectedFile != null
                         ? " "
                         : profileImage === false && (
-                          <div className="text-red-500 text-[.7vw] top-[-.7vw] absolute">
-                            * Profile Image is required
-                          </div>
-                        )}
+                            <div className="text-red-500 text-[.7vw] top-[-.7vw] absolute">
+                              * Profile Image is required
+                            </div>
+                          )}
 
                       <div>
                         <h1 className="text-[#1F4B7F] text-[0.7vw] font-semibold">
-                          *You must fill in all fields to be able to continue
+                          * You must fill in all fields to be able to continue
                         </h1>
                       </div>
                       <div className="flex items-center gap-x-[1vw]">
                         <button
                           type="button"
-                          onClick={()=>{
-                            resetForm()
-                            setReset(true)
+                          onClick={() => {
+                            resetForm();
+                            setReset(true);
                           }}
                           className="border-[#1F487C] w-[5vw] font-semibold text-[1vw] h-[2vw] rounded-full border-r-[0.2vw]  border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw]"
                         >

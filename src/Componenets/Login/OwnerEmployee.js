@@ -22,7 +22,7 @@ const validationSchema = Yup.object().shape({
   password: Yup.string().required("Password is required"),
 });
 
-export default function OwnerEmployee({ setAuthtoken ,setForgotPassword }) {
+export default function OwnerEmployee({ setAuthtoken, setForgotPassword }) {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   //const [toastError, setToastError] = useState();
@@ -37,16 +37,18 @@ export default function OwnerEmployee({ setAuthtoken ,setForgotPassword }) {
     return 0; // Invalid
   };
 
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (values, setFieldError) => {
     const validationResult = validateInput(values.emailid_phone);
     try {
       const data = await ProEmpLogin(values, validationResult);
       toast.warning(data?.message);
-        if (data?.token !== undefined) {
-          console.log(data, "data2");
-          navigate("/dashboard");
-          window.location.reload();
-        }
+      if (data?.token !== undefined) {
+        console.log(data, "data2");
+        navigate("/dashboard");
+        window.location.reload();
+      } else {
+        setFieldError("password", "Invalid Username or Password");
+      }
     } catch (error) {
       toast.error(error.message);
     }
@@ -58,7 +60,9 @@ export default function OwnerEmployee({ setAuthtoken ,setForgotPassword }) {
 
   return (
     <div className="absolute left-0 top-0 bg-[#E5FFF1] rounded-tl-[2vw] rounded-bl-[2vw] h-full w-[35vw] bg-opacity-90 flex flex-col items-center justify-center">
-      <label className="text-[#1F487C] font-bold text-[2vw] ">PRO EMPLOYEE</label>
+      <label className="text-[#1F487C] font-bold text-[2vw] ">
+        PRO EMPLOYEE
+      </label>
       <p className="text-[#1F487C] text-[1vw] py-[2vw]">
         Welcome Back, Please sign in to your account
       </p>
@@ -68,8 +72,8 @@ export default function OwnerEmployee({ setAuthtoken ,setForgotPassword }) {
           password: "",
         }}
         validationSchema={validationSchema}
-        onSubmit={(values) => {
-          handleSubmit(values);
+        onSubmit={(values, { setFieldError }) => {
+          handleSubmit(values, setFieldError);
         }}
       >
         {({ isSubmitting, handleSubmit }) => (
@@ -84,7 +88,7 @@ export default function OwnerEmployee({ setAuthtoken ,setForgotPassword }) {
                 <Field
                   type="text"
                   name="emailid_phone"
-                  placeholder="Enter Email Address or Phone Number"
+                  placeholder="Enter Email / Phone Number"
                   className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                 />
                 <ErrorMessage
@@ -127,13 +131,24 @@ export default function OwnerEmployee({ setAuthtoken ,setForgotPassword }) {
 
               {/* Remember Me and Forgot Password */}
               <div className="flex justify-between items-center">
-                <div>
-                  <Checkbox className="text-[#1F4B7F] text-[1vw]">
+                <div className="flex justify-between items-center gap-[1vw]">
+                  <input
+                    type="checkbox"
+                    onChange={(e) => {}}
+                    className="text-[#1F4B7F] text-[1vw] cursor-pointer "
+                  />
+                  <span className="text-[#1F4B7F]  text-[1vw] ">
                     Remember me
-                  </Checkbox>
+                  </span>
+                  {/* </Checkbox> */}
                 </div>
                 <div>
-                  <p  onClick={() => setForgotPassword(true)} className="text-[#1F487C] text-[1vw] cursor-pointer">Forgot Password</p>
+                  <p
+                    onClick={() => setForgotPassword(true)}
+                    className="text-[#1F487C] text-[1vw] cursor-pointer"
+                  >
+                    Forgot Password
+                  </p>
                 </div>
               </div>
 

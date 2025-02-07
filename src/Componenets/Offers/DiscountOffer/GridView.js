@@ -203,6 +203,7 @@ export default function GridView({
                   src={
                     item?.offer_img != null ? `${apiImgUrl}${item.theme}` : ""
                   }
+                  draggable={false}
                   onClick={() => {
                     setOfferView(item.theme ? true : false);
                     setOfferImage(item.theme);

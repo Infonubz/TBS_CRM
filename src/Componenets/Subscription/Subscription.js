@@ -31,7 +31,7 @@ import { IoIosArrowDropupCircle } from "react-icons/io";
 import moment from "moment";
 import { capitalizeFirstLetter } from "../Common/Captilization";
 
-export default function Subscription({}) {
+export default function Subscription({ }) {
   const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const [expandedRowKey, setExpandedRowKey] = useState(null);
   const [showHalfMap, setShowHalfMap] = useState({}); // State to track which user's product key to show/hide
@@ -184,26 +184,26 @@ export default function Subscription({}) {
         return (
           <div className="flex pl-[3vw] text-[#1F4B7F] font-bold  text-[1vw]">
             <h1 className="">{row.company_name}
-            {
-            row?.company_name?.length > 18 ? (
-              <Tooltip color="white"
-                overlayInnerStyle={{ color: "#1F4B7F" }} title={capitalizeFirstLetter(row?.company_name)}>
-                <span>
-                  {`${row?.company_name?.charAt(0) === row?.company_name?.charAt(0).toLowerCase()
-                    ? capitalizeFirstLetter(row?.company_name).slice(0, 18)
-                    : row?.company_name?.slice(0, 18)}...`}
-                </span>
+              {
+                row?.company_name?.length > 18 ? (
+                  <Tooltip color="white"
+                    overlayInnerStyle={{ color: "#1F4B7F" }} title={capitalizeFirstLetter(row?.company_name)}>
+                    <span>
+                      {`${row?.company_name?.charAt(0) === row?.company_name?.charAt(0).toLowerCase()
+                        ? capitalizeFirstLetter(row?.company_name).slice(0, 18)
+                        : row?.company_name?.slice(0, 18)}...`}
+                    </span>
 
-              </Tooltip>
-            ) : (
-              <span>
-              {row?.company_name?.charAt(0) === row?.company_name?.charAt(0).toLowerCase() 
-                ? capitalizeFirstLetter(row?.company_name) 
-                : row?.company_name}
-            </span>
-            
-            )
-          }
+                  </Tooltip>
+                ) : (
+                  <span>
+                    {row?.company_name?.charAt(0) === row?.company_name?.charAt(0).toLowerCase()
+                      ? capitalizeFirstLetter(row?.company_name)
+                      : row?.company_name}
+                  </span>
+
+                )
+              }
             </h1>
           </div>
         );
@@ -498,17 +498,17 @@ export default function Subscription({}) {
       "ArrowRight",
       "Delete",
     ].includes(e.key);
-  
+
     if (isControlKey) {
       return; // If it's a control key, do nothing and allow it to execute
     }
-  
+
     // Allow only alphabets (A-Z, a-z), numbers (0-9), and space
     if (!/^[A-Za-z0-9\s]$/.test(e.key)) {
       e.preventDefault(); // Prevent the key if it's not an alphabet, number, or space
     }
   };
-  
+
   return (
     <div
       className="h-screen w-screen"
@@ -574,32 +574,32 @@ export default function Subscription({}) {
           <div className="order-last">
             <div className="reqman">
               <ConfigProvider
-                                theme={{
-                                  token: {
-                                    fontSize: ".9vw",
-                                    lineHeight: 0,
-                                    colorPrimary: "#1F487C",
-                                  },
-                                  components: {
-                                    DatePicker: {
-                                      activeBorderColor: "#1F487C",
-                                      hoverBorderColor: "#1F487C",
-                                      activeShadow: "#1F487C",
-                                      cellWidth: 25,
-                                      cellHeight: 20,
-                                    },
-                                  },
-                                }}
-                              >
+                theme={{
+                  token: {
+                    fontSize: ".9vw",
+                    lineHeight: 0,
+                    colorPrimary: "#1F487C",
+                  },
+                  components: {
+                    DatePicker: {
+                      activeBorderColor: "#1F487C",
+                      hoverBorderColor: "#1F487C",
+                      activeShadow: "#1F487C",
+                      cellWidth: 25,
+                      cellHeight: 20,
+                    },
+                  },
+                }}
+              >
                 <RangePicker
                   allowClear={true}
                   autoFocus={false}
                   onChange={datefilter}
                   value={dateClear}
-                   className="ads-date1 border-r-[0.75vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-blue border-[#1F487C]
+                  className="ads-date1 border-r-[0.75vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-blue border-[#1F487C]
                         text-[#1F487C] text-[0.8vw] h-[5vh] w-[100%] rounded-[0.5vw] outline-none px-[1vw] placeholder-[#1F487C]"
-                  // className="custom-range-picker bg-white outline-none pl-[1.5vw] w-[17vw] h-[2.5vw] text-[0.9vw] border-[#1F4B7F] border-l-[0.1vw] px-[1vw] border-t-[0.1vw] rounded-[0.75vw] border-r-[0.2vw] border-b-[0.2vw]"
-                  // disabledDate={(current) => current < dayjs().startOf("day")}
+                // className="custom-range-picker bg-white outline-none pl-[1.5vw] w-[17vw] h-[2.5vw] text-[0.9vw] border-[#1F4B7F] border-l-[0.1vw] px-[1vw] border-t-[0.1vw] rounded-[0.75vw] border-r-[0.2vw] border-b-[0.2vw]"
+                // disabledDate={(current) => current < dayjs().startOf("day")}
                 />
               </ConfigProvider>
             </div>
@@ -616,7 +616,12 @@ export default function Subscription({}) {
               columns={columns}
               dataSource={data}
               pagination={false}
-              scroll={{ y: "65vh", x: "175vh" }}
+              locale={{ emptyText: 'No Data Available' }}
+              // scroll={{ y: "65vh", x: "175vh" }}
+              scroll={{
+                y: data.length > 0 && data.some(item => item.someColumn !== 0) ? "65vh" : undefined,
+                x: data.length > 0 && data.some(item => item.someColumn !== 0) ? "175vh" : undefined
+              }}
               expandedRowRender={(record) => (
                 <p style={{ margin: 0 }}>{record?.hidden_details}</p>
               )}

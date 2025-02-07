@@ -9,15 +9,16 @@ import SystemSettingList from "./SystemSetting/SystemSetting";
 import UserSettingList from "./UserSetting/UserSetting";
 import ConfigurationIndex from "./Configurations";
 import { useLocation } from "react-router";
+import ThemeSettings from "./ThemeSettings/ThemeIndex";
 
 export default function Settings() {
   //const { Search } = Input;
   const location = useLocation()
   const [selectedSetting, setSelectedSetting] = useState(location?.state?.tabIndex || "system");
   const type_id = sessionStorage.getItem("type_id");
-  useEffect(()=>{
+  useEffect(() => {
     setSelectedSetting(location?.state?.tabIndex || "system")
-  },[location.state])
+  }, [location.state])
   useEffect(() => {
     if (type_id !== "PRO101") {
       setSelectedSetting("user");
@@ -32,11 +33,11 @@ export default function Settings() {
       "ArrowRight",
       "Delete",
     ].includes(e.key);
-  
+
     if (isControlKey) {
       return; // If it's a control key, do nothing and allow it to execute
     }
-  
+
     // Allow only alphabets (A-Z, a-z), numbers (0-9), and space
     if (!/^[A-Za-z0-9\s]$/.test(e.key)) {
       e.preventDefault(); // Prevent the key if it's not an alphabet, number, or space
@@ -76,11 +77,10 @@ export default function Settings() {
               {type_id === "PRO101" && (
                 <div
                   onClick={() => setSelectedSetting("system")}
-                  className={` ${
-                    selectedSetting === "system"
-                      ? "border-b-[0.25vw]  border-[#1F487C] font-bold"
-                      : ""
-                  } cursor-pointer`}
+                  className={` ${selectedSetting === "system"
+                    ? "border-b-[0.25vw]  border-[#1F487C] font-bold"
+                    : ""
+                    } cursor-pointer`}
                 >
                   <p className={`text-[#1F487C] text-[1.4vw]  `}>
                     Company Settings
@@ -89,11 +89,10 @@ export default function Settings() {
               )}
               <div
                 onClick={() => setSelectedSetting("user")}
-                className={` ${
-                  selectedSetting === "user"
-                    ? "border-b-[0.25vw] border-[#1F487C] font-bold"
-                    : ""
-                } cursor-pointer`}
+                className={` ${selectedSetting === "user"
+                  ? "border-b-[0.25vw] border-[#1F487C] font-bold"
+                  : ""
+                  } cursor-pointer`}
               >
                 <p className={`text-[#1F487C] text-[1.4vw] `}>
                   User Settings
@@ -112,14 +111,13 @@ export default function Settings() {
                   </p>
                 </div>
               )} */}
-              {type_id === "PRO101" && ( 
+              {type_id === "PRO101" && (
                 <div
                   onClick={() => setSelectedSetting("configuration")}
-                  className={` ${
-                    selectedSetting === "configuration"
-                      ? "border-b-[0.25vw] border-[#1F487C] font-bold"
-                      : ""
-                  } cursor-pointer`}
+                  className={` ${selectedSetting === "configuration"
+                    ? "border-b-[0.25vw] border-[#1F487C] font-bold"
+                    : ""
+                    } cursor-pointer`}
                 >
                   <p className={`text-[#1F487C] text-[1.4vw] `}>
                     Configuration
@@ -129,14 +127,26 @@ export default function Settings() {
               {type_id === "PRO101" && (
                 <div
                   onClick={() => setSelectedSetting("integrations")}
-                  className={` ${
-                    selectedSetting === "integrations"
-                      ? "border-b-[0.25vw] border-[#1F487C] font-bold"
-                      : ""
-                  } cursor-pointer`}
+                  className={` ${selectedSetting === "integrations"
+                    ? "border-b-[0.25vw] border-[#1F487C] font-bold"
+                    : ""
+                    } cursor-pointer`}
                 >
                   <p className={`text-[#1F487C] text-[1.4vw] `}>
                     Product Integrations
+                  </p>
+                </div>
+              )}
+              {type_id === "PRO101" && (
+                <div
+                  onClick={() => setSelectedSetting("themeSettings")}
+                  className={` ${selectedSetting === "themeSettings"
+                    ? "border-b-[0.25vw] border-[#1F487C] font-bold"
+                    : ""
+                    } cursor-pointer`}
+                >
+                  <p className={`text-[#1F487C] text-[1.4vw] `}>
+                    Theme Settings
                   </p>
                 </div>
               )}
@@ -149,6 +159,7 @@ export default function Settings() {
               {selectedSetting === "data" && <DataSettingList />}
               {selectedSetting === "configuration" && <ConfigurationIndex />}
               {selectedSetting === "integrations"}
+              {selectedSetting === 'themeSettings' && <ThemeSettings />}
             </div>
           </div>
         </div>

@@ -23,17 +23,20 @@ const SUPPORTED_FORMATS = [
 ];
 const validationSchema = Yup.object().shape({
   gst: Yup.string()
-  .matches(
-    /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[0-9]{1}[A-Z]{1}[0-9]{1}$/,
-    "Format should be 22AAAAA0000A1Z5."
-  )
-  .required("GST number is required"),
+    .matches(
+      /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[0-9]{1}[A-Z]{1}[0-9]{1}$/,
+      "Format should be 22AAAAA0000A1Z5."
+    )
+    .required("GST number is required"),
   // gst: Yup.string().required("GSTIN is required"),
-  state_code: Yup.string().matches(/^\d+$/, "State code must be a number")  
-  .required("State code is required")
-  .max(2,"State code must be valid 2 digit number"),
+  state_code: Yup.string()
+    .matches(/^\d+$/, "State code must be a number")
+    .required("State code is required")
+    .max(2, "State code must be valid 2 digit number"),
   state: Yup.string().required("State is required"),
-  head_office: Yup.string().required("Head offcie is required").max(40,"Maximum 40 characters only"),
+  head_office: Yup.string()
+    .required("Head offcie is required")
+    .max(40, "Maximum 40 characters only"),
   gst_file: Yup.mixed()
     .test("required", "A file is required", function (value) {
       const { isEdit } = this.options.context;
@@ -98,8 +101,8 @@ export default function AddGST({
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
-  const [inputPreview, setInputPreview] = useState()
-  const [reset,setReset] = useState("")
+  const [inputPreview, setInputPreview] = useState();
+  const [reset, setReset] = useState("");
 
   // const handlePreview = (file) => {
   //   const reader = new FileReader();
@@ -156,11 +159,11 @@ export default function AddGST({
 
   const openModal = (event) => {
     // Get the image source (src) using `getElementById`
-    const imageSrc = event.target.getAttribute('src');
-    
+    const imageSrc = event.target.getAttribute("src");
+
     // Set the modal image source
     setModalImage(imageSrc);
-    
+
     // Open the modal
     setIsModalOpen(true);
   };
@@ -168,10 +171,9 @@ export default function AddGST({
     setIsModalOpen(false);
   };
 
-
   const handleFileChange = (event) => {
     const file = event?.currentTarget?.files[0];
-  
+
     // Check if the file is selected and it's a valid file
     if (file) {
       // Validate if the selected file is an actual file object
@@ -184,7 +186,7 @@ export default function AddGST({
       console.error("No file selected.");
     }
   };
-  
+
   // Additional logging to check state change
   useEffect(() => {
     console.log(updateId, "clientID111");
@@ -196,7 +198,7 @@ export default function AddGST({
     if (clientID != null) {
       fetchGetUser();
     }
-    setInputPreview(superadmingstdata?.upload_gst)
+    setInputPreview(superadmingstdata?.upload_gst);
   }, [clientID, setClientID]);
 
   return (
@@ -204,7 +206,7 @@ export default function AddGST({
       <div className="">
         <div className="h-[4vw] w-full flex items-center justify-between ">
           <label className="text-[1.5vw] font-semibold text-[#1f4b7f] ">
-            Add GST
+            {superadmingstdata?.state_name ? "Update GSTIN" : "Add GSTIN"}
           </label>
           {/* <button className="rounded-full font-semibold w-[6vw] h-[2vw] flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] border-[#34AE2A] text-[1.1vw] text-[#34AE2A] ">
             Save
@@ -216,12 +218,20 @@ export default function AddGST({
         <div>
           <Formik
             initialValues={{
-              gst:reset?"": superadmingstdata?.gstin || "",
-              state_code: reset?"": superadmingstdata?.state_code_number || "",
-              state: reset?"": superadmingstdata?.state_name || "",
-              head_office: reset?"": superadmingstdata?.head_office || "",
-              gst_file: reset?null: superadmingstdata?.upload_gst || null,
-              ctc: reset?"": superadmingstdata?.aggregate_turnover_exceeded  == true ? 1 : superadmingstdata?.aggregate_turnover_exceeded  == false ? 0 :"" || "",
+              gst: reset ? "" : superadmingstdata?.gstin || "",
+              state_code: reset
+                ? ""
+                : superadmingstdata?.state_code_number || "",
+              state: reset ? "" : superadmingstdata?.state_name || "",
+              head_office: reset ? "" : superadmingstdata?.head_office || "",
+              gst_file: reset ? null : superadmingstdata?.upload_gst || null,
+              ctc: reset
+                ? ""
+                : superadmingstdata?.aggregate_turnover_exceeded == true
+                ? 1
+                : superadmingstdata?.aggregate_turnover_exceeded == false
+                ? 0
+                : "" || "",
             }}
             validationSchema={validationSchema}
             onSubmit={(values) => {
@@ -255,9 +265,11 @@ export default function AddGST({
                         name="gst"
                         placeholder="Enter GSTIN"
                         autoComplete="off"
-                        onChange={(e) => setFieldValue("gst", e.target.value?.toUpperCase())}
+                        onChange={(e) =>
+                          setFieldValue("gst", e.target.value?.toUpperCase())
+                        }
                         value={values.gst}
-                        className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                        className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder:text-[#9FA6B2] border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                       />
                       <ErrorMessage
                         name="gst"
@@ -267,7 +279,7 @@ export default function AddGST({
                     </div>
                     <div className="col-span-1 relative">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
-                       State Code
+                        State Code
                         <span className="text-[1vw] text-red-600 pl-[0.2vw]">
                           *
                         </span>
@@ -278,7 +290,7 @@ export default function AddGST({
                         autoComplete="off"
                         placeholder="Enter State Code"
                         value={values.state_code}
-                        className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                        className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder:text-[#9FA6B2]  border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                       />
                       <ErrorMessage
                         name="state_code"
@@ -308,14 +320,14 @@ export default function AddGST({
                         <option label="Karnataka" value="Karnataka" />
                         <option label="Andhra" value="Andhra" />
                       </Field> */}
-                          <ConfigProvider
+                      <ConfigProvider
                         theme={{
                           components: {
                             Select: {
-                              optionActiveBg: '#aebed1',
-                              optionSelectedColor: '#FFF',
-                              optionSelectedBg: '#e5e5e5',
-                              optionHeight: '2',
+                              optionActiveBg: "#aebed1",
+                              optionSelectedColor: "#FFF",
+                              optionSelectedBg: "#e5e5e5",
+                              optionHeight: "2",
                             },
                           },
                         }}
@@ -325,7 +337,7 @@ export default function AddGST({
                           value={values.state}
                           listHeight={190}
                           onChange={(value) => {
-                            handleChange({ target: { name: 'state', value } })
+                            handleChange({ target: { name: "state", value } });
                           }}
                           // disabled={
                           //   updatedata || gstback
@@ -335,29 +347,34 @@ export default function AddGST({
                           //     : false
                           // }
                           name="state"
-                          className={`custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          className={`custom-select bg-white border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw]  border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
                           // className="custom-select bg-white outline-none w-full mt-[0.5vw] h-[3vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.2vw] border-b-[0.2vw] placeholder-[#1F487C]"
                           placeholder="Select state"
-                          filterOption={(input, option) => 
-                            option?.value?.toLowerCase()?.includes(input.toLowerCase()) // Make it case-insensitive
+                          filterOption={
+                            (input, option) =>
+                              option?.value
+                                ?.toLowerCase()
+                                ?.includes(input.toLowerCase()) // Make it case-insensitive
                           }
                           optionFilterProp="value"
-                          suffixIcon={<span style={{ fontSize: '1vw', color: '#1f487c' }}>
-                            <IoMdArrowDropdown size="2vw" />
-                          </span>}
+                          suffixIcon={
+                            <span style={{ fontSize: "1vw", color: "#1f487c" }}>
+                              <IoMdArrowDropdown size="2vw" />
+                            </span>
+                          }
                           style={{ padding: 4 }}
                           options={[
                             {
-                              value: '',
+                              value: "",
                               label: (
-                                <div className="text-[1vw] px-[0.2vw] pb-[0.1vw] text-gray-400">
+                                <div className="fontsanserif text-[1vw] px-[0.2vw]   text-[#9FA6B2]">
                                   Select State
                                 </div>
                               ),
                               disabled: true,
                             },
                             {
-                              value: 'Tamilnadu',
+                              value: "Tamilnadu",
                               label: (
                                 <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
                                   Tamilnadu
@@ -365,7 +382,7 @@ export default function AddGST({
                               ),
                             },
                             {
-                              value: 'Kerala',
+                              value: "Kerala",
                               label: (
                                 <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
                                   Kerala
@@ -373,7 +390,7 @@ export default function AddGST({
                               ),
                             },
                             {
-                              value: 'Karnataka',
+                              value: "Karnataka",
                               label: (
                                 <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
                                   Karnataka
@@ -381,14 +398,14 @@ export default function AddGST({
                               ),
                             },
                             {
-                              value: 'Andhra',
+                              value: "Andhra",
                               label: (
                                 <div className="text-[1vw] font-normal px-[0.2vw] pb-[0.1vw] text-[#1F487C]">
                                   Andhra
                                 </div>
                               ),
                             },
-                          ]}                          
+                          ]}
                         />
                       </ConfigProvider>
 
@@ -411,7 +428,7 @@ export default function AddGST({
                         autoComplete="off"
                         placeholder="Enter Head Office"
                         value={values.head_office}
-                        className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                        className="border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder:text-[#9FA6B2] border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                       />
                       <ErrorMessage
                         name="head_office"
@@ -492,30 +509,32 @@ export default function AddGST({
                             id="gst_file"
                             name="gst_file"
                             type="file"
-                            accept=".jpg, .jpeg, .png" 
+                            accept=".jpg, .jpeg, .png"
                             style={{ display: "none" }}
                             onChange={(event) => {
                               const file = event.currentTarget.files[0];
                               setFieldValue("gst_file", file);
                               // handlePreview(file); // If you want to preview the selected file
-                              handleFileChange(event)
+                              handleFileChange(event);
                             }}
                           />
                           <div className="relative">
-                          <button
-                            className="border-r-[0.3vw]  flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C]  text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none"
-                            onClick={(event) => {
-                              event.preventDefault();
-                              document.getElementById("gst_file").click();
-                            }}
-                          >
-                            <span className="text-[#9CA3AF]">Upload GST Image</span>
-                            {/* <FaCloudUploadAlt
+                            <button
+                              className="border-r-[0.3vw]  flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C]  text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none"
+                              onClick={(event) => {
+                                event.preventDefault();
+                                document.getElementById("gst_file").click();
+                              }}
+                            >
+                              <span className="text-[#9FA6B2]">
+                                Upload GST Image
+                              </span>
+                              {/* <FaCloudUploadAlt
                               color="#1F487C"
                               size={"2vw"}
                               className="absolute right-[1vw]"
                             /> */}
-                                  {/* {inputPreview  ? (
+                              {/* {inputPreview  ? (
                           inputPreview?.startsWith("blob") ? (
                             <img
                             src={inputPreview}
@@ -536,31 +555,31 @@ export default function AddGST({
                             className="absolute right-[1vw]"
                           />
                         )} */}
-                          </button>
-                          {inputPreview  ? (
-                          inputPreview?.startsWith("blob") ? (
-                            <img
-                            src={inputPreview}
-                            className="h-[2.5vw] w-[2.5vw] absolute cursor-zoom-in top-[.15vw] right-[.4vw]"
-                           alt="Gst Document"
-                            onClick={openModal} 
-                          />
-                          ) : (
-                            <img
-                            src={`${apiImgUrl}/${inputPreview}`}
-                            className="h-[2.5vw] w-[2.5vw] absolute  top-[.15vw] cursor-zoom-in right-[.4vw]"
-                            alt="Gst Document"
-                            onClick={openModal} 
-                          />
-                          )
-                        ) : (
-                          <FaCloudUploadAlt
-                            color="#1F487C"
-                            size="2vw"
-                            className="absolute cursor-zoom-in right-[1vw] top-[.4vw] pointer-events-none "
-                          />
-                        )}
-                        </div>
+                            </button>
+                            {inputPreview ? (
+                              inputPreview?.startsWith("blob") ? (
+                                <img
+                                  src={inputPreview}
+                                  className="h-[2.5vw] w-[2.5vw] absolute cursor-zoom-in top-[.15vw] right-[.4vw]"
+                                  alt="Gst Document"
+                                  onClick={openModal}
+                                />
+                              ) : (
+                                <img
+                                  src={`${apiImgUrl}/${inputPreview}`}
+                                  className="h-[2.5vw] w-[2.5vw] absolute  top-[.15vw] cursor-zoom-in right-[.4vw]"
+                                  alt="Gst Document"
+                                  onClick={openModal}
+                                />
+                              )
+                            ) : (
+                              <FaCloudUploadAlt
+                                color="#1F487C"
+                                size="2vw"
+                                className="absolute cursor-zoom-in right-[1vw] top-[.4vw] pointer-events-none "
+                              />
+                            )}
+                          </div>
                           {/* {values.gst_file && (
                             <div
                               onClick={() => setPreviewOpen(true)}
@@ -635,7 +654,12 @@ export default function AddGST({
                     </div>
                     <div className="grid grid-cols-2 w-full gap-x-[2vw]">
                       <div className="col-span-2 relative">
-                        <Field type="radio" name="ctc" value="0"  checked={values.ctc == "0"}/>
+                        <Field
+                          type="radio"
+                          name="ctc"
+                          value="0"
+                          checked={values.ctc == "0"}
+                        />
                         <label className="text-[#1F4B7F] text-[0.8vw] pl-[1vw]">
                           My Aggregate Turnover (PAN India Total Turnover) has
                           not Exceeded 20 lakhs
@@ -650,9 +674,14 @@ export default function AddGST({
                   </div>
                   <div className="flex items-center w-full  justify-between ">
                     <div className="flex w-full justify-between gap-x-[1vw]">
-                      <button type="button" onClick={()=>{setReset(true)
-                        setInputPreview("")
-                      }} className="border-[#1F487C] w-[5vw] font-semibold text-[1vw] h-[2vw] rounded-full border-r-[0.2vw]  border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw]">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setReset(true);
+                          setInputPreview("");
+                        }}
+                        className="border-[#1F487C] w-[5vw] font-semibold text-[1vw] h-[2vw] rounded-full border-r-[0.2vw]  border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw]"
+                      >
                         Reset
                       </button>
                       <button

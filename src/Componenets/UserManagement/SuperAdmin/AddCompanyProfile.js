@@ -51,18 +51,13 @@ const validationSchema = Yup.object().shape({
     .min(3, "At least 3 characters long")
     .max(30, "Maximum 30 characters only")
     .required("Company Name is required")
-    .matches(
-      /^[A-Za-z0-9\s]+$/,
-      "Only letters, numbers, spaces are allowed"
-    ),
-   
+    .matches(/^[A-Za-z0-9\s]+$/, "Only letters, numbers, spaces are allowed"),
+
   ownername: Yup.string()
     .required("Owner Name is required")
     .min(3, "At least 3 characters long")
     .max(30, "Maximum 30 characters only")
-    .matches(
-      /^[A-Za-z\s]+$/,
-      "Only letters and spaces are allowed"),
+    .matches(/^[A-Za-z\s]+$/, "Only letters and spaces are allowed"),
   password: Yup.string(),
   aadhar: Yup.string()
     .matches(/^[0-9]{12}$/, "Aadhar number must be exactly 12 digits")
@@ -121,12 +116,12 @@ export default function AddSuperAdmin({
   setEnableUpload,
   selectedFile,
   enableUpload,
-  setSelectedFile
+  setSelectedFile,
 }) {
   const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const dispatch = useDispatch();
   const [spinning, setSpinning] = useState(false);
-  const [reset,setReset] = useState(false)
+  const [reset, setReset] = useState(false);
   const [superadmincompanydata, setsuperadmincompanydata] = useState({
     company_name: "",
     owner_name: "",
@@ -186,8 +181,7 @@ export default function AddSuperAdmin({
       //   profileimg: values.profileimg,
       // });
       setEnableUpload(true);
-    } 
-    else if (superadmincompanydata.emailid === values.emailid) {
+    } else if (superadmincompanydata.emailid === values.emailid) {
       const mobileResponce = await validateMobile(values.phone, "operator");
       if (mobileResponce) {
         setFieldError("phone", "Phone no is already exist");
@@ -393,8 +387,7 @@ export default function AddSuperAdmin({
     }));
   };
 
-  console.log(selectedFile,"fileleieisijfdjfdjf");
-  
+  console.log(selectedFile, "fileleieisijfdjfdjf");
 
   return (
     <div>
@@ -433,17 +426,23 @@ export default function AddSuperAdmin({
         <div>
           <Formik
             initialValues={{
-              companyname:reset ? "" : superadmincompanydata?.company_name || "",
+              companyname: reset
+                ? ""
+                : superadmincompanydata?.company_name || "",
               ownername: reset ? "" : superadmincompanydata?.owner_name || "",
               phone: reset ? "" : superadmincompanydata?.phone || "",
               emailid: reset ? "" : superadmincompanydata?.emailid || "",
               // alt_phone: "",
               // alt_emailid: "",
-              aadhar: reset ? "" : superadmincompanydata?.aadharcard_number || "",
+              aadhar: reset
+                ? ""
+                : superadmincompanydata?.aadharcard_number || "",
               pan: reset ? "" : superadmincompanydata?.pancard_number || "",
               // pancarddoc: "",
               // aadardoc: "",
-              user_status: reset ? "" : superadmincompanydata?.user_status || "",
+              user_status: reset
+                ? ""
+                : superadmincompanydata?.user_status || "",
               req_status: reset ? "" : superadmincompanydata?.req_status || "",
               // profileimg: superadmincompanydata?.profileimg || "",
             }}
@@ -470,10 +469,9 @@ export default function AddSuperAdmin({
                 (updatedata && selectedFile?.length > 0)
               ) {
                 handleSubmit(values, setFieldError);
-              }
-              else if(selectedFile?.length <= 0){
-                setProfileImage(false)
-                setSelectedFile(null)
+              } else if (selectedFile?.length <= 0) {
+                setProfileImage(false);
+                setSelectedFile(null);
               }
             }}
             enableReinitialize
@@ -664,7 +662,12 @@ export default function AddSuperAdmin({
                           name="emailid"
                           autoComplete="emailid-field"
                           placeholder="Enter Email Address"
-                          onChange={(e) => setFieldValue("emailid", e.target.value.toLowerCase())}
+                          onChange={(e) =>
+                            setFieldValue(
+                              "emailid",
+                              e.target.value.toLowerCase()
+                            )
+                          }
                           // value={values.firstname}
                           // onBlur={(e) => handleEmailBlur(e, setFieldError, setFieldValue, validateField, setFieldTouched)}
                           disabled={
@@ -734,7 +737,7 @@ export default function AddSuperAdmin({
                     <div className="grid grid-cols-2 w-full gap-x-[2vw] relative mb-[.7vw]">
                       <div className="col-span-1 relative">
                         <label className="text-[#1F4B7F] text-[1.1vw] ">
-                        Aadhaar Card Number
+                          Aadhaar Card Number
                           <span className="text-[1vw] text-red-600 pl-[0.2vw]">
                             *
                           </span>
@@ -793,9 +796,14 @@ export default function AddSuperAdmin({
                           <Field
                             type="text"
                             name="pan"
-                            placeholder="Enter Pan Number"
+                            placeholder="Enter PAN Number"
                             autoComplete="pan-field"
-                            onChange={(e) => setFieldValue("pan", e.target.value?.toUpperCase())}
+                            onChange={(e) =>
+                              setFieldValue(
+                                "pan",
+                                e.target.value?.toUpperCase()
+                              )
+                            }
                             // value={values.firstname}
                             disabled={
                               operatorID || addressback
@@ -837,16 +845,16 @@ export default function AddSuperAdmin({
                     <div className="flex items-center justify-between pb-[1vw]">
                       <div>
                         <h1 className="text-[#1F4B7F] text-[0.7vw] font-semibold">
-                          *You must fill in all fields to be able to continue
+                          * You must fill in all fields to be able to continue
                         </h1>
                       </div>
                       <div className="flex items-center gap-x-[1vw]">
-                      <button
+                        <button
                           type="button"
                           className="border-[#1F487C] w-[5vw] font-semibold text-[1vw] h-[2vw] rounded-full border-r-[0.2vw]  border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw]"
-                          onClick={()=>{
-                            resetForm()
-                            setReset(true)
+                          onClick={() => {
+                            resetForm();
+                            setReset(true);
                           }}
                         >
                           Reset

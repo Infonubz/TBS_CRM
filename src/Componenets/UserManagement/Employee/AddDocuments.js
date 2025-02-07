@@ -31,7 +31,7 @@ const validationSchema = Yup.object().shape({
     .length(12, "Aadhaar number must be exactly 12 digits")
     .matches(/^\d{12}$/, "Aadhaar must be a valid 12-digit number"),
   pan_number: Yup.string()
-    .required("Pan number is required")
+    .required("PAN number is required")
     .length(10, "PAN number must be exactly 10 characters")
     .matches(
       /[A-Z]{5}[0-9]{4}[A-Z]{1}/,
@@ -58,7 +58,7 @@ const validationSchema = Yup.object().shape({
         : value && SUPPORTED_FORMATS.includes(value.type)
     ),
   pan_doc: Yup.mixed()
-    .required("Pan front page is required")
+    .required("PAN front page is required")
     .test("fileSize", "File too large max 5mb", (value) =>
       typeof value === "string" ? true : value && value.size <= FILE_SIZE
     )
@@ -68,7 +68,7 @@ const validationSchema = Yup.object().shape({
         : value && SUPPORTED_FORMATS.includes(value.type)
     ),
   pan_bk_doc: Yup.mixed()
-    .required("Pan back page is required")
+    .required("PAN back page is required")
     .test("fileSize", "File too large max 5mb", (value) =>
       typeof value === "string" ? true : value && value.size <= FILE_SIZE
     )

@@ -78,12 +78,12 @@ import { LiaSearchSolid } from "react-icons/lia";
 import { BsExclamationCircle } from "react-icons/bs";
 import { TiThMenu } from "react-icons/ti";
 import Dragger from "antd/es/upload/Dragger";
-import { Upload, message } from 'antd';
-import { InboxOutlined } from '@ant-design/icons';
+import { Upload, message } from "antd";
+import { InboxOutlined } from "@ant-design/icons";
 import { useLocation } from "react-router";
 
 export default function Discounts() {
-  const location = useLocation()
+  const location = useLocation();
   const [view, setView] = useState("list");
   const [currentPage, setCurrentPage] = useState(1);
   const [employeecurrentPage, setEmployeeCurrentPage] = useState(1);
@@ -95,7 +95,9 @@ export default function Discounts() {
   const [admindata, setAdminData] = useState([]);
   const [updatedata, SetUpdateData] = useState("");
   const [adminupdatedata, SetAdminUpdateData] = useState("");
-  const [adminUser, setAdminUser] = useState(location?.state?.tabIndex || "super_admin");
+  const [adminUser, setAdminUser] = useState(
+    location?.state?.tabIndex || "super_admin"
+  );
   const get_user_list = useSelector((state) => state.user_management_user_list);
   const get_operator_list = useSelector((state) => state.crm.operator_list);
   const get_employee_list = useSelector((state) => state.crm.employee_list);
@@ -109,9 +111,9 @@ export default function Discounts() {
   // const user = sessionStorage.getItem("USER_ID");
   const user = sessionStorage.getItem("USER_ID");
 
-  useEffect(()=>{
-    setAdminUser(location?.state?.tabIndex)
-  },[location.state])
+  useEffect(() => {
+    setAdminUser(location?.state?.tabIndex);
+  }, [location.state]);
 
   console.log(get_partner_list, user, "get_partner_list");
 
@@ -210,9 +212,13 @@ export default function Discounts() {
 
   useEffect(() => {
     if (user?.startsWith("tbs-pro")) {
-      setAdminUser(location?.state?.tabIndex ? location?.state?.tabIndex :"super_admin");
+      setAdminUser(
+        location?.state?.tabIndex ? location?.state?.tabIndex : "super_admin"
+      );
     } else {
-      setAdminUser(location?.state?.tabIndex ? location?.state?.tabIndex :"employee");
+      setAdminUser(
+        location?.state?.tabIndex ? location?.state?.tabIndex : "employee"
+      );
     }
   }, [user]);
 
@@ -419,7 +425,7 @@ export default function Discounts() {
         toast.success(response);
         GetOperatorData(dispatch);
         setLoading(false);
-        setexceldata("")
+        setexceldata("");
         //   setTimeout(()=>{
         //     setLoading(false);
         // },[5000])
@@ -436,7 +442,7 @@ export default function Discounts() {
         toast.success(response);
         GetClientData(dispatch);
         setLoading(false);
-        setexceldata("")
+        setexceldata("");
         //   setTimeout(()=>{
         //     setLoading(false);
         // },[5000])
@@ -451,7 +457,7 @@ export default function Discounts() {
         toast.success(response);
         GetEmployeeData(dispatch);
         setLoading(false);
-        setexceldata("")
+        setexceldata("");
         //   setTimeout(()=>{
         //     setLoading(false);
         // },[5000])
@@ -467,7 +473,7 @@ export default function Discounts() {
         toast.success(response);
         GetPartnerData(dispatch);
         setLoading(false);
-        setexceldata("")
+        setexceldata("");
         //   setTimeout(()=>{
         //     setLoading(false);
         // },[5000])
@@ -476,8 +482,7 @@ export default function Discounts() {
         // toast.error("Failed to upload file");
       }
     }
-    setImportModal(false)
-  
+    setImportModal(false);
   };
   console.log(adminUser, "ididididididididididididddddd");
 
@@ -552,35 +557,38 @@ export default function Discounts() {
         adminUser == "super_admin"
           ? "Operator ID"
           : adminUser == "partner"
-            ? "Partner ID"
-            : adminUser == "client"
-              ? "Client ID"
-              : "Employee ID",
+          ? "Partner ID"
+          : adminUser == "client"
+          ? "Client ID"
+          : "Employee ID",
     },
     {
       title:
         adminUser == "super_admin"
           ? "Company Name"
           : adminUser == "partner"
-            ? "Partner Name"
-            : adminUser == "client"
-              ? "Company Name"
-              : "Employee Name",
+          ? "Partner Name"
+          : adminUser == "client"
+          ? "Company Name"
+          : "Employee Name",
     },
     {
       title:
         adminUser == "super_admin"
           ? "Operator Name"
           : adminUser == "partner"
-            ? "Occupation"
-            : adminUser == "client"
-              ? "Client Name"
-              : "Role Type",
+          ? "Occupation"
+          : adminUser == "client"
+          ? "Client Name"
+          : "Role Type",
     },
     {
-      title: adminUser == "client"
-        ? "Business Type"
-        : adminUser == "employee" ? "Designation" : "",
+      title:
+        adminUser == "client"
+          ? "Business Type"
+          : adminUser == "employee"
+          ? "Designation"
+          : "",
     },
     {
       title: "Mobile",
@@ -597,37 +605,39 @@ export default function Discounts() {
     //   description: "MMM DD (e.g. Jan 01) - Format",
     // },
   ];
-  const filteredInfos = infos.filter(item => item.title && item.title.trim() !== "");
+  const filteredInfos = infos.filter(
+    (item) => item.title && item.title.trim() !== ""
+  );
 
   const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const apiurl = process.env.REACT_APP_API_URL;
 
-  const [exceldata, setexceldata] = useState()
-  console.log(exceldata, 'dummy_dummy')
+  const [exceldata, setexceldata] = useState();
+  console.log(exceldata, "dummy_dummy");
 
   const fetchopTemp = async () => {
     try {
-      const response = await GetExcelTemplateById(adminUser)
-      setexceldata(response.data[0])
-      console.log(response.data[0], 'fetch_optemp')
-      return response.data
+      const response = await GetExcelTemplateById(adminUser);
+      setexceldata(response.data[0]);
+      console.log(response.data[0], "fetch_optemp");
+      return response.data;
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchopTemp()
-    setClientActivePage(1)
-    setEmployeeActivePage(1)
-    setOperatorActivePage(1)
-    setPartnerActivePage(1) 
-    setExcelData("")
-  }, [adminUser, setAdminUser])
+    fetchopTemp();
+    setClientActivePage(1);
+    setEmployeeActivePage(1);
+    setOperatorActivePage(1);
+    setPartnerActivePage(1);
+    setExcelData("");
+  }, [adminUser, setAdminUser]);
 
   const handleDownloadExcel = () => {
     if (exceldata?.length === 0) {
-      console.log('error')
+      console.log("error");
     } else {
       const fileUrl = `${apiImgUrl}${exceldata?.upload_files}`;
       const a = document.createElement("a");
@@ -637,8 +647,7 @@ export default function Discounts() {
       a.click();
       document.body.removeChild(a);
     }
-
-  }
+  };
   // const handleChange = (info) => {
   //   if (info.file.status === 'done') {
   //     message.success(`${info.file.name} file uploaded successfully`);
@@ -654,20 +663,18 @@ export default function Discounts() {
   };
 
   const uploadProps = {
-    name: 'file', // The field name to send the file
-    accept: '.xls,.xlsx', // File type restrictions
+    name: "file", // The field name to send the file
+    accept: ".xls,.xlsx", // File type restrictions
     // onChange: handleChange, // Event handler for file status changes
     beforeUpload: (file) => {
       // Process file before upload (e.g., validate file format)
       handleFileUpload(file);
       return false; // Prevent automatic upload, you can handle upload yourself
     },
-    showUploadList: false
+    showUploadList: false,
   };
 
-  useEffect(()=>{
-
-  },[])
+  useEffect(() => {}, []);
   const handleKeyDown = (e) => {
     // Allow control keys like Backspace, Delete, ArrowLeft, ArrowRight, Tab
     const isControlKey = [
@@ -677,18 +684,16 @@ export default function Discounts() {
       "ArrowRight",
       "Delete",
     ].includes(e.key);
-  
+
     if (isControlKey) {
       return; // If it's a control key, do nothing and allow it to execute
     }
-  
+
     // Allow only alphabets (A-Z, a-z), numbers (0-9), and space
     if (!/^[A-Za-z0-9\s]$/.test(e.key)) {
       e.preventDefault(); // Prevent the key if it's not an alphabet, number, or space
     }
   };
-  
-
 
   return (
     <>
@@ -727,8 +732,9 @@ export default function Discounts() {
                       }}
                     >
                       <button
-                        className={`${view == "list" ? "bg-[#1F487C]" : "bg-[white]"
-                          } px-[0.75vw] rounded-l-[0.75vw]  border-t-[.1vw] border-l-[.1vw] border-b-[.2vw] border-r-0  border-[#1F487C]`}
+                        className={`${
+                          view == "list" ? "bg-[#1F487C]" : "bg-[white]"
+                        } px-[0.75vw] rounded-l-[0.75vw]  border-t-[.1vw] border-l-[.1vw] border-b-[.2vw] border-r-0  border-[#1F487C]`}
                         style={{
                           transition: "all 1s",
                         }}
@@ -756,8 +762,9 @@ export default function Discounts() {
                       }}
                     >
                       <button
-                        className={`${view == "grid" ? "bg-[#1F487C]" : "bg-[white]"
-                          } px-[0.75vw] rounded-r-[0.75vw] border-[0.2vw] border-t-[.1vw] border-l-0  border-[#1F487C]`}
+                        className={`${
+                          view == "grid" ? "bg-[#1F487C]" : "bg-[white]"
+                        } px-[0.75vw] rounded-r-[0.75vw] border-[0.2vw] border-t-[.1vw] border-l-0  border-[#1F487C]`}
                         style={{
                           transition: "all 1s",
                         }}
@@ -863,10 +870,11 @@ export default function Discounts() {
                   <div className="flex items-center pl-[2vw] gap-x-[3vw] ">
                     {user?.startsWith("tbs-pro") && (
                       <div
-                        className={` cursor-pointer ${adminUser == "super_admin"
-                          ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                          : ""
-                          } `}
+                        className={` cursor-pointer ${
+                          adminUser == "super_admin"
+                            ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                            : ""
+                        } `}
                         onClick={() => {
                           setAdminUser("super_admin");
                         }}
@@ -878,10 +886,11 @@ export default function Discounts() {
                     )}
                     {user?.startsWith("tbs-pro") && (
                       <div
-                        className={` cursor-pointer ${adminUser == "partner"
-                          ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                          : ""
-                          } `}
+                        className={` cursor-pointer ${
+                          adminUser == "partner"
+                            ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                            : ""
+                        } `}
                         onClick={() => setAdminUser("partner")}
                       >
                         <div className="text-[1.3vw] text-[#1f487c] text-center">
@@ -892,10 +901,11 @@ export default function Discounts() {
 
                     {user?.startsWith("tbs-pro") && (
                       <div
-                        className={` cursor-pointer ${adminUser == "client"
-                          ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                          : ""
-                          } `}
+                        className={` cursor-pointer ${
+                          adminUser == "client"
+                            ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                            : ""
+                        } `}
                         onClick={() => setAdminUser("client")}
                       >
                         <div className="text-[1.3vw] text-[#1f487c] text-center">
@@ -904,10 +914,11 @@ export default function Discounts() {
                       </div>
                     )}
                     <div
-                      className={` cursor-pointer ${adminUser == "employee"
-                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                        : ""
-                        } `}
+                      className={` cursor-pointer ${
+                        adminUser == "employee"
+                          ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                          : ""
+                      } `}
                       onClick={() => setAdminUser("employee")}
                     >
                       <div className="text-[1.3vw] text-[#1f487c] text-center">
@@ -922,10 +933,10 @@ export default function Discounts() {
                       adminUser == "employee"
                         ? currentEmployeeItems || []
                         : adminUser == "client"
-                          ? currentClientItems || []
-                          : adminUser == "super_admin"
-                            ? currentOperatorItems || []
-                            : currentPartnerItems || []
+                        ? currentClientItems || []
+                        : adminUser == "super_admin"
+                        ? currentOperatorItems || []
+                        : currentPartnerItems || []
                     }
                   />
                   <div>
@@ -937,7 +948,7 @@ export default function Discounts() {
                       }
                     >
                       <span>
-                        <CgImport size={"1.28vw"} color="white" />
+                        <CgImport size={"1.34vw"} color="white" />
                       </span>
                       <span className="text-white font-bold text-[1.1vw]">
                         Import
@@ -952,10 +963,25 @@ export default function Discounts() {
                     closeicon={false}
                   >
                     <div>
-                      <div className="text-[#1F4B7F] font-semibold text-center text-[1.3vw]">Import & Download {adminUser === "super_admin" ? "Operator" : adminUser === "client" ? "Client" : adminUser === "partner" ? "Partner" : adminUser === "employee" ? "Employee" : ""} Template</div>
-                      <button onClick={handleDownloadExcel} className="w-full px-[1vw] text-[#1F4B7F] shadow-[#00000054] shadow-lg   text-[1.2vw] h-[2.5vw] rounded-[.5vw]  my-[1.5vw]  bg-white flex justify-center items-center gap-x-[1vw]">
+                      <div className="text-[#1F4B7F] font-semibold text-center text-[1.3vw]">
+                        Import & Download{" "}
+                        {adminUser === "super_admin"
+                          ? "Operator"
+                          : adminUser === "client"
+                          ? "Client"
+                          : adminUser === "partner"
+                          ? "Partner"
+                          : adminUser === "employee"
+                          ? "Employee"
+                          : ""}{" "}
+                        Template
+                      </div>
+                      <button
+                        onClick={handleDownloadExcel}
+                        className="w-full px-[1vw] text-[#1F4B7F] shadow-[#00000054] shadow-lg   text-[1.2vw] h-[2.5vw] rounded-[.5vw]  my-[1.5vw]  bg-white flex justify-center items-center gap-x-[1vw]"
+                      >
                         <MdOutlineDownloading className="text-[#1F4B7F] text-[1.4vw]" />{" "}
-                        <span>Download  Template</span>
+                        <span>Download Template</span>
                       </button>
                       {/* <div className="text-[1vw] text-[#1F4B7F] flex   gap-x-[.5vw] my-[1vw] items-center "><div className="flex justify-center"><MdOutlineDownloading className="text-[#1F4B7F] text-center cursor-pointer text-[2.4vw]" /></div>
                       <span className="text-center">Download  Template</span></div> */}
@@ -964,21 +990,24 @@ export default function Discounts() {
                         theme={{
                           token: {
                             colorBorder: "#1F4B7F",
-                          colorPrimary: "#1F4B7F",
+                            colorPrimary: "#1F4B7F",
                           },
                           components: {
                             Upload: {
-                              actionsColor: "#1F4B7F"
-                            }
-                          }
-                        }}>
-                        <Dragger height={"9.2vw"} {...uploadProps}
-                        //  style={{
-                        //   backgroundSize: "cover",
-                        //   backgroundPosition: "center",
-                        //   position: "relative",
-                        // }}
-                        // className="border-dashed border-[#1F4B7F] border-[.1vw]"
+                              actionsColor: "#1F4B7F",
+                            },
+                          },
+                        }}
+                      >
+                        <Dragger
+                          height={"9.2vw"}
+                          {...uploadProps}
+                          //  style={{
+                          //   backgroundSize: "cover",
+                          //   backgroundPosition: "center",
+                          //   position: "relative",
+                          // }}
+                          // className="border-dashed border-[#1F4B7F] border-[.1vw]"
                         >
                           {/* <p className="ant-upload-drag-icon">
                             <InboxOutlined />
@@ -1104,14 +1133,15 @@ export default function Discounts() {
                       <FaPlus size={"1.2vw"} color="white" />
                     </span>
                     <span className="text-white font-bold text-[1vw] ">
-                      {`Add ${adminUser == "super_admin"
-                        ? "Operator"
-                        : adminUser == "partner"
+                      {`Add ${
+                        adminUser == "super_admin"
+                          ? "Operator"
+                          : adminUser == "partner"
                           ? "Partner"
                           : adminUser == "client"
-                            ? "Client"
-                            : "Employee"
-                        }`}
+                          ? "Client"
+                          : "Employee"
+                      }`}
                     </span>
                   </button>
                 </div>
@@ -1191,7 +1221,7 @@ export default function Discounts() {
                     setOperatorID={setOperatorID}
                     operatorID={operatorID}
                     setPartnerID={setPartnerID}
-                  // update={update}
+                    // update={update}
                   />
                 )
               ) : adminUser == "partner" ? (
@@ -1267,13 +1297,13 @@ export default function Discounts() {
               )} */}
             </div>
             {currentOperatorItems?.length > 10 ||
-              currentPartnerItems?.length > 10 ||
-              currentClientItems?.length > 10 ||
-              currentEmployeeItems?.length > 10
+            currentPartnerItems?.length > 10 ||
+            currentClientItems?.length > 10 ||
+            currentEmployeeItems?.length > 10
               ? ""
               : ""}
 
-            { }
+            {}
             {showPage === true && (
               <div className="w-full h-[8vh] flex justify-between items-center">
                 <div className="text-[#1f4b7f] flex text-[1.1vw] gap-[0.5vw] ">
@@ -1282,34 +1312,38 @@ export default function Discounts() {
                     {/* 1 -{" "} */}
                     {adminUser == "super_admin"
                       ? //  get_operator_list?.length
-                      // `${indexOfFirstOperatorItem + 1} - ${indexOfFirstOperatorItem + currentOperatorItems.length}`
-                      currentOperatorItems && currentOperatorItems?.length > 0
-                        ? `${indexOfFirstOperatorItem + 1} - ${indexOfFirstOperatorItem +
-                        currentOperatorItems?.length
-                        }`
+                        // `${indexOfFirstOperatorItem + 1} - ${indexOfFirstOperatorItem + currentOperatorItems.length}`
+                        currentOperatorItems && currentOperatorItems?.length > 0
+                        ? `${indexOfFirstOperatorItem + 1} - ${
+                            indexOfFirstOperatorItem +
+                            currentOperatorItems?.length
+                          }`
                         : "0"
                       : adminUser == "partner"
-                        ? //  get_partner_list?.length
+                      ? //  get_partner_list?.length
                         // `${indexOfFirstPartnerItem + 1} - ${indexOfFirstPartnerItem + currentPartnerItems.length}`
                         currentPartnerItems && currentOperatorItems?.length > 0
-                          ? `${indexOfFirstPartnerItem + 1} - ${indexOfFirstPartnerItem +
-                          currentPartnerItems?.length
+                        ? `${indexOfFirstPartnerItem + 1} - ${
+                            indexOfFirstPartnerItem +
+                            currentPartnerItems?.length
                           }`
-                          : "0"
-                        : adminUser == "client"
-                          ? //  get_all_client?.length
-                          // `${indexOfFirstClientItem + 1} - ${indexOfFirstClientItem + currentClientItems.length}`
-                          currentClientItems && currentClientItems?.length > 0
-                            ? `${indexOfFirstClientItem + 1} - ${indexOfFirstClientItem + currentClientItems?.length
-                            }`
-                            : "0"
-                          : // get_employee_list?.length
-                          // `${indexOfFirstEmployeeItem + 1} - ${indexOfFirstEmployeeItem + currentEmployeeItems.length}`
-                          currentEmployeeItems && currentEmployeeItems?.length > 0
-                            ? `${indexOfFirstEmployeeItem + 1} - ${indexOfFirstEmployeeItem +
-                            currentEmployeeItems?.length
-                            }`
-                            : "0"}
+                        : "0"
+                      : adminUser == "client"
+                      ? //  get_all_client?.length
+                        // `${indexOfFirstClientItem + 1} - ${indexOfFirstClientItem + currentClientItems.length}`
+                        currentClientItems && currentClientItems?.length > 0
+                        ? `${indexOfFirstClientItem + 1} - ${
+                            indexOfFirstClientItem + currentClientItems?.length
+                          }`
+                        : "0"
+                      : // get_employee_list?.length
+                      // `${indexOfFirstEmployeeItem + 1} - ${indexOfFirstEmployeeItem + currentEmployeeItems.length}`
+                      currentEmployeeItems && currentEmployeeItems?.length > 0
+                      ? `${indexOfFirstEmployeeItem + 1} - ${
+                          indexOfFirstEmployeeItem +
+                          currentEmployeeItems?.length
+                        }`
+                      : "0"}
                   </span>
                   <span>from</span>
                   <span className="font-bold">
@@ -1319,16 +1353,16 @@ export default function Discounts() {
                         ? get_operator_list?.length
                         : 0
                       : adminUser == "partner"
-                        ? get_partner_list?.length > 0
-                          ? get_partner_list?.length
-                          : 0
-                        : adminUser == "client"
-                          ? get_all_client?.length > 0
-                            ? get_all_client?.length
-                            : 0
-                          : get_employee_list?.length > 0
-                            ? get_employee_list?.length
-                            : 0}
+                      ? get_partner_list?.length > 0
+                        ? get_partner_list?.length
+                        : 0
+                      : adminUser == "client"
+                      ? get_all_client?.length > 0
+                        ? get_all_client?.length
+                        : 0
+                      : get_employee_list?.length > 0
+                      ? get_employee_list?.length
+                      : 0}
                   </span>
                   <span>data</span>
                 </div>
@@ -1382,38 +1416,38 @@ export default function Discounts() {
                       adminUser === "super_admin"
                         ? OperatorActivePage
                         : adminUser === "partner"
-                          ? PartnerActivePage
-                          : adminUser === "client"
-                            ? ClientActivePage
-                            : EmployeeActivePage
+                        ? PartnerActivePage
+                        : adminUser === "client"
+                        ? ClientActivePage
+                        : EmployeeActivePage
                     }
                     itemsCountPerPage={
                       adminUser === "super_admin"
                         ? operatorItemsPerPage
                         : adminUser === "partner"
-                          ? partnerItemsPerPage
-                          : adminUser === "client"
-                            ? clientItemsPerPage
-                            : employeeItemsPerPage
+                        ? partnerItemsPerPage
+                        : adminUser === "client"
+                        ? clientItemsPerPage
+                        : employeeItemsPerPage
                     }
                     totalItemsCount={
                       adminUser === "super_admin"
                         ? get_operator_list?.length
                         : adminUser === "partner"
-                          ? get_partner_list?.length
-                          : adminUser === "client"
-                            ? get_all_client?.length
-                            : get_employee_list?.length
+                        ? get_partner_list?.length
+                        : adminUser === "client"
+                        ? get_all_client?.length
+                        : get_employee_list?.length
                     }
                     pageRangeDisplayed={3}
                     onChange={
                       adminUser == "super_admin"
                         ? handleOperatorPageChange
                         : adminUser == "partner"
-                          ? handlePartnerPageChange
-                          : adminUser == "client"
-                            ? handleClientPageChange
-                            : handleEmployeePageChange
+                        ? handlePartnerPageChange
+                        : adminUser == "client"
+                        ? handleClientPageChange
+                        : handleEmployeePageChange
                     }
                     itemClass="page-item"
                     linkClass="page-link"

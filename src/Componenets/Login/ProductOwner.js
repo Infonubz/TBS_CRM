@@ -23,8 +23,6 @@ const validationSchema = Yup.object().shape({
 });
 
 export default function ProductOwner({ setAuthtoken, setForgotPassword }) {
-
-
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -63,7 +61,10 @@ export default function ProductOwner({ setAuthtoken, setForgotPassword }) {
   //   }
   // };
 
-  const handleSubmit = async (values, { setSubmitting, setFieldError, setAuthtoken }) => {
+  const handleSubmit = async (
+    values,
+    { setSubmitting, setFieldError, setAuthtoken }
+  ) => {
     const validationResult = validateInput(values.emailid_phone);
 
     try {
@@ -79,11 +80,13 @@ export default function ProductOwner({ setAuthtoken, setForgotPassword }) {
       if (data?.token) {
         navigate("/dashboard");
         window.location.reload();
+      } else {
+        setFieldError("password", " Invalid Username / Password");
       }
     } catch (error) {
       if (error.response && error.response.status === 401) {
-        setFieldError("password", "Invalid Password / Username");
-        // toast.error("Invalid Password / Username"); 
+        setFieldError("password", " Invalid Username / Password");
+        // toast.error("Invalid Password / Username");
       } else {
         toast.error(error.message);
       }
@@ -98,7 +101,9 @@ export default function ProductOwner({ setAuthtoken, setForgotPassword }) {
 
   return (
     <div className="absolute right-0 top-0 bg-[#E5FFF1] h-full w-[38vw] rounded-tr-[2vw] rounded-br-[2vw] bg-opacity-80 flex flex-col items-center justify-center">
-      <label className="text-[#1F487C] font-bold text-[2vw] ">PRODUCT OWNER</label>
+      <label className="text-[#1F487C] font-bold text-[2vw] ">
+        PRODUCT OWNER
+      </label>
       <p className="text-[#1F487C] text-[1vw] py-[2vw]">
         Welcome Back, Please sign in to your account
       </p>
@@ -123,7 +128,7 @@ export default function ProductOwner({ setAuthtoken, setForgotPassword }) {
                 <Field
                   type="text"
                   name="emailid_phone"
-                  placeholder="Enter Email ID / Phone number"
+                  placeholder="Enter Email / Phone Number"
                   className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                 />
                 <ErrorMessage
@@ -162,13 +167,13 @@ export default function ProductOwner({ setAuthtoken, setForgotPassword }) {
                 </div>
               </div>
               <div className="flex justify-between items-center">
-                <div className="flex justify-between items-center gap-[0.75vw]">
+                <div className="flex justify-between items-center gap-[1vw]">
                   <input
                     type="checkbox"
-                    onChange={(e) => { }}
-
+                    onChange={(e) => {}}
+                    className="text-[#1F4B7F] h-[.9vw] w-[.9vw] text-[1vw] cursor-pointer "
                   />
-                  <span className="text-[#1F4B7F] text-[1vw] ">
+                  <span className="text-[#1F4B7F]  text-[1vw] ">
                     Remember me
                   </span>
                   {/* </Checkbox> */}

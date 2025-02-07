@@ -52,6 +52,7 @@ import {
   GET_REQ_PARTNER,
   GET_ROLES_PERMISSION,
   GET_REQ_MOB_ADS,
+  THEME_BACKGROUND,
 } from "./Type";
 
 const initialState = {
@@ -99,6 +100,7 @@ const initialState = {
   get_req_partner: [],
   get_roles_permission: [],
   get_req_mob_ads: [],
+  theme_background:[],
 };
 
 export const crmreducer = (state = initialState, action) => {
@@ -408,6 +410,12 @@ export const crmreducer = (state = initialState, action) => {
       return {
         ...state,
         get_req_mob_ads: payload,
+      };
+    }
+    case THEME_BACKGROUND: {
+      return {
+        ...state,
+        theme_background: payload,
       };
     }
     default:
