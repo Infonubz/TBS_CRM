@@ -5,6 +5,7 @@ import { useRef } from "react";
 import rasterizeHTML from "rasterizehtml";
 import logo from "../../asserts/bus.jpg";
 import { toPng, toJpeg } from "html-to-image";
+import { FaCloudDownloadAlt } from "react-icons/fa";
 // business
 import business1 from "../../asserts/Offers/Business/Business01.png";
 import business2 from "../../asserts/Offers/Business/Business02.png";
@@ -88,9 +89,23 @@ import html2canvas from "html2canvas";
 import { useDispatch } from "react-redux";
 import { GetOffersData, SubmitOffersData } from "../../Api/Offers/Offers";
 
-const BackgroundView = ({
+import "swiper/css";
+import "swiper/css/effect-coverflow";
+import "swiper/css/pagination";
+import "swiper/css/navigation";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { EffectCoverflow, Pagination, Navigation } from "swiper/modules";
+import "./swipper.css";
+import {
+  GetRedeemOffersData,
+  SubmitRedeemOffersData,
+} from "../../Api/Offers/RedeemOffers";
+import "swiper/css/navigation";
+
+export default function BackgroundView({
   occupationvalue,
   setOccupationValue,
+  setCurrentOfferdata,
   setCurrentOffer,
   currentoffers,
   currentofferdata,
@@ -103,7 +118,19 @@ const BackgroundView = ({
   updatedata,
   offerdata,
   draggerImage,
-}) => {
+  offerType,
+  onImageConversionComplete,
+  setOfferBackground,
+  error,
+  setError,
+}) {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
+
+  console.log(offerlist, "usage_offer");
+  console.log(draggerImage, "draggerImage_background");
+  // const [startIndex, setStartIndex] = useState(0);
+  const [rotateAngle, setRotateAngle] = useState(0);
+
   console.log(offerdata, "uuupppddddaatteeee");
   const [showDialog, setShowDialog] = useState(false);
   // const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -134,10 +161,10 @@ const BackgroundView = ({
   ];
   const handicapped = [
     handicapped1,
-    handicapped2,
-    handicapped3,
-    handicapped4,
-    handicapped5,
+    // handicapped2,
+    // handicapped3,
+    // handicapped4,
+    // handicapped5,
     handicapped6,
     handicapped7,
     handicapped8,
@@ -148,10 +175,10 @@ const BackgroundView = ({
     pilgrim1,
     pilgrim2,
     pilgrim3,
-    pilgrim4,
-    pilgrim5,
-    pilgrim6,
-    pilgrim7,
+    // pilgrim4,
+    // pilgrim5,
+    // pilgrim6,
+    // pilgrim7,
     pilgrim8,
     pilgrim9,
     pilgrim10,
@@ -184,22 +211,36 @@ const BackgroundView = ({
     tourist1,
     tourist2,
     tourist3,
-    tourist4,
-    tourist5,
-    tourist6,
-    tourist7,
-    tourist8,
-    tourist9,
-    tourist10,
+    // tourist4,
+    // tourist5,
+    // tourist6,
+    // tourist7,
+    // tourist8,
+    // tourist9,
+    // tourist10,
   ];
-  const prevSlide = () => {
-    const newIndex = Math.max(0, startIndex - 1);
-    setStartIndex(newIndex);
-  };
+
   const nextSlide = () => {
-    const newIndex = Math.min(startIndex + 1, currentoffers.length - 1);
-    setStartIndex(newIndex);
+    if (startIndex + 1 < currentoffers.length) {
+      setStartIndex(startIndex + 1);
+      rotateCarousel("next");
+    }
   };
+
+  const prevSlide = () => {
+    if (startIndex > 0) {
+      setStartIndex(startIndex - 1);
+      rotateCarousel("prev");
+    }
+  };
+
+  const rotateCarousel = (direction) => {
+    let newAngle = rotateAngle + (direction === "next" ? -30 : 30);
+    if (newAngle <= -360) newAngle = 0;
+    if (newAngle >= 360) newAngle = 0;
+    setRotateAngle(newAngle);
+  };
+
   useEffect(() => {
     if (offerlist.occupation == 1) {
       setCurrentOffer(business);
@@ -223,446 +264,245 @@ const BackgroundView = ({
   const offerContainerRef = useRef(null);
   const offerRef = useRef(null);
 
-  const downloadImage = () => {
-    const element = document.querySelector(".offer-container");
-    setDownloadReq(true);
+  const [imageFile, setImageFile] = useState(null);
 
-    //*********dom to image quality 60 % */
+  const [convertedImage, setConvertedImage] = useState(null);
+  const containerRef = useRef(null);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
-    // if (element) {
-    //   domtoimage.toPng(element, { bgcolor: '#ffffff' ,quality: 1.0 }) // Use bgcolor to avoid transparency issues
-    //     .then((dataUrl) => {
-    //       const link = document.createElement('a');
-    //       link.href = dataUrl;
-    //       link.download = 'capture.png';
-    //       link.click();
-    //     })
-    //     .catch((error) => console.error('Error capturing image:', error));
-    // }
+  const [isCapturing, setIsCapturing] = useState(false);
 
-    //***********html2canva************** */
-
-    // if (element) {
-    //   html2canvas(element, { scale: 2 }) // Increase scale for better resolution
-    //     .then((canvas) => {
-    //       const link = document.createElement('a');
-    //       link.href = canvas.toDataURL('image/png');
-    //       link.download = 'capture.png';
-    //       link.click();
-    //     });
-    // }
-
-    //********************to png************************ */
-
-    if (element) {
-      toPng(element, { quality: 1.0 }) // Adjust quality if needed
-        .then((dataUrl) => {
-          const link = document.createElement("a");
-          link.href = dataUrl;
-          link.download = "OfferImage.png";
-          link.click();
+  const waitForImagesToLoad = (container) => {
+    const images = Array.from(container.querySelectorAll("img"));
+    const promises = images.map(
+      (img) =>
+        new Promise((resolve) => {
+          if (img.complete) {
+            resolve();
+          } else {
+            img.onload = resolve;
+            img.onerror = resolve;
+          }
         })
-        .catch((error) => console.error("Error capturing image:", error));
-    }
-
-    // if (element) {
-    //   toJpeg(element, { quality: 1.0 }) // Adjust quality (0.0 to 1.0, where 1.0 is highest)
-    //     .then((dataUrl) => {
-    //       const link = document.createElement('a');
-    //       link.href = dataUrl;
-    //       link.download = 'capture.jpeg'; // Change the file extension to .jpeg
-    //       link.click();
-    //     })
-    //     .catch((error) => console.error('Error capturing image:', error));
-    // }
-
-    // if (element) {
-    //   // Create a new canvas with higher resolution
-    //   const scale = 2; // Scale factor for higher resolution
-    //   const originalWidth = element.offsetWidth;
-    //   const originalHeight = element.offsetHeight;
-
-    //   // Set a higher resolution for the canvas
-    //   const canvas = document.createElement('canvas');
-    //   canvas.width = originalWidth * scale;
-    //   canvas.height = originalHeight * scale;
-    //   const context = canvas.getContext('2d');
-    //   context.scale(scale, scale);
-
-    //   // Capture the image using the higher-resolution canvas
-    //   toJpeg(element, {
-    //     canvas: canvas,
-    //     quality: 0.9 // Set quality (0.0 to 1.0, where 1.0 is highest)
-    //   })
-    //   .then((dataUrl) => {
-    //     const link = document.createElement('a');
-    //     link.href = dataUrl;
-    //     link.download = 'capture.jpeg'; // Change extension to .jpeg
-    //     link.click();
-    //   })
-    //   .catch((error) => console.error('Error capturing image:', error));
-    // }
-
-    // html2canvas(document.querySelector(".offer-container")).then((canvas) => {
-    //   const link = document.createElement("a");
-    //   link.href = canvas.toDataURL("image/png");
-    //   link.download = "offer-image.png";
-    //   link.click();
-    // });
-
-    // html2canvas(document.querySelector(".offer-container"), {
-    //   scale: 2, // Increase the resolution of the canvas
-    //   useCORS: true, // Enable cross-origin resource sharing if needed
-    //   onclone: (clonedDoc) => {
-    //     // Ensure fonts are loaded
-    //     const offerContainer = clonedDoc.querySelector(".offer-container");
-    //     offerContainer.style.fontFamily = getComputedStyle(
-    //       document.querySelector(".offer-container")
-    //     ).fontFamily;
-    //   },
-    // }).then((canvas) => {
-    //   const link = document.createElement("a");
-    //   link.href = canvas.toDataURL("image/png");
-    //   link.download = "offer-image.png";
-    //   link.click();
-    // });
-
-    // html2canvas(document.querySelector(".offer-container"), {
-    //   scale: 2, // Increase the resolution of the canvas
-    //   useCORS: true, // Enable cross-origin resource sharing if needed
-    //   onclone: (clonedDoc) => {
-    //     const offerContainer = clonedDoc.querySelector(".offer-container");
-    //     const originalStyles = getComputedStyle(document.querySelector(".offer-container"));
-
-    //     // Apply the same styles to the cloned document
-    //     offerContainer.style.fontFamily = originalStyles.fontFamily;
-    //     offerContainer.style.fontSize = originalStyles.fontSize;
-    //     offerContainer.style.lineHeight = originalStyles.lineHeight;
-    //     offerContainer.style.textAlign = originalStyles.textAlign;
-    //     offerContainer.style.margin = originalStyles.margin; // Add margin
-    //     offerContainer.style.padding = originalStyles.padding; // Add padding
-    //     offerContainer.style.boxSizing = originalStyles.boxSizing; // Add box-sizing
-    //     offerContainer.style.position = originalStyles.position; // Ensure position is included
-    //     offerContainer.style.top = originalStyles.top; // Ensure top is included
-    //     offerContainer.style.left = originalStyles.left; // Ensure left is included
-    //     offerContainer.style.transform = originalStyles.transform; // Add transform if applicable
-    //     offerContainer.style.marginTop = (parseFloat(originalStyles.marginTop) + 0.5) + 'vw';
-    //   },
-    // }).then((canvas) => {
-    //   const link = document.createElement("a");
-    //   link.href = canvas.toDataURL("image/png");
-    //   link.download = "offer-image.png";
-    //   link.click();
-    // });
-
-    //********************Dom to Image Package ************************* */
-
-    //   if (offerContainerRef.current) {
-    //     domtoimage.toPng(offerContainerRef.current, {
-    //       bgcolor: 'white', // Background color (adjust as needed)
-    //       quality: 1, // Image quality
-    //       style: {
-    //         fontFamily: getComputedStyle(offerContainerRef.current).fontFamily, // Ensure correct font
-    //       },
-    //       scale: 10
-    //     })
-    //     .then((dataUrl) => {
-    //       const link = document.createElement('a');
-    //       link.href = dataUrl;
-    //       link.download = 'offer-image.png';
-    //       link.click();
-    //     })
-    //     .catch((error) => {
-    //       console.error('Error generating image:', error);
-    //     });
-    //   }
-    // };
-
-    //********************Dom to Image Package ************************* */
-
-    // if (offerRef.current) {
-    //   // Define scale factor to improve image quality
-    //   const scaleFactor = 2; // Increase this for higher resolution
-
-    //   // Calculate width and height based on scale factor
-    //   const width = offerRef.current.offsetWidth * scaleFactor;
-    //   const height = offerRef.current.offsetHeight * scaleFactor;
-
-    //   rasterizeHTML.drawHTML(offerRef.current.outerHTML, {
-    //     windowWidth: width,
-    //     windowHeight: height,
-    //     // Additional options if necessary
-    //   }).then(function (renderResult) {
-    //     // Create a new canvas to apply higher DPI
-    //     const highDpiCanvas = document.createElement('canvas');
-    //     const context = highDpiCanvas.getContext('2d');
-    //     highDpiCanvas.width = width;
-    //     highDpiCanvas.height = height;
-    //     context.scale(scaleFactor, scaleFactor);
-    //     context.drawImage(renderResult.image, 0, 0);
-
-    //     // Create download link and trigger download
-    //     const link = document.createElement("a");
-    //     link.href = highDpiCanvas.toDataURL("image/png");
-    //     link.download = "offer-image.png";
-    //     link.click();
-    //   }).catch(function (error) {
-    //     console.error("Error rasterizing HTML:", error);
-    //   });
-    // }
+    );
+    return Promise.all(promises);
   };
 
-  // const downloadImage = async() => {
-  //   const element = document.getElementById('.offer-container'),
-  //   canvas = await html2canvas(element),
-  //   data = canvas.toDataURL('image/jpg'),
-  //   link = document.createElement('a');
-
-  //   link.href = data;
-  //   link.download = 'downloaded-image.jpg';
-
-  //   document.body.appendChild(link);
-  //   link.click();
-  //   document.body.removeChild(link);
-  // };
-  const [uploadimage, setUploadImage] = useState(false);
-  console.log(currentofferdata, "occupationvalue");
-  const handleupload = (file) => {
-    setOfferlist({
-      ...offerlist,
-      offer_bgImgae: file,
-    });
-  };
-  const handleonSubmit = () => {
-    setModalIsOpen(false);
-  };
-  const dispatch = useDispatch();
-  const handleSubmit = async () => {
-    if (offerlist.offer_bgImgae) {
-      try {
-        const data = await SubmitOffersData(
-          allvalues,
-          updatedata,
-          dispatch,
-          offerlist
-        );
-        setModalIsOpen(false);
-        toast.success(data?.message);
-        GetOffersData(dispatch);
-        console.log(data);
-      } catch (error) {
-        console.error("Error uploading data", error);
+  const convertImage = async () => {
+    try {
+      if (!containerRef.current) {
+        console.error("Container not found");
+        return;
       }
-    } else {
-      toast.error("Please upload Offer Image");
+
+      setIsCapturing(true);
+
+      // Wait for images to load before capturing
+      await waitForImagesToLoad(containerRef.current);
+
+      // Get the bounding box of the container (content area)
+      const boundingBox = containerRef.current.getBoundingClientRect();
+
+      // Capture only the visible area of the container
+      const dataUrl = await toPng(containerRef.current, {
+        width: boundingBox.width, // Capture only the content width
+        height: boundingBox.height, // Capture only the content height
+        style: {
+          position: "absolute",
+          top: "0px", // Ensure proper alignment
+          left: "0px", // Ensure proper alignment
+          margin: "0px",
+        },
+      });
+
+      // Convert data URL to Blob
+      const response = await fetch(dataUrl);
+      const blob = await response.blob();
+
+      // Create a File object from the Blob
+      const fileName = `captured_slide_${startIndex + 1}.png`;
+      const file = new File([blob], fileName, {
+        type: "image/png",
+        lastModified: Date.now(),
+      });
+
+      // Set the File object in the state
+      setOfferlist((prev) => ({ ...prev, background_image: file }));
+      setOfferBackground(file);
+
+      console.log("File Object:", file);
+
+      setIsCapturing(false);
+      onImageConversionComplete();
+    } catch (error) {
+      console.error("Error converting image", error);
+      setIsCapturing(false);
     }
   };
-  console.log(currentoffers, "offerlistofferlist");
+
+  const downloadImage = async () => {
+    try {
+      if (!containerRef.current) {
+        console.error("Container not found");
+        return;
+      }
+
+      setIsCapturing(true);
+
+      // Wait for images to load
+      await waitForImagesToLoad(containerRef.current);
+
+      // Convert container to PNG
+      const dataUrl = await toPng(containerRef.current, { quality: 1.0 });
+
+      // Create a link and trigger download
+      const link = document.createElement("a");
+      link.href = dataUrl;
+      link.download = "OffersImage.png";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      setIsCapturing(false);
+    } catch (error) {
+      console.error("Error capturing image:", error);
+      setIsCapturing(false);
+    }
+  };
 
   useEffect(() => {
-    setOfferlist({ ...offerlist, occupation: offerdata.occupation_id });
-  }, []);
-  return uploadimage == false ? (
-    <>
-      <div className="h-full w-full">
-        <div className="flex flex-col">
-          <label className="text-[#1F4B7F] text-[1.1vw] font-semibold">
-            Occupation
-          </label>
-          <select
-            value={offerdata.occupation_id || ""}
-            onChange={(e) => {
-              setOfferlist({ ...offerlist, occupation: e.target.value });
-            }}
-            className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-full rounded-[0.5vw] outline-none px-[1vw]"
-          >
-            <option label="Select Occupation" value={0} className="" />
-            <option label="Business" value={1} className="" />
-            <option label="General Public" value={2} className="" />
-            <option label="Handicapped" value={3} className="" />
-            <option label="Pilgrim" value={4} className="" />
-            <option label="Senior Citizen" value={5} className="" />
-            <option label="Student" value={6} className="" />
-            <option label="Tourist" value={7} className="" />
-          </select>
-        </div>
-        {currentoffers.length > 0 ? (
-          <div className="flex items-center justify-between mt-[2.5vw]">
-            {startIndex === 0 ?
-              <div className="w-[3vw] h-[3vw]"></div>
-              :
-              <button
-                onClick={prevSlide}
-                disabled={startIndex === 0}
-                className="text-[#1F4B7F] font-semibold"
-              >
-                <IoIosArrowDropleft size={"3vw"} />
-              </button>}
+    convertImage();
+    // downloadImage();
+  }, [startIndex]);
 
-            <div
-              ref={offerRef}
-              className="flex relative justify-center items-center space-x-[1vw] offer-container"
-            >
-              {currentoffers
-                .slice(startIndex, startIndex + 1)
-                .map((image, index) => (
-                  <img
-                    key={index}
-                    className="h-[15vw] w-[25vw] rounded-[1vw] object-cover transition-transform duration-1000 ease-in-out"
-                    src={image}
-                    alt={`Offer ${index}`}
-                  />
-                ))}
-              <div className=" absolute top-0 left-[-1vw]">
-                {updatedata && draggerImage === false ? (
-                  <img
-                    // src={previewUrl}
-                    // src={currentofferdata.file}
-                    src={`http://192.168.90.47:4000${offerdata.offer_img}`}
-                    className="w-[8.2vw] h-[15vw] bg-white object-cover opacity-50 rounded-tl-[1vw] rounded-bl-[1vw] rounded-tr-[2.2vw] rounded-br-[1.5vw]"
-                  />
-                ) : (
-                  <img
-                    src={previewUrl}
-                    className="w-[8.2vw] h-[15vw] bg-white object-cover opacity-50 rounded-tl-[1vw] rounded-bl-[1vw] rounded-tr-[2.2vw] rounded-br-[1.5vw]"
-                  />
-                )}
-              </div>
+  // const tempUrl = promo?.file && URL.createObjectURL(promo?.file); // Create temporary URL for the image
+  // console.log(tempUrl, "tempUrltempUrl");
 
-              {updatedata && draggerImage === false ? (
-                <img
-                  // src={previewUrl}
-                  src={`http://192.168.90.47:4000${offerdata.offer_img}`}
-                  className="absolute top-[4.5vw] bg-white left-[0.5vw] w-[5.5vw] h-[5.5vw] rounded-[50%]"
-                />
-              ) : (
-                <img
-                  src={previewUrl}
-                  // src={`http://192.168.90.47:4000${offerdata.offer_img}`}
-                  className="absolute top-[4.5vw] bg-white left-[0.5vw] w-[5.5vw] h-[5.5vw] rounded-[50%]"
-                />
-              )}
-
-              <div className="bg-white bg-opacity-30 rounded-[2vw] px-[1vw]  py-[0.2vw] absolute top-[1.5vw] left-[9vw]">
-                <h1 className="text-white  text-[1.2vw]">
-                  {currentofferdata.offer_name}
-                </h1>
-              </div>
-              <p className="text-white font-extrabold text-[1vw]  absolute top-[4.5vw] left-[9vw]">
-                {currentofferdata.offer_desc}
-              </p>
-              <p className="text-white  text-[1vw]  absolute top-[9.5vw] left-[9vw]">{`Valid till ${dayjs(
-                new Date(currentofferdata.expiry_date)
-              ).format("DD MMM")}`}</p>
-              <div className="bg-white bg-opacity-30 border-dashed border-[0.1vw] border-white px-[1vw]  py-[0.2vw] absolute top-[11.5vw] left-[9vw]">
-                <p className="text-white font-bold text-[1vw]">
-                  {currentofferdata.offer_code}
-                </p>
-              </div>
-            </div>
-            {startIndex + 1 >= currentoffers.length ?
-              (
-                <div className="w-[3vw] h-[3vw]"></div>
-              )
-              :
-              (<button
-                onClick={nextSlide}
-                disabled={startIndex + 1 >= currentoffers.length}
-                className="text-[#1F4B7F] font-semibold"
-              >
-                <IoIosArrowDropright size={"3vw"} />
-              </button>)
-            }
-
-          </div>
-        ) : (
-          ""
-        )}
-        {currentoffers.length > 0 && (
-          // <div className="flex">
-
-          <div className="flex items-center justify-between">
-            {downloadReq == false ? (
-              <div className="mt-[1.5vw] text-red-400 text-[1.2vw]">
-                {" "}
-                Download and click next
-              </div>
-            ) : (
-              <div></div>
-            )}
-
-            <div className="flex gap-[1vw]">
-              {/* <p className="text-red-600">download and click next</p> */}
-              <button
-                onClick={downloadImage}
-                className="mt-[1.5vw] bg-[#1F4B7F] text-[1vw] rounded-[0.5vw] text-white py-[0.5vw] px-[1vw] "
-              >
-                Download as Image
-              </button>
-              <button
-                // onClick={downloadImage}
-                onClick={() =>
-                  downloadReq == true ? setUploadImage(true) : ""
-                }
-                className="mt-[1.5vw] bg-[#1F4B7F] text-[1vw] rounded-[0.5vw] text-white py-[0.5vw] px-[2vw] "
-              >
-                Next
-              </button>
-            </div>
-          </div>
-          // </div>
-        )}
-      </div >
-    </>
-  ) : (
-    <>
-      <div>
-        <label className="text-[#1F4B7F] text-[1.2vw] font-bold">
-          Upload Downloaded Image
-        </label>
-        <input
-          id="fileInput"
-          type="file"
-          style={{ display: "none" }}
-          onChange={(e) => handleupload(e?.target?.files[0])}
-        />
-        <label
-          htmlFor="fileInput"
-          className="h-[7vw] w-[100%] mt-[0.5vw] cursor-pointer flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.3vw] border-[#1f4b7f] rounded-[0.5vw]"
+  const ComponentToPrint = React.forwardRef((props, ref) => (
+    <div className="flex items-center justify-between mt-[1vw]">
+      {startIndex === 0 ? (
+        <div className="w-[3vw] h-[3vw]"></div>
+      ) : (
+        <button
+          onClick={prevSlide}
+          disabled={startIndex === 0}
+          className="text-[#1F4B7F] font-semibold"
         >
-          {/* {selectedFile ? (
-            <img src={`${profileurl}${selectedFile}`} />
+          <IoIosArrowDropleft size={"3vw"} />
+        </button>
+      )}
+      <div
+        className="flex relative justify-center  items-center space-x-0 offer-container "
+        style={{ display: "inline-block" }} // Ensure content fits perfectly
+        ref={containerRef}
+      >
+        {currentoffers
+          ?.slice(startIndex, startIndex + 1)
+          .map((image, index) => (
+            <img
+              key={index}
+              className="h-[13vw] w-auto  rounded-[1vw] object-cover transition-transform duration-1000 ease-in-out"
+              src={image}
+              alt={`Offer ${index}`}
+            />
+          ))}
+        <div className=" absolute top-0 left-[-1vw]"></div>
+        <div className=" absolute top-0 left-[0vw]">
+          {updatedata && draggerImage === false ? (
+            <img
+              src={`http://192.168.90.47:4000${offerdata?.offer_img}`}
+              className="w-[7.5vw] h-[13vw] bg-white object-cover opacity-50 rounded-tl-[1vw] rounded-bl-[1vw] rounded-tr-[2.2vw] rounded-br-[1.5vw]"
+            />
           ) : (
-            <span className="text-[1.1vw] text-[#1f4b7f] font-bold">
-              Profile
-            </span>
-          )} */}
-          <span className="text-[1.1vw] text-[#1f4b7f] font-bold">Profile</span>
-        </label>
-        {offerlist.offer_bgImgae ? (
-          <p className="text-[0.9vw] text-[#1f4b7f] ">
-            {offerlist.offer_bgImgae.name}
-          </p>
+            <img
+              src={previewUrl}
+              className="w-[7.5vw] h-[13vw] bg-white object-cover  opacity-50 blur-[0.1vw] rounded-tl-[1vw] rounded-bl-[1vw] rounded-tr-[2.2vw] rounded-br-[1.5vw]"
+            />
+          )}
+        </div>
+        {updatedata && draggerImage === false ? (
+          <img
+            src={`http://192.168.90.47:4000${offerdata?.offer_img}`}
+            className="absolute top-[4vw] bg-white left-[1vw] w-[5.5vw] h-[5.5vw] rounded-[50%]"
+          />
         ) : (
-          ""
+          <img
+            src={previewUrl}
+            className="absolute top-[4vw] bg-white left-[1vw] w-[5.5vw] h-[5.5vw] rounded-[50%]"
+          />
         )}
-        <div className="flex items-center mt-[1vw] justify-end gap-x-[1vw]">
-          <button
-            onClick={() => setUploadImage(false)}
-            className="border-[#1f4b7f] border-[0.1vw] text-[#1f4b7f] text-[1vw] px-[2vw] py-[0.5vw] rounded-[0.5vw]"
-          >
-            Back
-          </button>
-          <button
-            className="bg-[#1f4b7f] text-white text-[1vw] px-[2vw] py-[0.5vw] rounded-[0.5vw]"
-            onClick={() => handleSubmit()}
-          >
-            Submit
-          </button>
+        <div className="bg-white bg-opacity-30 rounded-[2vw] px-[1vw]  py-[0.2vw] absolute top-[1vw] left-[9vw]">
+          <h1 className="text-white  text-[1.2vw]">
+            {currentofferdata.offer_name}
+          </h1>
+        </div>
+        {/* <div className="border-l-[.2vw] h-[13vw] border-dashed absolute top-[0vw] left-[7.6vw] border-white"></div> */}
+        <p className="text-white font-extrabold text-[1vw]  absolute top-[4vw] left-[9vw]">
+          {currentofferdata.offer_desc}
+        </p>
+        <p className="text-white  text-[1vw]  absolute top-[8vw] left-[9vw]">{`Valid till ${dayjs(
+          new Date(currentofferdata.expiry_date)
+        ).format("DD MMM")}`}</p>
+        <div className="bg-white bg-opacity-30 border-dashed border-[0.1vw] border-white px-[1vw]  py-[0.2vw] absolute top-[10vw] left-[9vw]">
+          <p className="text-white font-bold text-[1vw]">
+            {currentofferdata?.code?.toUpperCase()}
+          </p>
         </div>
       </div>
-    </>
-  );
-};
 
-export default BackgroundView;
+      {startIndex + 1 >= currentoffers?.length ? (
+        <div className="w-[3vw] h-[3vw]"></div>
+      ) : (
+        <button
+          onClick={nextSlide}
+          disabled={startIndex + 1 >= currentoffers?.length}
+          className="text-[#1F4B7F] font-semibold"
+        >
+          <IoIosArrowDropright size={"3vw"} />
+        </button>
+      )}
+    </div>
+  ));
+
+  return (
+    <div className="px-[0.5vw] relative ">
+      <div className="mt-[1vw]">
+        <label className="text-[#1F4B7F] text-[1.1vw] font-bold ">
+          Usage
+          <span className="text-[1vw] text-red-600 pl-[0.25vw]">*</span>
+          <span className="text-[#909193] text-[0.8vw] pl-[0.25vw]">
+            {`(member count)`}
+          </span>
+        </label>
+      </div>
+      <div className="relative">
+        <input
+          placeholder="Enter Usage Count"
+          className="border-r-[0.25vw] mt-[0.2vw] border-l-[0.05vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+          onChange={(e) => {
+            setOfferlist({
+              ...offerlist,
+              usage: e.target.value,
+            });
+            setError("");
+          }}
+          value={offerlist.usage || ""}
+        />
+        {error && error.includes("Usage") && (
+          <p className="absolute bottom-[-1.2vw] text-[0.8vw] text-red-500">
+            {error}
+          </p>
+        )}
+      </div>
+      <div className="mt-[4vw] ">
+        <ComponentToPrint ref={containerRef} />
+      </div>
+      <div
+        className="cursor-pointer absolute top-[-3.75vw] right-[15.5vw] z-10"
+        onClick={downloadImage}
+      >
+        <FaCloudDownloadAlt size="3vw" color="#1F487C" />
+      </div>
+    </div>
+  );
+}

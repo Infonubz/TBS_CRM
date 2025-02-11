@@ -7,10 +7,12 @@ const api = axios.create({
   },
 });
 const apiUrl = process.env.REACT_APP_API_URL;
+const user = sessionStorage.getItem("USER_ID");
 
 export const GetClientData = async (dispatch) => {
   try {
-    const response = await api.get(`${apiUrl}/All-client-details`);
+    // const response = await api.get(`${apiUrl}/All-client-details`);
+    const response = await api.get(`${apiUrl}/client-details-userId/${user}`);
     dispatch({ type: CLIENT_DATA, payload: response.data });
     return response.data;
   } catch (error) {
@@ -22,7 +24,7 @@ export const GetClientData = async (dispatch) => {
 export const handleClientSearch = async (e, dispatch) => {
   try {
     if (e.target.value) {
-      const response = await api.get(`${apiUrl}/client-search/${e.target.value}`);
+      const response = await api.get(`${apiUrl}/client-search/${user}/${e.target.value}`);
       dispatch({ type: CLIENT_DATA, payload: response.data })
       return response.data[0];
     }
@@ -36,7 +38,8 @@ export const handleClientSearch = async (e, dispatch) => {
 
 export const SubmitClientExcel = async (file) => {
   const formData = new FormData();
-  formData.append("xlsxFile", file);
+  formData.append("file", file);
+  formData.append("tbs_user_id",user)
 
   const excelEndpoint = `${apiUrl}/upload`;
   const method = "post";
@@ -67,7 +70,8 @@ export const submitClientComapanyData = async (
   dispatch,
   fileList,
   setCurrentId,
-  currentId
+  currentId,
+  setClientID
 ) => {
   // const payload = {
   //   company_name: companyvalues.company_name,
@@ -90,6 +94,7 @@ export const submitClientComapanyData = async (
   formData.append("type_of_constitution", companyvalues.constitution);
   formData.append("business_background", companyvalues.business);
   formData.append("web_url", companyvalues.web_url);
+  formData.append("tbs_user_id",user)
   if (fileList[0]?.originFileObj) {
     formData.append("company_logo", fileList[0].originFileObj);
 }
@@ -120,6 +125,7 @@ export const submitClientComapanyData = async (
     });
     sessionStorage.setItem("CLI_ID", response?.data?.id);
     setCurrentId(response?.data?.id)
+    setClientID(response?.data?.id ? response?.data?.id : clientID)
     GetClientData(dispatch);
     GetClientProfile(sessionStorage.getItem("CLI_ID") === null || sessionStorage.getItem("CLI_ID") === 'null' || sessionStorage.getItem("CLI_ID") === undefined || sessionStorage.getItem("CLI_ID") === 'undefined' ? clientID : sessionStorage.getItem("CLI_ID"), dispatch)
     console.log(response, "responseresponse");
@@ -177,13 +183,13 @@ export const SubmitClientAddressData = async (
 
 
 export const SubmitClientGSTData = async (documentsdata, clientID, setSuperAdminGSTData, dispatch) => {
-  console.log(documentsdata, "documentsdata");
+  console.log(documentsdata.ctc == 1 ? true : false, "documentsdata");
   const getid =  sessionStorage.getItem("CLIENT_ID")?sessionStorage.getItem("CLIENT_ID") : sessionStorage.getItem("CLI_ID");
 
   const formData = new FormData();
   formData.append(
     "aggregate_turnover_exceeded",
-    documentsdata.ctc == "1" || 1 ? "true" : "false"
+    documentsdata.ctc == 1 ? true : false
   );
   formData.append("state_name", documentsdata.state);
   formData.append("state_code_number", documentsdata.state_code);
@@ -209,7 +215,7 @@ export const SubmitClientGSTData = async (documentsdata, clientID, setSuperAdmin
         "Content-Type": "multipart/form-data",
       },
     });
-    //GetClientData(dispatch);
+    GetClientData(dispatch);
     setSuperAdminGSTData("");
     GetClientGSTById(clientID,clientID,setSuperAdminGSTData)
     //   GetSuperAdminGSTById();
@@ -225,7 +231,8 @@ export const SubmitClientGSTData = async (documentsdata, clientID, setSuperAdmin
 export const GetClientGSTById = async (
   clientID,
   setClientID,
-  setSuperAdminGSTData
+  setSuperAdminGSTData,
+  setSpinning
 ) => {
   console.log(clientID, "ahsgxdahsjksaxbj");
   const getid = sessionStorage.getItem("CLIENT_ID") ? sessionStorage.getItem("CLIENT_ID") : sessionStorage.getItem("CLI_ID");
@@ -241,13 +248,17 @@ export const GetClientGSTById = async (
     handleError(error);
     return null;
   }
+  finally{
+    setSpinning && setSpinning(false)
+  }
 };
 
 
 export const GetCompanyDetailsById = async (
   clientID,
   setClientID,
-  setClientData
+  setClientData,
+  setSpinning,
 ) => {
   console.log(clientID, "ahsgxdahsjksaxbj");
   try {
@@ -261,12 +272,16 @@ export const GetCompanyDetailsById = async (
     handleError(error);
     return null;
   }
+  finally{
+    setSpinning && setSpinning(false)
+  }
 };
 
 export const GetClientAddressById = async (
   clientID,
   setClientID,
-  setClientAddress
+  setClientAddress,
+  setSpinning
 ) => {
   console.log(clientID, "ahsgxdahsjksaxbj");
   try {
@@ -278,6 +293,9 @@ export const GetClientAddressById = async (
   } catch (error) {
     handleError(error);
     return null;
+  }
+  finally{
+    setSpinning && setSpinning(false)
   }
 };
 
@@ -442,6 +460,7 @@ export const ClientStatusUpdateApi = async (
   valueid,
   value,
   currentid,
+  setSpinning,
   dispatch
 ) => {
   const payload = {
@@ -467,6 +486,9 @@ export const ClientStatusUpdateApi = async (
   } catch (error) {
     handleError(error);
     return null;
+  }
+  finally{
+    setSpinning && setSpinning(false)
   }
 };
 

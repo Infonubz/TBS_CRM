@@ -1,4 +1,4 @@
-import { Button, Modal, Progress, Upload } from "antd";
+import { Button, Modal, Progress, Spin, Upload } from "antd";
 import { ErrorMessage, Field, FieldArray, Form, Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { FaCloudUploadAlt } from "react-icons/fa";
@@ -14,6 +14,8 @@ import {
   GetPatDocumentById,
   SubmitPatDocumentsData,
 } from "../../../Api/UserManagement/Partner";
+import umbuslogo from "../../../asserts/umbuslogo.png";
+import { useDispatch } from "react-redux";
 
 const FILE_SIZE = 1024 * 1024 * 5; // 5MB
 const SUPPORTED_FORMATS = [
@@ -25,9 +27,9 @@ const SUPPORTED_FORMATS = [
 
 const validationSchema = Yup.object().shape({
   aadhar_number: Yup.string()
-    .required("Aadhar number is required")
-    .length(12, "Aadhar number must be exactly 12 digits")
-    .matches(/^\d{12}$/, "Aadhar must be a valid 12-digit number"),
+    .required("Aadhaar number is required")
+    .length(12, "Aadhaar number must be exactly 12 digits")
+    .matches(/^\d{12}$/, "Aadhaar must be a valid 12-digit number"),
   pan_number: Yup.string()
     .required("PAN number is required")
     .length(10, "PAN number must be exactly 10 characters")
@@ -37,8 +39,8 @@ const validationSchema = Yup.object().shape({
     ),
 
   aadhar_fr_doc: Yup.mixed()
-    .required("Aadhar Front Page is required")
-    .test("fileSize", "File too large", (value) =>
+    .required("Aadhaar front page is required")
+    .test("fileSize", "File too large max 5mb", (value) =>
       typeof value === "string" ? true : value && value.size <= FILE_SIZE
     )
     .test("fileFormat", "Unsupported Format", (value) =>
@@ -47,8 +49,8 @@ const validationSchema = Yup.object().shape({
         : value && SUPPORTED_FORMATS.includes(value.type)
     ),
   aadhar_bk_doc: Yup.mixed()
-    .required("Aadhar Back Page is required")
-    .test("fileSize", "File too large", (value) =>
+    .required("Aadhaar back page is required")
+    .test("fileSize", "File too large max 5mb", (value) =>
       typeof value === "string" ? true : value && value.size <= FILE_SIZE
     )
     .test("fileFormat", "Unsupported Format", (value) =>
@@ -58,8 +60,8 @@ const validationSchema = Yup.object().shape({
     ),
 
   pan_fr_doc: Yup.mixed()
-    .required("Pan Front Page is required")
-    .test("fileSize", "File too large", (value) =>
+    .required("PAN front page is required")
+    .test("fileSize", "File too large max 5mb", (value) =>
       typeof value === "string" ? true : value && value.size <= FILE_SIZE
     )
     .test("fileFormat", "Unsupported Format", (value) =>
@@ -68,8 +70,8 @@ const validationSchema = Yup.object().shape({
         : value && SUPPORTED_FORMATS.includes(value.type)
     ),
   pan_bk_doc: Yup.mixed()
-    .required("Pan Back Page is required")
-    .test("fileSize", "File too large", (value) =>
+    .required("PAN back page is required")
+    .test("fileSize", "File too large max 5mb", (value) =>
       typeof value === "string" ? true : value && value.size <= FILE_SIZE
     )
     .test("fileFormat", "Unsupported Format", (value) =>
@@ -133,18 +135,61 @@ export default function AddDocuments({
   updatedata,
   addressback,
   PartnerID,
-  setModalIsOpen
+  setModalIsOpen,
 }) {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
   const [enable, setEnable] = useState(false);
-  const [viewImg,setViewImg] = useState("")
+  const [viewImg, setViewImg] = useState("");
+  const [spinning, setSpinning] = useState(false);
+  const [inputPreview, setInputPreview] = useState({
+    aadharfr: null,
+    aadharbk: null,
+    panfr: null,
+    panbk: null,
+  });
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalImage, setModalImage] = useState(null);
+
+  const openModal = (event) => {
+    // Get the image source (src) using `getElementById`
+    const imageSrc = event.target.getAttribute("src");
+
+    // Set the modal image source
+    setModalImage(imageSrc);
+
+    // Open the modal
+    setIsModalOpen(true);
+  };
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleFileChange = (event, key) => {
+    const file = event?.currentTarget?.files[0];
+
+    // Check if the file is selected and it's a valid file
+    if (file) {
+      // Validate if the selected file is an actual file object
+      if (file instanceof File) {
+        setInputPreview((prevState) => ({
+          ...prevState,
+          [key]: URL.createObjectURL(file), // Create object URL for valid file
+        }));
+      } else {
+        console.error("Selected item is not a valid file.");
+      }
+    } else {
+      console.error("No file selected.");
+    }
+  };
 
   // const handlePreview = (file) => {
   //   console.log(file,"imageview");
-    
+
   //   const reader = new FileReader();
   //   reader.onload = () => {
   //     // setPreviewImage(reader.result?reader.result:tempImg);
@@ -153,20 +198,20 @@ export default function AddDocuments({
   //   };
   //   reader?.readAsDataURL(file);
   // };
-  const handlePreview = (file) => {
-    if (!file) {
-        console.error('No file selected');
-        return;
-    }
+  //   const handlePreview = (file) => {
+  //     if (!file) {
+  //         console.error('No file selected');
+  //         return;
+  //     }
 
-    console.log(file, "imageview");
-    const reader = new FileReader();
-    reader.onload = () => {
-        setPreviewImage(reader.result);
-        setPreviewTitle(file.name);
-    };
-    reader.readAsDataURL(file);
-};
+  //     console.log(file, "imageview");
+  //     const reader = new FileReader();
+  //     reader.onload = () => {
+  //         setPreviewImage(reader.result);
+  //         setPreviewTitle(file.name);
+  //     };
+  //     reader.readAsDataURL(file);
+  // };
   console.log(updatedata, "asdidididid");
 
   // const handleSubmit = async (values) => {
@@ -182,16 +227,24 @@ export default function AddDocuments({
   //     }
   //   }
   // };
+  const dispatch = useDispatch();
   const handleSubmit = async (values) => {
     console.log(values, "docvalues");
+    if (updatedata) {
+      toast.success("Partner Updated Successfully");
+    }
 
     try {
-      if (enable === false) {
+      if (
+        enable === false &&
+        updatedata &&
+        empproffesionaldata?.aadhar_card_number != null
+      ) {
         setModalIsOpen(false); // Assuming setCurrentPage is a function in your component
       } else {
-        const data = await SubmitPatDocumentsData(values); // Replace with actual API call function
-        toast.success(data)
-        setModalIsOpen(false); 
+        const data = await SubmitPatDocumentsData(values, updatedata, dispatch); // Replace with actual API call function
+        toast.success(data);
+        setModalIsOpen(false);
         // Assuming setCurrentPage is a function in your component
         // console.log(values,actions,"docvalues");
       }
@@ -203,10 +256,10 @@ export default function AddDocuments({
     }
   };
   console.log(currentpage, "currentpagecurrentpage");
-  const handleCancel = () =>{ setPreviewOpen(false)
-    if(updatedata)
-    setViewImg("")
-    setPreviewImage("")
+  const handleCancel = () => {
+    setPreviewOpen(false);
+    if (updatedata) setViewImg("");
+    setPreviewImage("");
   };
   const [empproffesionaldata, setEmpProffesionalData] = useState("");
   const fetchGetUser = async () => {
@@ -215,7 +268,8 @@ export default function AddDocuments({
         EmployeeID,
         setEmployeeID,
         setEmpProffesionalData,
-        updatedata
+        updatedata,
+        setSpinning
       );
       setEmpProffesionalData(data);
     } catch (error) {
@@ -227,16 +281,26 @@ export default function AddDocuments({
   useEffect(() => {
     if (updatedata != null) {
       fetchGetUser();
+      setSpinning(true);
     }
   }, [EmployeeID, setEmployeeID, setEmpProffesionalData, updatedata]);
+
+  useEffect(() => {
+    setInputPreview({
+      aadharfr: empproffesionaldata?.aadhar_card_front,
+      aadharbk: empproffesionaldata.aadhar_card_back,
+      panfr: empproffesionaldata.pan_card_front,
+      panbk: empproffesionaldata.pan_card_back,
+    });
+  }, [empproffesionaldata]);
   return (
     <div>
-      <div className="border-l-[0.1vw] h-[28vw] overflow-y-auto  relative  px-[2vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f]">
+      <div className="border-l-[0.1vw] relative  px-[2vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f] mt-[1.5vw]">
         <div className="h-[4vw] w-full flex items-center justify-between">
           <label className="text-[1.5vw] font-semibold text-[#1f4b7f]">
             Documents
           </label>
-          {updatedata ? (
+          {updatedata && empproffesionaldata?.aadhar_card_number != null ? (
             <button
               className={`${
                 enable
@@ -281,132 +345,202 @@ export default function AddDocuments({
         >
           {({ isSubmitting, isValid, setFieldValue, values, handleChange }) => (
             <Form>
-              <div className="gap-y-[1.5vw] flex-col flex">
-                <div className="grid grid-cols-2 w-full gap-x-[2vw]">
-                  <div className="col-span-1 relative">
-                    <label className="text-[#1F4B7F] text-[1.1vw] ">
-                      Aadhar Card Number
-                      <span className="text-[1vw] text-red-600 pl-[0.2vw]">
-                        *
-                      </span>
-                    </label>
-                    <Field
-                      type="text"
-                      name="aadhar_number"
-                      placeholder="Enter Aadhar Number"
-                      value={values.aadhar_number}
-                      className={` ${
-                        PartnerID || addressback
-                          ? enable == false
-                            ? " cursor-not-allowed"
-                            : ""
-                          : ""
-                      } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
-                      disabled={
-                        PartnerID || addressback
-                          ? enable
-                            ? false
-                            : true
-                          : false
-                      }
-                    />
-                    <ErrorMessage
-                      name="aadhar_number"
-                      component="div"
-                      className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[.3vw]"
-                    />
-                  </div>
-                  <div className="col-span-1 relative">
-                    <label className="text-[#1F4B7F] text-[1.1vw] ">
-                      Pan Card Number
-                      <span className="text-[1vw] text-red-600 pl-[0.2vw]">
-                        *
-                      </span>
-                    </label>
-                    <Field
-                      type="text"
-                      name="pan_number"
-                      placeholder="Enter Pan Number"
-                      value={values.pan_number}
-                      className={` ${
-                        PartnerID || addressback
-                          ? enable == false
-                            ? " cursor-not-allowed"
-                            : ""
-                          : ""
-                      } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
-                      disabled={
-                        PartnerID || addressback
-                          ? enable
-                            ? false
-                            : true
-                          : false
-                      }
-                    />
-                    <ErrorMessage
-                      name="pan_number"
-                      component="div"
-                      className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[.3vw]"
-                    />
-                  </div>
+              {spinning ? (
+                <div className=" flex justify-center h-[23.2vw] items-center">
+                  <Spin size="large" />
                 </div>
-                <div className="grid grid-cols-2 gap-y-[1.5vw] w-full gap-x-[1.5vw]">
-                  <div className="col-span-1 relative">
-                    <label className="text-[#1F4B7F] text-[1.1vw]">
-                      Aadhar Card Front Doc
-                      <span className="text-[1vw] text-red-600 pl-[0.2vw]">
-                        *
-                      </span>
-                    </label>
-                    <div>
-                      <input
-                        id="aadhar_fr_doc"
-                        name="aadhar_fr_doc"
-                        type="file"
-                        style={{ display: "none" }}
-                        onChange={(event) => {
-                          const files = Array.from(event.target.files);
-                          console.log(files, event, "filesfiles");
-                          setFieldValue(
-                            "aadhar_fr_doc",
-                            event.currentTarget.files[0]
-                          );
-                          handlePreview(files[0]);
-                        }}
-                      disabled={
-                        PartnerID || addressback
-                          ? enable
-                            ? false
-                            : true
-                          : false
-                      }
-                      
-                      />
-                      <button
-                        type="button"
-                        className={` ${
-                          PartnerID || addressback
-                            ? enable == false
-                              ? " cursor-not-allowed"
+              ) : (
+                <>
+                  <div className="gap-y-[1.5vw] flex-col flex">
+                    <div className="grid grid-cols-2 w-full gap-x-[2vw]">
+                      <div className="col-span-1 relative">
+                        <label className="text-[#1F4B7F] text-[1.1vw] ">
+                          Aadhaar Card Number
+                          <span className="text-[1vw] text-red-600 pl-[0.2vw]">
+                            *
+                          </span>
+                        </label>
+                        <Field
+                          type="text"
+                          name="aadhar_number"
+                          autocomplete="off"
+                          placeholder="Enter Aadhaar Number"
+                          value={values.aadhar_number}
+                          className={` ${
+                            updatedata &&
+                            empproffesionaldata?.aadhar_card_number != null
+                              ? enable == false
+                                ? " cursor-not-allowed"
+                                : ""
                               : ""
-                            : ""
-                        } border-r-[0.3vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none`}
-                        onClick={(event) => {
-                          event.preventDefault();
-                          document.getElementById("aadhar_fr_doc").click();
-                          handlePreview(document.getElementById("aadhar_fr_doc").value[0])
-                        }}
-                      >
-                        <span className="opacity-50 text-[1vw]">
-                          Upload Aadhar Front Doc
-                        </span>
-                        <FaCloudUploadAlt
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          disabled={
+                            updatedata &&
+                            empproffesionaldata?.aadhar_card_number != null
+                              ? enable
+                                ? false
+                                : true
+                              : false
+                          }
+                        />
+                        <ErrorMessage
+                          name="aadhar_number"
+                          component="div"
+                          className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[.3vw]"
+                        />
+                      </div>
+                      <div className="col-span-1 relative">
+                        <label className="text-[#1F4B7F] text-[1.1vw] ">
+                          PAN Card Number
+                          <span className="text-[1vw] text-red-600 pl-[0.2vw]">
+                            *
+                          </span>
+                        </label>
+                        <Field
+                          type="text"
+                          name="pan_number"
+                          autocomplete="off"
+                          placeholder="Enter PAN Number"
+                          onChange={(e) =>
+                            setFieldValue(
+                              "pan_number",
+                              e.target.value?.toUpperCase()
+                            )
+                          }
+                          value={values.pan_number}
+                          className={` ${
+                            updatedata &&
+                            empproffesionaldata?.aadhar_card_number != null
+                              ? enable == false
+                                ? " cursor-not-allowed"
+                                : ""
+                              : ""
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          disabled={
+                            updatedata &&
+                            empproffesionaldata?.aadhar_card_number != null
+                              ? enable
+                                ? false
+                                : true
+                              : false
+                          }
+                        />
+                        <ErrorMessage
+                          name="pan_number"
+                          component="div"
+                          className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[.3vw]"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-y-[1.5vw] w-full gap-x-[1.5vw]">
+                      <div className="col-span-1 relative">
+                        <label className="text-[#1F4B7F] text-[1.1vw]">
+                          Aadhaar Card Front Doc
+                          <span className="text-[1vw] text-red-600 pl-[0.2vw]">
+                            *
+                          </span>
+                        </label>
+                        <div>
+                          <input
+                            id="aadhar_fr_doc"
+                            name="aadhar_fr_doc"
+                            accept=".jpg, .jpeg, .png"
+                            type="file"
+                            style={{ display: "none" }}
+                            onChange={(event) => {
+                              const files = Array.from(event.target.files);
+                              console.log(files, event, "filesfiles");
+                              setFieldValue(
+                                "aadhar_fr_doc",
+                                event.currentTarget.files[0]
+                              );
+                              // handlePreview(files[0]);
+                              handleFileChange(event, "aadharfr");
+                            }}
+                            disabled={
+                              updatedata &&
+                              empproffesionaldata?.aadhar_card_number != null
+                                ? enable
+                                  ? false
+                                  : true
+                                : false
+                            }
+                          />
+                          <div className="relative">
+                            <button
+                              type="button"
+                              className={` ${
+                                updatedata &&
+                                empproffesionaldata?.aadhar_card_number != null
+                                  ? enable == false
+                                    ? " cursor-not-allowed"
+                                    : ""
+                                  : ""
+                              } border-r-[0.3vw] flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none`}
+                              onClick={(event) => {
+                                event.preventDefault();
+                                document
+                                  .getElementById("aadhar_fr_doc")
+                                  .click();
+                                // handlePreview(document.getElementById("aadhar_fr_doc").value[0])
+                              }}
+                            >
+                              <span className="opacity-50 text-[1vw]">
+                                Upload Aadhaar Front Doc
+                              </span>
+                              {/* <FaCloudUploadAlt
                           color="#1F487C"
                           size={"2vw"}
                           className="absolute right-[1vw]"
-                        />
-                      </button>
-                      {values.aadhar_fr_doc && (
+                        /> */}
+
+                              {/* {inputPreview?.aadharfr  ? (
+                          inputPreview?.aadharfr?.startsWith("blob") ? (
+                            <img
+                            src={inputPreview.aadharfr}
+                            className="h-[2.5vw] w-[2.5vw] absolute right-[1vw]"
+                            alt="Aadhar Front"
+                          />
+                          ) : (
+                            <img
+                            src={`http://192.168.90.47:4000${inputPreview.aadharfr}`}
+                            className="h-[2.5vw] w-[2.5vw] absolute right-[1vw]"
+                            alt="Aadhar Front"
+                          />
+                          )
+                        ) : (
+                          <FaCloudUploadAlt
+                            color="#1F487C"
+                            size="2vw"
+                            className="absolute right-[1vw]"
+                          />
+                        )} */}
+                            </button>
+                            {inputPreview?.aadharfr ? (
+                              inputPreview?.aadharfr?.startsWith("blob") ? (
+                                <img
+                                  src={inputPreview.aadharfr}
+                                  className="h-[2.5vw] w-[2.5vw] absolute cursor-zoom-in top-[.15vw] right-[.3vw]"
+                                  alt="Aadhar Front"
+                                  onClick={openModal}
+                                />
+                              ) : (
+                                <img
+                                  src={`${apiImgUrl}${inputPreview.aadharfr}`}
+                                  className="h-[2.5vw] w-[2.5vw] absolute  top-[.15vw] cursor-zoom-in right-[.3vw]"
+                                  alt="Aadhar Front"
+                                  onClick={openModal}
+                                />
+                              )
+                            ) : (
+                              <FaCloudUploadAlt
+                                color="#1F487C"
+                                size="2vw"
+                                className="absolute right-[1vw] top-[.4vw] pointer-events-none"
+                              />
+                            )}
+                          </div>
+                          {/* {values.aadhar_fr_doc && (
                         <div
                           onClick={() => {setPreviewOpen(true)
                             setViewImg(empproffesionaldata?.aadhar_card_front)
@@ -417,71 +551,103 @@ export default function AddDocuments({
                             ? values.aadhar_fr_doc.name
                             : values.aadhar_fr_doc}
                         </div>
-                      )}
-                      <ErrorMessage
-                        name="aadhar_fr_doc"
-                        component="div"
-                        style={{ color: "red" }}
-                        className="text-[0.8vw] absolute bottom-[-1.2vw] left-[.3vw]"
-                      />
-                    </div>
-                  </div>
+                      )} */}
+                          <ErrorMessage
+                            name="aadhar_fr_doc"
+                            component="div"
+                            // style={{ color: "red" }}
+                            className="text-[0.8vw] text-red-500 absolute bottom-[-1.2vw] left-[.3vw]"
+                          />
+                        </div>
+                      </div>
 
-                  <div className="col-span-1 relative">
-                    <label className="text-[#1F4B7F] text-[1.1vw]">
-                      Aadhar Card Back Doc
-                      <span className="text-[1vw] text-red-600 pl-[0.2vw]">
-                        *
-                      </span>
-                    </label>
-                    <div>
-                      <input
-                        id="aadhar_bk_doc"
-                        name="aadhar_bk_doc"
-                        type="file"
-                        style={{ display: "none" }}
-                        onChange={(event) => {
-                          const files = Array.from(event.target.files);
-                          console.log(files, "filesfiles");
-                          // setFieldValue("pan_front", files);
-                          setFieldValue(
-                            "aadhar_bk_doc",
-                            event.currentTarget.files[0]
-                          );
-                          handlePreview(files[0]);
-                        }}
-                        disabled={
-                          PartnerID || addressback
-                            ? enable
-                              ? false
-                              : true
-                            : false
-                        }
-                      />
-                      <button
-                        type="button"
-                        className={` ${
-                          PartnerID || addressback
-                            ? enable == false
-                              ? " cursor-not-allowed"
-                              : ""
-                            : ""
-                        } border-r-[0.3vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none`}
-                        onClick={(event) => {
-                          event.preventDefault();
-                          document.getElementById("aadhar_bk_doc").click();
-                        }}
-                      >
-                        <span className="opacity-50">
-                          Upload Aadar Back Doc
-                        </span>
-                        <FaCloudUploadAlt
+                      <div className="col-span-1 relative">
+                        <label className="text-[#1F4B7F] text-[1.1vw]">
+                          Aadhaar Card Back Doc
+                          <span className="text-[1vw] text-red-600 pl-[0.2vw]">
+                            *
+                          </span>
+                        </label>
+                        <div>
+                          <input
+                            id="aadhar_bk_doc"
+                            name="aadhar_bk_doc"
+                            accept=".jpg, .jpeg, .png"
+                            type="file"
+                            style={{ display: "none" }}
+                            onChange={(event) => {
+                              const files = Array.from(event.target.files);
+                              console.log(files, "filesfiles");
+                              // setFieldValue("pan_front", files);
+                              setFieldValue(
+                                "aadhar_bk_doc",
+                                event.currentTarget.files[0]
+                              );
+                              // handlePreview(files[0]);
+                              handleFileChange(event, "aadharbk");
+                            }}
+                            disabled={
+                              updatedata &&
+                              empproffesionaldata?.aadhar_card_number != null
+                                ? enable
+                                  ? false
+                                  : true
+                                : false
+                            }
+                          />
+                          <div className="relative">
+                            <button
+                              type="button"
+                              className={` ${
+                                updatedata &&
+                                empproffesionaldata?.aadhar_card_number != null
+                                  ? enable == false
+                                    ? " cursor-not-allowed"
+                                    : ""
+                                  : ""
+                              } border-r-[0.3vw]  flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none`}
+                              onClick={(event) => {
+                                event.preventDefault();
+                                document
+                                  .getElementById("aadhar_bk_doc")
+                                  .click();
+                              }}
+                            >
+                              <span className="opacity-50">
+                                Upload Aadhaar Back Doc
+                              </span>
+
+                              {/* <FaCloudUploadAlt
                           color="#1F487C"
                           size={"2vw"}
                           className="absolute right-[1vw]"
-                        />
-                      </button>
-                      {values.aadhar_bk_doc && (
+                        /> */}
+                            </button>
+                            {inputPreview?.aadharbk ? (
+                              inputPreview?.aadharbk?.startsWith("blob") ? (
+                                <img
+                                  src={inputPreview.aadharbk}
+                                  className="h-[2.5vw] w-[2.5vw] absolute top-[.15vw] cursor-zoom-in right-[.3vw]"
+                                  alt="Aadhar Front"
+                                  onClick={openModal}
+                                />
+                              ) : (
+                                <img
+                                  src={`${apiImgUrl}${inputPreview.aadharbk}`}
+                                  className="h-[2.5vw] w-[2.5vw] absolute  top-[.15vw] cursor-zoom-in right-[.3vw]"
+                                  alt="Aadhar Front"
+                                  onClick={openModal}
+                                />
+                              )
+                            ) : (
+                              <FaCloudUploadAlt
+                                color="#1F487C"
+                                size="2vw"
+                                className="absolute right-[1vw] top-[.4vw] pointer-events-none"
+                              />
+                            )}
+                          </div>
+                          {/* {values.aadhar_bk_doc && (
                         <div
                           onClick={() => {setPreviewOpen(true)
                             setViewImg(empproffesionaldata?.aadhar_card_back)
@@ -492,67 +658,98 @@ export default function AddDocuments({
                             ? values.aadhar_bk_doc.name
                             : values.aadhar_bk_doc}
                         </div>
-                      )}
-                      <ErrorMessage
-                        name="aadhar_bk_doc"
-                        component="div"
-                        style={{ color: "red" }}
-                        className="text-[0.8vw] absolute bottom-[-1.2vw] left-[.3vw]"
-                      />
-                    </div>
-                  </div>
-                  <div className="col-span-1 relative">
-                    <label className="text-[#1F4B7F] text-[1.1vw]">
-                      Pan Card Front Document
-                      <span className="text-[1vw] text-red-600 pl-[0.2vw]">
-                        *
-                      </span>
-                    </label>
-                    <div>
-                      <input
-                        id="pan_fr_doc"
-                        name="pan_fr_doc"
-                        type="file"
-                        style={{ display: "none" }}
-                        onChange={(event) => {
-                          const files = Array.from(event.target.files);
-                          // setFieldValue("aadhar_back", files);
-                          setFieldValue(
-                            "pan_fr_doc",
-                            event.currentTarget.files[0]
-                          );
-                          handlePreview(files[0]);
-                        }}
-                        disabled={
-                          PartnerID || addressback
-                            ? enable
-                              ? false
-                              : true
-                            : false
-                        }
-                      />
-                      <button
-                        type="button"
-                        className={` ${
-                          PartnerID || addressback
-                            ? enable == false
-                              ? " cursor-not-allowed"
-                              : ""
-                            : ""
-                        } border-r-[0.3vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none`}
-                        onClick={(event) => {
-                          event.preventDefault();
-                          document.getElementById("pan_fr_doc").click();
-                        }}
-                      >
-                        <span className="opacity-50">Upload Pan Front Doc</span>
-                        <FaCloudUploadAlt
+                      )} */}
+                          <ErrorMessage
+                            name="aadhar_bk_doc"
+                            component="div"
+                            // style={{ color: "red" }}
+                            className="text-[0.8vw] text-red-500 absolute bottom-[-1.2vw] left-[.3vw]"
+                          />
+                        </div>
+                      </div>
+                      <div className="col-span-1 relative">
+                        <label className="text-[#1F4B7F] text-[1.1vw]">
+                          PAN Card Front Document
+                          <span className="text-[1vw] text-red-600 pl-[0.2vw]">
+                            *
+                          </span>
+                        </label>
+                        <div className="relative">
+                          <div>
+                            <input
+                              id="pan_fr_doc"
+                              name="pan_fr_doc"
+                              type="file"
+                              accept=".jpg, .jpeg, .png"
+                              style={{ display: "none" }}
+                              onChange={(event) => {
+                                const files = Array.from(event.target.files);
+                                // setFieldValue("aadhar_back", files);
+                                setFieldValue(
+                                  "pan_fr_doc",
+                                  event.currentTarget.files[0]
+                                );
+                                // handlePreview(files[0]);
+                                handleFileChange(event, "panfr");
+                              }}
+                              disabled={
+                                updatedata &&
+                                empproffesionaldata?.aadhar_card_number != null
+                                  ? enable
+                                    ? false
+                                    : true
+                                  : false
+                              }
+                            />
+                            <button
+                              type="button"
+                              className={` ${
+                                updatedata &&
+                                empproffesionaldata?.aadhar_card_number != null
+                                  ? enable == false
+                                    ? " cursor-not-allowed"
+                                    : ""
+                                  : ""
+                              } border-r-[0.3vw]  flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none`}
+                              onClick={(event) => {
+                                event.preventDefault();
+                                document.getElementById("pan_fr_doc").click();
+                              }}
+                            >
+                              <span className="opacity-50">
+                                Upload PAN Front Doc
+                              </span>
+                              {/* <FaCloudUploadAlt
                           color="#1F487C"
                           size={"2vw"}
                           className="absolute right-[1vw]"
-                        />
-                      </button>
-                      {values.pan_fr_doc && (
+                        /> */}
+                            </button>
+                            {inputPreview?.panfr ? (
+                              inputPreview?.panfr?.startsWith("blob") ? (
+                                <img
+                                  src={inputPreview.panfr}
+                                  className="h-[2.5vw] w-[2.5vw] absolute  top-[.15vw] cursor-zoom-in right-[.3vw]"
+                                  alt="pan doc"
+                                  onClick={openModal}
+                                />
+                              ) : (
+                                <img
+                                  src={`${apiImgUrl}${inputPreview.panfr}`}
+                                  className="h-[2.5vw] w-[2.5vw] absolute  top-[.15vw] cursor-zoom-in right-[.3vw]"
+                                  alt="pan doc"
+                                  onClick={openModal}
+                                />
+                              )
+                            ) : (
+                              <FaCloudUploadAlt
+                                color="#1F487C"
+                                size="2vw"
+                                className="absolute right-[1vw] top-[.4vw] pointer-events-none"
+                              />
+                            )}
+                          </div>
+                          {/* {values.pan_fr_doc && (
                         <div
                           onClick={() => {setPreviewOpen(true)
                             setViewImg(empproffesionaldata?.pan_card_front)
@@ -563,68 +760,99 @@ export default function AddDocuments({
                             ? values.pan_fr_doc.name
                             : values.pan_fr_doc}
                         </div>
-                      )}
-                      <ErrorMessage
-                        name="pan_fr_doc"
-                        component="div"
-                        style={{ color: "red" }}
-                        className="text-[0.8vw] absolute bottom-[-1.2vw] left-[.3vw]"
-                      />
-                    </div>
-                  </div>
-                  <div className="col-span-1 relative">
-                    <label className="text-[#1F4B7F] text-[1.1vw]">
-                      Pan Card Back Doc
-                      <span className="text-[1vw] text-red-600 pl-[0.2vw]">
-                        *
-                      </span>
-                    </label>
-                    <div>
-                      <input
-                        id="pan_bk_doc"
-                        name="pan_bk_doc"
-                        type="file"
-                        style={{ display: "none" }}
-                        onChange={(event) => {
-                          const files = Array.from(event.target.files);
-                          console.log(files, "filesfiles");
-                          // setFieldValue("pan_back", files);
-                          setFieldValue(
-                            "pan_bk_doc",
-                            event.currentTarget.files[0]
-                          );
-                          handlePreview(files[0]);
-                        }}
-                        disabled={
-                          PartnerID || addressback
-                            ? enable
-                              ? false
-                              : true
-                            : false
-                        }
-                      />
-                      <button
-                        type="button"
-                        className={` ${
-                          PartnerID || addressback
-                            ? enable == false
-                              ? " cursor-not-allowed"
-                              : ""
-                            : ""
-                        } border-r-[0.3vw] relative flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none`}
-                        onClick={(event) => {
-                          event.preventDefault();
-                          document.getElementById("pan_bk_doc").click();
-                        }}
-                      >
-                        <span className="opacity-50">Upload Pan Back Doc</span>
-                        <FaCloudUploadAlt
+                      )} */}
+                          <ErrorMessage
+                            name="pan_fr_doc"
+                            component="div"
+                            // style={{ color: "red" }}
+                            className="text-[0.8vw] absolute text-red-500 bottom-[-1.2vw] left-[.3vw]"
+                          />
+                        </div>
+                      </div>
+                      <div className="col-span-1 relative">
+                        <label className="text-[#1F4B7F] text-[1.1vw]">
+                          PAN Card Back Doc
+                          <span className="text-[1vw] text-red-600 pl-[0.2vw]">
+                            *
+                          </span>
+                        </label>
+                        <div>
+                          <input
+                            id="pan_bk_doc"
+                            name="pan_bk_doc"
+                            accept=".jpg, .jpeg, .png"
+                            type="file"
+                            style={{ display: "none" }}
+                            onChange={(event) => {
+                              const files = Array.from(event.target.files);
+                              console.log(files, "filesfiles");
+                              // setFieldValue("pan_back", files);
+                              setFieldValue(
+                                "pan_bk_doc",
+                                event.currentTarget.files[0]
+                              );
+                              // handlePreview(files[0]);
+                              handleFileChange(event, "panbk");
+                            }}
+                            disabled={
+                              updatedata &&
+                              empproffesionaldata?.aadhar_card_number != null
+                                ? enable
+                                  ? false
+                                  : true
+                                : false
+                            }
+                          />
+                          <div className="relative">
+                            <button
+                              type="button"
+                              className={` ${
+                                updatedata &&
+                                empproffesionaldata?.aadhar_card_number != null
+                                  ? enable == false
+                                    ? " cursor-not-allowed"
+                                    : ""
+                                  : ""
+                              } border-r-[0.3vw] flex items-center justify-between px-[1vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none`}
+                              onClick={(event) => {
+                                event.preventDefault();
+                                document.getElementById("pan_bk_doc").click();
+                              }}
+                            >
+                              <span className="opacity-50">
+                                Upload PAN Back Doc
+                              </span>
+                              {/* <FaCloudUploadAlt
                           color="#1F487C"
                           size={"2vw"}
                           className="absolute right-[1vw]"
-                        />
-                      </button>
-                      {values.pan_bk_doc && (
+                        /> */}
+                            </button>
+                            {inputPreview?.panbk ? (
+                              inputPreview?.panbk?.startsWith("blob") ? (
+                                <img
+                                  src={inputPreview.panbk}
+                                  className="h-[2.5vw] w-[2.5vw] absolute  top-[.15vw] cursor-zoom-in right-[.3vw]"
+                                  alt="pan doc"
+                                  onClick={openModal}
+                                />
+                              ) : (
+                                <img
+                                  src={`${apiImgUrl}${inputPreview.panbk}`}
+                                  className="h-[2.5vw] w-[2.5vw] absolute  top-[.15vw] cursor-zoom-in right-[.3vw]"
+                                  alt="pan doc"
+                                  onClick={openModal}
+                                />
+                              )
+                            ) : (
+                              <FaCloudUploadAlt
+                                color="#1F487C"
+                                size="2vw"
+                                className="absolute right-[1vw] top-[.4vw] pointer-events-none"
+                              />
+                            )}
+                          </div>
+                          {/* {values.pan_bk_doc && (
                         <div
                           onClick={() => {setPreviewOpen(true)
                             setViewImg(empproffesionaldata?.pan_card_back)
@@ -635,16 +863,16 @@ export default function AddDocuments({
                             ? values.pan_bk_doc.name
                             : values.pan_bk_doc}
                         </div>
-                      )}
-                      <ErrorMessage
-                        name="pan_bk_doc"
-                        component="div"
-                        style={{ color: "red" }}
-                        className="text-[0.8vw] absolute bottom-[-1.2vw] left-[.3vw]"
-                      />
-                    </div>
-                  </div>
-                  {/* <div className="col-span-1">
+                      )} */}
+                          <ErrorMessage
+                            name="pan_bk_doc"
+                            component="div"
+                            // style={{ color: "red" }}
+                            className="text-[0.8vw] absolute text-red-500 bottom-[-1.2vw] left-[.3vw]"
+                          />
+                        </div>
+                      </div>
+                      {/* <div className="col-span-1">
                     <label className="text-[#1F4B7F] text-[1.1vw]">
                       Educational Certificate
                       <span className="text-[1vw] text-red-600 pl-[0.2vw]">
@@ -703,49 +931,80 @@ export default function AddDocuments({
                       />
                     </div>
                   </div> */}
-                </div>
-              </div>
-              <div className="flex items-center  w-full justify-between pb-[1vw] pt-[2vw]">
-                <div>
-                  <h1 className="text-[#1F4B7F] text-[0.8vw] font-semibold">
-                    *You must fill in all fields to be able to continue
-                  </h1>
-                </div>
-                <div className="flex items-center gap-x-[1vw]">
-                  <button
-                    className="border-[#1F487C] w-[5vw] font-semibold text-[1vw] h-[2vw] rounded-full border-r-[0.2vw]  border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw]"
-                    onClick={() => {
-                      setCurrentpage(2);
-                      setDocumentBack(true);
-                    }}
-                  >
-                    Back
-                  </button>
-                  <button
-                    className="bg-[#1F487C] font-semibold rounded-full w-[10vw] h-[2vw] text-[1vw] text-white"
-                    type="submit"
-                    // onClick={() => setCurrentpage(4)}
-                  >
-                     {PartnerID || addressback ? enable
-                          ? "Update & Continue"
-                          : "Continue"
-                          : "Continue"}
-                  </button>
-                </div>
-              </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center  w-full justify-between pb-[1vw] pt-[2vw]">
+                    <div>
+                      <h1 className="text-[#1F4B7F] text-[0.7vw] font-semibold">
+                        *You must fill in all fields to be able to continue
+                      </h1>
+                    </div>
+                    <div className="flex items-center gap-x-[1vw]">
+                      <button
+                        className="border-[#1F487C] w-[5vw] font-semibold text-[1vw] h-[2vw] rounded-full border-r-[0.2vw]  border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw]"
+                        onClick={() => {
+                          setCurrentpage(2);
+                          setDocumentBack(true);
+                        }}
+                      >
+                        Back
+                      </button>
+                      <button
+                        className="bg-[#1F487C] font-semibold rounded-full w-[10vw] h-[2vw] text-[1vw] text-white"
+                        type="submit"
+                        // onClick={() => setCurrentpage(4)}
+                        // onClick={()=>{
+                        //   if(updatedata){
+                        //     toast.success("Partner Updated Successfully")
+                        //   }
+                        //   else{
+                        //     toast.success("Partner Submitted Successfully")
+                        //   }
+                        // }}
+                      >
+                        {updatedata &&
+                        empproffesionaldata?.aadhar_card_number != null
+                          ? enable
+                            ? "Update & Submit"
+                            : "Submit"
+                          : "Submit"}
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
             </Form>
           )}
         </Formik>
       </div>
-      <Modal
+      {/* <Modal
         open={previewOpen}
-        // open={true}
-        // title={previewTitle}
+        open={true}
+        title={previewTitle}
         footer={null}
         onCancel={handleCancel}
       >
-        {/* <img alt="example" style={{ width: "100%" ,height:"15vw" }} src={`http://192.168.90.47:4000${viewImg}`|| `${previewImage}`} /> */}
         <img alt="example" style={{ width: "100%" ,height:"15vw" }} src={ `${previewImage}`|| `http://192.168.90.47:4000${viewImg}`} />
+      </Modal> */}
+
+      <Modal
+        visible={isModalOpen}
+        onCancel={closeModal}
+        footer={null}
+        centered
+        // width="35vw"
+        bodyStyle={{ padding: 0 }}
+        destroyOnClose={true} // Ensures modal is destroyed on close
+      >
+        {/* Display the image in the modal */}
+        {modalImage && (
+          <img
+            src={modalImage}
+            alt="Document Preview"
+            style={{ width: "100%" }}
+            className=""
+          />
+        )}
       </Modal>
     </div>
   );

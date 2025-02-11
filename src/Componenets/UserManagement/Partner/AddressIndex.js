@@ -2,7 +2,7 @@ import { ErrorMessage, Field, Form, Formik } from "formik";
 import { useEffect, useState } from "react";
 import TempAddress from "./TempAddress";
 import PerAddress from "./PerAddress";
-import { Checkbox } from "antd";
+import { Checkbox, Spin } from "antd";
 import { GetPatAddressById } from "../../../Api/UserManagement/Partner";
 
 const AddressIndex = ({
@@ -11,8 +11,11 @@ const AddressIndex = ({
   setAddressBack,
   setCurrentpage,
   addressback,
-  setPartnerID
+  setPartnerID,
+  documentback,
+  updatedata
 }) => {
+  const [spinning, setSpinning] = useState(false);
   const [selected, setSelected] = useState(1);
   const [toggle,setToggle] = useState(false)
   const [checkBox, setCheckBox] = useState(false);
@@ -45,7 +48,8 @@ const AddressIndex = ({
       const data = await GetPatAddressById(
         PartnerID,
         setPartnerID,
-        setEmpAddressData
+        setEmpAddressData,
+        setSpinning
       );
       setEmpAddressData(data);
       console.log(data,"dfdkf");
@@ -74,16 +78,21 @@ const AddressIndex = ({
   useEffect(() => {
     if (PartnerID != null || proffesionaback) {
       fetchGetUser();
+      setSpinning(true)
       setEnable(false)
     }
   }, [PartnerID, setPartnerID, setEmpAddressData, proffesionaback]);
 
+  console.log(updatedata,"helloidid");
+  console.log(PartnerID || proffesionaback || updatedata ? (PartnerID &&  enable == false && updatedata == ""  ? false : enable ? false : empaddressdata.perm_add == null ? false : true) : false,"helloeooeoeoeoeoeo");
+  
+
   return (
     <div>
-      <div className="border-l-[0.1vw] h-[28vw] overflow-y-scroll px-[2vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f]">
+      <div className="border-l-[0.1vw] pl-[2vw] pr-[1.5vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] mt-[1.5vw] rounded-[1vw] border-[#1f4b7f]">
         <div className="h-[3vw] w-full flex items-center justify-between ">
           <label className="text-[1.5vw] font-semibold text-[#1f4b7f] ">
-            Registered Address
+          Address Details
           </label>
           {/* {PartnerID || proffesionaback ? (
             <button
@@ -99,7 +108,7 @@ const AddressIndex = ({
           ) : (
             ""
           )} */}
-           {PartnerID || proffesionaback ? (
+           {updatedata && empaddressdata?.perm_add != null || documentback ? (
             <button
               className={`${
                 enable
@@ -155,9 +164,17 @@ const AddressIndex = ({
   Permanent Address
 </button>
         </div>
+        {spinning ? (
+              <div className=" flex justify-center h-[22vw] items-center">
+                <Spin size="large" />
+              </div>
+            ) : (
+        <>
              <Checkbox className={`${selected === 1 ? "":"hidden"} text-[#1F4B7F] font-semibold text-[.9vw] mt-[.5vw]`}
           onChange={() => setCheckBox(!checkBox)}
-          disabled={PartnerID || proffesionaback ? (enable ? false : true) : false}
+          disabled={PartnerID || proffesionaback || updatedata ? (PartnerID &&  enable == false && updatedata == ""  ? false : enable ? false : empaddressdata.perm_add == null ? false : true) : false}
+
+          // disabled={PartnerID || proffesionaback || updatedata ? true : false}
           // onChange={(e) => {
           //   if (e.target.checked) {
           //     setFieldValue("temp_address", values.temp_address);
@@ -196,6 +213,8 @@ const AddressIndex = ({
             enable={enable}
             proffesionaback={proffesionaback}
             PartnerID={PartnerID}
+            updatedata={updatedata}
+            documentback={documentback}
           />
         ) : (
           <PerAddress
@@ -208,9 +227,11 @@ const AddressIndex = ({
             enable={enable}
             proffesionaback={proffesionaback}
             PartnerID={PartnerID}
-          
+            updatedata={updatedata}  
+            documentback={documentback}
           />
         )}
+        </>)}
       </div>
     </div>
   );

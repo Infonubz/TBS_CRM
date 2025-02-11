@@ -29,9 +29,21 @@ const validationSchema = Yup.object()
       .max(50, "Title should not be greater than 50 characters")
       .required("Title is required"),
     client_details: Yup.string().required("Client Name is required"),
+    // usage_per_day: Yup.string()
+    //   .min(1, "minimum usage is 1")
+    //   .max(100, "Max usage is 100")
+    //   .required("Usage is required")
+    //   .matches(/^[0-9]+$/, "Only numbers are allowed"),
     usage_per_day: Yup.string()
-      .required("Usage is required")
-      .matches(/^[0-9]+$/, "Only numbers are allowed"),
+  .required("Usage is required")
+  .matches(/^[0-9]+$/, "Only numbers are allowed")
+  .test('is-valid-range', 'Usage must be between 1 and 100', (value) => {
+    const num = Number(value);
+    return num >= 1 && num <= 100;
+  }),
+
+
+
     status: Yup.string().required("Status is required"),
     // start_date: Yup.string().required("Start Date is required"),
     // end_date: Yup.string().required("End Date is required"),
@@ -64,13 +76,16 @@ const validationSchema = Yup.object()
           return true;
         }
         if (value) {
-          const validTypes = ["image/gif"];
+          const validTypes = ["image/gif",   "video/mp4",
+            "image/jpeg",
+            "image/jpg",
+            "image/png",];
           const isValidType = validTypes.includes(value.type);
           const isInvalidImageType = [
             "video/mp4",
-            "image/jpeg",
-            "image/jpg",
-            "image/png",
+            // "image/jpeg",
+            // "image/jpg",
+            // "image/png",
           ].includes(value.type);
           return isValidType || !isInvalidImageType;
         }
@@ -79,21 +94,53 @@ const validationSchema = Yup.object()
 
     // duration: Yup.string().required("Duration is required")
   })
+  // .test(
+  //   "both-required",
+  //   "Start Date and End Date are required",
+  //   function (value) {
+  //     const { start_date, end_date } = value || {};
+  //     if (!start_date && !end_date) {
+  //       return this.createError({
+  //         path: "start_date",
+  //         message: "Start Date and End Date are required",
+  //       });
+  //     }
+  //     return true;
+  //   }
+  // );
   .test(
     "both-required",
     "Start Date and End Date are required",
     function (value) {
       const { start_date, end_date } = value || {};
-      if (!start_date && !end_date) {
+  
+      // Check if both start_date and end_date are provided
+      if (!start_date || !end_date) {
         return this.createError({
           path: "start_date",
           message: "Start Date and End Date are required",
         });
       }
-      return true;
+  
+      // Check if end_date is not more than 30 days after start_date
+      const startDate = new Date(start_date);
+      const endDate = new Date(end_date);
+      
+      // Ensure endDate is not greater than 30 days after startDate
+      const maxEndDate = new Date(startDate);
+      maxEndDate.setDate(startDate.getDate() + 30);
+  
+      if (endDate > maxEndDate) {
+        return this.createError({
+          path: "end_date",
+          message: "End Date should be within 30 days from Start Date",
+        });
+      }
+  
+      return true; // If all validations pass
     }
   );
-
+  
 const Ad_Advertisement = ({
   setIsModalOpen,
   updatedata,
@@ -106,6 +153,7 @@ const Ad_Advertisement = ({
   // clientdetail,
   // setClientDetail,
 }) => {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const { RangePicker } = DatePicker;
   const { Dragger } = Upload;
   const [advalues, setAdValues] = useState();
@@ -269,7 +317,7 @@ const Ad_Advertisement = ({
   };
 
   // const typeid = sessionStorage.getItem("type_id");
-  const typeid = localStorage.getItem("type_id");
+  const typeid = sessionStorage.getItem("type_id");
 
   const getStatusOptions = () => {
     if (typeid == "PRO101") {
@@ -284,7 +332,15 @@ const Ad_Advertisement = ({
         { label: "Draft", value: "Draft" },
         { label: "Requested", value: "Requested" },
       ];
-    } else {
+    } 
+    else if (typeid == "PROEMP101") {
+      return [
+        { label: "Select Status", value: "" },
+        { label: "Draft", value: "Draft" },
+        { label: "Requested", value: "Requested" },
+      ];
+    }
+    else {
       return [{ label: "Select Status", value: "" }];
     }
   };
@@ -348,7 +404,7 @@ const Ad_Advertisement = ({
               ? adsdata?.ad_title
               : adsdata?.mobad_title || "",
           client_details: adsdata ? adsdata?.client_details : "",
-          status: adsdata ? adsdata?.status : "",
+          status: adsdata ? adsdata?.ads_status : "",
           start_date: adsdata?.start_date
             ? dayjs(adsdata?.start_date).format("YYYY-MM-DD")
             : "",
@@ -447,7 +503,7 @@ const Ad_Advertisement = ({
                             "tbs_client_id",
                             selectedClient?.tbs_client_id
                           );
-                          localStorage.setItem(
+                          sessionStorage.setItem(
                             "client_details",
                             e.target.value
                           );
@@ -485,7 +541,7 @@ const Ad_Advertisement = ({
                         placeholder="Enter Title"
                         value={values?.ad_title}
                         onChange={handleChange}
-                        className="placeholder-[#1F487C] border-r-[0.175vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.175vw] placeholder-blue border-[#1F487C]
+                        className="placeholder-[#1F487C] border-r-[0.175vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.175vw] placeholder:text-[1vw] border-[#1F487C]
                      text-[#1F487C] text-[1vw] h-[2.7vw] w-[100%] rounded-[0.75vw] outline-none px-[1vw]"
                       />
                       <ErrorMessage
@@ -507,7 +563,7 @@ const Ad_Advertisement = ({
                         // onChange={(e) => {
                         //   const selectedStartDate = e.target.value;
                         //   handleChange(e);
-                        //   localStorage.setItem("start_date", selectedStartDate);
+                        //   sessionStorage.setItem("start_date", selectedStartDate);
 
                         //   // Update the minimum end date to the selected start date
                         //   setMinExpiryDate(selectedStartDate);
@@ -516,7 +572,7 @@ const Ad_Advertisement = ({
                         onChange={(e) => {
                           const selectedStartDate = e.target.value;
                           handleChange(e);
-                          localStorage.setItem("start_date", selectedStartDate);
+                          sessionStorage.setItem("start_date", selectedStartDate);
                           // Update the minimum expiry date
                           setMinExpiryDate(selectedStartDate);
                         }}
@@ -541,7 +597,7 @@ const Ad_Advertisement = ({
                         value={values.end_date}
                         onChange={(e) => {
                           handleChange(e);
-                          localStorage.setItem("end_date", e.target.value);
+                          sessionStorage.setItem("end_date", e.target.value);
                         }}
                         className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C]
                       text-[#1F487C] text-[1vw] h-[2.7vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
@@ -563,13 +619,14 @@ const Ad_Advertisement = ({
                       </label>
                       <Field
                         as="textarea"
+                        style={{resize:"none"}}
                         name="ad_description"
                         placeholder="Enter Description"
                         // rows="1"
                         cols="50"
                         value={values?.ad_description}
                         onChange={handleChange}
-                        className=" pt-[0.5vw] placeholder-[#1F487C] border-r-[0.175vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.175vw] placeholder-blue border-[#1F487C]
+                        className=" pt-[0.5vw] placeholder-[#1F487C] placeholder:text-[1vw] border-r-[0.175vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.175vw] placeholder-blue border-[#1F487C]
                      text-[#1F487C] text-[1vw] h-[2.7vw] w-[100%] rounded-[0.75vw] outline-none px-[1vw]"
                       />
                       <ErrorMessage
@@ -592,6 +649,7 @@ const Ad_Advertisement = ({
                               token: {
                                 fontSize: 13,
                                 lineHeight: 0,
+                                colorPrimary:'#1F487C'
                               },
                               components: {
                                 DatePicker: {
@@ -643,7 +701,7 @@ text-[#1F487C] text-[0.8vw] h-[2.7vw] w-[100%] rounded-[0.75vw] outline-none px-
                       <ErrorMessage
                         name="end_date"
                         component="div"
-                        className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[7vw]"
+                        className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] "
                       />
                     </div>
                   </div>
@@ -680,7 +738,7 @@ text-[#1F487C] text-[0.8vw] h-[2.7vw] w-[100%] rounded-[0.75vw] outline-none px-
                         value={values.page_name}
                         onChange={(e) => {
                           handleChange(e);
-                          localStorage.setItem("page_name", e.target.value);
+                          sessionStorage.setItem("page_name", e.target.value);
                         }}
 
                         className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C]
@@ -726,7 +784,7 @@ text-[#1F487C] text-[0.8vw] h-[2.7vw] w-[100%] rounded-[0.75vw] outline-none px-
                           value="regular_12-14"
                           label="(11:00 - 18:00) - Regular Hours"
                         />
-                         <option
+                        <option
                           value="peak_18-22"
                           label="(18:00 - 23:00) - Peak Hours"
                         />
@@ -734,7 +792,7 @@ text-[#1F487C] text-[0.8vw] h-[2.7vw] w-[100%] rounded-[0.75vw] outline-none px-
                           value="regular_14-17"
                           label="(23:00 - 06:00) - Regular Hours"
                         />
-                       
+
                       </Field>
                       {required == true ? (
                         <div className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]">
@@ -761,7 +819,7 @@ text-[#1F487C] text-[0.8vw] h-[2.7vw] w-[100%] rounded-[0.75vw] outline-none px-
                           value={"Dashboard"}
                           // onChange={(e) => {
                           //   handleChange(e);
-                          //   localStorage.setItem("page_name", e.target.value);
+                          //   sessionStorage.setItem("page_name", e.target.value);
                           // }}
                           disabled
                           className="border-r-[0.175vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.175vw] placeholder-blue border-[#1F487C]
@@ -793,7 +851,7 @@ text-[#1F487C] text-[0.8vw] h-[2.7vw] w-[100%] rounded-[0.75vw] outline-none px-
                           value={values.page_name}
                           onChange={(e) => {
                             handleChange(e);
-                            localStorage.setItem("page_name", e.target.value);
+                            sessionStorage.setItem("page_name", e.target.value);
                           }}
                           className="border-r-[0.15vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.15vw] placeholder-blue border-[#1F487C]
                    text-[#1F487C] text-[1vw] h-[2.7vw] w-[100%] rounded-[0.75vw] outline-none px-[1vw]"
@@ -837,9 +895,10 @@ text-[#1F487C] text-[0.8vw] h-[2.7vw] w-[100%] rounded-[0.75vw] outline-none px-
                         as="select"
                         name="status"
                         value={values.status}
+                        disabled={values.status === "Under Review" ? true : false}
                         onChange={(e) => {
                           handleChange(e);
-                          localStorage.setItem("status", e.target.value);
+                          sessionStorage.setItem("status", e.target.value);
                         }}
                         className="border-r-[0.175vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.175vw] placeholder-blue border-[#1F487C]
                    text-[#1F487C] text-[1vw] h-[2.7vw] w-[100%] rounded-[0.75vw] outline-none px-[1vw]"
@@ -911,15 +970,14 @@ text-[#1F487C] text-[0.8vw] h-[2.7vw] w-[100%] rounded-[0.75vw] outline-none px-
                           <div
                             className="absolute top-0 left-0 w-full h-full"
                             style={{
-                              backgroundImage: `url(${
-                                tabType == "Web" && adsdata
+                              backgroundImage: `url(${tabType == "Web" && adsdata
                                   ? adsdata.ad_video
-                                    ? `http://192.168.90.47:4000${adsdata.ad_video}`
-                                    : `http://192.168.90.47:4000${fileName.ad_video}`
+                                    ? `${apiImgUrl}${adsdata.ad_video}`
+                                    : `${apiImgUrl}${fileName.ad_video}`
                                   : adsdata.mobad_vdo
-                                  ? `http://192.168.90.47:4000${adsdata.mobad_vdo}`
-                                  : `http://192.168.90.47:4000${fileName.mobad_vdo}`
-                              })`,
+                                    ? `${apiImgUrl}${adsdata.mobad_vdo}`
+                                    : `${apiImgUrl}${fileName.mobad_vdo}`
+                                })`,
                               backgroundSize: "cover",
                               backgroundPosition: "center",
                               opacity: "30%",

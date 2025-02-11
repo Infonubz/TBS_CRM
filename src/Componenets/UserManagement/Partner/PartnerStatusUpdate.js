@@ -11,16 +11,19 @@ export default function PartnerStatusUpdate({
   clientid,
   PartnerID,
   setViewModal,
+  partnerStatusId,
+  setSpinning
 }) {
   const dispatch = useDispatch();
 
-  const handlechange = async (valueid, valuedata) => {
+  const handlechange = async () => {
     console.log(PartnerID, "employeeid");
+    setSpinning(true)
     try {
       const data = await PartnerStatusUpdateApi(
-        valueid,
-        valuedata,
+        partnerStatusId,
         PartnerID,
+        setSpinning,
         dispatch
       );
      // console.log(valueid, valuedata, employeeid, "currentidcurrentid");
@@ -36,27 +39,27 @@ export default function PartnerStatusUpdate({
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <p className="text-[1.5vw] text-[]">Update the Client Status</p>
+      <p className="text-[1.5vw] font-bold">Update the Partner Status</p>
       <img src={image} className="h-[6vw] w-[6vw] my-[1vw]"></img>
-      <div className="flex gap-2 mt-[1vw]">
-        <button
+      <div className="flex ">
+        {/* <button
           className="items-center text-[0.9vw] text-white  space-x-[0.7vw] px-[0.8vw] w-[8vw] h-[2vw] bg-[#2A99FF] rounded-[0.5vw]"
           onClick={() => handlechange(3, "Under Review")}
         >
           Under review
-        </button>
+        </button> */}
         <button
-          className="items-center text-[0.9vw] text-white  space-x-[0.7vw] px-[0.8vw] w-[10vw] h-[2vw]  bg-[#34AE2A] rounded-[0.5vw]"
-          onClick={() => handlechange(1, "Active")}
+          className={`items-center text-[1vw] shadow-md shadow-black font-extrabold text-white  space-x-[0.7vw] px-[0.8vw] w-[8vw] h-[2vw] ${partnerStatusId == 2 ? "bg-[#FD3434]" :"bg-[#34AE2B]"} rounded-[0.5vw]`}
+          onClick={handlechange}
         >
-          Active
+          {partnerStatusId == 2 ? "Inactive" : "Active"}
         </button>
-        <button
+        {/* <button
           className="items-center text-[0.9vw] text-white  space-x-[0.7vw] px-[0.8vw] w-[8vw] h-[2vw] bg-[#FF1100] rounded-[0.5vw]"
           onClick={() => handlechange(2, "InActive")}
         >
           Inactive
-        </button>
+        </button> */}
       </div>
     </div>
   );

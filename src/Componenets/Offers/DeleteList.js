@@ -1,7 +1,7 @@
-import axios from "axios";
+//import axios from "axios";
 import React from "react";
 import { MdAutoDelete } from "react-icons/md";
-import { toast } from "react-toastify";
+//import { toast } from "react-toastify";
 import { Deleteall } from "../../Api/Offers/Offers";
 import { useDispatch } from "react-redux";
 
@@ -10,6 +10,10 @@ export default function DeleteList({
   setDeleteModalIsOpen,
   api,
   module,
+  filter,
+  setPermission,
+  CurrentTab,
+  listType
 }) {
   // const DeletePromoData = async () => {
   //   const response = await axios.delete(api);
@@ -19,7 +23,7 @@ export default function DeleteList({
   const dispatch = useDispatch();
   const handlesubmit = () => {
     setDeleteModalIsOpen(false);
-    Deleteall(api, dispatch, module);
+    Deleteall(api, dispatch, module, filter, setPermission, CurrentTab,listType);
   };
   return (
     <div>

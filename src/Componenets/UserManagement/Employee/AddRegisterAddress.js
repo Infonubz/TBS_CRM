@@ -224,7 +224,7 @@ export default function AddRegisterAddress({
                           value={values.temp_country}
                           onChange={(e) => {
                             handleChange(e);
-                            localStorage.setItem("status", e.target.value);
+                            sessionStorage.setItem("status", e.target.value);
                           }}
                           disabled={
                             EmployeeID || proffesionaback
@@ -277,7 +277,7 @@ export default function AddRegisterAddress({
                           value={values.per_country}
                           onChange={(e) => {
                             handleChange(e);
-                            localStorage.setItem("status", e.target.value);
+                            sessionStorage.setItem("status", e.target.value);
                           }}
                           disabled={
                             EmployeeID || proffesionaback
@@ -332,7 +332,7 @@ export default function AddRegisterAddress({
                           value={values.temp_state}
                           onChange={(e) => {
                             handleChange(e);
-                            localStorage.setItem("status", e.target.value);
+                            sessionStorage.setItem("status", e.target.value);
                           }}
                           disabled={
                             EmployeeID || proffesionaback
@@ -377,7 +377,7 @@ export default function AddRegisterAddress({
                           value={values.per_state}
                           onChange={(e) => {
                             handleChange(e);
-                            localStorage.setItem("status", e.target.value);
+                            sessionStorage.setItem("status", e.target.value);
                           }}
                           disabled={
                             EmployeeID || proffesionaback
@@ -424,7 +424,7 @@ export default function AddRegisterAddress({
                           value={values.temp_city}
                           onChange={(e) => {
                             handleChange(e);
-                            localStorage.setItem("status", e.target.value);
+                            sessionStorage.setItem("status", e.target.value);
                           }}
                           disabled={
                             EmployeeID || proffesionaback
@@ -477,7 +477,7 @@ export default function AddRegisterAddress({
                           value={values.per_city}
                           onChange={(e) => {
                             handleChange(e);
-                            localStorage.setItem("status", e.target.value);
+                            sessionStorage.setItem("status", e.target.value);
                           }}
                           disabled={
                             EmployeeID || proffesionaback

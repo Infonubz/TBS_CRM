@@ -26,53 +26,57 @@ export default function Advertisement() {
   const videoUrl = `http://192.168.90.47:4000${selectItems?.ad_video}`;
 
 
-  const fileUrl =  `http://192.168.90.47:4000${selectItems?.ad_video}`;
+  const fileUrl = `http://192.168.90.47:4000${selectItems?.ad_video}`;
   const filename = selectItems?.ad_title;
 
   const columns = [
     {
-      title: <span className="text-[1vw]">Name</span>,
+      title: <span className="text-[1.25vw] font-bold text-[#1F487C]  flex items-center justify-center">Name</span>,
       render: (row) => (
-        <div className="flex items-center">
+        <div className="flex items-center justify-center">
           <p className="text-[1vw]">{row?.ad_title}</p>
         </div>
       ),
+      width: "20vw"
     },
     {
-      title: <span className="text-[1vw]">Modified</span>,
+      title: <span className="text-[1.25vw] font-bold text-[#1F487C]  flex items-center justify-center">Modified</span>,
       sorter: (a, b) => (a.updated_date ? new Date(a.updated_date) - new Date(b.updated_date) : 0),
       render: (row) => (
-        <div className="flex items-center">
+        <div className="flex items-center justify-center">
           <p className="text-[1vw]">
             {row?.updated_date ? `${dayjs(row.updated_date).format("DD MMM, YY")}` : ''}
           </p>
         </div>
       ),
+      width: "15vw"
     },
     {
-      title: <span className="text-[1vw]">Size</span>,
+      title: <span className="text-[1.25vw] font-bold text-[#1F487C]  flex items-center justify-center">Size</span>,
       render: (row) => (
-        <div className="flex items-center">
-          <p className="text-[1vw]">{row?.ad_file_size}</p>
+        <div className="flex items-center justify-center">
+          <p className="text-[1vw]">{(row?.ad_file_size / (1024 * 1024)).toFixed(2)} MB</p>
         </div>
       ),
+      width: "15vw"
     },
   ];
 
   return (
     <div>
       <div className="flex py-[1vw] space-x-[2.5vw] pt-[1vw]">
-        <div className="w-[59vw]">
+        {/* <div className="w-[59vw]">
           <Table
             columns={columns}
             dataSource={get_recent_ads}
             pagination={false}
             className="customize-table"
+            scroll={{ y: '25vw' }}
             onRow={(record) => ({
               onClick: () => handleOnClick(record),
             })}
           />
-        </div>
+        </div> */}
         <div className="flex flex-col space-y-[1vw]">
           <label className="text-[#818181] border-b-[0.1vw] border-[#E9E9E9]">
             File Preview
@@ -111,14 +115,17 @@ export default function Advertisement() {
                 {selectItems?.ad_video}
               </div>
               <div className="text-[#4283e5] cursor-pointer">
-              <Image_Video 
-                fileUrl={fileUrl} 
-                filename={filename}
-                selectItems ={selectItems} />
+                <Image_Video
+                  fileUrl={fileUrl}
+                  filename={filename}
+                  selectItems={selectItems} />
               </div>
             </div>
             <div className="text-[1vw] text-[#818181]">
-               Size:{selectItems?.ad_file_size}
+              {selectItems ?
+                <p>Size : {(selectItems?.ad_file_size / (1024 * 1024)).toFixed(2)} MB</p>
+                :
+                 <p>Size:{""}</p>}
             </div>
           </div>
         </div>

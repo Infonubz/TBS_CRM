@@ -7,10 +7,12 @@ const api = axios.create({
   },
 });
 const apiUrl = process.env.REACT_APP_API_URL;
+const user = sessionStorage.getItem("USER_ID");
 
 export const GetPartnerData = async (dispatch) => {
   try {
-    const response = await api.get(`${apiUrl}/all-partner_details`);
+    // const response = await api.get(`${apiUrl}/all-partner_details`);
+    const response = await api.get(`${apiUrl}/partner_details_userId/${user}`);
     dispatch({ type: GET_PARTNER_LIST, payload: response.data });
     return response.data;
   } catch (error) {
@@ -23,7 +25,7 @@ export const handlePartnerSearch = async (e, dispatch) => {
   try {
     if (e.target.value) {
       const response = await api.get(
-        `${apiUrl}/partner-search/${e.target.value}`
+        `${apiUrl}/partner-search/${user}/${e.target.value}`
       );
       dispatch({ type: GET_PARTNER_LIST, payload: response.data });
       return response.data[0];
@@ -56,6 +58,7 @@ export const GetPartnerProfile = async (PartnerID, dispatch) => {
 export const SubmitPartnerExcel = async (file, dispatch) => {
   const formData = new FormData();
   formData.append("file", file);
+  formData.append("tbs_user_id",user)
 
   const excelEndpoint = `${apiUrl}/import-partner-details`;
   const method = "post";
@@ -80,17 +83,25 @@ export const SubmitPartnerExcel = async (file, dispatch) => {
 };
 
 export const PartnerStatusUpdateApi = async (
-  valueid,
-  value,
+  partnerStatusId,
   PartnerID,
+  setSpinning,
   dispatch
 ) => {
+  // const payload = {
+  //   partner_status_id: partnerStatusId == 2 ? 3 : 2,
+  //   partner_status: partnerStatusId == 2 ? "Inactive" : "Active",
+  //   req_status_id: partnerStatusId == 2 ? 3 : 2,
+  //   req_status: partnerStatusId == 2 ? "Inactive" : "Active",
+  // };
   const payload = {
-    partner_status_id: valueid,
-    partner_status: value,
+    partner_status_id: partnerStatusId == 2 ? 3 : 2,
+    partner_status: partnerStatusId == 2 ? "Inactive" : "Active",
+    req_status_id: partnerStatusId == 2 ? 3 : 5,
+    req_status: partnerStatusId == 2 ? "Inactive" : "Approved",
   };
 
-  const url = `${apiUrl}/partner_status_update/${PartnerID}`;
+  const url = `${apiUrl}/request-management-partner/${PartnerID}`;
 
   // const url = `${apiUrl}/pro-emp-status/${employeeid}`;
   const method = "put";
@@ -110,6 +121,9 @@ export const PartnerStatusUpdateApi = async (
   } catch (error) {
     handleError(error);
     return null;
+  }
+  finally{
+    setSpinning && setSpinning(false)
   }
 };
 
@@ -146,7 +160,8 @@ export const submitPartnerPersonalData = async (
   PartnerID,
   enable,
   dispatch,
-  fileList
+  fileList,
+  setPartnerID
 ) => {
   // const payload = {
   //   partner_first_name: personalvalues.firstname,
@@ -166,6 +181,7 @@ export const submitPartnerPersonalData = async (
   formData.append('alternate_phone', personalvalues.alt_phone);
   formData.append('date_of_birth', personalvalues.dob);
   formData.append('gender', personalvalues.gender);
+  formData.append("tbs_user_id",user)
   if (fileList[0]?.originFileObj) {
     formData.append('profile_img', fileList[0].originFileObj)
 }
@@ -202,9 +218,10 @@ export const submitPartnerPersonalData = async (
     });
     console.log(response, "responseresponse");
     sessionStorage.setItem("PAT_ID", response?.data?.id);
+    setPartnerID(response?.data?.id ? response?.data?.id : PartnerID)
     GetPartnerData(dispatch);
     GetPartnerProfile(sessionStorage.getItem("PAT_ID") === null || sessionStorage.getItem("PAT_ID") === 'null' || sessionStorage.getItem("PAT_ID") === undefined || sessionStorage.getItem("PAT_ID") === 'undefined' ? PartnerID : sessionStorage.getItem("PAT_ID"), dispatch)
-    return response.data;
+    return response.data ;
   } catch (error) {
     handleError(error);
     return null;
@@ -349,12 +366,16 @@ export const SubmitPatDocumentsData = async (
     handleError(error);
     return null;
   }
+  finally{
+    GetPartnerData(dispatch)
+  }
 };
 
 export const GetPatAddressById = async (
   PartnerID,
   setPartnerID,
-  setEmpAddressData
+  setEmpAddressData,
+  setSpinning
 ) => {
   try {
     const response = await api.get(
@@ -367,6 +388,9 @@ export const GetPatAddressById = async (
   } catch (error) {
     handleError(error);
     return null;
+  }
+  finally{
+    setSpinning && setSpinning(false)
   }
 };
 
@@ -394,7 +418,10 @@ export const GetPatProffesionalById = async (
 export const GetPatPersonalById = async (
   PartnerID,
   setPartnerID,
-  setEmpPersonalData
+  setEmpPersonalData,
+  dispatch,
+ setSpinning
+
 ) => {
   try {
     const response = await api.get(`${apiUrl}/partner_details/${PartnerID ? PartnerID : sessionStorage.getItem("PAT_ID")}`);
@@ -407,13 +434,17 @@ export const GetPatPersonalById = async (
     handleError(error);
     return null;
   }
+  finally{
+    setSpinning && setSpinning(false)
+  }
 };
 
 export const GetPatDocumentById = async (
   PartnerID,
   setPartnerID,
   setEmpDocumentlData,
-  updatedata
+  updatedata,
+  setSpinning
 ) => {
   try {
     const response = await api.get(
@@ -426,6 +457,9 @@ export const GetPatDocumentById = async (
   } catch (error) {
     handleError(error);
     return null;
+  }
+  finally{
+    setSpinning && setSpinning(false)
   }
 };
 

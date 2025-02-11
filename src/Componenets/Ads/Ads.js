@@ -968,8 +968,10 @@ import { IoMdMenu } from "react-icons/io";
 import { RiComputerFill } from "react-icons/ri";
 import AdsListView from "./AdsListView";
 import AdsGridView from "./AdsGridView";
+import { useLocation } from "react-router";
 
 export default function Advertisement() {
+  const location = useLocation()
   const [isView, setIsView] = useState('List')
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentAd, setCurrentAd] = useState({});
@@ -981,13 +983,19 @@ export default function Advertisement() {
   const [openPopovers, setOpenPopovers] = useState({});
   const [toggleDelete, settoggleDelete] = useState(false);
   const [deleteData, SetDeleteData] = useState();
-  const [tabType, setTabType] = useState("Web");
+  const [tabType, setTabType] = useState(location?.state?.tabIndex || "Web");
+  const [showPagenation,setShowPagenation]= useState(false)
   const apiUrl = process.env.REACT_APP_API_URL;
   const getadlist = useSelector((state) => state.crm.ad_list);
   const getMobileadlist = useSelector((state) => state.crm.mobile_adsList);
+ 
 
 
+useEffect(()=>{
+  setTabType(location?.state?.tabIndex || "Web")
 
+},[location.state])
+console.log(getadlist,"listofads");
 
 
   const togglePopover = (adId) => {
@@ -1054,6 +1062,19 @@ export default function Advertisement() {
     GetAdsData(dispatch);
     GetMobileAds(dispatch);
   }, []);
+
+  useEffect(()=>{
+    setShowPagenation(false)
+    if(tabType === "Web"){
+      getadlist?.length > 3 &&
+      setShowPagenation(true)
+    }
+    else if(tabType === "Mobile"){
+      getMobileadlist?.length > 3 &&
+      setShowPagenation(true)
+
+    }
+  })
 
   // const webColumns = [
   //   // {
@@ -1503,7 +1524,7 @@ export default function Advertisement() {
   const mobileAds =
     getMobileadlist?.length > 0 &&
     getMobileadlist?.slice(indexOfFirst, indexOfLast);
-  console.log(mobileAds, 'mobileads')
+  console.log(getadlist, 'mobileads')
 
   // const AdsList = tabType === "Web" ? currentItems : mobileAds;
   // const columns = tabType === "Web" ? webColumns : mobileColumns;
@@ -1524,6 +1545,40 @@ export default function Advertisement() {
     }
   };
 
+  useEffect(()=>{
+    if(tabType == "Web")  {
+    if(currentItems?.length == 0){
+      setActivePage(activePage-1)
+    }
+  }
+  else{
+    if(mobileAds?.length == 0){
+      setMble_ActivePage(mble_activePage - 1)
+    }
+  }
+
+  },[currentItems,mobileAds])
+
+  const handleKeyDown = (e) => {
+    // Allow control keys like Backspace, Delete, ArrowLeft, ArrowRight, Tab
+    const isControlKey = [
+      "Backspace",
+      "Tab",
+      "ArrowLeft",
+      "ArrowRight",
+      "Delete",
+    ].includes(e.key);
+  
+    if (isControlKey) {
+      return; // If it's a control key, do nothing and allow it to execute
+    }
+  
+    // Allow only alphabets (A-Z, a-z), numbers (0-9), and space
+    if (!/^[A-Za-z0-9\s]$/.test(e.key)) {
+      e.preventDefault(); // Prevent the key if it's not an alphabet, number, or space
+    }
+  };
+
   return (
     <>
       <div
@@ -1534,10 +1589,10 @@ export default function Advertisement() {
           backgroundPosition: "center",
         }}
       >
-        <div className="px-[5vw] h-[92vh] relative w-full ">
+        <div className="px-[2.5vw] h-[92vh] relative w-full ">
           <div className="h-[12vh] w-full flex flex-col">
             <h1 className="text-[#1F4B7F] pt-[0.5vw] text-[1.5vw] font-bold">
-              UPLOAD ADS
+             <span> UPLOAD ADS  </span><span className="text-[1vw]">-</span><span className="text-[1vw] pl-[.5vw]">{`(${tabType})`}</span>
             </h1>
 
             <div className="pb-[0.5vw] flex h-full items-center justify-between">
@@ -1565,8 +1620,9 @@ export default function Advertisement() {
                 <div className="relative flex items-center">
                   <input
                     type="text"
-                    className="bg-white outline-none pl-[2vw] w-[17.25vw] h-[5vh] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.3vw] border-b-[0.3vw]"
+                    className="bg-white outline-none pl-[2vw] w-[17.25vw] h-[5vh] text-[#1F4B7F] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-xl border-r-[0.3vw] border-b-[0.3vw]"
                     placeholder="Search Ads"
+                    onKeyDown={handleKeyDown}
                     onChange={(e) => {
                       Search(e);
                     }}
@@ -1722,6 +1778,7 @@ export default function Advertisement() {
               className="custom-table"
             /> */}
           </div>
+          {showPagenation === true  &&
           <div className="w-full h-[8vh] flex justify-between items-center">
             <div className="text-[#1f4b7f] flex text-[1.1vw] gap-[0.5vw]">
               <span>Showing</span>
@@ -1812,7 +1869,7 @@ export default function Advertisement() {
                 />
               )}
             </div>
-          </div>
+          </div> }
         </div>
       </div>
       <ModalPopup

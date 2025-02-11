@@ -3,10 +3,12 @@ import { BIN_DATA } from "../../Store/Type";
 import { toast } from "react-toastify";
 
 const apiUrl = process.env.REACT_APP_API_URL;
+const typeId = sessionStorage.getItem("type_id");
+const user = sessionStorage.getItem("USER_ID");
 
 export const GetBinData = async (dispatch,id,setSpinning) => {
   try {
-    const response = await axios.get(`${apiUrl}/recycle-bin/${id}`);
+    const response = typeId === "PRO101" ? await axios.get(`${apiUrl}/recycle-bin/${id}/${user}`) : await axios.get(`${apiUrl}/recycle-bin/${id}/${user}`) ;
     console.log(response.data, "hellowfjdf");
     dispatch({ type: BIN_DATA, payload: response.data });
   } catch (err) {

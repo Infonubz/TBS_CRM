@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { FaCloudUploadAlt } from "react-icons/fa";
-import { GetTbsInfo, SubmitAboutUs, SubmitPrivacyPolicy, SubmitTermsConditions, SubmitUserAgreement } from '../../../Api/Settings/Configuration/LegalInformations';
+import { GetTbsInfo, SubmitAboutUs, SubmitPrivacyPolicy, SubmitTermsConditions, SubmitUserAgreement } from '../../../Api/Settings/SystemSettings/LegalInformations';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 import { IoClose } from "react-icons/io5";

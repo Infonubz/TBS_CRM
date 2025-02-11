@@ -16,7 +16,7 @@ import { GetAdsById } from "../../Api/Ads/Ads";
 import ReactPlayer from "react-player";
 import ViewAd from "./Advertisement/ViewAd";
 
-export default function ReqAdvertisement({ currentData, showtable }) {
+export default function ReqAdvertisement({ currentData, showtable, adfilter }) {
   const [eyeModalIsOpen, setEyeModalIsOpen] = useState(false);
   const [viewstatus, setViewStatus] = useState(false);
   const [viewmodal, setViewAdModal] = useState(false);
@@ -24,6 +24,7 @@ export default function ReqAdvertisement({ currentData, showtable }) {
   const [adsDtata, setAdsData] = useState("");
   const [advertisementId, setAdvertisementId] = useState(null);
   const [updatedata, SetUpdateData] = useState(null);
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   console.log(updatedata, "upppppddddddddaaaaaaaaattt");
   const UpdateStatus = (tbs_ad_id) => {
@@ -62,7 +63,7 @@ export default function ReqAdvertisement({ currentData, showtable }) {
       width: "4vw",
       render: (row, rowdta, index) => {
         return (
-          <div className="flex items-center justify-center">
+          <div className="flex items-center pl-[1vw] text-[#1F4B7F]">
             <h1 className="pl-[1vw]">{index + 1}</h1>
           </div>
         );
@@ -70,34 +71,60 @@ export default function ReqAdvertisement({ currentData, showtable }) {
     },
     {
       title: <h1 className="text-[1.1vw] font-semibold flex items-center justify-center">Client Details</h1>,
-      width: "10vw",
+      width: "9vw",
       render: (row) => {
         return (
           <div>
-            <p className="text-[1vw] flex items-center pl-[1vw]">{row?.client_details}</p>
+            <p className="text-[1vw] flex items-center text-[#1F4B7F] justify-center ">{row?.client_details}</p>
           </div>
         );
       },
     },
     {
       title: <h1 className="text-[1.1vw] font-semibold flex items-center justify-center">Ads Title</h1>,
-      sorter: (a, b) => a.ad_title.localeCompare(b.ad_title),
+      sorter: (a, b) => showtable == 4 ? a.ad_title.localeCompare(b.ad_title) : a.mobad_title.localeCompare(b.mobad_title),
       render: (row, rowdta, index) => {
         return (
-          <div className="flex items-center pl-[1vw] text-[1vw]">
+          <div className="flex items-center justify-center text-[#1F4B7F]  text-[1vw]">
             {/* <h1 className="text-[1.1vw]">{row.promo_name}</h1> */}
-            {row?.ad_title?.length > 15 ? (
-              <Tooltip
-                placement="bottom"
-                title={row?.ad_title}
-                className="cursor-pointer"
-                color="#1F487C"
-              >
-                {`${row?.ad_title?.slice(0, 15)}...`}
-              </Tooltip>
-            ) : (
-              row?.ad_title?.slice(0, 15)
-            )}
+            {
+              showtable == 4 ? (
+                <span>
+                {row?.ad_title?.length > 15 ? (
+                  <Tooltip
+                  color="white"
+                  overlayInnerStyle={{ color: "#1F4B7F" }}
+                    placement="top"
+                    title={row?.ad_title}
+                    className="cursor-pointer"
+                    // color="#1F487C"
+                  >
+                    {`${row?.ad_title?.slice(0, 15)}...`}
+                  </Tooltip>
+                ) : (
+                  row?.ad_title?.slice(0, 15)
+                )}
+                </span>
+              ) : (
+                <span>
+                {row?.mobad_title?.length > 15 ? (
+                  <Tooltip
+                  color="white"
+                  overlayInnerStyle={{ color: "#1F4B7F" }}
+                    placement="top"
+                    title={row?.mobad_title}
+                    className="cursor-pointer"
+                    // color="#1F487C"
+                  >
+                    {`${row?.mobad_title?.slice(0, 15)}...`}
+                  </Tooltip>
+                ) : (
+                  row?.mobad_title?.slice(0, 15)
+                )}
+                </span>
+              )
+            }
+          
           </div>
         );
       },
@@ -111,7 +138,7 @@ export default function ReqAdvertisement({ currentData, showtable }) {
       render: (row) => {
         return (
           <div>
-            <p className="text-[1vw] flex items-center pl-[1vw]"> {`${dayjs(row?.start_date).format(
+            <p className="text-[1vw] flex text-[#1F4B7F] justify-center items-center "> {`${dayjs(row?.start_date).format(
               "DD MMM YY")} - ${dayjs(row?.end_date).format("DD MMM YY")}`}</p>
           </div>
         );
@@ -121,39 +148,62 @@ export default function ReqAdvertisement({ currentData, showtable }) {
       title: <h1 className="text-[1.1vw] font-semibold flex items-center justify-center">Time Duration</h1>,
       sorter: (a, b) =>
         dayjs(a.duration).valueOf() - dayjs(b.duration).valueOf(),
-      width: "12vw",
+      width: "14vw",
       render: (row) => {
         return (
           <div>
-            <p className="text-[1vw] flex items-center pl-[1vw]">{`${capitalizeFirstLetter(row?.hours)} Hrs - ${row?.duration}`}</p>
+            <p className="text-[1vw] flex items-center text-[#1F4B7F] justify-center ">{`${capitalizeFirstLetter(row?.hours)} - ${row?.duration}`}</p>
           </div>
         );
       },
     },
     {
       title: <h1 className="text-[1.1vw] font-semibold flex items-center justify-center">Description</h1>,
-      sorter: (a, b) => a.promo_description.localeCompare(b.promo_description),
+      sorter: (a, b) => showtable == 4 ? a.promo_description.localeCompare(b.promo_description) : a.mobad_description.localeCompare(b.mobad_description) ,
       render: (row, rowdta, index) => {
         return (
+
+          // mobad_description
           // <div className="flex items-center">
           //   <h1 className="text-[1.1vw]">{row.promo_description}</h1>
           // </div>
-          <div className="flex items-center pl-[1vw]">
+          <div className="flex items-center text-[#1F4B7F] justify-center">
+            { showtable ==4 ? (
             <h1 className="text-[1vw]">
               {/* {row.promo_description} */}
               {row?.ad_description?.length > 25 ? (
                 <Tooltip
-                  placement="bottom"
+                color="white"
+                overlayInnerStyle={{ color: "#1F4B7F" }}
+                  placement="top"
                   title={row?.ad_description}
                   className="cursor-pointer"
-                  color="#1F487C"
+                  // color="#1F487C"
                 >
                   {`${row?.ad_description?.slice(0, 25)}...`}
                 </Tooltip>
               ) : (
                 row?.ad_description?.slice(0, 25)
               )}
-            </h1>
+            </h1> ) : 
+            (      <h1 className="text-[1vw]">
+              {/* {row.promo_description} */}
+              {row?.mobad_description?.length > 25 ? (
+                <Tooltip
+                color="white"
+                overlayInnerStyle={{ color: "#1F4B7F" }}
+                  placement="top"
+                  title={row?.mobad_description}
+                  className="cursor-pointer"
+                  // color="#1F487C"
+                >
+                  {`${row?.mobad_description?.slice(0, 25)}...`}
+                </Tooltip>
+              ) : (
+                row?.mobad_description?.slice(0, 25)
+              )}
+            </h1>)
+      }
           </div>
         );
       },
@@ -167,7 +217,7 @@ export default function ReqAdvertisement({ currentData, showtable }) {
       render: (row) => {
         return (
           <div>
-            <p className="text-[1vw] flex items-center justify-center">{row.usage_per_day}</p>
+            <p className="text-[1vw] flex items-center text-[#1F4B7F] justify-center">{row.usage_per_day}</p>
           </div>
         );
       },
@@ -177,25 +227,30 @@ export default function ReqAdvertisement({ currentData, showtable }) {
       width: "8 vw",
       render: (row) => {
         return (
-          <div className="flex items-center justify-center">
-            {row?.status_id != null ? (
+          <div className="flex items-center  justify-center">
+            {row?.ads_status_id != null ? (
               <button
-                className={`${row.req_status_id == 1
+                className={`${row.ads_req_status_id == 1
                   ? "bg-[#FF9900]"
-                  : row.req_status_id == 3
+                  : row.ads_req_status_id == 3
                     ? "bg-[#34AE2A]"
-                    : row.req_status_id == 5
+                    : row.ads_req_status_id == 4
                       ? "bg-[#FD3434]"
-                      : row.req_status_id == 2
+                      : row.ads_req_status_id == 2
                         ? "bg-[#2A99FF]"
                         : "bg-[#646262]"
                   } rounded-[0.5vw] text-[1.1vw]  font-bold text-white w-[8vw] py-[0.2vw]`}
                 onClick={() => {
-                  UpdateStatus(row.tbs_ad_id);
-                  console.log(row.tbs_ad_id, "row1");
+                  if(showtable == 4 ){
+                    UpdateStatus(row.tbs_ad_id);
+                    console.log(row.tbs_ad_id, "row1");
+                  }
+                  else{
+                    UpdateStatus(row.tbs_mobad_id)
+                  }
                 }}
               >
-                {capitalizeFirstLetter(row.req_status)}
+                {capitalizeFirstLetter(row.ads_req_status)}
               </button>
             ) : (
               ""
@@ -218,10 +273,16 @@ export default function ReqAdvertisement({ currentData, showtable }) {
               type="button"
               // className="text-white bg-[#727070] flex items-center justify-center rounded-[0.5vw]  text-[1vw] w-[5vw] py-[0.2vw]"  
               onClick={() => {
-                setViewAdModal(true);
                 // setAdvertisementId(row.tbs_ad_id);
-                SetUpdateData(row.tbs_ad_id);
-                console.log(row.tbs_ad_id, "advertisementId1111");
+                if(showtable == 4 ){
+                  setViewAdModal(true);
+                  SetUpdateData(row.tbs_ad_id);
+                  console.log(row.tbs_ad_id, "advertisementId1111");
+                }
+                else{
+                  setViewAdModal(true)
+                  SetUpdateData(row.tbs_mobad_id)
+                }
               }}
             // onClick={() => {
             //   setViewOfferModal(true);
@@ -296,7 +357,7 @@ export default function ReqAdvertisement({ currentData, showtable }) {
         <DeleteList
           setDeleteModalIsOpen={setDeleteModalIsOpen}
           title={"Want to delete this Promotion"}
-          api={`http://192.168.90.47:4000/api/ads/${advertisementId}`}
+          api={`${apiUrl}/ads/${advertisementId}`}
           module={"requestmanagement"}
         />
       </ModalPopup>
@@ -309,7 +370,7 @@ export default function ReqAdvertisement({ currentData, showtable }) {
       // height="180px"
       // width="950px"
       >
-        <ViewAd updatedata={updatedata} />
+        <ViewAd updatedata={updatedata} showtable={showtable} />
       </ModalPopup>
 
       <ModalPopup
@@ -323,6 +384,8 @@ export default function ReqAdvertisement({ currentData, showtable }) {
         <ReqAdsStatusUpdate
           adId={advertisementId}
           setViewStatus={setViewStatus}
+          showtable={showtable}
+          adfilter={adfilter}
         />
       </ModalPopup>
     </>

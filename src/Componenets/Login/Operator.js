@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import * as Yup from "yup";
 import { useNavigate } from "react-router";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import logo from "../../asserts/crmlogo.png";
+//import logo from "../../asserts/crmlogo.png";
 import { OperatorLogin } from "../../Api/Login/AllLogin";
 
 const validationSchema = Yup.object().shape({
@@ -16,25 +16,24 @@ const validationSchema = Yup.object().shape({
 });
 
 export default function Operator({ setForgotPassword, setAuthtoken }) {
-  const navigation = useNavigate();
+  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = async (values) => {
-    console.log(values, "==== Values");
+  const handleSubmit = async (values, setFieldError) => {
     const data = await OperatorLogin(values);
     try {
       toast.success(data);
-      if (data?.id) {
-        sessionStorage.setItem("token", data?.Generated_token);
-        navigation("/dashboard");
+      if (data?.token !== undefined) {
+        console.log(data, "data2");
+        navigate("/dashboard");
         window.location.reload();
+      } else {
+        setFieldError("password", "Invalid Username or Password");
       }
     } catch (error) {
-      toast.error(error);
-      console.error("Error", error);
+      toast.error(error.message);
     }
   };
-
-  const [showPassword, setShowPassword] = useState(false);
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -42,9 +41,9 @@ export default function Operator({ setForgotPassword, setAuthtoken }) {
 
   return (
     <div className="absolute right-0 top-0 bg-[#E5FFF1] h-full w-[38vw] rounded-tr-[2vw] rounded-br-[2vw] bg-opacity-90 flex flex-col items-center justify-center">
-      <label className="text-[#1F487C] font-bold text-[2vw] ">Login</label>
+      <label className="text-[#1F487C] font-bold text-[2vw] ">OPERATOR</label>
       <p className="text-[#1F487C]  text-[1vw] py-[2vw]">
-        Welcome Back, Please login to your account
+        Welcome Back, Please sign in to your account
       </p>
 
       <Formik
@@ -53,8 +52,8 @@ export default function Operator({ setForgotPassword, setAuthtoken }) {
           password: "",
         }}
         validationSchema={validationSchema}
-        onSubmit={(values) => {
-          handleSubmit(values);
+        onSubmit={(values, { setFieldError }) => {
+          handleSubmit(values, setFieldError);
         }}
         // validateOnChange={true}
         // validateOnBlur={true}
@@ -63,7 +62,7 @@ export default function Operator({ setForgotPassword, setAuthtoken }) {
         {({ isSubmitting, handleSubmit, handleChange }) => (
           <Form>
             <div className="gap-y-[1.5vw] flex-col flex">
-              <div className="col-span-1">
+              <div className="col-span-1 relative">
                 <label className="text-[#1F487C] text-[1.1vw] ">
                   Email / Phone
                   <span className="text-[1vw] text-red-600 pl-[0.2vw]">*</span>
@@ -71,20 +70,20 @@ export default function Operator({ setForgotPassword, setAuthtoken }) {
                 <Field
                   type="text"
                   name="emailid"
-                  placeholder="Enter Email Address / Phone "
+                  placeholder="Enter Email / Phone Number "
                   onChange={(e) => {
                     handleChange(e);
-                    localStorage.setItem("emailid", e.target.value);
+                    sessionStorage.setItem("emailid", e.target.value);
                   }}
                   className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                 />
                 <ErrorMessage
                   name="emailid"
                   component="div"
-                  className="text-red-500 text-[0.8vw]"
+                  className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]"
                 />
               </div>
-              <div className="col-span-1 ">
+              <div className="col-span-1 relative ">
                 <label className="text-[#1F487C] text-[1.1vw] ">
                   Password
                   <span className="text-[1vw] text-red-600 pl-[0.2vw]">*</span>
@@ -96,7 +95,7 @@ export default function Operator({ setForgotPassword, setAuthtoken }) {
                     placeholder="Enter Password"
                     onChange={(e) => {
                       handleChange(e);
-                      localStorage.setItem("password", e.target.value);
+                      sessionStorage.setItem("password", e.target.value);
                     }}
                     className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                   />
@@ -114,17 +113,20 @@ export default function Operator({ setForgotPassword, setAuthtoken }) {
                 <ErrorMessage
                   name="password"
                   component="div"
-                  className="text-red-500 text-[0.8vw]"
+                  className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]"
                 />
               </div>
               <div className="flex justify-between items-center">
-                <div>
-                  <Checkbox
+                <div className="flex justify-between items-center gap-[1vw]">
+                  <input
+                    type="checkbox"
                     onChange={(e) => {}}
-                    className="text-[#1F4B7F]  text-[1vw] "
-                  >
+                    className="text-[#1F4B7F]  text-[1vw] cursor-pointer "
+                  />
+                  <span className="text-[#1F4B7F]  text-[1vw] ">
                     Remember me
-                  </Checkbox>
+                  </span>
+                  {/* </Checkbox> */}
                 </div>
                 <div>
                   <p
@@ -135,7 +137,7 @@ export default function Operator({ setForgotPassword, setAuthtoken }) {
                   </p>
                 </div>
               </div>
-              <div className="pt-[3vw]">
+              <div className="">
                 <div>
                   <button
                     type="submit"
@@ -143,7 +145,7 @@ export default function Operator({ setForgotPassword, setAuthtoken }) {
                     onClick={handleSubmit}
                     className="w-full flex justify-center py-2 px-30 border border-transparent rounded-md shadow-sm text-[1.2vw] font-medium text-white bg-[#1F487C]"
                   >
-                    Login
+                    Sign In
                   </button>
                 </div>
               </div>

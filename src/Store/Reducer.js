@@ -46,6 +46,13 @@ import {
   BIN_DATA,
   TBS_INFO,
   REFER_EARN,
+  REDEEM_OFFER,
+  OPERATOR_DATA,
+  PROMO_BG_IMAGE,
+  GET_REQ_PARTNER,
+  GET_ROLES_PERMISSION,
+  GET_REQ_MOB_ADS,
+  THEME_BACKGROUND,
 } from "./Type";
 
 const initialState = {
@@ -87,12 +94,17 @@ const initialState = {
   operator_byid: {},
   bin_data: [],
   tbs_info: {},
-  refer_earn:[]
+  refer_earn: [],
+  operator_data: [],
+  promo_bg: "",
+  get_req_partner: [],
+  get_roles_permission: [],
+  get_req_mob_ads: [],
+  theme_background:[],
 };
 
 export const crmreducer = (state = initialState, action) => {
   const { type, payload, payload_count } = action;
-
   switch (type) {
     case PROMOTION_DATA:
       console.log(payload, "PROMOTION_DATA");
@@ -363,6 +375,49 @@ export const crmreducer = (state = initialState, action) => {
         ...state,
         refer_earn: payload,
       };
+    case REDEEM_OFFER:
+      console.log(payload, "REDEEM_OFFER");
+      return {
+        ...state,
+        redeem_offer: payload,
+      };
+    case OPERATOR_DATA:
+      console.log(payload, "OPERATOR_DATA");
+      return {
+        ...state,
+        operator_data: payload,
+      };
+    case PROMO_BG_IMAGE:
+      console.log(payload, "payload988585858");
+
+      return {
+        ...state,
+        promo_bg: payload,
+      };
+    case GET_REQ_PARTNER:
+      return {
+        ...state,
+        get_req_partner: payload,
+      };
+    case GET_ROLES_PERMISSION:
+      console.log(payload, "GET_ROLES_PERMISSION");
+      return {
+        ...state,
+        get_roles_permission: payload,
+      };
+
+    case GET_REQ_MOB_ADS: {
+      return {
+        ...state,
+        get_req_mob_ads: payload,
+      };
+    }
+    case THEME_BACKGROUND: {
+      return {
+        ...state,
+        theme_background: payload,
+      };
+    }
     default:
       return state;
   }

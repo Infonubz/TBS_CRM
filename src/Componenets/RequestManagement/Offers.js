@@ -1,20 +1,22 @@
-import { render } from '@testing-library/react'
+//import { render } from '@testing-library/react'
 import React, { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import ModalPopup from "../Common/Modal/Modal";
 // import DeleteList from "./DeleteList";
 import { Table, Pagination, Tooltip } from "antd";
-import { IoMdEye } from "react-icons/io";
+//import { IoMdEye } from "react-icons/io";
 import { MdDelete, MdEdit } from "react-icons/md";
 import DeleteList from '../Offers/DeleteList';
 import { useDispatch, useSelector } from 'react-redux';
 // import { GetAllReqManOffers } from '../../Api/RequestManagement/RequestManagementOffers';
 import { GetAllReqManOffers, ReqPromoStatusChange } from '../../Api/RequestManagement/RequestManagement';
-import ReqPromoStatusUpdate from './ReqPromoStatusUpdate';
+//import ReqPromoStatusUpdate from './ReqPromoStatusUpdate';
 import ReqOffersStatusUpdate from './ReqOffersStatusUpdate';
+import { FaEye } from 'react-icons/fa';
 
 export default function ReqOffers({ currentData }) {
 
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const [promotionid, setPromoId] = useState(null);
   const apiUrl = process.env.REACT_APP_API_URL;
   const [offerview, setOfferView] = useState(false);
@@ -28,7 +30,7 @@ export default function ReqOffers({ currentData }) {
   }
   const [updateData, SetUpdateData] = useState()
   const [statusupdateModal, setStatusupdateModal] = useState(false)
-  const [updateStatus, setUpdateStatus] = useState()
+  //const [updateStatus, setUpdateStatus] = useState()
 
   // const currentData = useSelector((state)=>state.crm.req_man_offers);
   const dispatch = useDispatch()
@@ -42,7 +44,7 @@ export default function ReqOffers({ currentData }) {
       render: (row, rowdta, index) => {
         // console.log(row.tbs_offer_id,'iffiddd');
         return (
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center text-[#1F4B7F]">
             <h1 className="pl-[1vw] text-[1.1vw]">{index + 1}</h1>
           </div>
         );
@@ -53,7 +55,7 @@ export default function ReqOffers({ currentData }) {
       sorter: (a, b) => a.offer_name.localeCompare(b.offer_name),
       render: (row, rowdta, index) => {
         return (
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center text-[#1F4B7F]">
             {/* <h1 className="text-[1.1vw]">{row.offer_name}</h1> */}
             {row?.offer_name?.length > 15 ? (
               <Tooltip
@@ -80,7 +82,7 @@ export default function ReqOffers({ currentData }) {
       width: "17vw",
       render: (row) => {
         return (
-          <div className='flex items-center justify-center'>
+          <div className='flex items-center text-[#1F4B7F] justify-center'>
             {row?.code?.length > 15 ? (
               <Tooltip
                 placement="right"
@@ -111,7 +113,7 @@ export default function ReqOffers({ currentData }) {
       width: "15vw",
       render: (row) => {
         return (
-          <div className='flex items-center justify-center'>
+          <div className='flex items-center text-[#1F4B7F] justify-center'>
             <p className="text-[1.1vw]">{`${dayjs(row?.created_date).format(
               "DD MMM, YY"
             )}`}</p>
@@ -126,7 +128,7 @@ export default function ReqOffers({ currentData }) {
       width: "15vw",
       render: (row) => {
         return (
-          <div className='flex items-center justify-center'>
+          <div className='flex items-center text-[#1F4B7F] justify-center'>
             <p className="text-[1.1vw] flex items-center justify-center">{`${dayjs(row?.updated_date).format(
               "DD MMM, YY"
             )}`}</p>
@@ -140,7 +142,7 @@ export default function ReqOffers({ currentData }) {
       width: "15vw",
       render: (row) => {
         return (
-          <div className='flex items-center justify-center'>
+          <div className='flex items-center text-[#1F4B7F] justify-center'>
             <p className="text-[1.1vw]">{`${dayjs(row?.start_date).format(
               "MMM DD"
             )} - ${dayjs(row?.expiry_date).format("MMM DD")}`}</p>
@@ -154,7 +156,7 @@ export default function ReqOffers({ currentData }) {
       render: (row) => {
         return (
           <div>
-            <p className="text-[1.1vw] flex items-center justify-center">{row.usage}</p>
+            <p className="text-[1.1vw] flex text-[#1F4B7F] items-center justify-center">{row.usage}</p>
           </div>
         );
       },
@@ -168,10 +170,10 @@ export default function ReqOffers({ currentData }) {
           <div className="flex items-center justify-center">
             <button
               className={`${row.status_id == 3
-                  ? "bg-[#34AE2A]"
-                  : row.status_id == 1
-                    ? "bg-[#FD3434]"
-                    : "bg-[#FF9900]"
+                ? "bg-[#34AE2A]"
+                : row.status_id == 1
+                  ? "bg-[#FD3434]"
+                  : "bg-[#FF9900]"
                 } rounded-[0.5vw] text-[1.1vw]  font-semibold text-white w-[7vw] py-[0.2vw]`}
             >
               {row.status == "Active" ? "Approved" : row.status}
@@ -189,7 +191,7 @@ export default function ReqOffers({ currentData }) {
         console.log(row, "rowrowrowrow");
         return (
           <div className="flex gap-[0.7vw] items-center justify-center">
-            <IoMdEye
+            {/* <IoMdEye
               size={"1.6vw"}
               color="#1F4B7F"
               className="cursor-pointer"
@@ -197,7 +199,12 @@ export default function ReqOffers({ currentData }) {
                 setOfferView(true);
                 setOfferImage(row.theme);
               }}
-            />
+            /> */}
+            <FaEye size={"1.5vw"} color="#1F487C" className="cursor-pointer"
+              onClick={() => {
+                setOfferView(true);
+                setOfferImage(row.theme);
+              }} />
             <MdEdit
               size={"1.3vw"}
               color="#1F4B7F"
@@ -263,7 +270,7 @@ export default function ReqOffers({ currentData }) {
         closeicon={false}
       >
         <img
-          src={`http://192.168.90.47:4000${offerimage}`}
+          src={`${apiImgUrl}${offerimage}`}
           className="w-full h-full"
         />
       </ModalPopup>
