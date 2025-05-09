@@ -3,6 +3,7 @@ import axios from "axios";
 import "../../App.css";
 
 export default function Video_modal({ viewData, setViewModalIsOpen }) {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const [adData, setAdData] = useState(null);
 
   useEffect(() => {
@@ -13,7 +14,7 @@ export default function Video_modal({ viewData, setViewModalIsOpen }) {
 
   const GetAdData = async (id) => {
     try {
-      const response = await axios.get(`http://192.168.90.47:4000/ads/${id}`);
+      const response = await axios.get(`${apiImgUrl}/ads/${id}`);
       setAdData(response.data[0]);
     } catch (error) {
       console.error("Error fetching advertisement data:", error);
@@ -30,7 +31,7 @@ export default function Video_modal({ viewData, setViewModalIsOpen }) {
       <div className="rounded-3xl mt-[0.3vw] h-[15vw] w-[40vw] border-[0.1vw] border-l-[0.2vw] border-b-[0.2vw] border-[#1f487c]">
         {adData.ad_file_type && adData.ad_file_type.startsWith("image/") ? (
           <img
-            src={`http://192.168.90.47:4000${adData.ad_video_url}`}
+            src={`${apiImgUrl}${adData.ad_video_url}`}
             alt="Ad"
             className="p-[0.4] w-full h-full"
             style={{
@@ -49,7 +50,7 @@ export default function Video_modal({ viewData, setViewModalIsOpen }) {
               borderRadius: "1.2vw",
             }}
           >
-            <source src={`http://192.168.90.47:4000${adData.ad_video_url}`} />
+            <source src={`${apiImgUrl}${adData.ad_video_url}`} />
           </video>
         )}
       </div>

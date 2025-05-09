@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Grid, Space, Table } from "antd";
+import { Button, Grid, Space, Spin, Table, Tooltip } from "antd";
 import { render } from "@testing-library/react";
 import { MdModeEditOutline, MdPadding } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
@@ -19,6 +19,11 @@ import DeleteList from "../Offers/DeleteList";
 import { useSelector } from "react-redux";
 import { capitalizeFirstLetter } from "../Common/Captilization";
 import EmployeeStatusUpdate from "./Employee/EmployeeStatusUpdate";
+import {
+  TiArrowUnsorted,
+  TiArrowSortedUp,
+  TiArrowSortedDown,
+} from "react-icons/ti";
 
 // import { width } from "@fortawesome/free-solid-svg-icons/fa0";
 
@@ -30,9 +35,26 @@ const EmployeeTableList = ({
   setEmployeeID,
   setDeleteEmpModalIsOpen,
   deleteEmpmodalIsOpen,
+  sortOrderDate,
+  handleDateSort,
+  sortOrderMobile,
+  handleMobileSort,
+  sortOrderEmail,
+  handleEmailSort,
+  sortOrderEmpName,
+  handleEmpNameSort,
+  sortOrderRole,
+  handleRoleSort,
+  sortOrderDes,
+  handleDesSort,
 }) => {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
+  const apiUrl = process.env.REACT_APP_API_URL;
   const [sortedInfo, setSortedInfo] = useState({});
   const [viewmodal, setViewModal] = useState(false);
+  const [userName, setUserName] = useState("")
+  const [spinning, setSpinning] = useState(false);
+  const typeId = sessionStorage.getItem("type_id");
 
   const handleChange = (pagination, filters, sorter) => {
     console.log("Various parameters", pagination, filters, sorter);
@@ -42,7 +64,7 @@ const EmployeeTableList = ({
 
   const get_operator_list = useSelector((state) => state.crm.operator_list);
 
-  const user = localStorage.getItem("USER_ID");
+  const user = sessionStorage.getItem("USER_ID");
 
   const [employee_id, setemployee_id] = useState(null);
 
@@ -53,92 +75,536 @@ const EmployeeTableList = ({
   const columns = [
     {
       title: (
-        <div className="flex items-center justify-center font-bold text-[1.2vw]">Photo</div>
+        <div className="flex items-center justify-center font-bold text-[1.1vw]">Profile</div>
       ),
       // dataIndex: "photo",
       // key: "photo",
       align: "center",
       render: (row) => {
         console.log(row, "rowrowrow");
-        const image = `http://192.168.90.47:4000${row?.profile_img}`;
+        const image = `${apiImgUrl}${row?.profile_img}`;
         console.log(image, "imageimage");
         return (
           <div className="flex justify-center items-center">
             <img
-              src={`${
-                row?.profile_img
-                  ? `http://192.168.90.47:4000${row?.profile_img}`
+              src={`${row?.profile_img
+                  ? `${apiImgUrl}${row?.profile_img}`
                   : UserProfile
-              } `}
-              alt="Photo"
+                } `}
+              alt="Profile"
               className="w-[2.15vw] h-[2.15vw] object-cover rounded-[0.2vw]"
             />
           </div>
         );
       },
-      width: "6vw",
+      width: "5vw",
     },
     {
-      title: <div className="flex items-center justify-center  font-bold text-[1.2vw]">Employee Name</div>, // dataIndex: "name",
-      key: "name",
-      sorter: (a, b) => {
-        const nameA = `${a.emp_first_name} ${a.emp_last_name}`.toUpperCase();
-        const nameB = `${b.emp_first_name} ${b.emp_last_name}`.toUpperCase();
-        return nameA.localeCompare(nameB);
+      title: <div className="flex items-center justify-center font-bold text-[1.1vw]">Employee ID</div>,
+      key: "id",
+      ellipsis: true,
+      width: "11vw",
+      render: (text, row) => {
+        return (
+          <div className="flex items-center justify-center">
+            <p className="text-[1vw] text-[#1F4B7F] font-bold">{user?.startsWith("tbs-pro") ? row.tbs_pro_emp_id : row.tbs_op_emp_id}</p>
+          </div>
+        );
       },
-      width: "12vw",
-      sortOrder: sortedInfo.columnKey === "name" && sortedInfo.order,
+    },
+    {
+      title: 
+      <div className="flex items-center justify-evenly  font-bold text-[1.1vw]">
+        Employee Name
+
+        <button onClick={handleEmpNameSort} className="">
+                              {sortOrderEmpName === "ascend" ? (
+                                <Tooltip
+                                  placement="top"
+                                  title="Ascending"
+                                  className="cursor-pointer"
+                                  color="white"
+                                  overlayInnerStyle={{
+                                    color: "#1F487C",
+                                  }}
+                                >
+                                  <TiArrowSortedUp />
+                                </Tooltip>
+                              ) : sortOrderEmpName === "descend" ? (
+                                <Tooltip
+                                  placement="top"
+                                  title="Descending"
+                                  className="cursor-pointer"
+                                  color="white"
+                                  overlayInnerStyle={{
+                                    color: "#1F487C",
+                                  }}
+                                >
+                                  <TiArrowSortedDown />
+                                </Tooltip>
+                              ) : sortOrderEmpName === null ? (
+                                <Tooltip
+                                  placement="top"
+                                  title="Unsorted"
+                                  className="cursor-pointer"
+                                  color="white"
+                                  overlayInnerStyle={{
+                                    color: "#1F487C",
+                                  }}
+                                >
+                                  <TiArrowUnsorted />
+                                </Tooltip>
+                              ) : (
+                                <Tooltip
+                                  placement="top"
+                                  title="Ascending"
+                                  className="cursor-pointer"
+                                  color="white"
+                                  overlayInnerStyle={{
+                                    color: "#1F487C",
+                                  }}
+                                >
+                                  <TiArrowSortedUp />
+                                </Tooltip>
+                              )}
+                            </button>
+        </div>, // dataIndex: "name",
+      key: "name",
+      // sorter: (a, b) => {
+      //   const nameA = `${a.emp_first_name} ${a.emp_last_name}`.toUpperCase();
+      //   const nameB = `${b.emp_first_name} ${b.emp_last_name}`.toUpperCase();
+      //   return nameA.localeCompare(nameB);
+      // },
+      width: "13vw",
+      // sortOrder: sortedInfo.columnKey === "name" && sortedInfo.order,
+      render: (row) => {
+        // const fullname = `${capitalizeFirstLetter(row?.emp_first_name)} ${row.emp_last_name}`
+        const fullname = `${row?.emp_first_name.charAt(0) === row?.emp_first_name.charAt(0)?.toLowerCase() 
+          ? capitalizeFirstLetter(row?.emp_first_name) 
+          : row?.emp_first_name} ${row?.emp_last_name}`;
+        return (
+          // <div className="flex items-center justify-center">
+          //   <p className="text-[1.1vw] text-[#1F4B7F]">{`${capitalizeFirstLetter(row?.emp_first_name)} ${row.emp_last_name}`}</p>
+          // </div>
+          <div className="flex items-center pl-[1vw]">
+            <p className="text-[1vw] text-[#1F4B7F] font-bold">{
+              fullname?.length > 20 ? <Tooltip placement="top" color="white"
+              overlayInnerStyle={{ color: "#1F4B7F" }}
+                title={`${capitalizeFirstLetter(row?.emp_first_name)} ${row.emp_last_name}`}
+                className="cursor-pointer">{fullname?.slice(0, 20) + ".."}</Tooltip> : fullname
+            }</p>
+          </div>
+        )
+      }
+    },
+    {
+      title: 
+      <div className="flex items-center justify-evenly  font-bold text-[1.1vw]">
+        Role Type
+
+        <button onClick={handleRoleSort} className="">
+                              {sortOrderRole === "ascend" ? (
+                                <Tooltip
+                                  placement="top"
+                                  title="Ascending"
+                                  className="cursor-pointer"
+                                  color="white"
+                                  overlayInnerStyle={{
+                                    color: "#1F487C",
+                                  }}
+                                >
+                                  <TiArrowSortedUp />
+                                </Tooltip>
+                              ) : sortOrderRole === "descend" ? (
+                                <Tooltip
+                                  placement="top"
+                                  title="Descending"
+                                  className="cursor-pointer"
+                                  color="white"
+                                  overlayInnerStyle={{
+                                    color: "#1F487C",
+                                  }}
+                                >
+                                  <TiArrowSortedDown />
+                                </Tooltip>
+                              ) : sortOrderRole === null ? (
+                                <Tooltip
+                                  placement="top"
+                                  title="Unsorted"
+                                  className="cursor-pointer"
+                                  color="white"
+                                  overlayInnerStyle={{
+                                    color: "#1F487C",
+                                  }}
+                                >
+                                  <TiArrowUnsorted />
+                                </Tooltip>
+                              ) : (
+                                <Tooltip
+                                  placement="top"
+                                  title="Ascending"
+                                  className="cursor-pointer"
+                                  color="white"
+                                  overlayInnerStyle={{
+                                    color: "#1F487C",
+                                  }}
+                                >
+                                  <TiArrowSortedUp />
+                                </Tooltip>
+                              )}
+                            </button>
+        </div>, // dataIndex: "name",
+      key: "role_type",
+      // sorter: (a, b) => {
+      //   const nameA = `${a.role_type} ${a.role_type}`.toUpperCase();
+      //   const nameB = `${b.role_type} ${b.role_type}`.toUpperCase();
+      //   return nameA.localeCompare(nameB);
+      // },
+      width: "8vw",
+      // sortOrder: sortedInfo.columnKey === "role_type" && sortedInfo.order,
       render: (row) => (
-        <div className="flex items-center">
-          <p className="text-[1.1vw]">{`${row?.emp_first_name} ${row.emp_last_name}`}</p>
+        // <div className="flex items-center pl-[1vw]">
+        //   <p className="text-[1vw] text-[#1F4B7F]">{`${capitalizeFirstLetter(row?.role_type)}`}</p>
+        // </div>
+        <div className="flex items-center ">
+          {row?.role_type ? ( <p className="text-[1vw] pl-[1vw] text-[#1F4B7F] font-bold">{
+          row?.role_type?.length > 10 ? <Tooltip placement="top" color="white"
+          overlayInnerStyle={{ color: "#1F4B7F" }}
+            title={`${capitalizeFirstLetter(row?.role_type)}`}
+            className="cursor-pointer">{capitalizeFirstLetter(row?.role_type?.slice(0, 10)) + ".."}</Tooltip> : capitalizeFirstLetter(row?.role_type)
+        }</p>):(<div className="font-bold pl-[2.5vw] text-[1vw] text-[#1f4b7f]  w-full">-</div>)}
+       
+      </div>
+      ),
+    },
+    {
+      title: 
+      <div className="flex items-center justify-evenly  font-bold text-[1.1vw]">
+        Designation
+
+        <button onClick={handleDesSort} className="">
+                              {sortOrderDes === "ascend" ? (
+                                <Tooltip
+                                  placement="top"
+                                  title="Ascending"
+                                  className="cursor-pointer"
+                                  color="white"
+                                  overlayInnerStyle={{
+                                    color: "#1F487C",
+                                  }}
+                                >
+                                  <TiArrowSortedUp />
+                                </Tooltip>
+                              ) : sortOrderDes === "descend" ? (
+                                <Tooltip
+                                  placement="top"
+                                  title="Descending"
+                                  className="cursor-pointer"
+                                  color="white"
+                                  overlayInnerStyle={{
+                                    color: "#1F487C",
+                                  }}
+                                >
+                                  <TiArrowSortedDown />
+                                </Tooltip>
+                              ) : sortOrderDes === null ? (
+                                <Tooltip
+                                  placement="top"
+                                  title="Unsorted"
+                                  className="cursor-pointer"
+                                  color="white"
+                                  overlayInnerStyle={{
+                                    color: "#1F487C",
+                                  }}
+                                >
+                                  <TiArrowUnsorted />
+                                </Tooltip>
+                              ) : (
+                                <Tooltip
+                                  placement="top"
+                                  title="Ascending"
+                                  className="cursor-pointer"
+                                  color="white"
+                                  overlayInnerStyle={{
+                                    color: "#1F487C",
+                                  }}
+                                >
+                                  <TiArrowSortedUp />
+                                </Tooltip>
+                              )}
+                            </button>
+        </div>, // dataIndex: "name",
+      key: "Designation",
+      // sorter: (a, b) => {
+      //   const nameA = `${a.designation} ${a.designation}`.toUpperCase();
+      //   const nameB = `${b.designation} ${b.designation}`.toUpperCase();
+      //   return nameA.localeCompare(nameB);
+      // },
+      width: "9vw",
+      // sortOrder: sortedInfo.columnKey === "Designation" && sortedInfo.order,
+      render: (row) => (
+        // <div className="flex items-center pl-[1vw]">
+        //   <p className="text-[1vw] text-[#1F4B7F]">{`${capitalizeFirstLetter(row?.designation)}`}</p>
+        // </div>
+          <div className="flex items-center pl-[1vw]">
+            { row?.designation ? (   <p className="text-[1vw] text-[#1F4B7F] font-bold">{
+            row?.designation?.length >= 12 ? <Tooltip placement="top" color="white"
+            overlayInnerStyle={{ color: "#1F4B7F" }}
+              title={`${capitalizeFirstLetter(row?.designation)}`}
+              className="cursor-pointer">{row?.designation?.slice(0, 12) + ".."}</Tooltip> : row?.designation 
+          }</p>): (<div className="pl-[2vw] w-full text-[1vw] text-[#1f4b7f]  font-bold">-</div>)}
+       
         </div>
       ),
     },
 
     {
-      title: <div className="flex items-center justify-center font-bold text-[1.2vw]">Mobile</div>,
+      title: 
+      <div className="flex items-center justify-evenly font-bold text-[1.1vw]">
+        Mobile
+
+        <button onClick={handleMobileSort}>
+                    {sortOrderMobile === "ascend" ? (
+                      <Tooltip
+                        placement="top"
+                        title="Ascending"
+                        className="cursor-pointer"
+                        color="white"
+                        overlayInnerStyle={{
+                          color: "#1F487C",
+                        }}
+                      >
+                        <TiArrowSortedUp />
+                      </Tooltip>
+                    ) : sortOrderMobile === "descend" ? (
+                      <Tooltip
+                        placement="top"
+                        title="Descending"
+                        className="cursor-pointer"
+                        color="white"
+                        overlayInnerStyle={{
+                          color: "#1F487C",
+                        }}
+                      >
+                        <TiArrowSortedDown />
+                      </Tooltip>
+                    ) : sortOrderMobile === null ? (
+                      <Tooltip
+                        placement="top"
+                        title="Unsorted"
+                        className="cursor-pointer"
+                        color="white"
+                        overlayInnerStyle={{
+                          color: "#1F487C",
+                        }}
+                      >
+                        <TiArrowUnsorted />
+                      </Tooltip>
+                    ) : (
+                      <Tooltip
+                        placement="top"
+                        title="Ascending"
+                        className="cursor-pointer"
+                        color="white"
+                        overlayInnerStyle={{
+                          color: "#1F487C",
+                        }}
+                      >
+                        <TiArrowSortedUp />
+                      </Tooltip>
+                    )}
+                  </button>
+        </div>,
       key: "mobile",
-      sorter: (a, b) => a.phone?.length - b.phone?.length,
-      sortOrder: sortedInfo.columnKey === "mobile" ? sortedInfo.order : null,
+      // sorter: (a, b) => a.phone?.length - b.phone?.length,
+      // sorter: (a, b) => {
+      //   const phoneA = a.phone ? a.phone.replace(/\D/g, '') : '';
+      //   const phoneB = b.phone ? b.phone.replace(/\D/g, '') : '';
+      //   return phoneA.localeCompare(phoneB);
+      // },
+      // sortOrder: sortedInfo.columnKey === "mobile" ? sortedInfo.order : null,
       ellipsis: true,
-      width: "10vw",
+      width: "8vw",
       render: (text, row) => {
         return (
           <div className="flex items-center justify-center">
-            <p className="text-[1.1vw]">{row.phone}</p>
+            {
+              row?.phone ? (
+                <p className="text-[1vw] text-[#1F4B7F]">{row.phone}</p>
+              ) :
+              (<div className="font-bold text-[1vw] text-[#1f4b7f] ">-</div>)
+            }
+         
           </div>
         );
       },
     },
     {
-      title: <div className="flex items-center justify-center  font-bold text-[1.2vw]">Email</div>,
+      title: 
+      <div className="flex items-center justify-evenly  font-bold text-[1.1vw]">
+        Email
+
+        <button onClick={handleEmailSort}>
+                              {sortOrderEmail === "ascend" ? (
+                                <Tooltip
+                                  placement="top"
+                                  title="Ascending"
+                                  className="cursor-pointer"
+                                  color="white"
+                                  overlayInnerStyle={{
+                                    color: "#1F487C",
+                                  }}
+                                >
+                                  <TiArrowSortedUp />
+                                </Tooltip>
+                              ) : sortOrderEmail === "descend" ? (
+                                <Tooltip
+                                  placement="top"
+                                  title="Descending"
+                                  className="cursor-pointer"
+                                  color="white"
+                                  overlayInnerStyle={{
+                                    color: "#1F487C",
+                                  }}
+                                >
+                                  <TiArrowSortedDown />
+                                </Tooltip>
+                              ) : sortOrderEmail === null ? (
+                                <Tooltip
+                                  placement="top"
+                                  title="Unsorted"
+                                  className="cursor-pointer"
+                                  color="white"
+                                  overlayInnerStyle={{
+                                    color: "#1F487C",
+                                  }}
+                                >
+                                  <TiArrowUnsorted />
+                                </Tooltip>
+                              ) : (
+                                <Tooltip
+                                  placement="top"
+                                  title="Ascending"
+                                  className="cursor-pointer"
+                                  color="white"
+                                  overlayInnerStyle={{
+                                    color: "#1F487C",
+                                  }}
+                                >
+                                  <TiArrowSortedUp />
+                                </Tooltip>
+                              )}
+                            </button>
+        </div>,
       // dataIndex: "email",
       key: "email",
-      sorter: (a, b) => a.email_id?.length - b.email_id?.length,
-      sortOrder: sortedInfo.columnKey === "email" ? sortedInfo.order : null,
+      // sorter: (a, b) => a.email_id?.length - b.email_id?.length,
+      // sortOrder: sortedInfo.columnKey === "email" ? sortedInfo.order : null,
+      // sorter: (a, b) => {
+      //   const emailA = (a.email_id || "").toLowerCase(); // Ensure it's always a string, even if null/undefined
+      //   const emailB = (b.email_id || "").toLowerCase(); // Ensure it's always a string, even if null/undefined
+      //   return emailA.localeCompare(emailB);  // Sort alphabetically
+      // },
+      // sortOrder: sortedInfo.columnKey === "email" ? sortedInfo.order : null,
       ellipsis: true,
-      width: "15vw",
+      width: "13vw",
       render: (row) => {
         return (
-          <div className="flex items-center justify-center">
-            <p className="text-[1.1vw]">{row.email_id}</p>
+          // <div className="flex items-center justify-center">
+          //   <p className="text-[1.1vw] text-[#1F4B7F]">{row.email_id}</p>
+          // </div>
+          <div>
+            {row?.email_id?.length > 20 ? (
+              <Tooltip
+              color="white"
+              overlayInnerStyle={{ color: "#1F4B7F" }}
+                placement="top"
+                title={row?.email_id}
+                className="cursor-pointer"
+              >
+                <div className="text-[1vw] pl-[1vw] text-[#1f4b7f]">
+                  {" "}
+                  {`${row?.email_id?.slice(0, 20)}...`}
+                </div>
+              </Tooltip>
+            ) : row?.email_id ? (
+              <div className="text-[1vw] pl-[1vw] text-[#1f4b7f]">
+                {row?.email_id?.slice(0, 20)}
+              </div>
+            ) : (<div className="font-bold text-[1vw] text-[#1f4b7f] text-center">-</div>)}
           </div>
         );
       },
     },
     {
-      title: <div className="flex items-center justify-center  font-bold text-[1.2vw]">Created</div>,
+      title: 
+      <div className="flex items-center justify-evenly  font-bold text-[1.1vw]">
+        Created
+
+        <button onClick={handleDateSort}>
+                              {sortOrderDate === "ascend" ? (
+                                <Tooltip
+                                  placement="top"
+                                  title="Ascending"
+                                  className="cursor-pointer"
+                                  color="white"
+                                  overlayInnerStyle={{
+                                    color: "#1F487C",
+                                  }}
+                                >
+                                  <TiArrowSortedUp />
+                                </Tooltip>
+                              ) : sortOrderDate === "descend" ? (
+                                <Tooltip
+                                  placement="top"
+                                  title="Descending"
+                                  className="cursor-pointer"
+                                  color="white"
+                                  overlayInnerStyle={{
+                                    color: "#1F487C",
+                                  }}
+                                >
+                                  <TiArrowSortedDown />
+                                </Tooltip>
+                              ) : sortOrderDate === null ? (
+                                <Tooltip
+                                  placement="top"
+                                  title="Unsorted"
+                                  className="cursor-pointer"
+                                  color="white"
+                                  overlayInnerStyle={{
+                                    color: "#1F487C",
+                                  }}
+                                >
+                                  <TiArrowUnsorted />
+                                </Tooltip>
+                              ) : (
+                                <Tooltip
+                                  placement="top"
+                                  title="Ascending"
+                                  className="cursor-pointer"
+                                  color="white"
+                                  overlayInnerStyle={{
+                                    color: "#1F487C",
+                                  }}
+                                >
+                                  <TiArrowSortedUp />
+                                </Tooltip>
+                              )}
+                            </button>
+        </div>,
       // dataIndex: "created",
       key: "created_date",
-      sorter: (a, b) => new Date(a.created_date) - new Date(b.created_date),
-      sortOrder: sortedInfo.columnKey === "created_date" && sortedInfo.order,
+      // sorter: (a, b) => new Date(a.created_date) - new Date(b.created_date),
+      // sortOrder: sortedInfo.columnKey === "created_date" && sortedInfo.order,
       ellipsis: true,
       width: "10vw",
       render: (row) => {
         return (
-          <div className="flex items-center justify-center">
-            <p className="text-[1.1vw]">
-              {dayjs(row.created_date).format("MMM DD hh:mm a")}
+          <div className="pl-[2.5vw]">
+            <p className="text-[1vw] text-[#1F4B7F]">
+              {/* {dayjs(row.created_date).format("MMM DD hh:mm a")} */}
+              {dayjs(row.created_date).format("DD MMM, YY")}
             </p>
           </div>
         );
@@ -146,7 +612,7 @@ const EmployeeTableList = ({
     },
     {
       title: (
-        <div className="flex items-center justify-center font-bold text-[1.2vw]">Status</div>
+        <div className="flex items-center justify-center font-bold text-[1.1vw]">Status</div>
       ),
       // dataIndex: "status",
       // key: "status",
@@ -155,25 +621,25 @@ const EmployeeTableList = ({
         return (
           <div className="flex items-center justify-center">
             <button
-              className={`${
-                row.emp_status_id == 0
-                  ? "bg-[#FF6B00]"
+              className={`${row.emp_status_id == 0
+                  ? "bg-[#646262]"
                   : row.emp_status_id == 1
-                  ? "bg-[#38ac2c]"
-                  : row.emp_status_id == 2
-                  ? "bg-[#FD3434]"
-                  : "bg-[#2A99FF]"
-              } ${
-                row.emp_status_id == 0 ? "cursor-not-allowed" : "cursor-pointer"
-              } h-[1.8vw] text-[1.1vw] text-white w-[8vw] rounded-[0.5vw]`}
-              onClick={() => {
-                setViewModal(true);
-                setemployee_id(
-                  user.startsWith("tbs-pro")
-                    ? row.tbs_pro_emp_id
-                    : row.tbs_op_emp_id
-                );
-              }}
+                    ? "bg-[#34AE2B]"
+                    : row.emp_status_id == 2
+                      ? "bg-[#FD3434]"
+                      : "bg-[#2A99FF]"
+                } ${row.emp_status_id == 0 ? "cursor-not-allowed" : "cursor-pointer"
+                } h-[1.8vw] text-[1vw] shadow-md shadow-black font-extrabold text-white w-[7vw] rounded-[0.5vw]`}
+                onClick={() => {
+                  if (row.emp_status_id !== 0) {
+                    setViewModal(true);
+                    setemployee_id(
+                      user.startsWith("tbs-pro")
+                        ? row.tbs_pro_emp_id
+                        : row.tbs_op_emp_id
+                    );
+                  }
+                }}
             >
               {capitalizeFirstLetter(row.emp_status)}
             </button>
@@ -183,11 +649,11 @@ const EmployeeTableList = ({
     },
     {
       title: (
-        <div className="flex items-center justify-center font-bold text-[1.2vw]">Action</div>
+        <div className="flex items-center justify-center font-bold text-[1.1vw]">Action</div>
       ),
       // dataIndex: "action",
       // key: "action",
-      width: "10vw",
+      width: "6vw",
       render: (row) => {
         console.log(
           user?.startsWith("tbs-pro") ? row.tbs_pro_emp_id : row.tbs_op_emp_id,
@@ -234,9 +700,11 @@ const EmployeeTableList = ({
                   if (user?.startsWith("tbs-pro")) {
                     setemployee_id(row.tbs_pro_emp_id);
                     console.log(row.tbs_pro_emp_id, "----owner id");
+                    setUserName(`${row.emp_first_name}${" "}${row.emp_last_name}`)
                   } else {
                     setemployee_id(row.tbs_op_emp_id);
                     console.log(row.tbs_op_emp_id, "----op id");
+                    setUserName(`${row.emp_first_name}${" "}${row.emp_last_name}`)
                   }
                 }}
               />
@@ -271,10 +739,15 @@ const EmployeeTableList = ({
     setDeleteEmpModalIsOpen(false);
   };
   console.log(currentData, "wefwefewfcewskjfbjksdvkjdfv");
-  const apiUrl = process.env.REACT_APP_API_URL;
+
 
   return (
     <>
+       {spinning === true ? (
+              <div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-20  z-10">
+                <Spin size="large" />
+              </div>
+            ) : "" }
       <Table
         columns={columns}
         dataSource={currentData}
@@ -291,7 +764,7 @@ const EmployeeTableList = ({
       >
         <DeleteList
           setDeleteModalIsOpen={setDeleteEmpModalIsOpen}
-          title={"Want to delete this User"}
+          title={`Want to delete this User ${capitalizeFirstLetter(userName)}`}
           api={
             user?.startsWith("tbs-pro")
               ? `${apiUrl}/pro-emp-personal-details/${employee_id}`
@@ -305,12 +778,13 @@ const EmployeeTableList = ({
         show={viewmodal}
         closeicon={false}
         onClose={closeModal}
-        height="16vw"
-        width="30vw"
+        height="17vw"
+        width="28vw"
       >
         <EmployeeStatusUpdate
           employeeid={employee_id}
           setViewModal={setViewModal}
+          setSpinning={setSpinning}
         />
       </ModalPopup>
     </>

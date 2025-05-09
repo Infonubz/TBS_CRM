@@ -11,12 +11,20 @@ import {
 } from "../../Api/ForgotPassword/ForgotPassword";
 import { toast } from "react-toastify";
 import "../../App.css";
+import { Spin } from "antd";
+
+const emailDomains = ['gmail.com', 'outlook.com'];
 const validationSchema = Yup.object().shape({
   email_id: Yup.string()
     .matches(
       /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
       "Invalid email address format"
     )
+    // .matches(
+      // add required email domains in the vatiable 'emailDomains'
+      // new RegExp(`^[^\\s@]+@(${emailDomains.join('|')})$`), 
+      // "Invalid email address format"
+    // )
     .required("Email is required"),
 });
 
@@ -27,7 +35,7 @@ const validationFullSchema = Yup.object().shape({
       "Invalid email address format"
     )
     .required("Email is required"),
-  //otp: Yup.string().required("OTP is required"),
+  // otp: Yup.string().required("OTP is required"),
   newPassword: Yup.string().required("New password is required"),
   confirm: Yup.string()
     .oneOf([Yup.ref("newPassword"), null], "Passwords must match")
@@ -38,6 +46,7 @@ const ProductOwnerForgotPassword = ({
   setLoginHide,
   setShowComponent,
   setForgotPassword,
+  typeID
 }) => {
   const [otpEnabled, setOtpEnabled] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
@@ -45,34 +54,81 @@ const ProductOwnerForgotPassword = ({
   const [value, setValue] = useState([]);
   const [otpDigits, setOtpDigits] = useState(["", "", "", "", "", ""]);
   const [showPassword, setShowPassword] = useState(false);
+  const [storeMail,setStoreMail] = useState("")
+  const [spinning,setSpinning] = useState(false)
   const [showConfirmPassword, setshowConfirmPassword] = useState(false);
+  const [userError,setUserError] = useState(false)
+
+  // const[inputNewPassword, setInputNewPassword] = useState("") -------------------------------------------------------------------
+  // const[inputConfirmPassword, setInputConfirmPassword] = useState("")
+  const[correctOtp, setCorrectOtp] = useState("")
+  const [error, setError] = useState('');
+
+
+
 
   const handleSendOTP = async (values) => {
-    console.log(values, "values emailid");
+    console.log(values ,typeID, "values emailid");
+    // setOtpEnabled(true);
+    setSpinning(true)
     try {
-      const otpMail = values;
-      const response = await SendOTP(otpMail);
+      const otpMail = values.email_id;
+      setStoreMail(otpMail)
+      const response = await SendOTP(otpMail,typeID,setSpinning);
+      console.log(response.request.status," otp response 2")
+      if(response.request.status === 200) {
+        setOtpEnabled(true);
+      } else {
+        setUserError(true)
+      }
       console.log(response, "-----response emailid");
-      toast.success(response?.data?.message);
-      setOtpEnabled(true);
+      // toast.success(response?.data?.message); ---------------------------------------------------------------------------------------
+      setCorrectOtp(response.data.otp)
     } catch (error) {
       console.error("Error sending OTP", error);
     }
   };
 
-  const handleResendOTP = () => {
+  const handleResendOTP = async() => {
     console.log("Resending OTP...");
+    try {
+      const response = await SendOTP(storeMail,typeID,setSpinning);
+      setOtpEnabled(true);
+      console.log(response, "-----response emailid");
+      // toast.success(response?.data?.message);
+    } catch (error) {
+      console.error("Error sending OTP", error);
+    }
   };
-
   const handleSubmit = async (values) => {
     try {
-      const response = await ResetPassword(values);
-      toast.success(response?.data?.message);
+      setSpinning(true)
+      const response = await ResetPassword(values ,typeID,setSpinning);
+      setForgotPassword(false)
       setLoginHide(true);
       setShowComponent(false);
-      navigation("/");
+      // navigation("/");
+      // toast.success(response?.data?.message); -------------------------------------------------------------------------------------
+      console.log(response, "response")
+      const allEmpty = otpDigits.every(digit => digit === "");
+      if(allEmpty) {
+        setError("OTP is required")
+      } else {
+        setError("OTP is incorrect")
+      }  
+      
     } catch (error) {
       console.error("Error resetting password", error);
+      // const allEmpty = otpDigits.every(digit => digit === ""); //----------------------------------------------------------------
+      // if(allEmpty) {
+      //   setError("OTP is required")
+      // } else {
+      //   setError("OTP is incorrect")
+      // } 
+      if(values.otp){
+        toast.error("Invalid OTP")
+      }
+      // console.log(values, "error values") //---------------------------------------------------------------------------------------
     }
   };
 
@@ -84,8 +140,14 @@ const ProductOwnerForgotPassword = ({
     setshowConfirmPassword(!showConfirmPassword);
   };
   console.log(otpEnabled, "otpEnabled");
+  
   return (
     <div className="absolute right-0 top-0 bg-[#E5FFF1] h-full w-[38vw] rounded-tr-[2vw] rounded-br-[2vw] bg-opacity-80 flex flex-col items-center justify-center">
+       {spinning === true ? (
+              <div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-5  z-30">
+                <Spin size="large" />
+              </div>
+            ) : "" }
       <label className="text-[#1F487C] font-bold text-[2vw] ">
         {otpEnabled ? "Create New Password" : "Forgot Password"}
       </label>
@@ -100,6 +162,7 @@ const ProductOwnerForgotPassword = ({
           return !otpEnabled ? validationSchema : validationFullSchema;
         }}
         onSubmit={(values, { setSubmitting }) => {
+          console.log(values,"iufhdxkjfhkjdhfkjdhf");          
           if (!otpEnabled) {
             handleSendOTP(values);
           } else {
@@ -108,12 +171,12 @@ const ProductOwnerForgotPassword = ({
           }
         }}
       >
-        {({ isSubmitting, setFieldValue }) => (
+        {({ isSubmitting, setFieldValue}) => (
           <Form>
             <div className="gap-y-[1.5vw] flex-col flex pt-[1vw]">
               {otpEnabled ? (
                 <>
-                  <div className="col-span-1">
+                  <div className="col-span-1 relative">
                     <InputOTP
                       name="otp"
                       style={{
@@ -131,6 +194,8 @@ const ProductOwnerForgotPassword = ({
                           }
                         }
                         setOtpDigits(updatedDigits);
+                        // setError(validateOtp([otpValue]));
+                        console.log(otpDigits, "otp digits")
                       }}
                       // wrapperStyle={{
                       //   height: "0.5vw",
@@ -138,11 +203,22 @@ const ProductOwnerForgotPassword = ({
                       classNames="input-otp__field"
                       inputType="numeric"
                     />
+                    {error ? (
+                      <div className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[.3vw]">
+                      {error}
+                      </div>
+                      ): ("")}
+                    {/* <Field ---------------------------------------------------------------------------------------------------
+                    type='text'
+                    name='otp'
+                    placeholder="Enter otp"
+                        className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                        />
                     <ErrorMessage
                       name="otp"
                       component="div"
-                      className="text-red-500 text-[0.8vw]"
-                    />
+                      className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[.3vw]"
+                    /> */}
                   </div>
                   <button
                     type="button"
@@ -151,13 +227,14 @@ const ProductOwnerForgotPassword = ({
                   >
                     Resend OTP
                   </button>
-                  <div className="col-span-1">
+                  <div className="col-span-1 relative">
                     <div className="relative flex items-center">
                       <Field
                         type={showPassword ? "text" : "password"}
                         name="newPassword"
                         placeholder="Enter New Password"
-                        className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                        // onChange={(e) => setInputNewPassword(e.target.value)} 
+                        className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                         />
                       <div
                         className="absolute right-[1vw] cursor-pointer"
@@ -174,16 +251,17 @@ const ProductOwnerForgotPassword = ({
                     <ErrorMessage
                       name="newPassword"
                       component="div"
-                      className="text-red-500 text-[0.8vw]"
+                      className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[.3vw]"
                     />
                   </div>
-                  <div className="col-span-1">
+                  <div className="col-span-1 relative">
                     <div className="relative flex items-center">
                       <Field
                         type={showConfirmPassword ? "text" : "password"}
                         name="confirm"
                         placeholder="Enter Confirm Password"
-                        className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                        // onChange={(e) => setInputConfirmPassword(e.target.value)} 
+                        className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                       />
                       <div
                         className="absolute right-[1vw] cursor-pointer"
@@ -200,7 +278,7 @@ const ProductOwnerForgotPassword = ({
                     <ErrorMessage
                       name="confirm"
                       component="div"
-                      className="text-red-500 text-[0.8vw]"
+                      className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[.3vw]"
                     />
                   </div>
                   <div className="pt-[1vw]">
@@ -215,15 +293,20 @@ const ProductOwnerForgotPassword = ({
                   </div>
                   <p
                     className="text-[1vw] text-center font-semibold text-[#1F487C] cursor-pointer"
-                    onClick={() => setOtpEnabled(false)}
+                    onClick={() => {setOtpEnabled(false)
+                      setError("")
+                      // setInputNewPassword("") -------------------------------------------------------------------------------
+                    // setInputConfirmPassword("")
+                  }
+                    }
                   >
                     Back
                   </p>
                 </>
               ) : (
                 <>
-                  <div className="col-span-1">
-                    <label className="text-[#1F487C] text-[1.1vw] ">
+                  <div className="col-span-1 relative">
+                    <label className="text-[#1F487C] text-[1.3vw] ">
                       Email ID
                       <span className="text-[1vw] text-red-600 pl-[0.2vw]">
                         *
@@ -233,19 +316,22 @@ const ProductOwnerForgotPassword = ({
                       type="text"
                       name="email_id"
                       placeholder="Enter Email Address"
-                      className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1.2vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
+                      className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                     />
                     <ErrorMessage
                       name="email_id"
                       component="div"
-                      className="text-red-500 text-[0.8vw]"
+                      className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[.3vw]"
                     />
+                    {userError && <div
+                      className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw] left-[.3vw]"
+                    >User not found</div>}
                   </div>
                   <div className="flex justify-center">
                     {!otpEnabled ? (
                       <button
                         type="submit"
-                        onClick={handleSendOTP}
+                        // onClick={handleSendOTP}
                         className="w-full flex justify-center py-2 px-2 border border-transparent rounded-md shadow-sm text-[1vw] font-medium text-white bg-[#1F487C]"
                       >
                         Send OTP
@@ -253,7 +339,7 @@ const ProductOwnerForgotPassword = ({
                     ) : (
                       <button
                         type="button"
-                        onClick={handleResendOTP}
+                        // onClick={handleResendOTP}
                         className="w-full flex justify-center py-2 px-2 border border-transparent rounded-md shadow-sm text-[1vw] font-medium text-white bg-[#1F487C]"
                       >
                         Resend OTP

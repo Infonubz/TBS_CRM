@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import operator from "../../asserts/Operator.png";
 import Operator_bg from "../../asserts/Operator-bg.png";
 import logo from "../../asserts/crmlogo.png";
-import ProductOwner from "../Login/ProductOwner";
-import ProductOwnerForgotPassword from "../ForgotPassword/ProductOwner";
 import OperatorForgotPassword from "../ForgotPassword/Operator";
 import Operator from "../Login/Operator";
+import ProductOwnerForgotPassword from "../ForgotPassword/ProductOwner";
+
 export default function OperatorLoginPage({ setAuthtoken }) {
+
   const [forgotpassword, setForgotPassword] = useState(false);
+
   return (
     <div>
       <div
@@ -21,11 +23,11 @@ export default function OperatorLoginPage({ setAuthtoken }) {
         }}
       >
         <div className="absolute right-[1.5vw] top-0">
-          <img src={logo} className="h-[6vw] w-[13vw]" />
+          <img src={logo} alt="logo" className="h-[6vw] w-[13vw]" />
         </div>
         <div className="w-[90%] h-[80%] relative rounded-tr-[2vw] rounded-br-[2vw] mt-[6%]">
           <div
-            className="h-full w-full  border-[0.1vw] border-[#1F487C] rounded-tr-[2vw] rounded-br-[2vw]"
+            className="h-full w-full border-[0.1vw] border-[#1F487C] rounded-tr-[2vw] rounded-br-[2vw]"
             style={{
               backgroundImage: `url(${operator})`,
               backgroundSize: "cover",
@@ -34,14 +36,20 @@ export default function OperatorLoginPage({ setAuthtoken }) {
                 "0 -10px 6px rgba(0, 0, 0, 0.1), 0 10px 6px rgba(0, 0, 0, 0.1)",
             }}
           >
-            {forgotpassword == false ? (
+            {forgotpassword === false ? (
               <Operator
                 setAuthtoken={setAuthtoken}
                 setForgotPassword={setForgotPassword}
               />
             ) : (
-              <OperatorForgotPassword
-                setForgotPassword={setForgotPassword}
+              // <OperatorForgotPassword
+              //   setForgotPassword={setForgotPassword}
+              //   typeID={"OP101"}
+
+              // />
+              <ProductOwnerForgotPassword 
+              setForgotPassword={setForgotPassword}
+              typeID={"OP101"}
               />
             )}
           </div>

@@ -31,7 +31,7 @@ export default function ReqPromoStatusUpdate({ promoId, setViewStatus }) {
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <p className="text-[1.5vw] text-[]">Update the Promotion Status</p>
+      <p className="text-[1.5vw] font-bold">Update The Promotion Status</p>
       <img src={image} className="h-[6vw] w-[6vw] my-[1vw]"></img>
       <div className="flex gap-2 mt-[1vw]">
         <button

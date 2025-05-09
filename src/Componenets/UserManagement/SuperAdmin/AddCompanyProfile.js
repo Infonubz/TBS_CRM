@@ -1,6 +1,6 @@
-import { Progress, Upload } from "antd";
+import { Progress, Spin, Upload } from "antd";
 import { ErrorMessage, Field, Form, Formik } from "formik";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
@@ -9,21 +9,33 @@ import {
   GetOperatorProfile,
   SubmitAddressData,
   SubmitCompanyData,
+  validateEmail,
+  validateMobile,
 } from "../../../Api/UserManagement/SuperAdmin";
 import axios from "axios";
 import { useDispatch } from "react-redux";
+import umbuslogo from "../../../asserts/umbuslogo.png";
 import { FaUpload } from "react-icons/fa";
 import ImageCropper from "./ImageCropper";
+import usePreventDragAndDrop from "../../Hooks/usePreventDragAndDrop";
 
+const emailDomains = ['gmail.com', 'outlook.com', 'yahoo.com', 'zoho.com'];
 const validationSchema = Yup.object().shape({
   phone: Yup.string()
-    .matches(/^[0-9]+$/, "Phone number must be a number")
+    // .matches(/^[6-9]\d{9}$/, "Phone number must start with 6, 7, 8, or 9")
+    // .matches(/^[0-9]+$/, "Phone number must be a number")
+    .matches(/^[6-9]\d{9}$/, "Enter a 10-digit number starting with 6-9")
     .min(10, "Phone number must be at least 10 digits")
     .max(10, "Phone number maximum 10 digits only")
     .required("Phone Number is required"),
   emailid: Yup.string()
+    // .matches(
+    //   /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+    //   "Invalid email address format"
+    // )
     .matches(
-      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+      // add required email domains in the vatiable 'emailDomains'
+      new RegExp(`^[^\\s@]+@(${emailDomains.join('|')})$`), 
       "Invalid email address format"
     )
     .required("Email is required"),
@@ -43,24 +55,27 @@ const validationSchema = Yup.object().shape({
     //   /^[a-zA-Z]+[0-9]+$/,
     //   "Company name must contain letters and numbers only"
     // )
-    .min(3, "Company name must be at least 3 characters long")
-    .max(30, "Company name must be at most 30 characters long")
-    .matches(/^[^!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+$/, 'Special characters are not allowed')
-    .required("Company Name is required"),
+    .min(3, "At least 3 characters long")
+    .max(30, "Maximum 30 characters only")
+    .required("Company Name is required")
+    .matches(/^[A-Za-z0-9\s]+$/, "Only letters, numbers, spaces are allowed"),
+
   ownername: Yup.string()
     .required("Owner Name is required")
-    .matches(/^[^!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+$/, 'Special characters are not allowed'),
+    .min(3, "At least 3 characters long")
+    .max(30, "Maximum 30 characters only")
+    .matches(/^[A-Za-z\s]+$/, "Only letters and spaces are allowed"),
   password: Yup.string(),
   aadhar: Yup.string()
     .matches(/^[0-9]{12}$/, "Aadhar number must be exactly 12 digits")
     .required("Aadhar Number is required")
-    .max(12,"Aadhar number must be exactly 12 digits"),
+    .max(12, "Aadhar number must be exactly 12 digits"),
   pan: Yup.string()
     .matches(
       /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
-      "PAN number must be in the format: ABCDE1234F"
+      "PAN number format must be: ABCDE1234F"
     )
-    .required("Pan Number is required"),
+    .required("PAN Number is required"),
   // profileimg: Yup.mixed()
   //   .required("File is empty")
   //   .test("required", "A file is required", function (value) {
@@ -105,64 +120,15 @@ export default function AddSuperAdmin({
   profileImage,
   setProfileImage,
   updatedata,
-  setEnableUpload
+  setEnableUpload,
+  selectedFile,
+  enableUpload,
+  setSelectedFile,
 }) {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const dispatch = useDispatch();
-
-  const handleSubmit = async (values) => {
-    console.log(values, "hiiiiiiiiii");
-    if (operatorID && enable == false) {
-      setCurrentpage(2);
-    } else {
-      try {
-        const data = await SubmitCompanyData(
-          values,
-          operatorID,
-          enable,
-          dispatch,
-          fileList
-        );
-        toast.success(data?.message);
-        setCurrentpage(2);
-        setOperator_Id(data?.id);
-        GetOperatorProfile(operatorID, dispatch)
-        console.log("Current page set to 2");
-      } catch (error) {
-        console.error("Error uploading data", error);
-      }
-  
-    }
-    setsuperadmincompanydata({
-      company_name: values.companyname,
-      owner_name: values.ownername,
-      phone: values.phone,
-      alternate_phone: values.phone,
-      emailid: values.emailid,
-      alternate_emailid: values.emailid,
-      aadharcard_number: values.aadhar,
-      pancard_number: values.pan,
-      profileimg: values.profileimg
-    });
-  };
-
-  const handleBlur = async (e, setFieldError) => {
-    const { value } = e.target;
-
-    try {
-      const response = await axios.post(
-        "http://192.168.90.47:4000/operator_validation",
-        { phone: value }
-      );
-      console.log(response.data.Phone, "ggggg");
-      if (response.data.Phone) {
-        console.log("heloo");
-        setFieldError("phone", "Mobile number already exists");
-      }
-    } catch (error) {
-      console.error("Error checking mobile number", error);
-      setFieldError("phone", "Error checking mobile number");
-    }
-  };
+  const [spinning, setSpinning] = useState(false);
+  const [reset, setReset] = useState(false);
   const [superadmincompanydata, setsuperadmincompanydata] = useState({
     company_name: "",
     owner_name: "",
@@ -172,17 +138,225 @@ export default function AddSuperAdmin({
     alternate_emailid: "",
     aadharcard_number: "",
     pancard_number: "",
-    profileimg: ""
+    profileimg: "",
   });
 
+  const handleSubmit = async (values, setFieldError) => {
+    console.log(
+      superadmincompanydata.phone === values.phone ||
+        superadmincompanydata.emailid === values.emailid,
+      "phonevalidation"
+    );
+
+    if (
+      superadmincompanydata.phone === values.phone &&
+      superadmincompanydata.emailid === values.emailid
+    ) {
+      if (
+        (operatorID && enable == false && addressback == true) ||
+        (updatedata && enable == false)
+      ) {
+        setCurrentpage(2);
+      } else {
+        try {
+          const data = await SubmitCompanyData(
+            values,
+            operatorID,
+            enable,
+            dispatch,
+            fileList,
+            setOperatorID
+          );
+          toast.success(data?.message);
+          setCurrentpage(2);
+          setOperator_Id(data?.id);
+          GetOperatorProfile(operatorID, dispatch);
+          console.log("Current page set to 2");
+        } catch (error) {
+          console.error("Error uploading data", error);
+        }
+      }
+      // setsuperadmincompanydata({
+      //   company_name: values.companyname,
+      //   owner_name: values.ownername,
+      //   phone: values.phone,
+      //   alternate_phone: values.phone,
+      //   emailid: values.emailid,
+      //   alternate_emailid: values.emailid,
+      //   aadharcard_number: values.aadhar,
+      //   pancard_number: values.pan,
+      //   profileimg: values.profileimg,
+      // });
+      setEnableUpload(true);
+    } else if (superadmincompanydata.emailid === values.emailid) {
+      const mobileResponce = await validateMobile(values.phone, "operator");
+      if (mobileResponce) {
+        setFieldError("phone", "Phone no is already exist");
+      } else {
+        if (
+          (operatorID && enable == false && addressback == true) ||
+          (updatedata && enable == false)
+        ) {
+          setCurrentpage(2);
+        } else {
+          try {
+            const data = await SubmitCompanyData(
+              values,
+              operatorID,
+              enable,
+              dispatch,
+              fileList,
+              setOperatorID
+            );
+            toast.success(data?.message);
+            setCurrentpage(2);
+            setOperator_Id(data?.id);
+            GetOperatorProfile(operatorID, dispatch);
+            console.log("Current page set to 2");
+          } catch (error) {
+            console.error("Error uploading data", error);
+          }
+        }
+        setEnableUpload(true);
+      }
+    } else if (superadmincompanydata.phone === values.phone) {
+      const emailResponce = await validateEmail(values.emailid, "operator");
+      if (emailResponce) {
+        setFieldError("emailid", "Email id is already exist");
+      } else {
+        if (
+          (operatorID && enable == false && addressback == true) ||
+          (updatedata && enable == false)
+        ) {
+          setCurrentpage(2);
+        } else {
+          try {
+            const data = await SubmitCompanyData(
+              values,
+              operatorID,
+              enable,
+              dispatch,
+              fileList,
+              setOperatorID
+            );
+            toast.success(data?.message);
+            setCurrentpage(2);
+            setOperator_Id(data?.id);
+            GetOperatorProfile(operatorID, dispatch);
+            console.log("Current page set to 2");
+          } catch (error) {
+            console.error("Error uploading data", error);
+          }
+        }
+        setEnableUpload(true);
+      }
+    } else {
+      const mobileResponce = await validateMobile(values.phone, "operator");
+      const emailResponce = await validateEmail(values.emailid, "operator");
+      if (mobileResponce == true || emailResponce == true) {
+        if (mobileResponce) {
+          setFieldError("phone", "Phone no is already exist");
+        } else if (emailResponce) {
+          setFieldError("emailid", "Email id is already exist");
+        }
+      } else {
+        console.log(values, "hiiiiiiiiii");
+        if (
+          (operatorID && enable == false && addressback == true) ||
+          (updatedata && enable == false)
+        ) {
+          setCurrentpage(2);
+        } else {
+          try {
+            const data = await SubmitCompanyData(
+              values,
+              operatorID,
+              enable,
+              dispatch,
+              fileList,
+              setOperatorID
+            );
+            toast.success(data?.message);
+            setCurrentpage(2);
+            setOperator_Id(data?.id);
+            GetOperatorProfile(operatorID, dispatch);
+            console.log("Current page set to 2");
+          } catch (error) {
+            console.error("Error uploading data", error);
+          }
+        }
+        setEnableUpload(true);
+      }
+    }
+  };
+
+  // const handleEmailBlur = async (e, setFieldError, setFieldValue, validateField, setFieldTouched) => {
+  //   const { value,name } = e.target;
+  //   await setFieldTouched(name, true);
+  //   await validateField(name);
+  //   console.log("i am here",value);
+  //   try{
+  //     const response = await validateEmail(value)
+  //     console.log(response.exists,"llllllllaaaaaaaaaalalala");
+  //     if (response.exists) {
+  //           console.log("heloo");
+  //           setFieldError("emailid", "Email Id already exists");
+  //         }
+  //         else {
+  //           // You can set the error to null if the phone number is valid
+  //           // setFieldError("phone", "");
+  //         }
+  //   }
+  //   catch(err){
+  //     setFieldError("emailid", "Error checking mobile number");
+  //   }
+
+  // }
+
+  // const handleBlur = async (e, setFieldError, setFieldValue, validateField, setFieldTouched) => {
+
+  //   const { value,name } = e.target;
+  //   await setFieldTouched(name, true);
+  //   await validateField(name);
+  //   console.log("i am here",value);
+  //   try{
+  //     const response = await validateMobile(value)
+  //     // console.log(response.exists,"llllllllaaaaaaaaaalalala");
+  //     if (response.exists) {
+  //           console.log("heloo");
+  //           setFieldError("phone", "Mobile number already exists");
+  //         }
+  //         else {
+  //           // You can set the error to null if the phone number is valid
+  //           // setFieldError("phone", "");
+  //         }
+  //   }
+  //   catch(err){
+  //     setFieldError("phone", "Error checking mobile number");
+  //   }
+
+  //   // try {
+  //   //   const response = await axios.post(
+  //   //     `${apiImgUrl}/operator_validation`,
+  //   //     { phone: value }
+  //   //   );
+  //   //   console.log(response.data.Phone, "ggggg");
+  //   //   if (response.data.Phone) {
+  //   //     console.log("heloo");
+  //   //     setFieldError("phone", "Mobile number already exists");
+  //   //   }
+  //   // } catch (error) {
+  //   //   console.error("Error checking mobile number", error);
+  //   //   setFieldError("phone", "Errorchecking  mobile number");
+  //   // }
+  // };
 
   const { Dragger } = Upload;
   // const [profileImage, setProfileImage] = useState("");
-  console.log(profileImage, 'super_admin_company_data')
+  console.log(profileImage, "super_admin_company_data");
 
   const [previewUrl, setPreviewUrl] = useState("");
-  const [draggerImage, setDraggerImage] = useState(false)
-
+  const [draggerImage, setDraggerImage] = useState(false);
 
   const [enable, setEnable] = useState(false);
   const fetchGetUser = async () => {
@@ -191,7 +365,8 @@ export default function AddSuperAdmin({
         operatorID,
         setOperatorID,
         setsuperadmincompanydata,
-        dispatch
+        dispatch,
+        setSpinning
       );
       setsuperadmincompanydata(data[0]);
     } catch (error) {
@@ -201,27 +376,47 @@ export default function AddSuperAdmin({
 
   useEffect(() => {
     if (operatorID != null || enable || addressback) {
+      setSpinning(true);
       fetchGetUser();
     }
   }, [
     operatorID,
     setOperatorID,
     setsuperadmincompanydata,
-    enable,
+    // enable,
     addressback,
   ]);
 
-
   const handleImageCrop = (croppedImage) => {
-    setsuperadmincompanydata(prevState => ({
+    setsuperadmincompanydata((prevState) => ({
       ...prevState,
-      profileimg: croppedImage
+      profileimg: croppedImage,
     }));
   };
 
+  console.log(selectedFile, "fileleieisijfdjfdjf");
+
+  // to avoid image drag in input field
+  const inputRef1 = useRef(null);
+  const inputRef2 = useRef(null);
+  const inputRef3 = useRef(null);
+  const inputRef4 = useRef(null);
+  const inputRef5 = useRef(null);
+  const inputRef6 = useRef(null);
+
+  usePreventDragAndDrop(inputRef1);
+  usePreventDragAndDrop(inputRef2);
+  usePreventDragAndDrop(inputRef3);
+  usePreventDragAndDrop(inputRef4);
+  usePreventDragAndDrop(inputRef5);
+  usePreventDragAndDrop(inputRef6);
+
   return (
     <div>
-      <div className="border-l-[0.1vw] px-[2vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f]">
+      <div className="border-l-[0.1vw] px-[2vw] border-t-[0.1vw] mt-[1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f] relative">
+        <div className="w-[5vw] h-[5vw] bg-white shadow-lg rounded-full absolute left-[16.6vw] top-[-2.5vw] flex justify-center items-center">
+          <img className="" src={umbuslogo} alt="buslogo" />
+        </div>
         <div className="h-[4vw] w-full flex items-center justify-between ">
           <label className="text-[1.5vw] font-semibold text-[#1f4b7f] ">
             Company Profile
@@ -231,13 +426,14 @@ export default function AddSuperAdmin({
           </button> */}
           {operatorID || addressback ? (
             <button
-              className={`${enable
-                ? "bg-[#1f4b7f] text-white"
-                : "text-[#1f4b7f] bg-white border-[#1f4b7f]"
-                } rounded-full font-semibold w-[10vw] h-[2vw] flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] text-[1.1vw] `}
-              onClick={() =>{ 
-                setEnable(!enable)
-                setEnableUpload(false)
+              className={`${
+                enable
+                  ? "bg-[#1f4b7f] text-white"
+                  : "text-[#1f4b7f] bg-white border-[#1f4b7f]"
+              } rounded-full font-semibold w-[10vw] h-[2vw] flex items-center justify-center border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] text-[1.1vw] `}
+              onClick={() => {
+                setEnable(!enable);
+                setEnableUpload(!enableUpload);
               }}
             >
               Enable to Edit
@@ -252,29 +448,53 @@ export default function AddSuperAdmin({
         <div>
           <Formik
             initialValues={{
-              companyname: superadmincompanydata?.company_name || "",
-              ownername: superadmincompanydata?.owner_name || "",
-              phone: superadmincompanydata?.phone || "",
-              emailid: superadmincompanydata?.emailid || "",
+              companyname: reset
+                ? ""
+                : superadmincompanydata?.company_name || "",
+              ownername: reset ? "" : superadmincompanydata?.owner_name || "",
+              phone: reset ? "" : superadmincompanydata?.phone || "",
+              emailid: reset ? "" : superadmincompanydata?.emailid || "",
               // alt_phone: "",
               // alt_emailid: "",
-              aadhar: superadmincompanydata?.aadharcard_number || "",
-              pan: superadmincompanydata?.pancard_number || "",
+              aadhar: reset
+                ? ""
+                : superadmincompanydata?.aadharcard_number || "",
+              pan: reset ? "" : superadmincompanydata?.pancard_number || "",
               // pancarddoc: "",
               // aadardoc: "",
-              user_status: superadmincompanydata?.user_status || "",
-              req_status: superadmincompanydata?.req_status || "",
+              user_status: reset
+                ? ""
+                : superadmincompanydata?.user_status || "",
+              req_status: reset ? "" : superadmincompanydata?.req_status || "",
               // profileimg: superadmincompanydata?.profileimg || "",
             }}
             validationSchema={validationSchema}
-            onSubmit={(values) => {
-              console.log([superadmincompanydata]?.length,"lelelelelel");
-              
-              if(profileImage === true || updatedata ){
-                handleSubmit(values);
-              }
-        
+            validateOnBlur={true}
+            validateOnChange={true}
+            onSubmit={async (values, { setFieldError }) => {
+              console.log([superadmincompanydata]?.length, "lelelelelel");
+              // const mobileResponce = await validateMobile(values.phone)
+              // const emailResponce = await validateEmail(values.emailid)
+              // if(mobileResponce == true || emailResponce == true)
+              // {
+              //   if(mobileResponce){
+              //     setFieldError('phone',"Phone no is already exist")
+              //   }
+              //   else if(emailResponce){
+              //     setFieldError("emailid","Email id is alreadu exist")
+              //   }
+              // }
+              // else{}
 
+              if (
+                (profileImage === true && selectedFile != null) ||
+                (updatedata && selectedFile?.length > 0)
+              ) {
+                handleSubmit(values, setFieldError);
+              } else if (selectedFile?.length <= 0) {
+                setProfileImage(false);
+                setSelectedFile(null);
+              }
             }}
             enableReinitialize
           >
@@ -288,92 +508,40 @@ export default function AddSuperAdmin({
               setFieldError,
               errors,
               touched,
-              resetForm
+              resetForm,
+              validateField,
+              setFieldTouched,
             }) => (
               <Form onSubmit={handleSubmit}>
-                <div className="gap-y-[1.5vw] flex-col flex">
-                  <div className="grid grid-cols-2 w-full gap-x-[2vw]">
-                    <div className="col-span-1">
-                      <label className="text-[#1F4B7F] text-[1.1vw] ">
-                        Company Name
-                        <span className="text-[1vw] text-red-600 pl-[0.2vw]">
-                          *
-                        </span>
-                      </label>
-                      <Field
-                        type="text"
-                        name="companyname"
-                        placeholder="Enter Company Name"
-                        // value={values.firstname}
-                        disabled={
-                          operatorID || addressback
-                            ? enable
-                              ? false
-                              : true
-                            : false
-                        }
-                        className={`${operatorID || addressback
-                          ? enable == false
-                            ? " cursor-not-allowed"
-                            : ""
-                          : ""
-                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
-                      />
-                      <ErrorMessage
-                        name="companyname"
-                        component="div"
-                        className="text-red-500 text-[0.8vw]"
-                      />
-                    </div>
-                    <div className="col-span-1">
-                      <label className="text-[#1F4B7F] text-[1.1vw] ">
-                        Owner Name
-                        <span className="text-[1vw] text-red-600 pl-[0.2vw]">
-                          *
-                        </span>
-                      </label>
-                      <Field
-                        type="text"
-                        name="ownername"
-                        placeholder="Enter Owner Name"
-                        // value={values.firstname}
-                        disabled={
-                          operatorID || addressback
-                            ? enable
-                              ? false
-                              : true
-                            : false
-                        }
-                        className={`${operatorID || addressback
-                          ? enable == false
-                            ? " cursor-not-allowed"
-                            : ""
-                          : ""
-                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
-                      />
-                      <ErrorMessage
-                        name="ownername"
-                        component="div"
-                        className="text-red-500 text-[0.8vw]"
-                      />
-                    </div>
+                {spinning ? (
+                  <div className=" flex justify-center h-[22.8vw] items-center">
+                    <Spin size="large" />
                   </div>
-                  <div className="grid grid-cols-2 w-full gap-x-[2vw]">
-                    <div className="col-span-1 ">
-                      <label className="text-[#1F4B7F] text-[1.1vw] ">
-                        Phone
-                        <span className="text-[1vw] text-red-600 pl-[0.2vw]">
-                          *
-                        </span>
-                      </label>
-                      <div className="relative flex items-center">
+                ) : (
+                  <div className="gap-y-[1.5vw] flex-col flex">
+                    <div className="grid grid-cols-2 w-full gap-x-[2vw]">
+                      <div className="col-span-1 relative">
+                        <label className="text-[#1F4B7F] text-[1.1vw] ">
+                          Company Name
+                          <span className="text-[1vw] text-red-600 pl-[0.2vw]">
+                            *
+                          </span>
+                        </label>
+                        <input
+                          type="text"
+                          name="companyname"
+                          style={{ display: "none" }}
+                        />
                         <Field
                           type="text"
-                          name="phone"
-                          placeholder="Enter Number"
+                          name="companyname"
+                          placeholder="Enter Company Name"
                           // value={values.firstname}
-                          onBlur={(e) => handleBlur(e, setFieldError)} // Custom onBlur handler
-                          // onBlur={(e) => handleBlur(e, setFieldError)} // Custom onBlur handler
+                          autoComplete="companyname-field"
+                          innerRef={inputRef1}
+
+
+                          // autoComplete="off"
                           disabled={
                             operatorID || addressback
                               ? enable
@@ -381,57 +549,178 @@ export default function AddSuperAdmin({
                                 : true
                               : false
                           }
-                          className={`${operatorID || addressback
-                            ? enable == false
-                              ? " cursor-not-allowed"
+                          className={`${
+                            operatorID || addressback
+                              ? enable == false
+                                ? " cursor-not-allowed"
+                                : ""
                               : ""
-                            : ""
-                            } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw] placeholder:font-sans`}
                         />
-                        {/* <button className="absolute right-[0.5vw] text-[1vw] text-white w-[5vw] bg-[#1F4B7F] rounded-full h-[1.7vw]">
+                        <ErrorMessage
+                          name="companyname"
+                          component="div"
+                          className="text-red-500 text-[0.8vw] absolute left-[.2vw] bottom-[-1.2vw]"
+                        />
+                      </div>
+                      <div className="col-span-1 relative">
+                        <label className="text-[#1F4B7F] text-[1.1vw] ">
+                          Owner Name
+                          <span className="text-[1vw] text-red-600 pl-[0.2vw]">
+                            *
+                          </span>
+                          <span className="text-[.7vw] ml-[.5vw]">
+                            (As Per Aadhar)
+                          </span>
+                        </label>
+                        {/* <input
+                          type="text"
+                          name="ownername"
+                          style={{ display: "none" }}
+                        /> */}
+                        <Field
+                          type="text"
+                          name="ownername"
+                          placeholder="Enter Owner Name"
+                          // value={values.firstname}
+                          // autoComplete="ownername-field"
+                          autoComplete="off"
+                          innerRef={inputRef2}
+                          disabled={
+                            operatorID || addressback
+                              ? enable
+                                ? false
+                                : true
+                              : false
+                          }
+                          className={`${
+                            operatorID || addressback
+                              ? enable == false
+                                ? " cursor-not-allowed"
+                                : ""
+                              : ""
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw] placeholder:font-sans`}
+                        />
+                        <ErrorMessage
+                          name="ownername"
+                          component="div"
+                          className="text-red-500 text-[0.8vw] absolute left-[.2vw] bottom-[-1.2vw]"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 w-full gap-x-[2vw]">
+                      <div className="col-span-1 relative">
+                        <label className="text-[#1F4B7F] text-[1.1vw] ">
+                          Phone
+                          <span className="text-[1vw] text-red-600 pl-[0.2vw]">
+                            *
+                          </span>
+                        </label>
+                        <div className="">
+                          <input
+                            type="text"
+                            name="phone"
+                            style={{ display: "none" }}
+                          />
+                          <Field
+                            type="text"
+                            name="phone"
+                            id="phone"
+                            autoComplete="phone-field"
+                            placeholder="Enter Number"
+                            innerRef={inputRef3}
+                            // onChange={(e) => {
+                            //   handleChange(e);
+                            //   // handleBlur(e, setFieldError,setFieldValue)
+
+                            // }}
+                            // onChange={(e) => {
+                            //   handleChange(e);
+                            //   validateField('phone');  // Trigger validation on change
+                            // }}
+                            // onFocus={() => {
+                            //   // If the phone field has an error, set the error message again on focus
+                            //   if (errors.phone) {
+                            //     setFieldError("phone", errors.phone);
+                            //   }
+                            // }}
+                            // value={values.firstname}
+                            // onBlur={(e) => handleBlur(e, setFieldError, setFieldValue, validateField, setFieldTouched)} // Custom onBlur handler
+                            // onBlur={(e) => handleBlur(e, setFieldError)} // Custom onBlur handler
+                            disabled={
+                              operatorID || addressback
+                                ? enable
+                                  ? false
+                                  : true
+                                : false
+                            }
+                            className={`${
+                              operatorID || addressback
+                                ? enable == false
+                                  ? " cursor-not-allowed"
+                                  : ""
+                                : ""
+                            } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw] placeholder:font-sans`}
+                          />
+                          {/* <button className="absolute right-[0.5vw] text-[1vw] text-white w-[5vw] bg-[#1F4B7F] rounded-full h-[1.7vw]">
                           Verify
                         </button> */}
+                        </div>
+                        <ErrorMessage
+                          name="phone"
+                          component="div"
+                          className="text-red-500 text-[0.8vw] absolute left-[.2vw] bottom-[-1.2vw]"
+                        />
                       </div>
-                      <ErrorMessage
-                        name="phone"
-                        component="div"
-                        className="text-red-500 text-[0.8vw]"
-                      />
+                      <div className="col-span-1 relative">
+                        <label className="text-[#1F4B7F] text-[1.1vw] ">
+                          Email ID
+                          <span className="text-[1vw] text-red-600 pl-[0.2vw]">
+                            *
+                          </span>
+                        </label>
+                        <input
+                          type="text"
+                          name="emailid"
+                          style={{ display: "none" }}
+                        />
+                        <Field
+                          type="text"
+                          name="emailid"
+                          autoComplete="emailid-field"
+                          placeholder="Enter Email Address"
+                          innerRef={inputRef4}
+                          onChange={(e) =>
+                            setFieldValue(
+                              "emailid",
+                              e.target.value.toLowerCase()
+                            )
+                          }
+                          // value={values.firstname}
+                          // onBlur={(e) => handleEmailBlur(e, setFieldError, setFieldValue, validateField, setFieldTouched)}
+                          disabled={
+                            operatorID || addressback
+                              ? enable
+                                ? false
+                                : true
+                              : false
+                          }
+                          className={`${
+                            operatorID || addressback
+                              ? enable == false
+                                ? " cursor-not-allowed"
+                                : ""
+                              : ""
+                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw] placeholder:font-sans`}
+                        />
+                        <ErrorMessage
+                          name="emailid"
+                          component="div"
+                          className="text-red-500 text-[0.8vw] absolute left-[.2vw] bottom-[-1.2vw]"
+                        />
+                      </div>
                     </div>
-                    <div className="col-span-1">
-                      <label className="text-[#1F4B7F] text-[1.1vw] ">
-                        Email ID
-                        <span className="text-[1vw] text-red-600 pl-[0.2vw]">
-                          *
-                        </span>
-                      </label>
-                      <Field
-                        type="text"
-                        name="emailid"
-                        placeholder="Enter Email Address"
-                        // value={values.firstname}
-                        disabled={
-                          operatorID || addressback
-                            ? enable
-                              ? false
-                              : true
-                            : false
-                        }
-                        className={`${operatorID || addressback
-                          ? enable == false
-                            ? " cursor-not-allowed"
-                            : ""
-                          : ""
-                          } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
-                      />
-                      <ErrorMessage
-                        name="emailid"
-                        component="div"
-                        className="text-red-500 text-[0.8vw]"
-                      />
-                    </div>
-                  </div>
-                  {/* <div className="grid grid-cols-2 w-full gap-x-[2vw]">
+                    {/* <div className="grid grid-cols-2 w-full gap-x-[2vw]">
                     <div className="col-span-1">
                       <label className="text-[#1F4B7F] text-[1.1vw] ">
                         Alternate Phone
@@ -473,121 +762,148 @@ export default function AddSuperAdmin({
                       />
                     </div>
                   </div> */}
-                  <div className="grid grid-cols-2 w-full gap-x-[2vw] relative mb-[.7vw]">
-                    <div className="col-span-1">
-                      <label className="text-[#1F4B7F] text-[1.1vw] ">
-                        Aadhar Card Number
-                        <span className="text-[1vw] text-red-600 pl-[0.2vw]">
-                          *
-                        </span>
-                      </label>
-                      <div className="flex items-center relative">
-                        <Field
-                          type="text"
+                    <div className="grid grid-cols-2 w-full gap-x-[2vw] relative mb-[.7vw]">
+                      <div className="col-span-1 relative">
+                        <label className="text-[#1F4B7F] text-[1.1vw] ">
+                          Aadhaar Card Number
+                          <span className="text-[1vw] text-red-600 pl-[0.2vw]">
+                            *
+                          </span>
+                        </label>
+                        <div className="flex items-center relative">
+                          <input
+                            type="text"
+                            name="aadhar"
+                            style={{ display: "none" }}
+                          />
+                          <Field
+                            type="text"
+                            name="aadhar"
+                            placeholder="Enter Aadhaar Number"
+                            autoComplete="aadhar-field"
+                            innerRef={inputRef5}
+                            // value={values.firstname}
+                            disabled={
+                              operatorID || addressback
+                                ? enable
+                                  ? false
+                                  : true
+                                : false
+                            }
+                            className={`${
+                              operatorID || addressback
+                                ? enable == false
+                                  ? " cursor-not-allowed"
+                                  : ""
+                                : ""
+                            } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw] placeholder:font-sans`}
+                          />
+
+                          {/* <div className=" absolute right-[1vw]">
+                          <FaCloudUploadAlt color="#1F487C" size={"2vw"} />
+                        </div> */}
+                        </div>
+                        <ErrorMessage
                           name="aadhar"
-                          placeholder="Enter Aadhar Number"
-                          // value={values.firstname}
-                          disabled={
-                            operatorID || addressback
-                              ? enable
-                                ? false
-                                : true
-                              : false
-                          }
-                          className={`${operatorID || addressback
-                            ? enable == false
-                              ? " cursor-not-allowed"
-                              : ""
-                            : ""
-                            } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          component="div"
+                          className="text-red-500 text-[0.8vw] absolute left-[.2vw] bottom-[-1.2vw]"
                         />
+                      </div>
+                      <div className="col-span-1 relative">
+                        <label className="text-[#1F4B7F] text-[1.1vw] ">
+                          PAN Card Number
+                          <span className="text-[1vw] text-red-600 pl-[0.2vw]">
+                            *
+                          </span>
+                        </label>
+                        <div className="flex items-center relative">
+                          <input
+                            type="text"
+                            name="pan"
+                            style={{ display: "none" }}
+                          />
+                          <Field
+                            type="text"
+                            name="pan"
+                            placeholder="Enter PAN Number"
+                            autoComplete="pan-field"
+                            innerRef={inputRef6}
+                            onChange={(e) =>
+                              setFieldValue(
+                                "pan",
+                                e.target.value?.toUpperCase()
+                              )
+                            }
+                            // value={values.firstname}
+                            disabled={
+                              operatorID || addressback
+                                ? enable
+                                  ? false
+                                  : true
+                                : false
+                            }
+                            className={`${
+                              operatorID || addressback
+                                ? enable == false
+                                  ? " cursor-not-allowed"
+                                  : ""
+                                : ""
+                            } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw] placeholder:font-sans`}
+                          />
 
-                        {/* <div className=" absolute right-[1vw]">
+                          {/* <div className=" absolute right-[1vw]">
                           <FaCloudUploadAlt color="#1F487C" size={"2vw"} />
                         </div> */}
-                      </div>
-                      <ErrorMessage
-                        name="aadhar"
-                        component="div"
-                        className="text-red-500 text-[0.8vw]"
-                      />
-                    </div>
-                    <div className="col-span-1">
-                      <label className="text-[#1F4B7F] text-[1.1vw] ">
-                        Pan Card Number
-                        <span className="text-[1vw] text-red-600 pl-[0.2vw]">
-                          *
-                        </span>
-                      </label>
-                      <div className="flex items-center relative">
-                        <Field
-                          type="text"
+                        </div>
+
+                        <ErrorMessage
                           name="pan"
-                          placeholder="Enter Pan Number"
-                          // value={values.firstname}
-                          disabled={
-                            operatorID || addressback
-                              ? enable
-                                ? false
-                                : true
-                              : false
-                          }
-                          className={`${operatorID || addressback
-                            ? enable == false
-                              ? " cursor-not-allowed"
-                              : ""
-                            : ""
-                            } border-r-[0.3vw] mt-[0.2vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]`}
+                          component="div"
+                          className="text-red-500 text-[0.8vw] absolute left-[.2vw] bottom-[-1.2vw]"
                         />
-
-                        {/* <div className=" absolute right-[1vw]">
-                          <FaCloudUploadAlt color="#1F487C" size={"2vw"} />
-                        </div> */}
                       </div>
 
-                      <ErrorMessage
-                        name="pan"
-                        component="div"
-                        className="text-red-500 text-[0.8vw]"
-                      />
+                      {updatedata && selectedFile != null
+                        ? " "
+                        : profileImage === false && (
+                            <div className="text-red-500 text-[.7vw] absolute  bottom-[-2.5vw]">
+                              * Company Logo is required
+                            </div>
+                          )}
                     </div>
 
-
-
-                    {
-                    updatedata ?  " " : (
-                    profileImage === false && <div className="text-red-700 text-[.7vw] absolute  bottom-[-3vw]">
-                     * Profile Image is required
-                    </div>)}
-
-                  </div>
-                 
-
-              
-                  <div className="flex items-center justify-between py-[1vw]">
-                    <div>
-                      <h1 className="text-[#1F4B7F] text-[0.7vw] font-semibold">
-                        *You must fill in all fields to be able to continue
-                      </h1>
-                    </div>
-                    <div className="flex items-center gap-x-[1vw]">
-                      {/* <button className="border-[#1F487C] w-[5vw] font-semibold text-[1vw] h-[2vw] rounded-full border-r-[0.2vw]  border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw]">
-                        Reset
-                      </button> */}
-                      <button
-                        className="bg-[#1F487C] font-semibold rounded-full w-[11vw] h-[2vw] text-[1vw] text-white"
-                        type="submit"
-                      // onClick={() => setCurrentpage(2)}
-                      >
-                        {operatorID || addressback
-                          ? enable
-                            ? "Update & Continue"
-                            : "Continue"
-                          : "Continue"}
-                      </button>
+                    <div className="flex items-center justify-between pb-[1vw]">
+                      <div>
+                        <h1 className="text-[#1F4B7F] text-[0.7vw] font-semibold">
+                          * You must fill in all fields to be able to continue
+                        </h1>
+                      </div>
+                      <div className="flex items-center gap-x-[1vw]">
+                        <button
+                          type="button"
+                          className="border-[#1F487C] w-[5vw] font-semibold text-[1vw] h-[2vw] rounded-full border-r-[0.2vw]  border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw]"
+                          onClick={() => {
+                            resetForm();
+                            setReset(true);
+                          }}
+                        >
+                          Reset
+                        </button>
+                        <button
+                          className="bg-[#1F487C] font-semibold rounded-full w-[11vw] h-[2vw] text-[1vw] text-white"
+                          type="submit"
+                          // onClick={() => setCurrentpage(2)}
+                        >
+                          {operatorID || addressback
+                            ? enable
+                              ? "Update & Continue"
+                              : "Continue"
+                            : "Continue"}
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </Form>
             )}
           </Formik>

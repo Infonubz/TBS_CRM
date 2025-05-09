@@ -6,8 +6,9 @@ import dayjs from "dayjs";
 import ModalPopup from "../Common/Modal/Modal";
 import BinDelete from "./BinDelete";
 import BinRestore from "./BinRestore";
+import { capitalizeFirstLetter } from "../Common/Captilization";
 
-export default function Promotion({ currentItems, selectedTab ,activePage, itemsPerPage }) {
+export default function Promotion({ currentItems, selectedTab, activePage, itemsPerPage }) {
   const apiUrl = process.env.REACT_APP_API_URL;
 
   const [tbsId, setTbsId] = useState();
@@ -23,108 +24,122 @@ export default function Promotion({ currentItems, selectedTab ,activePage, items
   const columns = [
     {
       title: (
-        <div className="flex font-bold text-[1.2vw]">S.No</div>
+        <div className="flex font-bold justify-center text-[1.1vw]">S.No</div>
       ),
-      width: "5vw",
+      width: "4vw",
       render: (row, rowdta, index) => {
-        const pageNo = (activePage - 1) * itemsPerPage + index+1
+        const pageNo = (activePage - 1) * itemsPerPage + index + 1
         return (
-          <div className="flex justify-start">
-            <h1 className="pl-[1vw] text-[#1F4B7F]">{pageNo}</h1>
+          <div className="flex justify-center">
+            <h1 className="pl-[.5vw] text-[1vw] text-[#1F4B7F]">{pageNo}</h1>
           </div>
         );
       },
     },
     {
       title: (
-        <h1 className="text-[1.2vw] font-semibold  flex items-center">
+        <h1 className="text-[1.1vw] font-bold justify-center flex items-center">
           Name
         </h1>
       ),
-      sorter: (a, b) =>
-        a.deleted_data.promo_name.localeCompare(b.deleted_data.promo_name),
+      sorter: (a, b) => {
+        const promoNameA = a?.deleted_data?.promo_name || "";
+        const promoNameB = b?.deleted_data?.promo_name || "";
+    
+        return promoNameA.localeCompare(promoNameB);
+      },
       render: (row, rowdta, index) => {
+        const promoName = row?.deleted_data?.promo_name;
+    
+        // Apply capitalization and slicing logic
+        const displayName = promoName?.charAt(0) === promoName?.charAt(0)?.toLowerCase()
+          ? capitalizeFirstLetter(promoName?.slice(0, 18))
+          : promoName?.slice(0, 18);
+    
         return (
-          <div className="flex items-center  text-[#1F4B7F] font-semibold text-[1vw]">
-            {row?.deleted_data.promo_name?.length > 15 ? (
+          <div className="flex items-center pl-[1.2vw] text-[#1F4B7F] font-bold text-[1vw]">
+            {promoName?.length > 18 ? (
               <Tooltip
                 placement="bottom"
-                title={row?.deleted_data.promo_name}
+                title={promoName}
                 className="cursor-pointer"
                 color="#1F487C"
               >
-                {`${row?.deleted_data.promo_name?.slice(0, 15)}...`}
+                <span>{`${displayName}...`}</span>
               </Tooltip>
             ) : (
-              row?.deleted_data.promo_name?.slice(0, 15)
-            )}{" "}
+              <span>{displayName}</span>
+            )}
           </div>
         );
       },
+      width: "11vw",
+    },    
+    {
+      title: (
+        <h1 className="text-[1.1vw] font-bold justify-center  flex items-center ">
+          Operator Name
+        </h1>
+      ),
+        sorter: (a, b) => {
+          const promoNameA = a?.deleted_data?.operator_details || "";
+          const promoNameB = b?.deleted_data?.operator_details || "";
+          return promoNameA.localeCompare(promoNameB);
+        },
       width: "14vw",
+      render: (row, rowdta, index) => {
+        return (
+          <div className="flex items-center pl-[1.5vw] ">
+            <p className="text-[1vw] font-bold text-[#1F4B7F] ">{row.deleted_data.operator_details}</p>
+          </div>
+        );
+      },
     },
     {
       title: (
-        <h1 className="text-[1.2vw] font-semibold  flex items-center">
+        <h1 className="text-[1.1vw] font-bold justify-center flex items-center">
           Description
         </h1>
       ),
-      sorter: (a, b) =>
-        a.deleted_data.promo_description.localeCompare(
-          b.deleted_data.promo_description
-        ),
+        sorter: (a, b) => {
+          const promoNameA = a?.deleted_data?.promo_description || "";
+          const promoNameB = b?.deleted_data?.promo_description || "";
+          return promoNameA.localeCompare(promoNameB);
+        },
       render: (row, rowdta, index) => {
         return (
-          <div className="flex items-center ">
+          <div className="flex items-center pl-[1vw] ">
             <h1 className="text-[1vw] text-[#1F4B7F] ">
-              {row?.deleted_data?.promo_description?.length > 15 ? (
+              {row?.deleted_data?.promo_description?.length > 27 ? (
                 <Tooltip
                   placement="bottom"
                   title={row?.deleted_data.promo_description}
                   className="cursor-pointer"
                   color="#1F487C"
                 >
-                  {`${row?.deleted_data.promo_description?.slice(0, 15)}...`}
+                  {`${row?.deleted_data.promo_description?.slice(0, 27)}...`}
                 </Tooltip>
               ) : (
-                row?.deleted_data.promo_description?.slice(0, 15)
+                row?.deleted_data.promo_description?.slice(0, 27)
               )}
             </h1>
           </div>
         );
       },
-      width: "14vw",
+      width: "18vw",
     },
+
     {
       title: (
-        <h1 className="text-[1.2vw] font-semibold  flex items-center ">
-          Operator Name
-        </h1>
-      ),
-      sorter: (a, b) =>
-        a.deleted_data.operator_details.localeCompare(
-          b.deleted_data.operator_details
-        ),
-      width: "17vw",
-      render: (row, rowdta, index) => {
-        return (
-          <div className="flex items-center ">
-            <p className="text-[1vw] text-[#1F4B7F] ">{row.deleted_data.operator_details}</p>
-          </div>
-        );
-      },
-    },
-    {
-      title: (
-        <div className="flex font-bold text-[1.2vw]">
+        <div className="flex font-bold justify-center text-[1.1vw]">
           Duration
         </div>
       ),
-      width: "15vw",
+      width: "11vw",
       render: (row) => {
         return (
           <div>
-            <p className="text-[1vw] text-[#1F4B7F] flex ">{`${dayjs(
+            <p className="text-[1vw] justify-center text-[#1F4B7F] flex ">{`${dayjs(
               row?.deleted_data.start_date
             ).format("MMM DD")} - ${dayjs(row?.expiry_date).format(
               "MMM DD"
@@ -135,29 +150,29 @@ export default function Promotion({ currentItems, selectedTab ,activePage, items
     },
     {
       title: (
-        <div className="flex  font-bold text-[1.2vw]">Usage</div>
+        <div className="flex justify-center font-bold text-[1.1vw]">Usage</div>
       ),
       width: "7vw",
       render: (row) => {
         return (
           <div>
-            <p className="text-[1vw]  text-[#1F4B7F] ">{row?.deleted_data.usage}</p>
+            <p className="text-[1vw] pl-[1.5vw]  text-[#1F4B7F] ">{row?.deleted_data.usage}</p>
           </div>
         );
       },
     },
     {
       title: (
-        <h1 className="text-[1.2vw] font-semibold  flex items-center">
+        <h1 className="text-[1.1vw] font-bold justify-center flex items-center">
           Deleted Date
         </h1>
       ),
       sorter: (a, b) =>
         dayjs(a.deleted_date).valueOf() - dayjs(b.deleted_date).valueOf(),
-      width: "15vw",
+      width: "13vw",
       render: (row) => {
         return (
-          <div className="flex items-center ">
+          <div className="flex items-center justify-center">
             <p className="text-[1vw] text-[#1F4B7F] ">{`${dayjs(row?.deleted_date).format(
               "DD MMM, YY"
             )}`}</p>
@@ -167,20 +182,25 @@ export default function Promotion({ currentItems, selectedTab ,activePage, items
     },
     {
       title: (
-        <div className="flex  font-bold text-[1.2vw]">Status</div>
+        <div className="flex  font-bold justify-center text-[1.1vw]">Status</div>
       ),
       width: "10vw",
       render: (row) => {
         return (
-          <div className="flex ">
+          <div className="flex justify-center  ">
             <button
-              className={`${
-                row?.deleted_data?.promo_status?.toLowerCase() === "active"
-                  ? "bg-[#34AE2A]"
-                  : row.deleted_data?.promo_status?.toLowerCase() == "draft"
-                  ? "bg-[#FF9900]"
-                  : "bg-[#FD3434]"
-              } rounded-[0.5vw] text-[1vw]  font-semibold text-white w-[7vw] py-[0.2vw] cursor-not-allowed`}
+              className={`${row?.deleted_data?.promo_status_id == 0
+                  ? "bg-[#646262]"
+                  : row.deleted_data?.promo_status_id == 1
+                    ? "bg-[#FF9900]"
+                    : row.deleted_data?.promo_status_id == 2
+                      ? "bg-[#34AE2B]"
+                      : row.deleted_data?.promo_status_id == 3
+                        ? "bg-[#2A99FF]"
+                        : row.deleted_data?.promo_status_id == 4
+                          ? "bg-[#FD3434]"
+                          : "bg-[#646262]"
+                } h-[1.8vw] shadow-md shadow-black font-extrabold text-[1vw] text-white w-[7vw] cursor-not-allowed rounded-[0.5vw]`}
             >
               {row?.deleted_data.promo_status}
             </button>
@@ -190,7 +210,7 @@ export default function Promotion({ currentItems, selectedTab ,activePage, items
     },
     {
       title: (
-        <div className="flex  font-bold text-[1.2vw]">
+        <div className="flex justify-center  font-bold text-[1.2vw]">
           Actions
         </div>
       ),
@@ -198,31 +218,33 @@ export default function Promotion({ currentItems, selectedTab ,activePage, items
       render: (row) => {
         console.log(row, "rowrowrowrow");
         return (
-          <div className="flex gap-[0.7vw]  items-center">
-            <span>
-              <TbRestore
-                size={"1.6vw"}
-                 className=" cursor-pointer"
-                color="#1F4B7F"
-                onClick={() => {
-                  SetRestoreModalOpen(true);
-                  setTbsId(row?.tbs_recycle_id);
-                  SetRowName(row?.deleted_data.promo_name);
-                }}
-              />
-            </span>
-            <span>
-              <MdDelete
-                size={"1.3vw"}
-                color="#1F4B7F"
-                className=" cursor-pointer"
-                onClick={() => {
-                  setDeleteModalOpen(true);
-                  setTbsId(row?.tbs_recycle_id);
-                  SetRowName(row?.deleted_data.promo_name);
-                }}
-              />
-            </span>
+          <div className="flex justify-center">
+            <div className="flex gap-[0.7vw]   items-center">
+              <span>
+                <TbRestore
+                  size={"1.3vw"}
+                  className=" cursor-pointer"
+                  color="#1F4B7F"
+                  onClick={() => {
+                    SetRestoreModalOpen(true);
+                    setTbsId(row?.tbs_recycle_id);
+                    SetRowName(row?.deleted_data.promo_name);
+                  }}
+                />
+              </span>
+              <span>
+                <MdDelete
+                  size={"1.3vw"}
+                  color="#1F4B7F"
+                  className=" cursor-pointer"
+                  onClick={() => {
+                    setDeleteModalOpen(true);
+                    setTbsId(row?.tbs_recycle_id);
+                    SetRowName(row?.deleted_data.promo_name);
+                  }}
+                />
+              </span>
+            </div>
           </div>
         );
       },
@@ -252,7 +274,7 @@ export default function Promotion({ currentItems, selectedTab ,activePage, items
           // title={`want to delete ( ${rowName} ) offer Permenantly`}
           title={
             <>
-             want to delete <span style={{ fontWeight: 'bold' }}>{rowName}</span> promotion
+              want to delete <span style={{ fontWeight: 'bold' }}>{capitalizeFirstLetter(rowName)}</span> promotion
             </>
           }
           id={tbsId}
@@ -272,7 +294,7 @@ export default function Promotion({ currentItems, selectedTab ,activePage, items
           // title={`want to restore ( ${rowName} ) offer`}
           title={
             <>
-             want to restore <span style={{ fontWeight: 'bold' }}>{rowName}</span> promotion
+              want to restore <span style={{ fontWeight: 'bold' }}>{capitalizeFirstLetter(rowName)}</span> promotion
             </>
           }
           id={tbsId}

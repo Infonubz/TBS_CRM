@@ -9,23 +9,24 @@ const api = axios.create({
 });
 const apiUrl = process.env.REACT_APP_API_URL;
 
-export const GetSubscriptionList = async (dispatch,setSpinning) => {
+export const GetSubscriptionList = async (dispatch, setSpinning) => {
   try {
-    const response = await api.get(`${apiUrl}/all-sub-operators`);
+    const response = await api.get(`${apiUrl}/subscription`);
     dispatch({ type: GET_SUBSCRIPTION, payload: response.data });
     console.log(response, "response response...");
     return response.data;
   } catch (error) {
     handleError(error);
-  }
-  finally{
-    setSpinning && setSpinning(false)
+  } finally {
+    setSpinning && setSpinning(false);
   }
 };
 export const handleAdsearch = async (e, dispatch) => {
   try {
     if (e.target.value) {
-      const response = await api.get(`${apiUrl}/subscription/search/${e.target.value}`);
+      const response = await api.get(
+        `${apiUrl}/subscription/search/${e.target.value}`
+      );
       dispatch({ type: GET_SUBSCRIPTION, payload: response.data });
       return response.data[0];
     } else {
@@ -34,6 +35,29 @@ export const handleAdsearch = async (e, dispatch) => {
   } catch (error) {
     handleError(error);
     return null;
+  }
+};
+export const GetSubscriptionByDate = async (dispatch, startDate, endDate) => {
+  try {
+    // const response = await api.get(`${apiUrl}/filter-by-date`)
+
+    const response = await axios.post(
+      `${apiUrl}/subscription-filter-by-date`,
+      {
+        from: startDate,
+        to: endDate,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    dispatch({ type: GET_SUBSCRIPTION, payload: response.data });
+
+    console.log(response.data, "hello this is res");
+  } catch (err) {
+    console.log(err, "this is the error");
   }
 };
 const handleError = (error) => {

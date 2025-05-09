@@ -8,10 +8,25 @@ const api = axios.create({
   },
 });
 const apiUrl = process.env.REACT_APP_API_URL;
+const typeid = sessionStorage.getItem("type_id");
+const userId = sessionStorage.getItem("USER_ID");
 
-export const GetPermissionData = async (dispatch) => {
+export const GetPermissionData = async (filter, dispatch) => {
+  const payload = {
+    term : filter 
+  };
+
+  const roleId = typeid === "OP101" ? 1 : 3 
+
+  const url = `${apiUrl}/permission/${userId}/${roleId}`;
+
   try {
-    const response = await axios.get(`${apiUrl}/permissions`);
+    console.log("Sending payload:", payload); 
+    const response = await axios.post(url, payload, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     dispatch({ type: GET_PERMISSIONS, payload: response.data });
     return response.data;
   } catch (error) {
@@ -29,31 +44,92 @@ export const GetRoleNameData = async (dispatch) => {
   }
 };
 
-export const SubmitPermissionData = async (
+export const SubmitOPPermissionData = async (
   permissions,
   permissionupdate,
   dispatch,
-  role_type_id // Include role_type_id parameter
+  filter,
+  role_type_id, 
+  user,
+  rolesPermisionData
 ) => {
-  // Ensure permissions are defined and have valid values
-  const crud_permission =
-    permissions?.crud_permissions?.map((item) => {
-      return item.value;
-    }) || [];
+
+  const crud_permission = rolesPermisionData?.crud_permissions?.length > 0 
+  ? rolesPermisionData.crud_permissions 
+  : permissions?.crud_permissions;
+
+  const typeId = typeid === "PRO101" ? "EMP101" : typeid;
 
   const module_permission = permissions?.module_permissions || [];
+  const selectedUser =
+  filter === "OP" && typeid === "PRO101"
+  ? "Operator"
+  : filter === "PO" && typeid === "PRO101"
+  ? "Employee"
+  : typeid === "OP101"
+  ? "Operator"
+  : "";
+
 
   const payload = {
+    role_id : role_type_id,
+    user: selectedUser,
+    user_id: typeId,
+    tbs_user_id: sessionStorage.getItem("USER_ID"),
     role_type: permissions.role_type,
     crud_permissions: crud_permission,
     module_permissions: module_permission,
   };
 
+  console.log(payload,rolesPermisionData, "payload payload")
+
   const url = permissionupdate
     ? `${apiUrl}/permissions/${permissionupdate}`
-    : `${apiUrl}/permissions/${role_type_id}`;
+    : `${apiUrl}/permissions`;
 
-  const method = permissionupdate ? "put" : "put";
+  const method = permissionupdate ? "put" : "post";
+  try {
+    const response = await api({
+      method,
+      url,
+      data: payload,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    GetPermissionData(filter, dispatch);
+    return response.data;
+  } catch (error) {
+    handleError(error);
+    return null;
+  }
+  finally{
+    GetPermissionCount(filter, dispatch);
+  }
+};
+
+
+
+export const SubmitPermissionData = async (
+  permissions,
+  permissionupdate,
+  dispatch,
+  filter,
+  rolesPermisionData
+) => {
+
+  const crud_permission = permissions?.crud_permissions;
+  const module_permission = permissions?.module_permissions || [];
+
+  const payload = {
+    crud_permissions: crud_permission,
+    module_permissions:module_permission
+  };
+
+  console.log(payload,rolesPermisionData, "payload payload")
+
+  const url = `${apiUrl}/crud-permissions/${permissionupdate}`
+  const method = "put";
 
   try {
     const response = await api({
@@ -64,7 +140,8 @@ export const SubmitPermissionData = async (
         "Content-Type": "application/json",
       },
     });
-    GetPermissionData(dispatch);
+    GetPermissionData(filter, dispatch);
+    GetPermissionCount(filter, dispatch);
     return response.data;
   } catch (error) {
     handleError(error);
@@ -72,18 +149,52 @@ export const SubmitPermissionData = async (
   }
 };
 
+
+// export const GetPermissionById = async (
+//   permissionupdate,
+//   SetPermissionUpdate,
+//   SetPermissionData,
+//   role_type_id // Include role_type_id parameter
+// ) => {
+//   try {
+//     const response = await api.get(
+//       `${apiUrl}/permissions/${userId}/${permissionupdate}`
+//     );
+//     SetPermissionData("");
+//     return response?.data[0];
+//   } catch (error) {
+//     handleError(error);
+//     return null;
+//   }
+// };
+
+
 export const GetPermissionById = async (
   permissionupdate,
   SetPermissionUpdate,
   SetPermissionData,
-  role_type_id // Include role_type_id parameter
+  role_type_id 
 ) => {
+  const payload =  typeid === "PRO101"
+  ? { 
+    crud_permission_id: permissionupdate 
+  }: { 
+    permission_id: permissionupdate 
+  };
+
+  const url = `${apiUrl}/permissions/${userId}`
+  const method = "post";
+
   try {
-    const response = await api.get(
-      `${apiUrl}/permissions/${permissionupdate}`
-    );
-    SetPermissionData("");
-    return response?.data[0];
+    const response = await api({
+      method,
+      url,
+      data: payload,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data[0];
   } catch (error) {
     handleError(error);
     return null;
@@ -102,15 +213,34 @@ export const handlePermissionsearch = async (e, dispatch) => {
     return null;
   }
 };
-export const GetPermissionCount = async (dispatch) => {
+
+export const GetPermissionCount = async (filter, dispatch) => {
+  const payload = {
+    term: filter,
+  };
+
+  const url = `${apiUrl}/crud-permission-count/${userId}`;
+  const method = "post";
+
   try {
-    const response = await axios.get(`${apiUrl}/crud-permission-count`);
+    const response = await api.request({
+      method,
+      url,
+      data: payload, // Attach payload (non-standard)
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     dispatch({ type: GET_PERMISSION_COUNT, payload: response.data });
+    console.log(response.data, payload, GET_PERMISSION_COUNT, "response role");
     return response.data;
   } catch (error) {
+    console.error("Error in GetPermissionCount:", error);
     handleError(error);
   }
 };
+
+
 const handleError = (error) => {
   console.error("Error details:", error);
   let errorMessage = "An error occurred";

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { IoIosArrowUp } from "react-icons/io";
+import React, { useState, useEffect } from "react";
+import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 import { RiArrowRightSLine } from "react-icons/ri";
 import { FiAlertCircle } from "react-icons/fi";
 import { FaUserLarge } from "react-icons/fa6";
@@ -10,24 +10,67 @@ import { Collapse } from "antd";
 import "../../../App.css";
 import EditProfile from "./EditProfile";
 import ForgotPassword from "./ForgotPassword";
+import { GetOperatorData } from "../../../Api/Settings/SystemSettings/CompanyDetails";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function UserSettingList() {
 
-  const [active, setActive] = useState("0");
+  // const [active, setActive] = useState("0");
+
+  // const handleCollapseChange = (key) => {
+  //   if (active !== key) {
+  //     setActive(key);
+  //   }
+  // };
+  // console.log(active, 'active_KEY');
+
+  const [companyData, setCompanyData] = useState();
+  const [userid, setUserid] = useState();
+  const [selectedFile, setSelectedFile] = useState(null);
+
+
+  const typeId = sessionStorage.getItem("type_id");
+  const userID = sessionStorage.getItem("USER_ID")
+
+
+  const operatorData = useSelector((state) => state?.crm?.operator_data[0])
+  console.log(operatorData, 'operator_data')
+
+  const dispatch = useDispatch()
+
+  const fetchData = async () => {
+    if (typeId === 'OP101') {
+      try {
+        const data = await GetOperatorData(dispatch)
+        const profile = data[0].profileimg
+        setSelectedFile(profile)
+        console.log(profile, 'op_profile')
+      } catch (error) {
+
+      }
+    }
+  }
+
+  useEffect(() => {
+    fetchData()
+  }, [dispatch]);
+
+  const [active, setActive] = useState("");
 
   const handleCollapseChange = (key) => {
-    if (active !== key) {
-      setActive(key);
-    }
+    setActive((prev) => (prev === key ? "" : key));
   };
+
   console.log(active, 'active_KEY');
+
+  
 
   return (
     <div>
       <Collapse
         activeKey={active}
         onChange={() => handleCollapseChange("1")}
-        className="bg-[#1F487C] rounded-2xl border border-[#1F487C]  shadow-[0_9px_9px_rgba(0,0,0,0.45)] shadow-xl"
+        className="bg-[#1F487C] rounded-2xl border border-[#1F487C] shadow-[0_9px_9px_rgba(0,0,0,0.45)] shadow-xl"
         size="large"
         expandIcon={({ isActive }) =>
           isActive ? (
@@ -36,7 +79,7 @@ export default function UserSettingList() {
               style={{ color: "#FFFFFF", height: "2vw", width: "1.8vw" }}
             />
           ) : (
-            <RiArrowRightSLine
+            <IoIosArrowDown
               className="mt-[1.5vw]"
               style={{ color: "#FFFFFF", height: "2vw", width: "1.8vw" }}
             />
@@ -132,7 +175,7 @@ export default function UserSettingList() {
               style={{ color: "#FFFFFF", height: "2vw", width: "1.8vw" }}
             />
           ) : (
-            <RiArrowRightSLine
+            <IoIosArrowDown
               className="mt-[1.5vw]"
               style={{ color: "#FFFFFF", height: "2vw", width: "1.8vw" }}
             />

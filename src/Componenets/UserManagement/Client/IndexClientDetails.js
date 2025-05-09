@@ -10,6 +10,8 @@ import { SubmitProfileData } from "../../../Api/UserManagement/SuperAdmin";
 import { useLocation } from "react-router";
 import { useDispatch } from "react-redux";
 import AddCompanyDetails from "./AddCompanyDetails";
+import umbuslogo from "../../../asserts/umbuslogo.png"
+import pencilshape from '../../../asserts/pencilicon.png'
 import {
   ClientProfile,
   GetClientProfile,
@@ -19,6 +21,7 @@ import {
 import { toast } from "react-toastify";
 import { RiUser3Fill } from "react-icons/ri";
 import ImgCrop from "antd-img-crop";
+
 
 const getBase64 = (file) =>
   new Promise((resolve, reject) => {
@@ -35,6 +38,7 @@ export default function ClientIndex({
   setModalIsOpen,
   updatedata,
 }) {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const [currentpage, setCurrentpage] = useState(1);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
@@ -51,6 +55,8 @@ export default function ClientIndex({
   const location = useLocation();
   const [selectedFile, setSelectedFile] = useState(null);
   const [SPA_ID, SetSPAID] = useState(null);
+
+  const imgUrl = process.env.REACT_SERVER_IMAGE_URL
   //const [superadmindata, setSuperAdminData] = useState("");
   const [clientdata, setClientData] = useState("");
 
@@ -73,15 +79,45 @@ export default function ClientIndex({
     );
   };
 
-  const handleChange = ({ fileList: newFileList }) => {
-    console.log(newFileList, "newFileList");
-    setFileList(newFileList);
-    if (newFileList?.length > 0) {
-      setProfileImage(true);
+  // const handleChange = ({ fileList: newFileList }) => {
+  //   console.log(newFileList, "newFileList");
+  //   setFileList(newFileList);
+  //   setSelectedFile(newFileList)
+  //   if (newFileList?.length > 0) {
+  //     setProfileImage(true);
+  //   } else {
+  //     setProfileImage(false);
+  //   }
+  //   // SubmitProfileData(newFileList[0], dispatch);
+  // };
+  const handleChange = async ({ fileList: newFileList }) => {
+    const file = newFileList[0]?.originFileObj;
+    
+    if (file) {
+      // Check file size (5MB = 5 * 1024 * 1024 bytes)
+      const fileSizeInMB = file.size / (1024 * 1024); // Convert bytes to MB
+      
+      if (fileSizeInMB > 5) {
+        // If the file size is greater than 5MB, alert the user
+        // alert('File size exceeds 5MB limit!');
+        setProfileImage(false)
+        // Remove the file from the list
+        newFileList.pop(); 
+      } else {
+        setFileList(newFileList);
+        setSelectedFile(newFileList)
+        if (newFileList?.length > 0) {
+          setProfileImage(true);
+        } else {
+          setProfileImage(false);
+        }
+      }
     } else {
-      setProfileImage(false);
+      // If no file, just update the file list
+      setProfileImage(false)
+      setFileList(newFileList);
+      setSelectedFile(newFileList)
     }
-    // SubmitProfileData(newFileList[0], dispatch);
   };
 
   const handleCancel = () => setPreviewOpen(false);
@@ -150,7 +186,7 @@ export default function ClientIndex({
     }
   }, [clientID, setClientID, setClientData]);
 
-  console.log(clientdata, "clientdata");
+  console.log(clientID,updatedata, "clientdata");
 
   console.log(location.pathname == "/settings", "locationlocationlocation");
 
@@ -159,6 +195,7 @@ export default function ClientIndex({
   //     setFileList(selectedFile)
   //   }
   // },[selectedFile])
+console.log(process.env.REACT_SERVER_IMAGE_URL,"urlrurlrurlrurlrurlrurl");
 
   return (
     <div>
@@ -203,7 +240,7 @@ export default function ClientIndex({
                 <div className="border-b-[0.1vw] border-[#1f4b7f] w-[15vw]"></div>
               </div>
 
-              <div className="flex items-center flex-col">
+              <div className="flex items-center flex-col relative">
                 {/* <Upload
                   action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
                   listType="picture-card"
@@ -242,12 +279,14 @@ export default function ClientIndex({
                     onImageCrop={(file) => {}}
                   >
                     <Upload
+                    className="umimgupload"
                       action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
                       listType="picture-card"
                       fileList={fileList}
                       onChange={handleChange}
                       onPreview={handlePreview}
                       disabled={enableUpload}
+                      accept=".jpg,.jpeg,.png" 
                     >
                       {fileList?.length < 1 && "+ Upload"}
                     </Upload>
@@ -256,9 +295,9 @@ export default function ClientIndex({
                   {fileList.length === 0 &&
                     selectedFile && ( // Check if there are no files in the fileList and selectedFile is set
                       <img
-                        src={`http://192.168.90.47:4000${selectedFile}`}
-                        alt="Photo"
-                        className="w-[5vw] h-[5vw] object-cover rounded-[0.2vw] top-[.7vw] left-[.7vw] absolute opacity-25 z-[1] pointer-events-none"
+                        src={`${apiImgUrl}${selectedFile}`}
+                        alt="Profile"
+                        className="w-[5.9vw] h-[5.9vw] object-cover rounded-[0.2vw] top-[0vw] left-[0vw] absolute opacity-25 z-[1] pointer-events-none"
                       />
                     )}
                 </div>
@@ -293,22 +332,38 @@ export default function ClientIndex({
                     src={previewImage}
                   />
                 </Modal>
+                {/* {updatedata
+                      ? " "
+                      : profileImage === false && (
+                          <div className="text-red-500 text-[.7vw] bottom-[-1.2vw] absolute">
+                            * Profile Image is required
+                          </div>
+                        )} */}
+                         {updatedata && selectedFile != null 
+                        ? " "
+                        : profileImage === false && (
+                          <div className="text-red-500 text-[.7vw] bottom-[-1.2vw] absolute">
+                            * Profile Image is required - (Max Size : 5MB)
+                          </div>
+                        )}
               </div>
 
               <div className="flex gap-[3vw] pt-[2vw] px-[7.5vw]">
                 <div className="">
                   <div className="bg-[#D9D9D9] rounded-t-full rounded-b-full w-[0.7vw] h-[11vw] relative">
                     <div
-                      className={`absolute rounded-t-full rounded-b-full w-[0.7vw] h-[2vw] bg-[#1f4b7f] ${
+                      className={`absolute w-[3.4vw] h-[1.5vw] ${
                         currentpage == 1
-                          ? "top-0"
+                          ? "top-[.2vw]"
                           : currentpage == 2
-                          ? "top-[4.5vw]"
+                          ? "top-[4.8vw]"
                           : currentpage == 3
                           ? "bottom-0"
                           : "bottom-0"
                       }`}
-                    ></div>
+                    >
+                       <img src={pencilshape} alt='icon' className="h-[1.2vw] w-[3.4vw]" />
+                    </div>
                   </div>
                 </div>
                 <div className="flex">
@@ -327,11 +382,14 @@ export default function ClientIndex({
                 </div>
               </div>
             </div>
-            <div className="col-span-4">
+            <div className="col-span-4 relative">
+            <div className="w-[5vw] h-[5vw] bg-white shadow-lg rounded-full absolute left-[16.6vw] top-[-1.5vw] flex justify-center items-center z-[1]"><img className="" src={umbuslogo} alt="buslogo"/></div>
+
               {currentpage == 1 ? (
                 <AddCompanyDetails
                   setCurrentpage={setCurrentpage}
                   SetSPAID={SetSPAID}
+                  setClientID={setClientID}
                   SPA_ID={SPA_ID}
                   clientdata={clientdata}
                   clientID={clientID}
@@ -344,6 +402,9 @@ export default function ClientIndex({
                   setProfileImage={setProfileImage}
                   updatedata={updatedata}
                   setEnableUpload={setEnableUpload}
+                  selectedFile={selectedFile}
+                  enableUpload={enableUpload}
+                  setSelectedFile={setSelectedFile}
                 />
               ) : currentpage == 2 ? (
                 <AddRegisterAddress
@@ -358,6 +419,8 @@ export default function ClientIndex({
                   addressback={addressback}
                   setBusinessBack={setBusinessBack}
                   businessback={businessback}
+                  updatedata={updatedata}
+                  gstback={gstback}
                 />
               ) : (
                 currentpage == 3 && (
@@ -372,6 +435,7 @@ export default function ClientIndex({
                     gstback={gstback}
                     client_id={client_id}
                     setGstback={setGstback}
+                    updatedata={updatedata}
                   />
                 )
               )}

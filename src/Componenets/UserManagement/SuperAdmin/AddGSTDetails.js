@@ -1,4 +1,4 @@
-import { Progress } from "antd";
+import { Modal, Progress, Spin } from "antd";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { FaCloudUploadAlt, FaPlus } from "react-icons/fa";
@@ -6,6 +6,7 @@ import * as Yup from "yup";
 import AddGST from "./AddGST";
 import ModalPopup from "../../Common/Modal/Modal";
 import { toast } from "react-toastify";
+import umbuslogo from "../../../asserts/umbuslogo.png"
 import {
   GetSuperAdminData,
   GetSuperAdminGSTById,
@@ -13,6 +14,7 @@ import {
   // SubmitClientGSTData,
 } from "../../../Api/UserManagement/SuperAdmin";
 import { useDispatch } from "react-redux";
+import { capitalizeFirstLetter } from "../../Common/Captilization";
 // import { GetClientGSTById } from "../../../Api/UserManagement/Client";
 
 const validationSchema = Yup.object().shape({
@@ -40,14 +42,17 @@ export default function AddGSTDetails({
   setGstback,
   client_id
 }) {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
   const [modalIsOpen1, setmodalIsOpen1] = useState(false);
 
   const closeModal = () => {
     setmodalIsOpen1(false);
+    setIsModalOpen(false);
   };
 
   const dispatch = useDispatch();
   const [superadmingstdata, setSuperAdminGSTData] = useState("");
+  const [spinning, setSpinning] = useState(false);
 
   const handleSubmit = async (values) => {
     if (superadmingstdata?.state_name) {
@@ -74,22 +79,42 @@ export default function AddGSTDetails({
   };
 
   const fetchGetUser = async () => {
+    console.log("admindatadadghdfkg");
     try {
       const data = await GetSuperAdminGSTById(
         operatorID,
         operatorID,
-        setSuperAdminGSTData
+        setSuperAdminGSTData,
+        setSpinning
       );
       setSuperAdminGSTData(data);
+      console.log(superadmingstdata,"admindatadadghdfkg");
+      
     } catch (error) {
       console.error("Error fetching additional user data", error);
     }
   };
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+const [modalImage, setModalImage] = useState(null);
+
+const openModal = (event) => {
+  // Get the image source (src) using `getElementById`
+  const imageSrc = event.target.getAttribute('src');
+  
+  // Set the modal image source
+  setModalImage(imageSrc);
+  
+  // Open the modal
+  setIsModalOpen(true);
+};
+
+
   useEffect(() => {
-    if (operatorID != null) {
+    if (operatorID != null || clientID) {
       console.log(superadmingstdata, "superadmingstdata");
       fetchGetUser();
+      setSpinning(true)
     }
     console.log(operatorID, "clientID");
   }, [operatorID, setOperatorID, setSuperAdminGSTData]);
@@ -102,7 +127,9 @@ export default function AddGSTDetails({
 
   return (
     <div>
-      <div className="border-l-[0.1vw] relative px-[2vw] h-[28vw] ree border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f]">
+      <div className="border-l-[0.1vw] relative px-[2vw] h-[28vw] ree border-t-[0.1vw] border-b-[0.3vw] border-r-[0.1vw] rounded-[1vw] border-[#1f4b7f] mt-[1vw]">
+      <div className="w-[5vw] h-[5vw] bg-white shadow-lg rounded-full absolute left-[16.6vw] top-[-2.5vw] flex justify-center items-center"><img className="" src={umbuslogo} alt="buslogo"/></div>
+
         <div className="h-[4vw] w-full flex items-center justify-between ">
           <label className="text-[1.5vw] font-semibold text-[#1f4b7f] ">
             GST Details
@@ -155,6 +182,11 @@ export default function AddGSTDetails({
               touched,
             }) => (
               <Form onSubmit={handleSubmit}>
+                  {spinning ? (
+                  <div className=" flex justify-center h-[23.8vw] items-center">
+                    <Spin size="large" />
+                  </div>
+                ) : (
                 <div className="gap-y-[1.5vw] flex-col flex">
                   {/* <div className="grid grid-cols-2 w-full gap-x-[2vw] items-center">
                     <div className="col-span-1">
@@ -244,7 +276,7 @@ export default function AddGSTDetails({
                       <div className="gap-y-[1vw] text-[#1F4B7F] text-[1vw]">
                         <div className="grid grid-cols-2 ">
                           <div className="font-semibold">State:</div>
-                          <div>{superadmingstdata?.state_name}</div>
+                          <div>{capitalizeFirstLetter(superadmingstdata?.state_name)}</div>
                         </div>
                         <div className="grid grid-cols-2 mt-[1vw]">
                           <div className="font-semibold">
@@ -258,11 +290,11 @@ export default function AddGSTDetails({
                         </div>
                         <div className="grid grid-cols-2 mt-[1vw]">
                           <div className="font-semibold">Head Office:</div>
-                          <div>{superadmingstdata?.head_office}</div>
+                          <div>{capitalizeFirstLetter(superadmingstdata?.head_office)}</div>
                         </div>
                         <div className="grid grid-cols-2 mt-[1vw]">
-                          <div className="font-semibold">Upload Documents:</div>
-                          <div>{superadmingstdata?.upload_gst}</div>
+                          <div className="font-semibold">Uploaded Document:</div>
+                          <span className="h-[8vw] w-[9vw] flex items center cursor-zoom-in"><img src={`${apiImgUrl}${superadmingstdata?.upload_gst}`}   onClick={openModal}  alt="Gst Image"/></span>
                         </div>
                       </div>
                     ) : (
@@ -300,7 +332,7 @@ export default function AddGSTDetails({
                       <button
                         className="border-[#1F487C] w-[5vw] font-semibold text-[1vw] h-[2vw] rounded-full border-r-[0.2vw]  border-l-[0.1vw] border-t-[0.1vw] border-b-[0.2vw]"
                         onClick={() => {
-                          setCurrentpage(2);
+                          setCurrentpage(4);
                           setGstback(true);
                         }}
                       >
@@ -312,13 +344,20 @@ export default function AddGSTDetails({
                         onClick={() => {
                           setModalIsOpen(false);
                           setmodalIsOpen1(false);
+                          if(superadmingstdata?.state_name){
+                            toast.success("Form Updated Successfully")
+                          }
+                          else{
+                            toast.success("Form Submitted Successfully")
+                          }
                         }}
                       >
-                        {superadmingstdata?.state_name ? "Update" : "Submit"}
+                        {superadmingstdata?.state_name? "Update" : "Submit"}
                       </button>
                     </div>
                   </div>
                 </div>
+                )}
               </Form>
             )}
           </Formik>
@@ -338,8 +377,29 @@ export default function AddGSTDetails({
           setClientID={setClientID}
           setmodalIsOpen1={setmodalIsOpen1}
           modalIsOpen1={modalIsOpen1}
+          superadmingstdata={superadmingstdata}
+          setSuperAdminGSTData={setSuperAdminGSTData}
         />
       </ModalPopup>
+      <Modal
+        visible={isModalOpen}
+        onCancel={closeModal}
+        footer={null}
+        centered
+        // width="35vw"
+        bodyStyle={{ padding: 0 }}
+        destroyOnClose={true} // Ensures modal is destroyed on close
+      >
+        {/* Display the image in the modal */}
+        {modalImage && (
+          <img
+            src={modalImage}
+            alt="Gst Preview"
+            style={{ width: "100%" }}
+            className=""
+          />
+        )}
+      </Modal>
     </div>
   );
 }

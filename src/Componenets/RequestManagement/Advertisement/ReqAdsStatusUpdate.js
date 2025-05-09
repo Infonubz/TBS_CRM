@@ -9,17 +9,17 @@ import {
 } from "../../../Api/RequestManagement/RequestManagement";
 import { toast } from "react-toastify";
 
-export default function ReqAdsStatusUpdate({ adId, setViewStatus }) {
+export default function ReqAdsStatusUpdate({ adId, setViewStatus,showtable,adfilter }) {
   const dispatch = useDispatch();
 
   const handlechange = async (valueid, valuedata) => {
     try {
-      const data = await ReqAdsStatusChange(valueid, valuedata, adId, dispatch);
+      const data = await ReqAdsStatusChange(valueid, valuedata, adId, dispatch,showtable,adfilter);
       console.log(valueid, valuedata, adId, "currentidcurrentid");
       console.log(data, "datadatadatadata");
       toast.success(data);
       setViewStatus(false);
-      GetRequestAdsData(dispatch);
+      // GetRequestAdsData(dispatch);
       console.log(data);
     } catch (error) {
       console.error("Error uploading data", error);
@@ -28,7 +28,7 @@ export default function ReqAdsStatusUpdate({ adId, setViewStatus }) {
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <p className="text-[1.5vw] text-[]">Update the Promotion Status</p>
+      <p className="text-[1.5vw] font-bold">Update The Promotion Status</p>
       <img src={image} className="h-[6vw] w-[6vw] my-[1vw]"></img>
       <div className="flex gap-2 mt-[1vw]">
         <button
@@ -45,7 +45,7 @@ export default function ReqAdsStatusUpdate({ adId, setViewStatus }) {
         </button>
         <button
           className="items-center text-[0.9vw] text-white  space-x-[0.7vw] px-[0.8vw] w-[8vw] h-[2vw] bg-[#FF1100] rounded-[0.5vw]"
-          onClick={() => handlechange(5, "Rejected")}
+          onClick={() => handlechange(4, "Rejected")}
         >
           Rejected
         </button>

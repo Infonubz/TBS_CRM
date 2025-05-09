@@ -1,0 +1,103 @@
+/* Main container styling */
+.container {
+    /* display: flex; */
+    /* justify-content: center; */
+    /* align-items: center; */
+    width: 100%;
+    max-width: 1000px; /* Adjust this if needed */
+    margin: 0 auto;
+    padding: 20px;
+    background: none !important; /* Removed background */
+    
+  }
+  
+  /* Swiper container styling */
+  .swiper_container {
+    position: relative;
+    width: 100%;
+    background: none !important;
+    
+  }
+  
+  /* Slide styling */
+  .swiper-slide {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 25vw; /* Set width to 25vw */
+    height: 15vw; /* Set height to 15vw */
+    background: none !important; /* Removed gradient background */
+    border-radius: none !important; /* Retain rounded corners for images */
+    overflow: auto;
+    transition: transform 0.3s ease;
+    box-shadow: none; /* Removed box-shadow */
+    border: #000 0.2vw;
+    border-radius: 1vw;
+  }
+  
+  .swiper-slide img {
+    width: 40vw;
+    height: 15vw;
+    /* border-radius: 20px; */
+    /* object-fit: none; Ensures images fill the slide area */
+  }
+  
+  /* Centered effect for the active slide */
+  .swiper-slide-active {
+    transform: scale(1.1);
+  }
+  
+  /* Pagination styling */
+  /* .swiper-pagination {
+    bottom: -10px !important;
+  }
+   */
+  /* .swiper-pagination-bullet {
+    background: rgba(0, 0, 0, 0.8);
+    width: 10px;
+    height: 10px;
+    margin: 0 4px;
+    opacity: 1;
+  }
+   */
+  /* .swiper-pagination-bullet-active {
+    background: #000;
+    width: 12px;
+    height: 12px;
+  }
+   */
+  /* Navigation arrow styling */
+  .slider-controler .slider-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #000;
+    font-size: 20px;
+    cursor: pointer;
+  }
+  
+  .slider-controler .swiper-button-prev {
+    left: -20vw;
+  }
+  
+  .slider-controler .swiper-button-next {
+    right: -20vw;
+  }
+  
+  /* Custom arrow shapes */
+  .slider-controler .swiper-button-prev:before,
+  .slider-controler .swiper-button-next:before {
+    content: '';
+    display: inline-block;
+    border: solid transparent;
+    border-width: 8px;
+  }
+  
+  .slider-controler .swiper-button-prev:before {
+    border-right-color: #000;
+  }
+  
+  .slider-controler .swiper-button-next:before {
+    border-left-color: #000;
+  }
+  

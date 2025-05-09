@@ -31,6 +31,7 @@ import rootReducer from "./Store"; // Assuming index.js in Store folder exports 
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
+// import WrappedApp from "./App";
 
 const store = createStore(rootReducer);
 
@@ -38,6 +39,7 @@ ReactDOM.render(
   <Provider store={store}>
     <React.StrictMode>
       <App />
+      {/* <WrappedApp/> */}
     </React.StrictMode>
   </Provider>,
   document.getElementById("root")

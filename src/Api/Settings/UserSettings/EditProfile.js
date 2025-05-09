@@ -1,5 +1,6 @@
 import axios from "axios";
 import { USER_SETTINGS_EDIT } from "../../../Store/Type";
+import { toast } from "react-toastify";
 
 const api = axios.create({
   headers: {
@@ -9,10 +10,17 @@ const api = axios.create({
 
 const apiUrl = process.env.REACT_APP_API_URL;
 
-export const EditUserSettings = async (id, dispatch) => {
+
+const userType = sessionStorage.getItem('type_name');
+const typeId = sessionStorage.getItem("type_id") ? sessionStorage.getItem("type_id") : localStorage.getItem("type_id");
+const userID = sessionStorage.getItem("USER_ID")
+
+
+export const EditUserSettings = async (id, dispatch, Login) => {
+
   console.log("hello i am printing", id);
   try {
-    const response = await axios.get(`${apiUrl}/product_owner/${id}`);
+    const response = await axios.get(`${apiUrl}/${Login}/${id}`);
     console.log(response.data, "this is responce data");
     // dispatch({type:USER_SETTINGS_EDIT ,payload:response.data})
     dispatch({ type: USER_SETTINGS_EDIT, payload: response.data });
@@ -29,6 +37,7 @@ export const UpdateEditUserSettings = async (id, owname, dispatch) => {
     });
     dispatch({ type: USER_SETTINGS_EDIT, payload: response.data });
     sessionStorage.setItem("user_name", owname);
+    toast.success(response?.data?.message);
     window.location.reload();
   } catch (err) {
     console.log(err);

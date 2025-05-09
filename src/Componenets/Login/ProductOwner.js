@@ -5,10 +5,8 @@ import { toast } from "react-toastify";
 import * as Yup from "yup";
 import { ProductOwnerLogin } from "../../Api/Login/AllLogin";
 import { useNavigate } from "react-router";
-import product_owner_bg from "../../asserts/product_owner_bg1.png";
-import product_owner from "../../asserts/product_owner1.png";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import logo from "../../asserts/crmlogo.png";
+import { useDispatch } from "react-redux";
 
 const emailOrPhoneValidation = Yup.string().test(
   "emailOrPhone",
@@ -26,10 +24,11 @@ const validationSchema = Yup.object().shape({
 });
 
 export default function ProductOwner({ setAuthtoken, setForgotPassword }) {
-  console.log(emailOrPhoneValidation, "emailOrPhoneValidation");
+  const dispatch = useDispatch()
   const navigate = useNavigate();
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const phoneRegex = /^\d{10}$/;
+  const [showPassword, setShowPassword] = useState(false);
+  // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  // const phoneRegex = /^\d{10}$/;
 
   const validateInput = (input) => {
     const emailRegex = /\S+@\S+\.\S+/;
@@ -64,13 +63,17 @@ export default function ProductOwner({ setAuthtoken, setForgotPassword }) {
   //   }
   // };
 
-  const handleSubmit = async (values, { setSubmitting, setFieldError, setAuthtoken }) => {
+  const handleSubmit = async (
+    values,
+    { setSubmitting, setFieldError, setAuthtoken }
+  ) => {
     const validationResult = validateInput(values.emailid_phone);
 
     try {
       const data = await ProductOwnerLogin(
         values,
         validationResult,
+        dispatch,
         setAuthtoken
       );
 
@@ -80,11 +83,13 @@ export default function ProductOwner({ setAuthtoken, setForgotPassword }) {
       if (data?.token) {
         navigate("/dashboard");
         window.location.reload();
+      } else {
+        setFieldError("password", " Invalid Username / Password");
       }
     } catch (error) {
       if (error.response && error.response.status === 401) {
-        setFieldError("password", "Invalid Password / Username");
-        // toast.error("Invalid Password / Username"); 
+        setFieldError("password", " Invalid Username / Password");
+        // toast.error("Invalid Password / Username");
       } else {
         toast.error(error.message);
       }
@@ -92,7 +97,6 @@ export default function ProductOwner({ setAuthtoken, setForgotPassword }) {
       setSubmitting(false);
     }
   };
-  const [showPassword, setShowPassword] = useState(false);
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -100,9 +104,11 @@ export default function ProductOwner({ setAuthtoken, setForgotPassword }) {
 
   return (
     <div className="absolute right-0 top-0 bg-[#E5FFF1] h-full w-[38vw] rounded-tr-[2vw] rounded-br-[2vw] bg-opacity-80 flex flex-col items-center justify-center">
-      <label className="text-[#1F487C] font-bold text-[2vw] ">Login</label>
+      <label className="text-[#1F487C] font-bold text-[2vw] ">
+        PRODUCT OWNER
+      </label>
       <p className="text-[#1F487C] text-[1vw] py-[2vw]">
-        Welcome Back, Please login to your account
+        Welcome Back, Please sign in to your account
       </p>
       <Formik
         initialValues={{
@@ -125,14 +131,14 @@ export default function ProductOwner({ setAuthtoken, setForgotPassword }) {
                 <Field
                   type="text"
                   name="emailid_phone"
-                  placeholder="Enter Email ID / Phone number"
+                  placeholder="Enter Email / Phone Number"
                   className="border-r-[0.3vw] mt-[0.5vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.3vw] placeholder-blue border-[#1F487C] text-[#1F487C] text-[1vw] h-[3vw] w-[100%] rounded-[0.5vw] outline-none px-[1vw]"
                 />
                 <ErrorMessage
-                    name="emailid_phone"
-                    component="div"
-                    className="text-red-500 text-[0.8vw] absolute bottom-[-1.5vw]"
-                  />
+                  name="emailid_phone"
+                  component="div"
+                  className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]"
+                />
               </div>
               <div className="col-span-1 ">
                 <label className="text-[#1F487C] text-[1.1vw] ">
@@ -159,18 +165,22 @@ export default function ProductOwner({ setAuthtoken, setForgotPassword }) {
                   <ErrorMessage
                     name="password"
                     component="div"
-                    className="text-red-500 text-[0.8vw] absolute bottom-[-1.5vw]"
+                    className="text-red-500 text-[0.8vw] absolute bottom-[-1.2vw]"
                   />
                 </div>
               </div>
               <div className="flex justify-between items-center">
-                <div>
-                  <Checkbox
-                    onChange={(e) => { }}
-                    className="text-[#1F4B7F] text-[1vw] "
-                  >
+                <div className="flex justify-between items-center gap-[1vw]">
+                  {/* <Checkbox> */}
+                  <input
+                    type="checkbox"
+                    onChange={(e) => {}}
+                    className="h-[.9vw] w-[.9vw] cursor-pointer "
+                  />
+                  <span className="text-[#1F4B7F]  text-[1vw] ">
                     Remember me
-                  </Checkbox>
+                  </span>
+                  {/* </Checkbox> */}
                 </div>
                 <div>
                   <p

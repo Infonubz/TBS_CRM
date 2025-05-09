@@ -1,7 +1,7 @@
-import { render } from "@testing-library/react";
+//import { render } from "@testing-library/react";
 import { Table, Pagination, Tooltip } from "antd";
 import React, { useState } from "react";
-import { IoMdEye } from "react-icons/io";
+//import { IoMdEye } from "react-icons/io";
 import { MdDelete, MdEdit } from "react-icons/md";
 import "../../App.css";
 import dayjs from "dayjs";
@@ -28,27 +28,72 @@ export default function ReqPromotion({
 
   const [promotionId, setPromotionId] = useState(null);
   const [viewmodal, setViewPromoModal] = useState(false);
-  const [viewid, setViewID] = useState(null);
+  //const [viewid, setViewID] = useState(null);
   const [promoId, setPromoId] = useState("");
-  console.log(promoId,"prooooooooooid");
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
+  const apiUrl = process.env.REACT_APP_API_URL;
+
   const columns = [
     {
-      title: <h1 className="text-[1.2vw] font-semibold flex items-center justify-center">S.No</h1>,
+      title: (
+        <h1 className="text-[1.2vw] font-semibold flex items-center justify-center">
+          S.No
+        </h1>
+      ),
       width: "5vw",
       render: (row, rowdta, index) => {
+        console.log(row, "rororororororororororororoorooooo");
+
         return (
           <div className="flex items-center justify-center">
-            <h1 className="pl-[1vw]">{index + 1}</h1>
+            <h1 className="pl-[1vw] text-[#1F4B7F]">{index + 1}</h1>
           </div>
         );
       },
     },
     {
-      title: <h1 className="text-[1.2vw] font-semibold flex items-center justify-center">Name</h1>,
+      title: (
+        <h1 className="flex items-center justify-center text-[1.2vw] font-semibold">
+          Operator Name
+        </h1>
+      ),
+      sorter: (a, b) => a.operator_details.localeCompare(b.operator_details),
+      render: (row, rowdta, index) => {
+        return (
+          // <div className="flex items-center">
+          //   <h1 className="text-[1.1vw]">{row.promo_description}</h1>
+          // </div>
+          <div className="flex items-center justify-center text-[1vw] text-[#1F4B7F]">
+            <h1 className="text-[1.1vw]">
+              {/* {row.promo_description} */}
+              {row?.operator_details?.length > 15 ? (
+                <Tooltip
+                  placement="bottom"
+                  title={row?.operator_details}
+                  className="cursor-pointer"
+                  color="#1F487C"
+                >
+                  {`${row?.operator_details?.slice(0, 15)}...`}
+                </Tooltip>
+              ) : (
+                row?.operator_details?.slice(0, 15)
+              )}
+            </h1>
+          </div>
+        );
+      },
+      width: "14vw",
+    },
+    {
+      title: (
+        <h1 className="text-[1.2vw] font-semibold flex items-center justify-center">
+          Promo Title
+        </h1>
+      ),
       sorter: (a, b) => a.promo_name.localeCompare(b.promo_name),
       render: (row, rowdta, index) => {
         return (
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center text-[1vw] text-[#1F4B7F]">
             {/* <h1 className="text-[1.1vw]">{row.promo_name}</h1> */}
             {row?.promo_name?.length > 15 ? (
               <Tooltip
@@ -69,14 +114,18 @@ export default function ReqPromotion({
     },
 
     {
-      title: <h1 className="flex items-center justify-center text-[1.2vw] font-semibold">Description</h1>,
+      title: (
+        <h1 className="flex items-center justify-center text-[1.2vw] font-semibold">
+          Description
+        </h1>
+      ),
       sorter: (a, b) => a.promo_description.localeCompare(b.promo_description),
       render: (row, rowdta, index) => {
         return (
           // <div className="flex items-center">
           //   <h1 className="text-[1.1vw]">{row.promo_description}</h1>
           // </div>
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center text-[1vw] text-[#1F4B7F]">
             <h1 className="text-[1.1vw]">
               {/* {row.promo_description} */}
               {row?.promo_description?.length > 15 ? (
@@ -97,118 +146,131 @@ export default function ReqPromotion({
       },
       width: "14vw",
     },
+    // {
+    //   title: <h1 className="flex items-center justify-center text-[1.2vw] font-semibold">Operator</h1>,
+    //   width: "17vw",
+    //   render: (row) => {
+    //     return (
+    //       <div>
+    //         {/* {row?.promo_code?.length > 15 ? (
+    //           <Tooltip
+    //             placement="right"
+    //             title={row?.promo_code}
+    //             className="cursor-pointer"
+    //             color="#1F487C"
+    //           >
+    //             <button className="border-dashed text-[1.1vw] bg-[#1F4B7F] border-white border-[0.2vw] rounded-[0.5vw] text-white px-[2vw] py-[0.2vw]">
+    //               {`${row?.promo_code?.slice(0, 15)}...`}
+    //             </button>
+    //           </Tooltip>
+    //         ) : (
+    //           <button className="border-dashed text-[1.1vw] bg-[#1F4B7F] border-white border-[0.2vw] rounded-[0.5vw] text-white px-[2vw] py-[0.2vw]">
+    //             {`${row?.promo_code?.slice(0, 15)}`}
+    //           </button>
+    //         )} */}
+    //       </div>
+    //     );
+    //   },
+    // },
     {
-      title: <h1 className="flex items-center justify-center text-[1.2vw] font-semibold">Operator</h1>,
-      width: "17vw",
-      render: (row) => {
-        return (
-          <div>
-            {/* {row?.promo_code?.length > 15 ? (
-              <Tooltip
-                placement="right"
-                title={row?.promo_code}
-                className="cursor-pointer"
-                color="#1F487C"
-              >
-                <button className="border-dashed text-[1.1vw] bg-[#1F4B7F] border-white border-[0.2vw] rounded-[0.5vw] text-white px-[2vw] py-[0.2vw]">
-                  {`${row?.promo_code?.slice(0, 15)}...`}
-                </button>
-              </Tooltip>
-            ) : (
-              <button className="border-dashed text-[1.1vw] bg-[#1F4B7F] border-white border-[0.2vw] rounded-[0.5vw] text-white px-[2vw] py-[0.2vw]">
-                {`${row?.promo_code?.slice(0, 15)}`}
-              </button>
-            )} */}
-          </div>
-        );
-      },
-    },
-    {
-      title: <h1 className=" flex items-center justify-center text-[1.2vw] font-semibold">Duration</h1>,
+      title: (
+        <h1 className=" flex items-center justify-center text-[1.2vw] font-semibold">
+          Duration
+        </h1>
+      ),
       sorter: (a, b) =>
         dayjs(a.start_date).valueOf() - dayjs(b.start_date).valueOf(),
       width: "15vw",
       render: (row) => {
         return (
           <div>
-            <p className="flex items-center justify-center text-[1.1vw]">{`${dayjs(row?.start_date).format(
+            <p className="flex items-center justify-center text-[1vw] text-[#1F4B7F]">{`${dayjs(
+              row?.start_date
+            ).format("MMM DD")} - ${dayjs(row?.expiry_date).format(
               "MMM DD"
-            )} - ${dayjs(row?.expiry_date).format("MMM DD")}`}</p>
-          </div>
-        );
-      },
-    },
-    {
-      title: <h1 className=" flex items-center justify-center text-[1.2vw] font-semibold">Usage</h1>,
-      sorter: (a, b) => a.usage - b.usage,
-      width: "7vw",
-      render: (row) => {
-        return (
-          <div>
-            <p className="flex items-center justify-center text-[1.1vw]">{row.usage}</p>
+            )}`}</p>
           </div>
         );
       },
     },
     {
       title: (
-        <div className="flex justify-center items-center font-bold text-[1.2vw]">
-          Card
-        </div>
+        <h1 className=" flex items-center justify-center text-[1.2vw] font-semibold">
+          Usage
+        </h1>
       ),
-      width: "10vw",
+      sorter: (a, b) => a.usage - b.usage,
+      width: "7vw",
       render: (row) => {
-        // setPromoId(row.promo_id);
-        console.log(row, "rowrowrowrow");
         return (
-          <div className="flex  justify-center items-center">
-            <button
-              
-              className="text-white bg-[#727070] flex items-center justify-center rounded-[0.5vw]  text-[1vw] w-[5vw] py-[0.2vw]  
-               "
-              // onClick={() => {
-              //   setViewID(row.tbs_operator_id);
-              //   setViewPromoModal(true);
-              // }}
-              onClick={()=>{
-                // setViewID(row.promo_id)
-                setPromoId(row.promo_id)
-                console.log(row.promo_id,"idvaratum");
-                setViewPromoModal(true)
-
-              }}
-            >
-              <span>
-                <FaEye size={"1vw"} color="white" />
-              </span>
-              <span className="pl-[0.5vw]">View</span>
-            </button>
+          <div>
+            <p className="flex items-center justify-center text-[1vw] text-[#1F4B7F]">
+              {row.usage}
+            </p>
           </div>
         );
       },
     },
+    // {
+    //   title: (
+    //     <div className="flex justify-center items-center font-bold text-[1.2vw]">
+    //       Card
+    //     </div>
+    //   ),
+    //   width: "10vw",
+    //   render: (row) => {
+    //     // setPromoId(row.promo_id);
+    //     console.log(row, "rowrowrowrow");
+    //     return (
+    //       <div className="flex  justify-center items-center">
+    //         <button
+    //           className="text-white bg-[#727070] flex items-center justify-center rounded-[0.5vw]  text-[1vw] w-[5vw] py-[0.2vw]  
+    //            "
+    //           // onClick={() => {
+    //           //   setViewID(row.tbs_operator_id);
+    //           //   setViewPromoModal(true);
+    //           // }}
+    //           onClick={() => {
+    //             // setViewID(row.promo_id)
+    //             setPromoId(row.promo_id);
+    //             console.log(row.promo_id, "idvaratum");
+    //             setViewPromoModal(true);
+    //           }}
+    //         >
+    //           <span>
+    //             <FaEye size={"1vw"} color="white" />
+    //           </span>
+    //           <span className="pl-[0.5vw]">View</span>
+    //         </button>
+    //       </div>
+    //     );
+    //   },
+    // },
     {
-      title: <h1 className="text-[1.2vw] font-semibold flex items-center justify-center">Status</h1>,
+      title: (
+        <h1 className="text-[1.2vw] font-semibold flex items-center justify-center">
+          Status
+        </h1>
+      ),
       width: "10vw",
       render: (row) => {
         return (
           <div className="flex items-center justify-center">
             {row?.user_id != null ? (
               <button
-                className={`${
-                  row.user_id == 0
+                className={`${row.user_id == 0
                     ? "bg-[#FF9900]"
                     : row.user_id == 1
-                    ? "bg-[#34AE2A]"
-                    : row.user_id == 2
-                    ? "bg-[#FD3434]"
-                    : row.user_id == 3
-                    ? "bg-[#2A99FF]"
-                    : "bg-[#646262]"
-                } rounded-[0.5vw] text-[1.1vw]  font-bold text-white w-[8vw] py-[0.2vw]`}
-                onClick={() =>{
-                  setViewStatus(true)
-                  setPromoId(row.promo_id)
+                      ? "bg-[#34AE2A]"
+                      : row.user_id == 2
+                        ? "bg-[#FD3434]"
+                        : row.user_id == 3
+                          ? "bg-[#2A99FF]"
+                          : "bg-[#646262]"
+                  } rounded-[0.5vw] text-[1.1vw]  font-bold text-white w-[8vw] py-[0.2vw]`}
+                onClick={() => {
+                  setViewStatus(true);
+                  setPromoId(row.promo_id);
                 }}
               >
                 {capitalizeFirstLetter(row.user_status)}
@@ -221,13 +283,25 @@ export default function ReqPromotion({
       },
     },
     {
-      title: <h1 className="text-[1.2vw] font-semibold flex items-center justify-center">Actions</h1>,
+      title: (
+        <h1 className="text-[1.2vw] font-semibold flex items-center justify-center">
+          Actions
+        </h1>
+      ),
       width: "10vw",
       render: (row) => {
         console.log(row, "rowrowrowrow");
         return (
           <div className="flex gap-[0.7vw] justify-center  items-center">
             {/* <div><IoMdEye size={"1.6vw"} color="#1F4B7F" onClick={() => { setEyeModalIsOpen(true) }} /></div> */}
+            <span  className="cursor-pointer"  onClick={() => {
+                // setViewID(row.promo_id)
+                setPromoId(row.promo_id);
+                console.log(row.promo_id, "idvaratum");
+                setViewPromoModal(true);
+              }}>
+                <FaEye size={"1.3vw"} color="#1F4B7F" />
+              </span>
             {/* <MdEdit
               size={"1.3vw"}
               color="#1F4B7F"
@@ -277,7 +351,7 @@ export default function ReqPromotion({
         <DeleteList
           setDeleteModalIsOpen={setDeleteModalIsOpen}
           title={"Want to delete this Promotion"}
-          api={`http://192.168.90.47:4000/api/promo/${promotionId}`}
+          api={`${apiUrl}/promo/${promotionId}`}
           module={"promotion"}
         />
       </ModalPopup>
@@ -290,7 +364,7 @@ export default function ReqPromotion({
       >
         {
           <img
-            api={`http://192.168.90.47:4000/${promotionId}`}
+            api={`${apiImgUrl}/${promotionId}`}
             className="rounded-[0.5vw]"
           />
         }

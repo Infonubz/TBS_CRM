@@ -12,6 +12,7 @@ import DeleteList from "./DeleteList";
 export default function ListView({
   currentData,
   setModalIsOpen,
+  
   SetUpdateData,
   activePage,
   itemsPerPage

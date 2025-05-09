@@ -19,26 +19,36 @@ const ReqOffersStatusUpdate = ({ updateData, setStatusupdateModal }) => {
   };
   return (
     <div className="flex flex-col items-center justify-center">
-      <p className="text-[1.5vw] text-[]">Update the Offer Status</p>
+      <p className="text-[1.5vw] font-bold">Update The Offer Status</p>
       <img src={image} className="h-[6vw] w-[6vw] my-[1vw]"></img>
-      <div className="flex gap-2 mt-[1vw]">
+      <div className="flex gap-x-[1.5vw] mt-[1.5vw]">
         <button
-          className="items-center text-[0.9vw] text-white  space-x-[0.7vw] px-[0.8vw] w-[8vw] h-[2vw] bg-[#2A99FF] rounded-[0.5vw]"
-          onClick={() => handlechange(2, "Under Review")}
+          className="items-center text-[1vw] text-white shadow-md font-extrabold shadow-black space-x-[0.7vw] px-[0.8vw] w-[7vw] h-[2vw] bg-[#2A99FF] rounded-[0.5vw] cursor-pointer"
+          // onClick={() => {
+          //   handlechange(4, "On Hold");
+
+          // }}
+          onClick={() => handlechange(2, 'Under Review')}
         >
-          Under review
+          Hold
         </button>
         <button
-          className="items-center text-[0.9vw] text-white  space-x-[0.7vw] px-[0.8vw] w-[10vw] h-[2vw]  bg-[#34AE2A] rounded-[0.5vw]"
-          onClick={() => handlechange(3, "Approved")}
+          className="items-center text-[1vw] text-white font-extrabold shadow-md font-bold shadow-black space-x-[0.7vw] px-[0.8vw] w-[7vw] h-[2vw]  bg-[#34AE2B] rounded-[0.5vw] cursor-pointer"
+          // onClick={() => {
+          //   handlechange(5, "Approved");
+          // }}
+          onClick={() => handlechange(3, 'Approved')}
         >
-          Approved
+          Active
         </button>
         <button
-          className="items-center text-[0.9vw] text-white  space-x-[0.7vw] px-[0.8vw] w-[8vw] h-[2vw] bg-[#FF1100] rounded-[0.5vw]"
-          onClick={() => handlechange(5, "Rejected")}
+          className="items-center text-[1vw] text-white font-extrabold shadow-md shadow-black space-x-[0.7vw] px-[0.8vw] w-[7vw] h-[2vw] bg-[#FF1100] rounded-[0.5vw] cursor-pointer"
+          // onClick={() => {
+          //   handlechange(6, "Rejected");
+          // }}
+          onClick={() => handlechange (5, 'Rejected')}
         >
-          Rejected
+          Reject
         </button>
       </div>
     </div>

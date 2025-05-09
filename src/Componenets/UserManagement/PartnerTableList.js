@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Grid, Space, Table } from "antd";
+import { Button, Grid, Space, Spin, Table, Tooltip } from "antd";
 import { render } from "@testing-library/react";
 import { MdModeEditOutline, MdPadding } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
@@ -19,6 +19,12 @@ import DeleteList from "../Offers/DeleteList";
 import { capitalizeFirstLetter } from "../Common/Captilization";
 import PartnerStatusUpdate from "./Partner/PartnerStatusUpdate";
 import { useSelector } from "react-redux";
+import moment from "moment/moment";
+import {
+  TiArrowUnsorted,
+  TiArrowSortedUp,
+  TiArrowSortedDown,
+} from "react-icons/ti";
 
 // import { width } from "@fortawesome/free-solid-svg-icons/fa0";
 
@@ -30,10 +36,25 @@ const PartnerTableList = ({
   PartnerID,
   setPartnerID,
   get_partner_list,
-  updatedata
+  updatedata,
+  sortOrderDate,
+  handleDateSort,
+  sortOrderMobile,
+  handleMobileSort,
+  sortOrderEmail,
+  handleEmailSort,
+  sortOrderOccupation,
+  handleOccupationSort,
+  sortOrderPartnerName,
+  handlePartnerNameSort,
 }) => {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
+  const apiUrl = process.env.REACT_APP_API_URL;
   const [sortedInfo, setSortedInfo] = useState({});
   const [viewmodal, setViewModal] = useState(false);
+  const [userName, setUserName] = useState();
+  const [partnerStatusId, setPartnerStatusId] = useState();
+  const [spinning, setSpinning] = useState(false);
 
   const handleChange = (pagination, filters, sorter) => {
     console.log("Various parameters", pagination, filters, sorter);
@@ -51,93 +72,48 @@ const PartnerTableList = ({
   const columns = [
     {
       title: (
-        <div className="flex items-center justify-center font-bold text-[1.2vw]">Photo</div>
+        <div className="flex items-center justify-center font-bold text-[1.1vw]">
+          Profile
+        </div>
       ),
       // dataIndex: "photo",
       // key: "photo",
       align: "center",
+      width: "5vw",
       render: (row) => {
         console.log(row, "rowrowrow");
-        const image = `http://192.168.90.47:4000${row?.profile_img}`;
+        const image = `${apiImgUrl}${row?.profile_img}`;
         console.log(image, "imageimage");
         return (
           <div className="flex justify-center items-center">
             <img
-              src={`${row?.profile_img
-                ? `http://192.168.90.47:4000${row?.profile_img}`
-                : UserProfile
-                } `}
-              alt="Photo"
+              src={`${
+                row?.profile_img
+                  ? `${apiImgUrl}${row?.profile_img}`
+                  : UserProfile
+              } `}
+              alt="Profile"
               className="w-[2.15vw] h-[2.15vw] object-cover rounded-[0.2vw]"
             />
           </div>
         );
       },
-      width: "6vw",
+      width: "5vw",
     },
     {
-      title: <div className="flex items-center justify-center  font-bold text-[1.2vw]">Partner Name</div>, // dataIndex: "name",
-      key: "name",
-      sorter: (a, b) => {
-        const nameA =
-          `${a.partner_first_name} ${a.partner_last_name}`.toUpperCase();
-        const nameB =
-          `${b.partner_first_name} ${b.partner_last_name}`.toUpperCase();
-        return nameA.localeCompare(nameB);
-      },
-      width: "12vw",
-      sortOrder: sortedInfo.columnKey === "name" && sortedInfo.order,
-      render: (row) => (
-        <div className="flex items-center justify-center">
-          <p className="text-[1.1vw]">{`${row?.partner_first_name} ${row.partner_last_name}`}</p>
+      title: (
+        <div className="flex items-center justify-center font-bold text-[1.1vw]">
+          Partner ID
         </div>
       ),
-    },
-
-    {
-      title: <div className="flex items-center justify-center font-bold text-[1.2vw]">Mobile</div>,
-      key: "mobile",
-      sorter: (a, b) => a.mobilenumber?.length - b.mobilenumber?.length,
-      sortOrder: sortedInfo.columnKey === "mobile" ? sortedInfo.order : null,
+      key: "id",
       ellipsis: true,
-      width: "10vw",
+      width: "9vw",
       render: (text, row) => {
         return (
           <div className="flex items-center justify-center">
-            <p className="text-[1.1vw]">{row.phone}</p>
-          </div>
-        );
-      },
-    },
-    {
-      title: <div className="flex items-center justify-center  font-bold text-[1.2vw]">Email</div>,
-      // dataIndex: "email",
-      key: "email",
-      sorter: (a, b) => a.emailid.length - b.emailid.length,
-      sortOrder: sortedInfo.columnKey === "email" ? sortedInfo.order : null,
-      ellipsis: true,
-      width: "15vw",
-      render: (row) => {
-        return (
-          <div className="flex items-center justify-center">
-            <p className="text-[1.1vw]">{row.emailid}</p>
-          </div>
-        );
-      },
-    },
-    {
-      title: <div className="flex items-center justify-center  font-bold text-[1.2vw]">Created</div>,
-      // dataIndex: "created",
-      // key: "created",
-      sorter: (a, b) => a.created.length - b.created.length,
-      sortOrder: sortedInfo.columnKey === "created" ? sortedInfo.order : null,
-      ellipsis: true,
-      width: "10vw",
-      render: (row) => {
-        return (
-          <div className="flex items-center justify-center">
-            <p className="text-[1.1vw]">
-              {dayjs(row.created_date).format("MMM DD hh:mm a")}
+            <p className="text-[1vw] text-[#1F4B7F] font-bold">
+              {row.tbs_partner_id}
             </p>
           </div>
         );
@@ -145,7 +121,505 @@ const PartnerTableList = ({
     },
     {
       title: (
-        <div className="flex items-center justify-center font-bold text-[1.2vw]">Status</div>
+        <div className="flex items-center justify-evenly  font-bold text-[1.1vw]">
+          Partner Name
+
+          <button onClick={handlePartnerNameSort} className="">
+                      {sortOrderPartnerName === "ascend" ? (
+                        <Tooltip
+                          placement="top"
+                          title="Ascending"
+                          className="cursor-pointer"
+                          color="white"
+                          overlayInnerStyle={{
+                            color: "#1F487C",
+                          }}
+                        >
+                          <TiArrowSortedUp />
+                        </Tooltip>
+                      ) : sortOrderPartnerName === "descend" ? (
+                        <Tooltip
+                          placement="top"
+                          title="Descending"
+                          className="cursor-pointer"
+                          color="white"
+                          overlayInnerStyle={{
+                            color: "#1F487C",
+                          }}
+                        >
+                          <TiArrowSortedDown />
+                        </Tooltip>
+                      ) : sortOrderPartnerName === null ? (
+                        <Tooltip
+                          placement="top"
+                          title="Unsorted"
+                          className="cursor-pointer"
+                          color="white"
+                          overlayInnerStyle={{
+                            color: "#1F487C",
+                          }}
+                        >
+                          <TiArrowUnsorted />
+                        </Tooltip>
+                      ) : (
+                        <Tooltip
+                          placement="top"
+                          title="Ascending"
+                          className="cursor-pointer"
+                          color="white"
+                          overlayInnerStyle={{
+                            color: "#1F487C",
+                          }}
+                        >
+                          <TiArrowSortedUp />
+                        </Tooltip>
+                      )}
+                    </button>
+          
+        </div>
+      ), // dataIndex: "name",
+      key: "name",
+      // sorter: (a, b) => {
+      //   const nameA =
+      //     `${a.partner_first_name} ${a.partner_last_name}`.toUpperCase();
+      //   const nameB =
+      //     `${b.partner_first_name} ${b.partner_last_name}`.toUpperCase();
+      //   return nameA.localeCompare(nameB);
+      // },
+      width: "11vw",
+      // sortOrder: sortedInfo.columnKey === "name" && sortedInfo.order,
+      // render: (row) => (
+      //   <div className="flex items-center justify-center">
+      //     <p className="text-[1.1vw] text-[#1F4B7F]">{`${capitalizeFirstLetter(row?.partner_first_name)} ${row.partner_last_name}`}</p>
+      //   </div>
+      // ),
+      render: (row) => {
+        // const fullname = `${capitalizeFirstLetter(row?.partner_first_name)} ${
+        //   row.partner_last_name
+        // }`;
+        const fullname = `${
+          row?.partner_first_name.charAt(0) ===
+          row?.partner_first_name.charAt(0).toLowerCase()
+            ? capitalizeFirstLetter(row?.partner_first_name)
+            : row?.partner_first_name
+        } ${row?.partner_last_name}`;
+        return (
+          <div className="flex items-center pl-[1vw]">
+            <p className="text-[1vw] text-[#1F4B7F] font-bold">
+              {fullname?.length > 18 ? (
+                <Tooltip
+                  placement="top"
+                  color="white"
+                  overlayInnerStyle={{ color: "#1F4B7F" }}
+                  title={`${capitalizeFirstLetter(row?.partner_first_name)} ${
+                    row.partner_last_name
+                  }`}
+                  className="cursor-pointer"
+                >
+                  {fullname?.slice(0, 18) + ".."}
+                </Tooltip>
+              ) : (
+                fullname
+              )}
+            </p>
+          </div>
+        );
+      },
+    },
+    {
+      title: (
+        <div className="flex items-center justify-evenly  font-bold text-[1.1vw]">
+          Occupation
+          
+          <button onClick={handleOccupationSort} className="">
+                      {sortOrderOccupation === "ascend" ? (
+                        <Tooltip
+                          placement="top"
+                          title="Ascending"
+                          className="cursor-pointer"
+                          color="white"
+                          overlayInnerStyle={{
+                            color: "#1F487C",
+                          }}
+                        >
+                          <TiArrowSortedUp />
+                        </Tooltip>
+                      ) : sortOrderOccupation === "descend" ? (
+                        <Tooltip
+                          placement="top"
+                          title="Descending"
+                          className="cursor-pointer"
+                          color="white"
+                          overlayInnerStyle={{
+                            color: "#1F487C",
+                          }}
+                        >
+                          <TiArrowSortedDown />
+                        </Tooltip>
+                      ) : sortOrderOccupation === null ? (
+                        <Tooltip
+                          placement="top"
+                          title="Unsorted"
+                          className="cursor-pointer"
+                          color="white"
+                          overlayInnerStyle={{
+                            color: "#1F487C",
+                          }}
+                        >
+                          <TiArrowUnsorted />
+                        </Tooltip>
+                      ) : (
+                        <Tooltip
+                          placement="top"
+                          title="Ascending"
+                          className="cursor-pointer"
+                          color="white"
+                          overlayInnerStyle={{
+                            color: "#1F487C",
+                          }}
+                        >
+                          <TiArrowSortedUp />
+                        </Tooltip>
+                      )}
+                    </button>
+        </div>
+      ),
+      // dataIndex: "email",
+      key: "occupation",
+      // sorter: (a, b) => a.occupation?.length - b.occupation?.length,
+      // sorter: (a, b) =>
+      //   a.occupation?.toLowerCase().localeCompare(b.occupation?.toLowerCase()),
+      // sortOrder:
+      //   sortedInfo.columnKey === "occupation" ? sortedInfo.order : null,
+      ellipsis: true,
+      width: "10vw",
+      render: (row) => {
+        return (
+          // <div className="flex items-center justify-center">
+          //   <p className="text-[1.1vw] text-[#1F4B7F]">{row.emailid}</p>
+          // </div>
+          <div>
+            {row?.occupation?.length > 18 ? (
+              <Tooltip
+                placement="top"
+                color="white"
+                overlayInnerStyle={{ color: "#1F4B7F" }}
+                title={row?.occupation}
+                className="cursor-pointer"
+              >
+                <div
+                  className={`text-[1vw] pl-[1.5vw] font-bold ${
+                    !row?.occupation && "pl-[3vw]"
+                  } text-[#1f4b7f]`}
+                >
+                  {" "}
+                  {`${capitalizeFirstLetter(row?.occupation?.slice(0, 18))}...`}
+                </div>
+              </Tooltip>
+            ) : (
+              <div
+                className={`text-[1vw] pl-[1.5vw] font-bold ${
+                  !row?.occupation && "pl-[3vw]"
+                } text-[#1f4b7f]`}
+              >
+                {row?.occupation
+                  ? capitalizeFirstLetter(row?.occupation?.slice(0, 18))
+                  : "-"}
+              </div>
+            )}
+          </div>
+        );
+      },
+    },
+    {
+      title: (
+        <div className="flex items-center justify-center font-bold text-[1.1vw]">
+          Age / Gender
+        </div>
+      ),
+      ellipsis: true,
+      width: "9vw",
+      render: (row) => {
+        return (
+          <div className="pl-[2.5vw]">
+            <p className={`text-[1vw] text-[#1F4B7F] flex `}>
+              {row.date_of_birth ? (
+                <>
+                  <div>{moment().diff(moment(row.date_of_birth), "years")}</div>
+                  <div className="px-[.3vw]">/</div>
+                  <div>
+                    {row?.gender === "Male"
+                      ? "M"
+                      : row?.gender === "Female"
+                      ? "F"
+                      : "O"}
+                  </div>
+                </>
+              ) : (
+                <div className="pl-[1vw]  font-bold w-full">-</div>
+              )}
+            </p>
+          </div>
+        );
+      },
+    },
+    {
+      title: (
+        <div className="flex items-center justify-evenly font-bold text-[1.1vw]">
+          Mobile
+          <button onClick={handleMobileSort}>
+            {sortOrderMobile === "ascend" ? (
+              <Tooltip
+                placement="top"
+                title="Ascending"
+                className="cursor-pointer"
+                color="white"
+                overlayInnerStyle={{
+                  color: "#1F487C",
+                }}
+              >
+                <TiArrowSortedUp />
+              </Tooltip>
+            ) : sortOrderMobile === "descend" ? (
+              <Tooltip
+                placement="top"
+                title="Descending"
+                className="cursor-pointer"
+                color="white"
+                overlayInnerStyle={{
+                  color: "#1F487C",
+                }}
+              >
+                <TiArrowSortedDown />
+              </Tooltip>
+            ) : sortOrderMobile === null ? (
+              <Tooltip
+                placement="top"
+                title="Unsorted"
+                className="cursor-pointer"
+                color="white"
+                overlayInnerStyle={{
+                  color: "#1F487C",
+                }}
+              >
+                <TiArrowUnsorted />
+              </Tooltip>
+            ) : (
+              <Tooltip
+                placement="top"
+                title="Ascending"
+                className="cursor-pointer"
+                color="white"
+                overlayInnerStyle={{
+                  color: "#1F487C",
+                }}
+              >
+                <TiArrowSortedUp />
+              </Tooltip>
+            )}
+          </button>
+        </div>
+      ),
+      key: "mobile",
+      // sorter: (a, b) => {
+      //   const phoneA = a.phone ? a.phone.replace(/\D/g, "") : "";
+      //   const phoneB = b.phone ? b.phone.replace(/\D/g, "") : "";
+      //   return phoneA.localeCompare(phoneB);
+      // },
+      // sortOrder: sortedInfo.columnKey === "mobile" && sortedInfo.order,
+      ellipsis: true,
+      width: "9vw",
+      render: (text, row) => {
+        return (
+          <div className="flex items-center w-full">
+            <p className="text-[1vw] text-[#1F4B7F] w-full flex justify-center">
+              {row.phone ? (
+                <span>{row.phone}</span>
+              ) : (
+                <div className="font-bold">-</div>
+              )}
+            </p>
+          </div>
+        );
+      },
+    },
+    {
+      title: (
+        <div className="flex items-center justify-evenly  font-bold text-[1.2vw]">
+          Email
+          <button onClick={handleEmailSort}>
+            {sortOrderEmail === "ascend" ? (
+              <Tooltip
+                placement="top"
+                title="Ascending"
+                className="cursor-pointer"
+                color="white"
+                overlayInnerStyle={{
+                  color: "#1F487C",
+                }}
+              >
+                <TiArrowSortedUp />
+              </Tooltip>
+            ) : sortOrderEmail === "descend" ? (
+              <Tooltip
+                placement="top"
+                title="Descending"
+                className="cursor-pointer"
+                color="white"
+                overlayInnerStyle={{
+                  color: "#1F487C",
+                }}
+              >
+                <TiArrowSortedDown />
+              </Tooltip>
+            ) : sortOrderEmail === null ? (
+              <Tooltip
+                placement="top"
+                title="Unsorted"
+                className="cursor-pointer"
+                color="white"
+                overlayInnerStyle={{
+                  color: "#1F487C",
+                }}
+              >
+                <TiArrowUnsorted />
+              </Tooltip>
+            ) : (
+              <Tooltip
+                placement="top"
+                title="Ascending"
+                className="cursor-pointer"
+                color="white"
+                overlayInnerStyle={{
+                  color: "#1F487C",
+                }}
+              >
+                <TiArrowSortedUp />
+              </Tooltip>
+            )}
+          </button>
+        </div>
+      ),
+      // dataIndex: "email",
+      key: "email",
+      // sorter: (a, b) => a.emailid.length - b.emailid.length,
+      // sortOrder: sortedInfo.columnKey === "email" ? sortedInfo.order : null,
+      // sorter: (a, b) =>
+      //   (a.emailid || "")
+      //     .toLowerCase()
+      //     .localeCompare((b.emailid || "").toLowerCase()), // Sort alphabetically
+      // sortOrder: sortedInfo.columnKey === "email" ? sortedInfo.order : null,
+      ellipsis: true,
+      width: "13vw",
+      render: (row) => {
+        return (
+          // <div className="flex items-center justify-center">
+          //   <p className="text-[1.1vw] text-[#1F4B7F]">{row.emailid}</p>
+          // </div>
+          <div>
+            {row?.emailid?.length > 20 ? (
+              <Tooltip
+                placement="top"
+                color="white"
+                overlayInnerStyle={{ color: "#1F4B7F" }}
+                title={row?.emailid}
+                className="cursor-pointer"
+              >
+                <div className="text-[1vw] pl-[1vw] text-[#1f4b7f]">
+                  {`${row?.emailid?.slice(0, 20)}...`}
+                </div>
+              </Tooltip>
+            ) : row?.emailid ? (
+              <div className="text-[1vw] pl-[1vw] text-[#1f4b7f]">
+                {row?.emailid?.slice(0, 20)}
+              </div>
+            ) : (
+              <div className="text-center text-[1vw] font-bold text-[#1f4b7f]">
+                -
+              </div>
+            )}
+          </div>
+        );
+      },
+    },
+    {
+      title: (
+        <div className="flex items-center justify-evenly  font-bold text-[1.1vw]">
+          Created
+          <button onClick={handleDateSort}>
+            {sortOrderDate === "ascend" ? (
+              <Tooltip
+                placement="top"
+                title="Ascending"
+                className="cursor-pointer"
+                color="white"
+                overlayInnerStyle={{
+                  color: "#1F487C",
+                }}
+              >
+                <TiArrowSortedUp />
+              </Tooltip>
+            ) : sortOrderDate === "descend" ? (
+              <Tooltip
+                placement="top"
+                title="Descending"
+                className="cursor-pointer"
+                color="white"
+                overlayInnerStyle={{
+                  color: "#1F487C",
+                }}
+              >
+                <TiArrowSortedDown />
+              </Tooltip>
+            ) : sortOrderDate === null ? (
+              <Tooltip
+                placement="top"
+                title="Unsorted"
+                className="cursor-pointer"
+                color="white"
+                overlayInnerStyle={{
+                  color: "#1F487C",
+                }}
+              >
+                <TiArrowUnsorted />
+              </Tooltip>
+            ) : (
+              <Tooltip
+                placement="top"
+                title="Ascending"
+                className="cursor-pointer"
+                color="white"
+                overlayInnerStyle={{
+                  color: "#1F487C",
+                }}
+              >
+                <TiArrowSortedUp />
+              </Tooltip>
+            )}
+          </button>
+        </div>
+      ),
+      // dataIndex: "created",
+      key: "created",
+      // sorter: (a, b) => new Date(a.created_date) - new Date(b.created_date),
+      // sortOrder: sortedInfo.columnKey === "created" ? sortedInfo.order : null,
+      ellipsis: true,
+      width: "8vw",
+      render: (row) => {
+        return (
+          <div className="pl-[2vw]">
+            <p className="text-[1vw] text-[#1F4B7F]">
+              {dayjs(row.created_date).format("DD MMM YYYY")}
+            </p>
+          </div>
+        );
+      },
+    },
+    {
+      title: (
+        <div className="flex items-center justify-center font-bold text-[1.1vw]">
+          Status
+        </div>
       ),
       // dataIndex: "status",
       // key: "status",
@@ -154,20 +628,24 @@ const PartnerTableList = ({
         return (
           <div className="flex items-center justify-center">
             <button
-              className={`${row.partner_status_id == 0
-                ? "bg-[#FF6B00]"
-                : row.partner_status_id == 1
-                  ? "bg-[#38ac2c]"
+              className={`${
+                row.partner_status_id == 0
+                  ? "bg-[#646262] cursor-not-allowed"
+                  : row.partner_status_id == 1
+                  ? "bg-[#FF9900] cursor-not-allowed"
                   : row.partner_status_id == 2
-                    ? "bg-[#FD3434]"
-                    : "bg-[#2A99FF]"
-                } ${row.partner_status_id == 0
-                  ? "cursor-not-allowed"
-                  : "cursor-pointer"
-                } h-[1.8vw] text-[1.1vw] text-white w-[8vw] rounded-[0.5vw]`}
+                  ? "bg-[#34AE2B]"
+                  : row.partner_status_id == 3
+                  ? "bg-[#FD3434]"
+                  : "bg-[#2A99FF] cursor-not-allowed"
+              }  h-[1.8vw] shadow-md shadow-black font-extrabold text-[1vw] text-white w-[7vw] rounded-[0.5vw]`}
               onClick={() => {
-                if (row.partner_status_id === 1) {
+                if (
+                  row.partner_status_id === 2 ||
+                  row.partner_status_id === 3
+                ) {
                   setViewModal(true);
+                  setPartnerStatusId(row.partner_status_id);
                   setPartnerID(row?.tbs_partner_id);
                 }
               }}
@@ -180,11 +658,13 @@ const PartnerTableList = ({
     },
     {
       title: (
-        <div className="flex items-center justify-center font-bold text-[1.2vw]">Action</div>
+        <div className="flex items-center justify-center font-bold text-[1.1vw]">
+          Action
+        </div>
       ),
       // dataIndex: "action",
       // key: "action",
-      width: "10vw",
+      width: "5vw",
       render: (row) => {
         console.log(row?.tbs_partner_id, "rowrowrow");
         return (
@@ -216,6 +696,11 @@ const PartnerTableList = ({
                 onClick={() => {
                   setDeleteModalIsOpen(true);
                   setPartnerID(row?.tbs_partner_id);
+                  setUserName(
+                    `${row?.partner_first_name} ${" "} ${
+                      row?.partner_last_name
+                    }`
+                  );
                 }}
               />
 
@@ -249,11 +734,17 @@ const PartnerTableList = ({
   const closeDeleteModal = () => {
     setDeleteModalIsOpen(false);
   };
-  const apiUrl = process.env.REACT_APP_API_URL;
 
   console.log(currentData, "wefwefewfcew");
   return (
     <>
+      {spinning === true ? (
+        <div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-20  z-10">
+          <Spin size="large" />
+        </div>
+      ) : (
+        ""
+      )}
       <Table
         columns={columns}
         dataSource={currentData}
@@ -270,7 +761,7 @@ const PartnerTableList = ({
       >
         <DeleteList
           setDeleteModalIsOpen={setDeleteModalIsOpen}
-          title={"Want to delete this User"}
+          title={`Want to delete this User  ${capitalizeFirstLetter(userName)}`}
           api={`${apiUrl}/partner_details/${PartnerID}`}
           module={"partner"}
         />
@@ -286,6 +777,8 @@ const PartnerTableList = ({
         <PartnerStatusUpdate
           PartnerID={PartnerID}
           setViewModal={setViewModal}
+          partnerStatusId={partnerStatusId}
+          setSpinning={setSpinning}
         />
       </ModalPopup>
     </>

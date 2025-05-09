@@ -46,6 +46,28 @@ import {
   BIN_DATA,
   TBS_INFO,
   REFER_EARN,
+  REDEEM_OFFER,
+  OPERATOR_DATA,
+  PROMO_BG_IMAGE,
+  GET_REQ_PARTNER,
+  GET_ROLES_PERMISSION,
+  GET_REQ_MOB_ADS,
+  THEME_BACKGROUND,
+  // GET_BG_IMAGE,
+  // STARTER_IMAGE,
+  GET_BOOKING_DETAILS,
+  GET_DASHBOARD_DETAILS,
+  GET_CANCELLATION_DETAILS,
+  GET_PASSENGER_DETAILS,
+  GET_BLOCKED_DETAILS,
+  GET_ALL_MOBILE_NUMBERS,
+  GET_AVAILABLE_BALANCE,
+  GET_PAYMENT_DETAILS,
+  GET_SETTLEMENT_DETAILS,
+  GET_REFUND_DETAILS,
+  GET_USAGE_DETAIL,
+  GET_BARCHART_DETAILS,
+  GET_MOBILE_NOTIFICATION,
 } from "./Type";
 
 const initialState = {
@@ -87,12 +109,31 @@ const initialState = {
   operator_byid: {},
   bin_data: [],
   tbs_info: {},
-  refer_earn:[]
+  refer_earn: [],
+  operator_data: [],
+  promo_bg: "",
+  get_req_partner: [],
+  get_roles_permission: [],
+  get_req_mob_ads: [],
+  theme_background: [],
+  booking_details: [],
+  dashboard_details: [],
+  cancellation_details: [],
+  passenger_details: [],
+  blocked_details: [],
+  all_mobile_numbers: [],
+  available_balance: [],
+  payment_details: [],
+  settlement_details: [],
+  refund_details: [],
+  barchart_details: [],
+  mobile_notification: "",
+  // get_bg_image: [],
+  // starter_image:"",
 };
 
 export const crmreducer = (state = initialState, action) => {
   const { type, payload, payload_count } = action;
-
   switch (type) {
     case PROMOTION_DATA:
       console.log(payload, "PROMOTION_DATA");
@@ -363,7 +404,155 @@ export const crmreducer = (state = initialState, action) => {
         ...state,
         refer_earn: payload,
       };
+    case REDEEM_OFFER:
+      console.log(payload, "REDEEM_OFFER");
+      return {
+        ...state,
+        redeem_offer: payload,
+      };
+    case OPERATOR_DATA:
+      console.log(payload, "OPERATOR_DATA");
+      return {
+        ...state,
+        operator_data: payload,
+      };
+    case PROMO_BG_IMAGE:
+      console.log(payload, "payload988585858");
+
+      return {
+        ...state,
+        promo_bg: payload,
+      };
+    case GET_REQ_PARTNER:
+      return {
+        ...state,
+        get_req_partner: payload,
+      };
+    case GET_ROLES_PERMISSION:
+      console.log(payload, "GET_ROLES_PERMISSION");
+      return {
+        ...state,
+        get_roles_permission: payload,
+      };
+
+    case GET_REQ_MOB_ADS: {
+      return {
+        ...state,
+        get_req_mob_ads: payload,
+      };
+    }
+    case THEME_BACKGROUND: {
+      return {
+        ...state,
+        theme_background: payload,
+      };
+    }
+
+    // case STARTER_IMAGE: {
+    //   return {
+    //     ...state,
+    //     starter_image: payload,
+    //   }
+    // }
+
+    // case GET_BG_IMAGE: {
+    //   return{
+    //     ...state,
+    //     get_bg_image: payload,
+    //   }
+    // }
+    case GET_BOOKING_DETAILS:
+      console.log(payload, "BOOKING_DETAILS");
+      return {
+        ...state,
+        booking_details: payload,
+      };
+    case GET_DASHBOARD_DETAILS:
+      console.log(payload, "DASHBOARD_DETAILS");
+      return {
+        ...state,
+        dashboard_details: payload,
+      };
+    case GET_CANCELLATION_DETAILS:
+      console.log(payload, "GET_CANCELLATION_DETAILS");
+      return {
+        ...state,
+        cancellation_details: payload,
+      };
+    case GET_PASSENGER_DETAILS:
+      console.log(payload, "GET_PASSENGER_DETAILS");
+      return {
+        ...state,
+        passenger_details: payload,
+      };
+    case GET_BLOCKED_DETAILS:
+      console.log(payload, "GET_BLOCKED_DETAILS");
+      return {
+        ...state,
+        blocked_details: payload,
+      };
+    case GET_ALL_MOBILE_NUMBERS:
+      console.log(payload, "GET_ALL_MOBILE_NUMBERS");
+      return {
+        ...state,
+        all_mobile_numbers: payload,
+      };
+    case GET_AVAILABLE_BALANCE:
+      console.log(payload, "GET_AVAILABLE_BALANCE");
+      return {
+        ...state,
+        available_balance: payload,
+      };
+    case GET_PAYMENT_DETAILS:
+      console.log(payload, "GET_PAYMENT_DETAILS");
+      return {
+        ...state,
+        payment_details: payload,
+      };
+    case GET_SETTLEMENT_DETAILS:
+      console.log(payload, "GET_SETTLEMENT_DETAILS");
+      return {
+        ...state,
+        settlement_details: payload,
+      };
+    case GET_REFUND_DETAILS:
+      console.log(payload, "GET_REFUND_DETAILS");
+      return {
+        ...state,
+        refund_details: payload,
+      };
+    case GET_USAGE_DETAIL:
+      console.log(payload, "GET_USAGE_DETAIL");
+      return {
+        ...state,
+        usage_details: payload,
+      };
+    case GET_BARCHART_DETAILS:
+      console.log(payload, "GET_REFUND_DETAILS");
+      return {
+        ...state,
+        barchart_details: payload,
+      };
+      case GET_MOBILE_NOTIFICATION:
+        console.log(payload, "GET_MOBILE_NOTIFICATION");
+        return {
+          ...state,
+          mobile_notification: payload,
+        };
     default:
       return state;
   }
 };
+
+// const initialBgImageState = {
+//   bggImage: null,
+// };
+
+// export const bgImageReducer = (state = initialBgImageState, action) => {
+//   switch (action.type) {
+//     case 'GET_BG_IMAGE':
+//       return { ...state, bggImage: action.payload };
+//     default:
+//       return state;
+//   }
+// };

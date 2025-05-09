@@ -1,7 +1,8 @@
 import axios from "axios";
-import { useNavigate } from "react-router";
+//import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import { PRODUCT_OWNER_DATA } from "../../Store/Type";
+import { GetNotificationData } from "../Notification/Notification";
 const apiUrl = process.env.REACT_APP_API_URL;
 // const apiUrl = 'http://192.168.90.47:4000/api'
 const api = axios.create({
@@ -10,7 +11,9 @@ const api = axios.create({
   },
 });
 
-export const ProductOwnerLogin = async (personalvalues, validationResult) => {
+
+export const ProductOwnerLogin = async (personalvalues, validationResult,dispatch) => {
+  
   const emailpayload = {
     email_id: personalvalues.emailid_phone,
     password: personalvalues.password,
@@ -20,14 +23,14 @@ export const ProductOwnerLogin = async (personalvalues, validationResult) => {
     password: personalvalues.password,
   };
   // const url = `http://192.168.90.47:4000/api/product_owner_login`;
-  const url = `${apiUrl}/product_owner_login`
+  const url = `${apiUrl}/product_owner_login`;
   const method = "post";
   const payload =
     validationResult === 1
       ? emailpayload
       : validationResult === 2
-        ? phonepayload
-        : "";
+      ? phonepayload
+      : "";
 
   try {
     const response = await axios({
@@ -39,33 +42,40 @@ export const ProductOwnerLogin = async (personalvalues, validationResult) => {
       },
     });
 
-    if (response.data) {
-      // sessionStorage.setItem("PRO_ID", response.data.id);
-      // sessionStorage.setItem("USER_ID", response.data.id);
-      // sessionStorage.setItem("token", response.data.token);
-      // sessionStorage.setItem("user_name", response.data.user_name);
-      // sessionStorage.setItem("type_id", response.data.type_id);
-      // sessionStorage.setItem("type_name", response.data.type_name);
-      // sessionStorage.setItem("password", response.data.password)
-      localStorage.setItem("PRO_ID", response.data.id);
-      localStorage.setItem("USER_ID", response.data.id);
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("user_name", response.data.user_name);
-      localStorage.setItem("type_id", response.data.type_id);
-      localStorage.setItem("type_name", response.data.type_name);
-      localStorage.setItem("password", response.data.password)
-      // sessionStorage.getItem("PRO_ID")
-      return response.data;
+    if (response?.data?.error) {
+      toast.warning(response.data.error);
     } else {
-      throw new Error("Invalid response from server");
+      sessionStorage.setItem("PRO_ID", response.data.id);
+      sessionStorage.setItem("USER_ID", response.data.id);
+      sessionStorage.setItem("token", response.data.token);
+      sessionStorage.setItem("user_name", response.data.user_name);
+      sessionStorage.setItem("type_id", response.data.type_id);
+      sessionStorage.setItem("type_name", response.data.type_name);
+      sessionStorage.setItem("password", response.data.password);
+      // localStorage.setItem("PRO_ID", response.data.id);
+      // localStorage.setItem("USER_ID", response.data.id);
+      // localStorage.setItem("token", response.data.token);
+      // localStorage.setItem("user_name", response.data.user_name);
+      // localStorage.setItem("type_id", response.data.type_id);
+      // localStorage.setItem("type_name", response.data.type_name);
+      // localStorage.setItem("password", response.data.password)
+      // sessionStorage.getItem("PRO_ID")
+      await GetNotificationData(dispatch)
+      return response.data;
     }
   } catch (error) {
-    console.error("Error during login:", error);
-    throw error;
+    if (error.response.data.error) {
+      toast.warning(error.response.data.error);
+    } else {
+      console.log(error.response, "An error occurred. Please try again.");
+    }
+    return null;
   }
 };
+
 export const ProEmpLogin = async (personalvalues, validationResult) => {
-  console.log(personalvalues, "personalvalues");
+  console.log(validationResult, "personalvalues");
+
   const emailpayload = {
     email_id: personalvalues.emailid_phone,
     password: personalvalues.password,
@@ -80,11 +90,11 @@ export const ProEmpLogin = async (personalvalues, validationResult) => {
     validationResult === 1
       ? emailpayload
       : validationResult === 2
-        ? phonepayload
-        : "";
+      ? phonepayload
+      : "";
   console.log(payload, "payloadpayloadpayload");
   try {
-    const responce = await axios({
+    const response = await axios({
       method,
       url,
       data: payload,
@@ -92,18 +102,87 @@ export const ProEmpLogin = async (personalvalues, validationResult) => {
         "Content-Type": "application/json",
       },
     });
-    if (responce.data) {
-      sessionStorage.setItem("USER_ID", responce.data.id);
-      sessionStorage.setItem("token", responce.data.token);
-      sessionStorage.setItem("user_name", responce.data.user_name);
-      sessionStorage.setItem("type_id", responce.data.type_id);
-      sessionStorage.setItem("type_name", responce.data.type_name);
-      return responce.data;
+    const modulePermissions = response?.data?.module_permissions;
+    const crudPermissions = response?.data?.crud_permissions;
+    if (response.data) {
+      sessionStorage.setItem("USER_ID", response.data.id);
+      sessionStorage.setItem("PRO_ID", response.data.ownerId);
+      sessionStorage.setItem("USER_ID", response.data.id);
+      sessionStorage.setItem("token", response.data.token);
+      sessionStorage.setItem("user_name", response.data.user_name);
+      sessionStorage.setItem("type_id", response.data.type_id);
+      sessionStorage.setItem("type_name", response.data.type_name);
+      sessionStorage.setItem("crud_permission",crudPermissions);
+      sessionStorage.setItem(
+        "module_permission",
+        JSON.stringify(modulePermissions)
+      );
+      return response.data;
     } else {
-      throw new Error("invalid response from server");
+      throw new Error("Invalid response from server");
     }
-  } catch (err) {
-    console.log(err);
+  } catch (error) {
+    if (error.response && error.response.data && error.response.data.error) {
+      toast.warning(error.response.data.error);
+    } else {
+      toast.error("An error occurred. Please try again.");
+    }
+    return null;
+  }
+};
+
+export const OpEmpLogin = async (personalvalues, validationResult) => {
+  console.log(validationResult, "personalvalues");
+
+  const emailpayload = {
+    email_id: personalvalues.emailid_phone,
+    password: personalvalues.password,
+  };
+  const phonepayload = {
+    phone: personalvalues.emailid_phone,
+    password: personalvalues.password,
+  };
+  const url = `${apiUrl}/employee-login`;
+  const method = "post";
+  const payload =
+    validationResult === 1
+      ? emailpayload
+      : validationResult === 2
+      ? phonepayload
+      : "";
+  console.log(payload, "payloadpayloadpayload");
+  try {
+    const response = await axios({
+      method,
+      url,
+      data: payload,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const modulePermissions = response?.data?.module_permissions;
+    const crudPermissions = response?.data?.crud_permissions;
+    if (response.data) {
+      sessionStorage.setItem("USER_ID", response.data.id);
+      sessionStorage.setItem("OP_ID", response.data.operatorId);
+      sessionStorage.setItem("token", response.data.token);
+      sessionStorage.setItem("user_name", response.data.user_name);
+      sessionStorage.setItem("type_id", response.data.type_id);
+      sessionStorage.setItem("type_name", response.data.type_name);
+      sessionStorage.setItem("crud_permission", crudPermissions);
+      sessionStorage.setItem("module_permission", JSON.stringify(modulePermissions));
+      sessionStorage.setItem("company_name",response.data.company_name)
+      return response.data;
+    } else {
+      throw new Error("Invalid response from server");
+    }
+  } catch (error) {
+    if (error.response && error.response.data && error.response.data.error) {
+      toast.warning(error.response.data.error);
+    } else {
+      toast.error("An error occurred. Please try again.");
+    }
+    return null;
   }
 };
 
@@ -162,29 +241,79 @@ export const OperatorLogin = async (values, validationResult) => {
       },
     });
 
-    console.log(response, "=== response");
     if (response?.data?.error) {
-      console.log(response?.data?.error, "=== response");
-      throw new Error("Invalid response from server");
+      toast.warning(response.data.error);
     } else {
-      console.log(response.data.token,"asdfghjkl");
-      
+      console.log(response.data.token, "asdfghjkl");
       sessionStorage.setItem("SPA_ID", response.data.id);
       sessionStorage.setItem("USER_ID", response.data.id);
       sessionStorage.setItem("token", response.data.token);
-      localStorage.setItem("token", response.data.token);
       sessionStorage.setItem("user_name", response.data.user_name);
       sessionStorage.setItem("type_id", response.data.type_id);
       sessionStorage.setItem("type_name", response.data.type_name);
-      toast.success(response?.data);
+      sessionStorage.setItem("user_name", response.data.owner_name);
+      sessionStorage.setItem("company_name",response.data.company_name)
       return response?.data;
     }
   } catch (error) {
-    console.log(error, "errror occured");
-    handleError(error);
+    if (error.response && error.response.data && error.response.data.error) {
+      toast.warning(error.response.data.error);
+    } else {
+      console.log(error.response, "An error occurred. Please try again.");
+    }
     return null;
   }
 };
+
+export const PartnerLogin = async (values, validationResult) => {
+  const emailpayload = {
+    emailid: values.emailid_phone,
+    password: values.password,
+  };
+  const phonepayload = {
+    phone: values.emailid_phone,
+    password: values.password,
+  };
+  const payload =
+    validationResult === 1
+      ? emailpayload
+      : validationResult === 2
+      ? phonepayload
+      : "";
+  const url = `${apiUrl}/partner-login`;
+  const method = "post";
+  try {
+    const response = await api({
+      method,
+      url,
+      data: payload,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (response?.data?.error) {
+      toast.warning(response.data.error);
+    } else {
+      sessionStorage.setItem("SPA_ID", response.data.id);
+      sessionStorage.setItem("USER_ID", response.data.id);
+      sessionStorage.setItem("token", response.data.token);
+      // sessionStorage.setItem("user_name", response.data.user_name);
+      sessionStorage.setItem("type_id", response.data.type_id);
+      sessionStorage.setItem("type_name", response.data.type_name);
+      sessionStorage.setItem("user_name", response.data.user_name);
+      return response?.data;
+    }
+  } catch (error) {
+    if (error.response && error.response.data && error.response.data.error) {
+      toast.warning(error.response.data.error);
+    } else {
+      toast.error("An error occurred. Please try again.");
+    }
+    return null;
+  }
+};
+
 export const GetProductOwnerData = async (dispatch) => {
   try {
     const response = await axios.get(`${apiUrl}/product_owners`);
@@ -195,6 +324,7 @@ export const GetProductOwnerData = async (dispatch) => {
     // return null;
   }
 };
+
 const handleError = (error) => {
   console.error("Error details:", error);
   let errorMessage = "An error occurred";

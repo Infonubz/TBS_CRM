@@ -9,6 +9,7 @@ import AddRegisterAddress from "./AddRegisterAddress";
 import AddBusinessDetails from "./AddBusinessDetails";
 import AddGSTDetails from "./AddGSTDetails";
 import AddDocuments from "./AddDocuments";
+import pencilshape from "../../../asserts/pencilicon.png";
 import {
   GetOperatorProfile,
   GetSuperAdminById,
@@ -18,7 +19,7 @@ import {
 import { useLocation } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import USERPROFILE from '../../../asserts/Image.png'
+import USERPROFILE from "../../../asserts/Image.png";
 import { RiUser3Fill } from "react-icons/ri";
 import ImgCrop from "antd-img-crop";
 const getBase64 = (file) =>
@@ -34,29 +35,30 @@ export default function SuperAdminIndex({
   setOperatorID,
   operatorID,
   setModalIsOpen,
-  updatedata
+  updatedata,
 }) {
+  const apiImgUrl = process.env.REACT_APP_API_URL_IMAGE;
+  // const apiurl = process.env.REACT_APP_API_URL;
+
   const [currentpage, setCurrentpage] = useState(1);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
   const [fileList, setFileList] = useState([]);
   const [operator_id, setOperator_Id] = useState(null);
-  const [profileImage,setProfileImage] = useState(false)
-  const [enableUpload,setEnableUpload] = useState(false)
+  const [profileImage, setProfileImage] = useState(false);
+  const [enableUpload, setEnableUpload] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
 
-  console.log("fileListfileLisfileListt",fileList);
-  
+  console.log("fileListfileLisfileListt", operatorID, updatedata);
 
-useEffect(()=>{
-  if(updatedata){
-    setEnableUpload(true)
-  }
-  else{
-    setEnableUpload(false)
-  }
-},[])
-
+  useEffect(() => {
+    if (updatedata) {
+      setEnableUpload(true);
+    } else {
+      setEnableUpload(false);
+    }
+  }, []);
 
   const handlePreview = async (file) => {
     if (!file.url && !file.preview) {
@@ -69,32 +71,60 @@ useEffect(()=>{
     );
   };
 
-  const operatorProfileImage = sessionStorage.getItem('OperatorProfileImg')
+  const operatorProfileImage = sessionStorage.getItem("OperatorProfileImg");
   // const operatorProfileImage = useSelector((state) => state.crm.operator_byid[0]?.profileimg)
-  console.log(operatorProfileImage, 'check_operator_profile_image')
+  console.log(operatorProfileImage, "check_operator_profile_image");
 
   const dispatch = useDispatch();
 
+  // const handleChange = async ({ fileList: newFileList }) => {
+  //   console.log(newFileList[0]?.originFileObj, "helldjfhdjkfhdkjf", newFileList?.length, "ereffgdfqe");
+  //   setFileList(newFileList);
+  //   if (newFileList?.length > 0) {
+
+  //     setProfileImage(true)
+  //   }
+  //   else {
+  //     setProfileImage(false)
+  //   }
+  //   // SubmitProfileData(newFileList[0], dispatch);
+
+  //   // try {
+  //   //   const data = await OperatorProfile(newFileList[0]);
+  //   //   // setSuperAdminData(data);
+  //   //   console.log(data);
+
+  //   // } catch (error) {
+  //   //   console.error("Error fetching additional user data", error);
+  //   // }
+  // };
   const handleChange = async ({ fileList: newFileList }) => {
-    console.log(newFileList[0]?.originFileObj,"helldjfhdjkfhdkjf",newFileList?.length, "ereffgdfqe");
-    setFileList(newFileList);
-    if(newFileList?.length > 0){
-
-      setProfileImage(true)
+    const file = newFileList[0]?.originFileObj;
+    console.log(file, "Filelistfilesisfjd");
+    if (file) {
+      // Check file size (5MB = 5 * 1024 * 1024 bytes)
+      const fileSizeInMB = file.size / (1024 * 1024); // Convert bytes to MB
+      if (fileSizeInMB > 5) {
+        // If the file size is greater than 5MB, alert the user
+        // alert('File size exceeds 5MB limit!');
+        setProfileImage(false);
+        // Remove the file from the list
+        newFileList.pop();
+      } else {
+        setFileList(newFileList);
+        setSelectedFile(newFileList);
+        if (newFileList?.length > 0) {
+          setProfileImage(true);
+        } else {
+          setProfileImage(false);
+        }
+      }
+    } else {
+      // If no file, just update the file list
+      setProfileImage(false);
+      setFileList(newFileList);
+      setSelectedFile(newFileList);
     }
-    else{
-      setProfileImage(false)
-    }
-    // SubmitProfileData(newFileList[0], dispatch);
-
-    // try {
-    //   const data = await OperatorProfile(newFileList[0]);
-    //   // setSuperAdminData(data);
-    //   console.log(data);
-      
-    // } catch (error) {
-    //   console.error("Error fetching additional user data", error);
-    // }
   };
 
   const handleCancel = () => setPreviewOpen(false);
@@ -149,8 +179,8 @@ useEffect(()=>{
   const [documentback, setDocumentBack] = useState(false);
   const [gstback, setGstback] = useState(false);
   const location = useLocation();
-  const [selectedFile, setSelectedFile] = useState(null);
-  console.log(selectedFile, 'selected_file')
+
+  console.log(selectedFile, "selected_file");
 
   const getprofile = async () => {
     try {
@@ -169,29 +199,23 @@ useEffect(()=>{
     getprofile();
   }, [operatorID]);
 
-  const apiurl = process.env.REACT_APP_API_URL;
+  console.log(apiImgUrl, "urlurlurlurlurlurlurlurl");
 
-  const profileurl = process.env.REACT_SERVER_IMAGE_URL;
+  console.log(`${apiImgUrl}${selectedFile}`, "locationlocationlocation");
 
-  console.log(
-    `http://192.168.90.47:4000${selectedFile}`,
-    "locationlocationlocation"
-  );
-
-  console.log(profileImage,"imagkjhdfkjdhfk");
-  
+  console.log(enableUpload, "imagkjhdfkjdhfk");
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     setSelectedFile(file);
   };
 
-
   return (
     <div>
       <div
-        className={`w-full h-full ${location.pathname != "/settings" ? "py-0" : "py-[1vw] px-[1vw]"
-          }`}
+        className={`w-full h-full ${
+          location.pathname != "/settings" ? "py-0" : "py-[1vw] px-[1vw]"
+        }`}
       >
         {location.pathname != "/settings" ? (
           <div className="w-full h-[3vw] flex">
@@ -200,12 +224,12 @@ useEffect(()=>{
                 currentpage == 1
                   ? 20
                   : currentpage == 2
-                    ? 40
-                    : currentpage == 3
-                      ? 60
-                      : currentpage == 4
-                        ? 80
-                        : 100
+                  ? 40
+                  : currentpage == 3
+                  ? 60
+                  : currentpage == 4
+                  ? 80
+                  : 100
               }
               size="1.2vw"
               strokeColor="#1F4B7F"
@@ -231,7 +255,7 @@ useEffect(()=>{
                 <div className="border-b-[0.1vw] border-[#1f4b7f] w-[15vw]"></div>
               </div>
 
-              <div className="flex items-center flex-col">
+              <div className="flex items-center flex-col relative">
                 {/* <Upload
                   action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
                   listType="picture-card"
@@ -248,31 +272,43 @@ useEffect(()=>{
                   {fileList.length >= 1 ? null : uploadButton}
                 </Upload> */}
 
-<div className="relative">
-  <ImgCrop showGrid rotationSlider showReset onImageCrop={(file) => {
-      
-    }}>
-    <Upload
-      action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-      listType="picture-card"
-      fileList={fileList}
-      onChange={handleChange}
-      onPreview={handlePreview}
-      disabled={enableUpload}
-    >
-      {fileList?.length < 1 && "+ Upload"}
-    </Upload>
-  </ImgCrop>
+                <div className="relative">
+                  <ImgCrop
+                    showGrid
+                    rotationSlider
+                    showReset
+                    onImageCrop={(file) => {}}
+                  >
+                    <Upload
+                      className="umimgupload"
+                      action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                      listType="picture-card"
+                      fileList={fileList}
+                      onChange={handleChange}
+                      onPreview={handlePreview}
+                      disabled={enableUpload}
+                      accept=".jpg,.jpeg,.png"
+                    >
+                      {fileList?.length < 1 && "+ Upload"}
+                    </Upload>
+                  </ImgCrop>
 
-  {fileList.length === 0 && selectedFile && (  // Check if there are no files in the fileList and selectedFile is set
-    <img
-      src={`http://192.168.90.47:4000${selectedFile}`}
-      alt="Photo"
-      className="w-[5vw] h-[5vw] object-cover rounded-[0.2vw] top-[.7vw] left-[.7vw] absolute opacity-25 z-[1] pointer-events-none"
-    />
-  )}
-</div>
-
+                  {fileList.length === 0 &&
+                    selectedFile && ( // Check if there are no files in the fileList and selectedFile is set
+                      <img
+                        src={`${apiImgUrl}${selectedFile}`}
+                        alt="Profile"
+                        className="w-[5.9vw] h-[5.9vw] object-cover rounded-[0.2vw] top-[0vw] left-[0vw] absolute opacity-25 z-[1] pointer-events-none"
+                      />
+                    )}
+                </div>
+                {updatedata && selectedFile != null
+                  ? " "
+                  : profileImage === false && (
+                      <span className="text-red-500 text-[.7vw] absolute bottom-[-1.2vw]">
+                        * Company Logo is required - (Max Size : 5MB)
+                      </span>
+                    )}
 
                 {/* {operatorProfileImage === 'null' || operatorProfileImage === null ? (
                   <div>
@@ -303,11 +339,30 @@ useEffect(()=>{
                 </Modal>
               </div>
 
-              <div className="flex gap-[3vw] pt-[2vw] px-[7.5vw]">
+              <div className="flex gap-[3vw] pt-[2vw] px-[7.5vw] relative">
                 <div className="">
                   <div className="bg-[#D9D9D9] rounded-t-full rounded-b-full w-[0.7vw] h-[14vw] relative">
                     <div
-                      className={`absolute rounded-t-full rounded-b-full w-[0.7vw] h-[2vw] bg-[#1f4b7f] ${currentpage == 1
+                      className={`absolute  h-[1.5vw] w-[3.4vw] ${
+                        currentpage == 1
+                          ? "top-[.2vw]"
+                          : currentpage == 2
+                          ? "top-[3.4vw]"
+                          : currentpage == 3
+                          ? "top-[6.5vw]"
+                          : currentpage == 4
+                          ? "top-[9.5vw]"
+                          : "bottom-[-.3vw]"
+                      }`}
+                    >
+                      <img
+                        src={pencilshape}
+                        alt="icon"
+                        className="h-[1.2vw] w-[3.4vw]"
+                      />
+                    </div>
+                    {/* <img src={pencilshape} alt='icon' 
+                      className={`absolute h-[3vw] w-[5vw] ${currentpage == 1
                         ? "top-0"
                         : currentpage == 2
                           ? "top-[3vw]"
@@ -317,7 +372,7 @@ useEffect(()=>{
                               ? "top-[9vw]"
                               : "bottom-0"
                         }`}
-                    ></div>
+                    /> */}
                   </div>
                 </div>
                 <div className="flex">
@@ -350,6 +405,7 @@ useEffect(()=>{
                   SPA_ID={SPA_ID}
                   superadmindata={superadmindata}
                   operatorID={operatorID}
+                  setOperatorID={setOperatorID}
                   setAddressBack={setAddressBack}
                   addressback={addressback}
                   operator_id={operator_id}
@@ -359,6 +415,9 @@ useEffect(()=>{
                   setProfileImage={setProfileImage}
                   updatedata={updatedata}
                   setEnableUpload={setEnableUpload}
+                  selectedFile={selectedFile}
+                  enableUpload={enableUpload}
+                  setSelectedFile={setSelectedFile}
                 />
               ) : currentpage == 2 ? (
                 <AddRegisterAddress
@@ -372,6 +431,7 @@ useEffect(()=>{
                   addressback={addressback}
                   setBusinessBack={setBusinessBack}
                   businessback={businessback}
+                  updatedata={updatedata}
                 />
               ) : currentpage == 3 ? (
                 <AddBusinessDetails
@@ -384,6 +444,7 @@ useEffect(()=>{
                   businessback={businessback}
                   documentback={documentback}
                   setDocumentBack={setDocumentBack}
+                  updatedata={updatedata}
                 />
               ) : currentpage == 4 ? (
                 <AddDocuments
@@ -398,6 +459,7 @@ useEffect(()=>{
                   setBusinessBack={setBusinessBack}
                   gstback={gstback}
                   setGstback={setGstback}
+                  updatedata={updatedata}
                 />
               ) : (
                 currentpage == 5 && (
@@ -412,6 +474,7 @@ useEffect(()=>{
                     gstback={gstback}
                     operator_id={operator_id}
                     setGstback={setGstback}
+                    updatedata={updatedata}
                   />
                 )
               )}
@@ -419,6 +482,6 @@ useEffect(()=>{
           </div>
         </div>
       </div>
-    </div >
+    </div>
   );
 }

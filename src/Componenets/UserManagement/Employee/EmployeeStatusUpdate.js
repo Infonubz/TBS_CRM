@@ -11,22 +11,25 @@ export default function EmployeeStatusUpdate({
   clientid,
   employeeid,
   setViewModal,
+  setSpinning
 }) {
   const dispatch = useDispatch();
 
   const handlechange = async (valueid, valuedata) => {
     console.log(employeeid, "employeeid");
+    setSpinning(true)
+    setViewModal(false)
     try {
       const data = await EmployeeStatusUpdateApi(
         valueid,
         valuedata,
         employeeid,
-        dispatch
+        setSpinning,
+        dispatch,
       );
       console.log(valueid, valuedata, employeeid, "currentidcurrentid");
       console.log(data, "datadatadatadata");
-      toast.success(data);
-      setViewModal(false);
+      toast.success(data.message);
       GetEmployeeData(dispatch);
       console.log(data);
     } catch (error) {
@@ -36,23 +39,23 @@ export default function EmployeeStatusUpdate({
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <p className="text-[1.5vw] text-[]">Update the Client Status</p>
+      <p className="text-[1.5vw] font-bold">Update The Employee Status</p>
       <img src={image} className="h-[6vw] w-[6vw] my-[1vw]"></img>
-      <div className="flex gap-2 mt-[1vw]">
+      <div className="flex gap-x-[1.5vw] mt-[1vw]">
         <button
-          className="items-center text-[0.9vw] text-white  space-x-[0.7vw] px-[0.8vw] w-[8vw] h-[2vw] bg-[#2A99FF] rounded-[0.5vw]"
-          onClick={() => handlechange(3, "Under Review")}
+          className="items-center text-[1vw] text-white shadow-md shadow-black font-extrabold  space-x-[0.7vw] px-[0.8vw] w-[7vw] h-[2vw] bg-[#2A99FF] rounded-[0.5vw]"
+          onClick={() => handlechange(3, "Hold")}
         >
-          Under review
+          Hold
         </button>
         <button
-          className="items-center text-[0.9vw] text-white  space-x-[0.7vw] px-[0.8vw] w-[10vw] h-[2vw]  bg-[#34AE2A] rounded-[0.5vw]"
+          className="items-center text-[1vw] text-white font-extrabold shadow-md shadow-black space-x-[0.7vw] px-[0.8vw] w-[7vw] h-[2vw]  bg-[#34AE2B] rounded-[0.5vw]"
           onClick={() => handlechange(1, "Active")}
         >
           Active
         </button>
         <button
-          className="items-center text-[0.9vw] text-white  space-x-[0.7vw] px-[0.8vw] w-[8vw] h-[2vw] bg-[#FF1100] rounded-[0.5vw]"
+          className="items-center text-[1vw] text-white font-extrabold shadow-md shadow-black space-x-[0.7vw] px-[0.8vw] w-[7vw] h-[2vw] bg-[#FD3434] rounded-[0.5vw]"
           onClick={() => handlechange(2, "InActive")}
         >
           Inactive

@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import Backdrop from "../../asserts/CRMbg.png";
 import { IoGrid, IoSearch } from "react-icons/io5";
 import { IoMdMenu } from "react-icons/io";
-import { DatePicker, Pagination, Tooltip } from "antd";
-
+import { ConfigProvider, DatePicker, Pagination, Popover, Tooltip } from "antd";
+import "../../App.css";
 import { FaCaretDown } from "react-icons/fa";
 import Operator from "./Operator";
 import Partner from "./Partner";
@@ -13,8 +13,10 @@ import { MdDelete, MdEdit } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import {
   GetAllReqManOffers,
+  GetPartnerByDate,
   GetReqAdsByDate,
   GetReqOperatorByDate,
+  GetReqPartnerData,
   GetReqPromotionByDate,
   GetReqPromotionData,
   GetRequestAdsData,
@@ -23,6 +25,7 @@ import {
   ReqManOffersSearch,
   SearchReqAdvertisement,
   SearchReqOperator,
+  SearchReqPartner,
   SearchRequestPromotion,
 } from "../../Api/RequestManagement/RequestManagement";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -39,9 +42,45 @@ import moment from "moment/moment";
 import ReqAdvertisement from "./Advertisement";
 import ReqOffers from "./Offers";
 import { IoMdArrowDropdown } from "react-icons/io";
+import { LiaSearchSolid } from "react-icons/lia";
+import { BsExclamationCircle } from "react-icons/bs";
+import { MdCancel } from "react-icons/md";
 // import { GetAllReqManOffers, ReqManOffersDateFilter, ReqManOffersSearch } from "../../Api/RequestManagement/RequestManagementOffers";
 const { RangePicker } = DatePicker;
+
+
+
 export default function RequestManagement() {
+
+  // date picker
+  const changeDatePickerPlaceholder = () => {
+    const inputDiv = document.querySelector(".ant-picker-input");
+    if (inputDiv) {
+      const inputElement = inputDiv.querySelector("input");
+      if (inputElement) {
+        inputElement.placeholder = "Start Date";
+        inputElement.className = "text-center"
+      }
+    }
+  };
+  changeDatePickerPlaceholder();
+  
+  const changeDatePickerPlaceholder2 = () => {
+    const inputDiv = document.querySelector(".ant-picker");
+    if (inputDiv) {
+      const children = inputDiv.querySelectorAll("div");
+      if (children.length > 2) {
+        const thirdChild = children[2];
+        const inputElement = thirdChild.querySelector("input");
+        if (inputElement) {
+          inputElement.placeholder = "End Date";
+          inputElement.className = "text-center"
+        }
+      }
+    }
+  };
+  changeDatePickerPlaceholder2();
+
   const getadslist = useSelector((state) => state.crm.get_req_ads);
   const [adfilter, SetAdFilter] = useState("all");
   const [adsactivePage, setAdsActivePage] = useState(1);
@@ -68,27 +107,52 @@ export default function RequestManagement() {
   const [operatorId, setOperatorId] = useState(null);
   const [verifyData, setVerifyData] = useState("");
   const [getData, setGetData] = useState("");
-  const [dateClear, setDateClear] = useState()
-  const get_rq_man_data = useSelector((state) => state.crm.request_management);
-  const getpromotionlist = useSelector((state) => state.crm.req_promotion);
-
-  //offers vikram
-  //************************************************ */
-  const get_req_man_offers = useSelector((state) => state.crm.req_man_offers);
-  //************************************************** */
+  const [dateClear, setDateClear] = useState();
+  const [showpaginate, setShowPaginate] = useState(false);
+  const [partnerFilter, setPartnerFilter] = useState("all");
+  const [inputValue,setInputValue]=useState();
+  const get_rq_man_data = useSelector(
+    (state) => state?.crm?.request_management
+  );
+  const getPartnerList = useSelector((state) => state?.crm?.get_req_partner);
+  const getpromotionlist = useSelector((state) => state?.crm?.req_promotion);
+  const get_req_man_offers = useSelector((state) => state?.crm?.req_man_offers);
 
   const [showtable, setShowTable] = useState(1);
-  console.log(showtable, 'show_table')
+  console.log(showtable, "show_table");
   const dispatch = useDispatch();
 
-
+  const handleClear = () => {
+    setInputValue('');
+    if(filter=="all"){
+      GetRequestManagementData(dispatch,filter);
+    }else if(filter=="pending"){
+      GetRequestManagementData(dispatch,filter);
+    }else if(filter=="approved"){
+      GetRequestManagementData(dispatch,filter);
+    }else if(filter=="hold"){
+      GetRequestManagementData(dispatch,filter);
+    }else if(filter=="rejected"){
+      GetRequestManagementData(dispatch,filter);
+    }
+  }
 
   useEffect(() => {
     if (showtable == 1) {
       // setDateClear("")
       GetRequestManagementData(dispatch, filter);
     }
+    // else if (showtable == 2) {
+    //   GetReqPartnerData(dispatch, partnerFilter)
+    // }
+    // console.log(getPartnerList,"partnerdatatata");
   }, [showtable, filter]);
+
+  useEffect(() => {
+    if (showtable == 2) {
+      GetReqPartnerData(dispatch, partnerFilter);
+    }
+  }, [showtable, partnerFilter]);
 
   console.log(filter, "showtableshowtable");
 
@@ -98,7 +162,7 @@ export default function RequestManagement() {
     {
       title: (
         <div className="flex justify-center font-bold text-[1.2vw]">
-          Operator Id
+          Operator ID
         </div>
       ),
       render: (row) => {
@@ -108,6 +172,32 @@ export default function RequestManagement() {
             <h1 className="pl-[1vw] text-[1vw] text-[#1F4B7F]">
               {row?.tbs_operator_id}
             </h1>
+          </div>
+        );
+      },
+    },
+    {
+      title: (
+        <div className="flex justify-center font-bold text-[1.2vw]">
+          Operator Name
+        </div>
+      ),
+      render: (row) => {
+        return (
+          <div className="flex justify-center">
+            {/* <p className="text-[1vw] text-[#1F4B7F]">{row?.owner_name}</p> */}
+            {row?.owner_name?.length > 15 ? (
+              <Tooltip
+                placement="bottom"
+                title={row?.owner_name}
+                className="cursor-pointer"
+                color="#1F487C"
+              >
+                {`${row?.owner_name?.slice(0, 15)}...`}
+              </Tooltip>
+            ) : (
+              row?.owner_name?.slice(0, 15)
+            )}
           </div>
         );
       },
@@ -219,17 +309,18 @@ export default function RequestManagement() {
         return (
           <div className="flex justify-center">
             <button
-              className={`${row?.req_status == "verified" || "Verified"
-                ? "bg-[#34AE2A]"
-                : row?.req_status == "pending" || "Pending"
-                  ? "bg-[#FFD600]"
+              className={`${
+                row?.req_status == "verified" || "Verified"
+                  ? "bg-[#34AE2A]"
+                  : row?.req_status == "pending" || "Pending"
+                  ? "bg-[#FF9900]"
                   : row?.req_status == "rejected" || "Rejected"
-                    ? "bg-[#FF1100]"
-                    : row?.req_status == "under review" || "Under Review"
-                      ? "bg-[#2A99FF]"
-                      : "bg-[#ffffff]"
-                } rounded-[0.5vw] font-semibold text-white w-[7vw] py-[0.2vw]`}
-            // #########################################################################################
+                  ? "bg-[#FF1100]"
+                  : row?.req_status == "under review" || "Under Review"
+                  ? "bg-[#2A99FF]"
+                  : "bg-[#ffffff]"
+              } rounded-[0.5vw] font-semibold text-white w-[7vw] py-[0.2vw]`}
+              // #########################################################################################
             >
               {row?.req_status}
             </button>
@@ -287,6 +378,8 @@ export default function RequestManagement() {
   const handlePageChange = (pageNumber) => {
     if (showtable == 1) {
       setActivePage(pageNumber);
+    } else if (showtable == 2) {
+      setPartnerActivePage(pageNumber);
     } else if (showtable == 3) {
       setPromoActivePage(pageNumber);
     } else {
@@ -299,8 +392,19 @@ export default function RequestManagement() {
   const onChange = (value) => {
     setShowTable(value);
     console.log(`selected ${value}`);
-    setDateClear("")
+    setDateClear("");
   };
+
+  const [partnerActivePage, setPartnerActivePage] = useState(1);
+  const partnerItemsPerPage = 10;
+
+  const partnerIndexOfLastItem = partnerActivePage * partnerItemsPerPage;
+  const partnerIndexOfFirtsItem = partnerIndexOfLastItem - partnerItemsPerPage;
+  const partnerCurrentItems =
+    getPartnerList?.length > 0 &&
+    getPartnerList.slice(partnerIndexOfFirtsItem, partnerIndexOfLastItem);
+  console.log(partnerCurrentItems, "partnerCurrentItems");
+
   const [promoactivePage, setPromoActivePage] = useState(1);
   const promoitemsPerPage = 10; // Number of items to display per page
 
@@ -333,7 +437,15 @@ export default function RequestManagement() {
   const offerCurrentItems =
     get_req_man_offers.length > 0 &&
     get_req_man_offers?.slice(offerIndexOfFirstItem, offerIndexOfLastItem);
-  console.log(offerCurrentItems, "cur items", offerIndexOfFirstItem, "first", offerIndexOfLastItem, "last", "request management offers");
+  console.log(
+    offerCurrentItems,
+    "cur items",
+    offerIndexOfFirstItem,
+    "first",
+    offerIndexOfLastItem,
+    "last",
+    "request management offers"
+  );
 
   const [offerfilter, SetOfferFilter] = useState("All");
   useEffect(() => {
@@ -344,6 +456,7 @@ export default function RequestManagement() {
 
   useEffect(() => {
     setActivePage(1);
+    setPartnerActivePage(1);
     setPromoActivePage(1);
     setOfferActivePage(1);
   }, [offerfilter, promofilter, filter]);
@@ -373,7 +486,7 @@ export default function RequestManagement() {
   const datefilter = async (values) => {
     if (showtable == 1) {
       try {
-        setDateClear(values)
+        setDateClear(values);
         // console.log(values[0].$d.toISOString().split('T')[0],"datevaluesss1")
         // console.log(values[1].$d.toISOString().split('T')[0],"datevaluesss2")
 
@@ -387,16 +500,31 @@ export default function RequestManagement() {
         await GetReqOperatorByDate(
           dispatch,
           moment(values[0].$d).format("YYYY-MM-DD"),
-          moment(values[1].$d).format("YYYY-MM-DD")
+          moment(values[1].$d).format("YYYY-MM-DD"),
+          filter
         );
         // functioncall()
       } catch (err) {
         console.log(err, "iam the error");
-        GetRequestManagementData(dispatch);
+        GetRequestManagementData(dispatch, filter);
+      }
+    } else if (showtable == 2) {
+      try {
+        setDateClear(values);
+        await GetPartnerByDate(
+          dispatch,
+          moment(values[0].$d).format("YYYY-MM-DD"),
+          moment(values[1].$d).format("YYYY-MM-DD"),
+          partnerFilter
+        );
+        console.log("this is promotion request");
+      } catch (err) {
+        console.log(err);
+        GetReqPartnerData(dispatch, partnerFilter);
       }
     } else if (showtable == 3) {
       try {
-        setDateClear(values)
+        setDateClear(values);
         await GetReqPromotionByDate(
           dispatch,
           moment(values[0].$d).format("YYYY-MM-DD"),
@@ -409,20 +537,22 @@ export default function RequestManagement() {
       }
     } else if (showtable == 4) {
       try {
-        setDateClear(values)
+        setDateClear(values);
         await GetReqAdsByDate(
           dispatch,
           moment(values[0].$d).format("YYYY-MM-DD"),
-          moment(values[1].$d).format("YYYY-MM-DD")
+          moment(values[1].$d).format("YYYY-MM-DD"),
+          showtable,
+          adfilter
         );
         // functioncall()
       } catch (err) {
         console.log(err, "iam the error");
-        GetRequestAdsData(dispatch);
+        GetRequestAdsData(dispatch, adfilter, showtable);
       }
-    } else {
+    } else if (showtable == 5) {
       try {
-        setDateClear(values)
+        setDateClear(values);
         await ReqManOffersDateFilter(
           dispatch,
           moment(values[0].$d).format("YYYY-MM-DD"),
@@ -437,6 +567,21 @@ export default function RequestManagement() {
         console.log(err);
         GetAllReqManOffers(dispatch);
       }
+    } else {
+      try {
+        setDateClear(values);
+        await GetReqAdsByDate(
+          dispatch,
+          moment(values[0].$d).format("YYYY-MM-DD"),
+          moment(values[1].$d).format("YYYY-MM-DD"),
+          showtable,
+          adfilter
+        );
+        // functioncall()
+      } catch (err) {
+        console.log(err, "iam the error");
+        GetRequestAdsData(dispatch, adfilter, showtable);
+      }
     }
 
     // const utcDate = new Date(Date.UTC(values[0].getFullYear(), values[0].getMonth(), values[0].getDate()));
@@ -449,29 +594,174 @@ export default function RequestManagement() {
   const SearchRequest = (e) => {
     if (showtable == 1) {
       console.log(e.target.value, "e values");
-      SearchReqOperator(e.target.value, dispatch);
+      SearchReqOperator(e.target.value, filter, dispatch);
+    } else if (showtable == 2) {
+      SearchReqPartner(e.target.value, partnerFilter, dispatch);
     } else if (showtable == 3) {
       console.log(e.target.value, "search e value");
       SearchRequestPromotion(e.target.value, dispatch);
     } else if (showtable == 4) {
       console.log(e.target.value, "search e value");
-      SearchReqAdvertisement(e.target.value, dispatch);
-    } else {
+      SearchReqAdvertisement(e.target.value, dispatch, showtable, adfilter);
+    } else if (showtable == 5) {
       ReqManOffersSearch(e.target.value, dispatch);
       console.log(e.target.value, "evalues");
+    } else {
+      console.log(e.target.value, "search e value");
+      SearchReqAdvertisement(e.target.value, dispatch, showtable, adfilter);
     }
   };
   // ######################################################################
   useEffect(() => {
     if (showtable == 4) {
-      GetRequestAdsData(dispatch, adfilter);
+      GetRequestAdsData(dispatch, adfilter, showtable);
+    } else if (showtable == 6) {
+      GetRequestAdsData(dispatch, adfilter, showtable);
     }
     console.log(adfilter, "adfilter");
   }, [showtable, adfilter]);
   //offer
   console.log(getadslist, "adscurrentItemsadscurrentItems");
 
+  // useEffect(() => {
+  //   setShowPaginate(false);
+  //   {
+  //     showtable == 1
+  //       ? get_rq_man_data?.length > 10 && setShowPaginate(true)
+  //       : showtable == 2
+  //       ? setShowPaginate(true)
+  //       : showtable == 3
+  //       ? getpromotionlist?.length > 10 && setShowPaginate(true)
+  //       : showtable == 4
+  //       ? getadslist?.length > 10 && setShowPaginate(true)
+  //       : showtable == 5
+  //       ? get_req_man_offers?.length > 10 && setShowPaginate(true)
+  //       : getadslist?.length > 10 && setShowPaginate(true);
+  //   }
+  // }, [showtable, setShowTable, showpaginate, setShowPaginate]);
 
+  // const Paginate = () =>{
+  //   if (showtable === 1 ) {
+  //     get_rq_man_data?.length > 10 && setShowPaginate(true);
+  //     setShowPaginate(true)
+  //   } else if (showtable == 2) {
+  //     getPartnerList?.length > 10 && setShowPaginate(true);
+  //   } else if (showtable == 3) {
+  //     getpromotionlist?.length > 10 && setShowPaginate(true);
+  //   } else if (showtable == 4) {
+  //     getadslist?.length > 10 && setShowPaginate(true);
+  //   } else if (showtable == 5) {
+  //     get_req_man_offers?.length > 10 && setShowPaginate(true);
+  //   } else {
+  //     getadslist?.length > 10 && setShowPaginate(true);
+  //   }
+  // }
+  useEffect(() => {
+    setShowPaginate(false);
+    // console.log(get_rq_man_data?.length,"lelkfjdkljldjf")
+    if (showtable === 1 && get_rq_man_data?.length > 10) {
+      setShowPaginate(true);
+    } else if (showtable == 2 && getPartnerList?.length > 10) {
+      setShowPaginate(true);
+    }
+    // Paginate()
+  }, [showtable, showpaginate, get_rq_man_data]);
+
+  // useEffect(() => {
+  //   setShowPaginate(false);
+  //   // alert(showpaginate)
+  //   if (showtable === 1 && get_rq_man_data?.length > 10) {
+  //     // get_rq_man_data?.length > 10 && setShowPaginate(true);
+
+  //     // setShowPaginate(true)
+  //   } else if (showtable == 2) {
+  //     getPartnerList?.length > 10 && setShowPaginate(true);
+  //   } else if (showtable == 3) {
+  //     getpromotionlist?.length > 10 && setShowPaginate(true);
+  //   } else if (showtable == 4) {
+  //     getadslist?.length > 10 && setShowPaginate(true);
+  //   } else if (showtable == 5) {
+  //     get_req_man_offers?.length > 10 && setShowPaginate(true);
+  //   } else {
+  //     getadslist?.length > 10 && setShowPaginate(true);
+  //   }
+  // }, [showtable, setShowTable, showpaginate, setShowPaginate]);
+
+  useEffect(() => {
+    SetFilter("all");
+    setPartnerFilter("all");
+    SetAdFilter("all");
+    SetOfferFilter("All");
+    SetPromoFilter("All");
+    setActivePage(1);
+    setPartnerActivePage(1);
+    setPromoActivePage(1);
+    setAdsActivePage(1);
+    setOfferActivePage(1);
+  }, [showtable]);
+
+  useEffect(() => {
+    if (currentItems?.length == 0 && activePage > 1) {
+      setActivePage(activePage - 1);
+    } else if (partnerCurrentItems?.length == 0 && partnerActivePage > 1) {
+      setPartnerActivePage(partnerActivePage - 1);
+    } else if (promocurrentItems?.length == 0 && promoactivePage > 1) {
+      setPromoActivePage(promoactivePage - 1);
+    } else if (adscurrentItems?.length == 0 && adsactivePage > 1) {
+      setAdsActivePage(adsactivePage - 1);
+    } else if (offerCurrentItems?.length == 0 && offerActivePage > 1) {
+      setOfferActivePage(offerActivePage - 1);
+    }
+  }, [
+    currentItems,
+    partnerCurrentItems,
+    promocurrentItems,
+    adscurrentItems,
+    offerCurrentItems,
+  ]);
+  const [currentTab, setCurrentTab] = useState(1);
+  const infos = [
+    {
+      title: showtable == 1 ? "Operator ID" : "Partner ID",
+    },
+    {
+      title: showtable == 1 ? "Operator Name" : "Partner Name",
+    },
+    {
+      title: showtable == 1 ? "Owner Name" : "Occupation",
+    },
+    {
+      title: "Mobile",
+    },
+    {
+      title: "Email",
+    },
+    // {
+    //   title: "Requested  Date",
+    //   description: "MMM DD (e.g. Jan 01) - Format",
+    // },
+  ];
+  console.log(partnerCurrentItems, currentItems, "partnerCurrentItems");
+
+  const handleKeyDown = (e) => {
+    // Allow control keys like Backspace, Delete, ArrowLeft, ArrowRight, Tab
+    const isControlKey = [
+      "Backspace",
+      "Tab",
+      "ArrowLeft",
+      "ArrowRight",
+      "Delete",
+    ].includes(e.key);
+
+    if (isControlKey) {
+      return; // If it's a control key, do nothing and allow it to execute
+    }
+
+    // Allow only alphabets (A-Z, a-z), numbers (0-9), and space
+    if (!/^[A-Za-z0-9\s]$/.test(e.key)) {
+      e.preventDefault(); // Prevent the key if it's not an alphabet, number, or space
+    }
+  };
 
   return (
     <>
@@ -483,20 +773,25 @@ export default function RequestManagement() {
           backgroundPosition: "center",
         }}
       >
-        <div className="px-[5vw] h-[92vh] w-full ">
+        <div className="px-[2.5vw] h-[92vh] w-full ">
           <div className="h-[12vh] w-full flex flex-col ">
             <div className="flex items-center pt-[0.5vw]">
               <h1 className="text-[#1F4B7F]  text-[1.5vw] font-bold">
                 {`REQUEST MANAGEMENT`}
               </h1>
-              <span className="text-[1vw]  text-[#1F4B7F] font-semibold">{`  -  (${showtable == 1
-                ? "Operator"
-                : showtable == 3
+              <span className="text-[1vw]  text-[#1F4B7F] font-semibold">{`  -  (${
+                showtable == 1
+                  ? "Operator"
+                  : showtable == 2
+                  ? "Partner"
+                  : showtable == 3
                   ? "Promotion"
-                  : showtable == 4 ?
-                    "Advertisment"
-                    : "Offers"
-                })`}</span>
+                  : showtable == 4
+                  ? "Advertisement"
+                  : showtable == 5
+                  ? "Offers"
+                  : "Mobile Advertisement"
+              })`}</span>
             </div>
             <div className="pb-[0.5vw] flex justify-between h-full items-center ">
               {/* <div className="relative flex items-center ">
@@ -515,25 +810,65 @@ export default function RequestManagement() {
               <div className="relative flex items-center">
                 <input
                   type="text"
-                  className="bg-white outline-none pl-[2vw] w-[20vw] h-[2.5vw] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.5vw] border-r-[0.2vw] border-b-[0.2vw]"
-                  placeholder="Search ....."
+                  value={inputValue}
+                  className="bg-white outline-none placeholder-[#9CA3AF] pt-[0.25vw] pl-[2vw] w-[20vw] h-[5vh] text-[#1f487c]  text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.75vw] border-r-[0.25vw] border-b-[0.25vw]"
+                  placeholder="Search..."
                   onChange={(e) => {
                     SearchRequest(e);
+                    setInputValue(e.target.value);
                   }}
+                  onKeyDown={handleKeyDown}
                 />
-                <IoSearch
-                  className="absolute left-[0.5vw]"
+                <LiaSearchSolid
+                  className="absolute left-[0.5vw] inline-block"
                   size={"1vw"}
-                  color="#1F4B7F"
+                  color="#9CA3AF"
                 />
+                <span className="inline-block cursor-pointer text-[#1F4B7F] text-[1vw] align-text-bottom absolute right-[1vw]">
+                  {" "}
+                  {inputValue ? (
+            <MdCancel size="1.3vw" className="text-[#1f487c] cursor-pointer  " onClick={() => {
+              handleClear(); 
+              // setPopoverVisible(false); 
+            }} />
+          ) : (
+                  <Popover
+                    color="white"
+                    // trigger={"click"}
+                    title={
+                      <div className=" text-[#1F4B7F] p-[1vw] max-h-[20vw] overflow-auto ">
+                        <span className="font-bold">SEARCH BY...</span>
+                        {infos.map((info, index) => (
+                          <div key={index} className="flex flex-col">
+                            <ul
+                              className="pl-[1vw]"
+                              style={{ listStyleType: "disc" }}
+                            >
+                              <li className="text-[0.8vw] ">
+                                <p className="">{info.title}</p>
+                              </li>
+                            </ul>
+                            <span className="text-[.7vw] pl-[1vw] text-[#9CA3AF]">
+                              {info.description}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    }
+                    placement="bottom"
+                  >
+                    <BsExclamationCircle size={"1vw"} color="#9CA3AF" />
+                  </Popover>)}
+                </span>
               </div>
               {showtable == 1 ? (
-                <div className="flex gap-x-[2.5vw] text-[1.3vw]">
+                <div className="flex gap-x-[4vw] text-[1.3vw]">
                   <div
-                    className={` cursor-pointer ${filter == "all"
-                      ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                      : ""
-                      } `}
+                    className={` cursor-pointer ${
+                      filter == "all"
+                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                        : ""
+                    } `}
                     onClick={() => {
                       SetFilter("all");
                     }}
@@ -543,10 +878,11 @@ export default function RequestManagement() {
                     </p>
                   </div>
                   <div
-                    className={` cursor-pointer ${filter == "pending"
-                      ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                      : ""
-                      } `}
+                    className={` cursor-pointer ${
+                      filter == "pending"
+                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                        : ""
+                    } `}
                     onClick={() => {
                       SetFilter("pending");
                     }}
@@ -556,36 +892,39 @@ export default function RequestManagement() {
                     </p>
                   </div>
                   <div
-                    className={` cursor-pointer ${filter == "verified"
-                      ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                      : ""
-                      } `}
+                    className={` cursor-pointer ${
+                      filter == "approved"
+                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                        : ""
+                    } `}
                     onClick={() => {
-                      SetFilter("verified");
+                      SetFilter("approved");
                     }}
                   >
                     <p className="text-[1.3vw] text-[#1f487c] text-center">
-                      Verified
+                      Approved
                     </p>
                   </div>
                   <div
-                    className={` cursor-pointer ${filter == "under_review"
-                      ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                      : ""
-                      } `}
+                    className={` cursor-pointer ${
+                      filter == "on_hold"
+                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                        : ""
+                    } `}
                     onClick={() => {
-                      SetFilter("under_review");
+                      SetFilter("on_hold");
                     }}
                   >
                     <p className="text-[1.3vw] text-[#1f487c] text-center">
-                      Under Review
+                      Hold
                     </p>
                   </div>
                   <div
-                    className={` cursor-pointer ${filter == "rejected"
-                      ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                      : ""
-                      } `}
+                    className={` cursor-pointer ${
+                      filter == "rejected"
+                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                        : ""
+                    } `}
                     onClick={() => {
                       SetFilter("rejected");
                     }}
@@ -596,211 +935,299 @@ export default function RequestManagement() {
                   </div>
                 </div>
               ) : // ###############################################VIKRAM#######################
-                showtable == 3 ? (
-                  <div className="flex gap-x-[2.5vw] text-[1.3vw]">
-                    <div
-                      className={` cursor-pointer ${promofilter == "All"
+              showtable == 2 ? (
+                <div className="flex gap-x-[4vw] text-[1.3vw]">
+                  <div
+                    className={` cursor-pointer ${
+                      partnerFilter == "all"
                         ? "border-b-[0.25vw] font-bold border-[#1f487c]"
                         : ""
-                        } `}
-                      onClick={() => {
-                        SetPromoFilter("All");
-                      }}
-                    >
-                      <p className="text-[1.3vw] text-[#1f487c] text-center">
-                        All
-                      </p>
-                    </div>
-                    <div
-                      className={` cursor-pointer ${promofilter == "Pending"
-                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                        : ""
-                        } `}
-                      onClick={() => {
-                        SetPromoFilter("Pending");
-                      }}
-                    >
-                      <p className="text-[1.3vw] text-[#1f487c] text-center">
-                        Pending
-                      </p>
-                    </div>
-                    <div
-                      className={` cursor-pointer ${promofilter == "Approved"
-                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                        : ""
-                        } `}
-                      onClick={() => {
-                        SetPromoFilter("Approved");
-                      }}
-                    >
-                      <p className="text-[1.3vw] text-[#1f487c] text-center">
-                        Approved
-                      </p>
-                    </div>
-                    <div
-                      className={` cursor-pointer ${promofilter == "Rejected"
-                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                        : ""
-                        } `}
-                      onClick={() => {
-                        SetPromoFilter("Rejected");
-                      }}
-                    >
-                      <p className="text-[1.3vw] text-[#1f487c] text-center">
-                        Rejected
-                      </p>
-                    </div>
-                    <div
-                      className={` cursor-pointer ${offerfilter == "Under Review"
-                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                        : ""
-                        } `}
-                      onClick={() => {
-                        SetPromoFilter("Under Review");
-                      }}
-                    >
-                      <p className="text-[1.3vw] text-[#1f487c] text-center">
-                        Under Review
-                      </p>
-                    </div>
+                    } `}
+                    onClick={() => {
+                      setPartnerFilter("all");
+                    }}
+                  >
+                    <p className="text-[1.3vw] text-[#1f487c] text-center">
+                      All
+                    </p>
                   </div>
-                ) : showtable == 4 ? (
-                  <div className="flex gap-x-[2.5vw] text-[1.3vw]">
-                    <div
-                      className={` cursor-pointer ${adfilter == "all"
+                  <div
+                    className={` cursor-pointer ${
+                      partnerFilter == "pending"
                         ? "border-b-[0.25vw] font-bold border-[#1f487c]"
                         : ""
-                        } `}
-                      onClick={() => {
-                        SetAdFilter("all");
-                      }}
-                    >
-                      <p className="text-[1.3vw] text-[#1f487c] text-center">
-                        All
-                      </p>
-                    </div>
-                    <div
-                      className={` cursor-pointer ${adfilter == "pending"
-                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                        : ""
-                        } `}
-                      onClick={() => {
-                        SetAdFilter("pending");
-                      }}
-                    >
-                      <p className="text-[1.3vw] text-[#1f487c] text-center">
-                        Pending
-                      </p>
-                    </div>
-                    <div
-                      className={` cursor-pointer ${adfilter == "verified"
-                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                        : ""
-                        } `}
-                      onClick={() => {
-                        SetAdFilter("verified");
-                      }}
-                    >
-                      <p className="text-[1.3vw] text-[#1f487c] text-center">
-                        Verified
-                      </p>
-                    </div>
-                    <div
-                      className={` cursor-pointer ${adfilter == "under_review"
-                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                        : ""
-                        } `}
-                      onClick={() => {
-                        SetAdFilter("under_review");
-                      }}
-                    >
-                      <p className="text-[1.3vw] text-[#1f487c] text-center">
-                        Under Review
-                      </p>
-                    </div>
-                    <div
-                      className={` cursor-pointer ${adfilter == "rejected"
-                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                        : ""
-                        } `}
-                      onClick={() => {
-                        SetAdFilter("rejected");
-                      }}
-                    >
-                      <p className="text-[1.3vw] text-[#1f487c] text-center">
-                        Rejected
-                      </p>
-                    </div>
+                    } `}
+                    onClick={() => {
+                      setPartnerFilter("pending");
+                    }}
+                  >
+                    <p className="text-[1.3vw] text-[#1f487c] text-center">
+                      Pending
+                    </p>
                   </div>
-                ) : (
-                  <div className="flex gap-x-[2.5vw] text-[1.3vw]">
-                    <div
-                      className={` cursor-pointer ${offerfilter == "All"
+                  {/* <div
+                    className={` cursor-pointer ${
+                      partnerFilter == "approved"
                         ? "border-b-[0.25vw] font-bold border-[#1f487c]"
                         : ""
-                        } `}
-                      onClick={() => {
-                        SetOfferFilter("All");
-                      }}
-                    >
-                      <p className="text-[1.3vw] text-[#1f487c] text-center">
-                        All
-                      </p>
-                    </div>
-                    <div
-                      className={` cursor-pointer ${offerfilter == "Pending"
+                    } `}
+                    onClick={() => {
+                      setPartnerFilter("approved");
+                    }}
+                  >
+                    <p className="text-[1.3vw] text-[#1f487c] text-center">
+                      Approved
+                    </p>
+                  </div> */}
+                  <div
+                    className={` cursor-pointer ${
+                      partnerFilter == "on_hold"
                         ? "border-b-[0.25vw] font-bold border-[#1f487c]"
                         : ""
-                        } `}
-                      onClick={() => {
-                        SetOfferFilter("Pending");
-                      }}
-                    >
-                      <p className="text-[1.3vw] text-[#1f487c] text-center">
-                        Pending
-                      </p>
-                    </div>
-                    <div
-                      className={` cursor-pointer ${offerfilter == "Approved"
-                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                        : ""
-                        } `}
-                      onClick={() => {
-                        SetOfferFilter("Approved");
-                      }}
-                    >
-                      <p className="text-[1.3vw] text-[#1f487c] text-center">
-                        Approved
-                      </p>
-                    </div>
-                    <div
-                      className={` cursor-pointer ${offerfilter == "Rejected"
-                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                        : ""
-                        } `}
-                      onClick={() => {
-                        SetOfferFilter("Rejected");
-                      }}
-                    >
-                      <p className="text-[1.3vw] text-[#1f487c] text-center">
-                        Rejected
-                      </p>
-                    </div>
-                    <div
-                      className={` cursor-pointer ${offerfilter == "Under Review"
-                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
-                        : ""
-                        } `}
-                      onClick={() => {
-                        SetOfferFilter("Under Review");
-                      }}
-                    >
-                      <p className="text-[1.3vw] text-[#1f487c] text-center">
-                        Under Review
-                      </p>
-                    </div>
+                    } `}
+                    onClick={() => {
+                      setPartnerFilter("on_hold");
+                    }}
+                  >
+                    <p className="text-[1.3vw] text-[#1f487c] text-center">
+                      Hold
+                    </p>
                   </div>
-                )}
+                  <div
+                    className={` cursor-pointer ${
+                      partnerFilter == "rejected"
+                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                        : ""
+                    } `}
+                    onClick={() => {
+                      setPartnerFilter("rejected");
+                    }}
+                  >
+                    <p className="text-[1.3vw] text-[#1f487c] text-center">
+                      Rejected
+                    </p>
+                  </div>
+                </div>
+              ) : showtable == 3 ? (
+                <div className="flex gap-x-[2.5vw] text-[1.3vw]">
+                  <div
+                    className={` cursor-pointer ${
+                      promofilter == "All"
+                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                        : ""
+                    } `}
+                    onClick={() => {
+                      SetPromoFilter("All");
+                    }}
+                  >
+                    <p className="text-[1.3vw] text-[#1f487c] text-center">
+                      All
+                    </p>
+                  </div>
+                  <div
+                    className={` cursor-pointer ${
+                      promofilter == "Pending"
+                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                        : ""
+                    } `}
+                    onClick={() => {
+                      SetPromoFilter("Pending");
+                    }}
+                  >
+                    <p className="text-[1.3vw] text-[#1f487c] text-center">
+                      Pending
+                    </p>
+                  </div>
+                  <div
+                    className={` cursor-pointer ${
+                      promofilter == "Approved"
+                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                        : ""
+                    } `}
+                    onClick={() => {
+                      SetPromoFilter("Approved");
+                    }}
+                  >
+                    <p className="text-[1.3vw] text-[#1f487c] text-center">
+                      Approved
+                    </p>
+                  </div>
+                  <div
+                    className={` cursor-pointer ${
+                      promofilter == "Rejected"
+                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                        : ""
+                    } `}
+                    onClick={() => {
+                      SetPromoFilter("Rejected");
+                    }}
+                  >
+                    <p className="text-[1.3vw] text-[#1f487c] text-center">
+                      Rejected
+                    </p>
+                  </div>
+                  <div
+                    className={` cursor-pointer ${
+                      offerfilter == "Under Review"
+                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                        : ""
+                    } `}
+                    onClick={() => {
+                      SetPromoFilter("Under Review");
+                    }}
+                  >
+                    <p className="text-[1.3vw] text-[#1f487c] text-center">
+                      Under Review
+                    </p>
+                  </div>
+                </div>
+              ) : showtable == 4 || 6 ? (
+                <div className="flex gap-x-[2.5vw] text-[1.3vw]">
+                  <div
+                    className={` cursor-pointer ${
+                      adfilter == "all"
+                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                        : ""
+                    } `}
+                    onClick={() => {
+                      SetAdFilter("all");
+                    }}
+                  >
+                    <p className="text-[1.3vw] text-[#1f487c] text-center">
+                      All
+                    </p>
+                  </div>
+                  <div
+                    className={` cursor-pointer ${
+                      adfilter == "pending"
+                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                        : ""
+                    } `}
+                    onClick={() => {
+                      SetAdFilter("pending");
+                    }}
+                  >
+                    <p className="text-[1.3vw] text-[#1f487c] text-center">
+                      Pending
+                    </p>
+                  </div>
+                  <div
+                    className={` cursor-pointer ${
+                      adfilter == "verified"
+                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                        : ""
+                    } `}
+                    onClick={() => {
+                      SetAdFilter("verified");
+                    }}
+                  >
+                    <p className="text-[1.3vw] text-[#1f487c] text-center">
+                      Approved
+                    </p>
+                  </div>
+                  <div
+                    className={` cursor-pointer ${
+                      adfilter == "under_review"
+                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                        : ""
+                    } `}
+                    onClick={() => {
+                      SetAdFilter("under_review");
+                    }}
+                  >
+                    <p className="text-[1.3vw] text-[#1f487c] text-center">
+                      Under Review
+                    </p>
+                  </div>
+                  <div
+                    className={` cursor-pointer ${
+                      adfilter == "rejected"
+                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                        : ""
+                    } `}
+                    onClick={() => {
+                      SetAdFilter("rejected");
+                    }}
+                  >
+                    <p className="text-[1.3vw] text-[#1f487c] text-center">
+                      Rejected
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex gap-x-[2.5vw] text-[1.3vw]">
+                  <div
+                    className={` cursor-pointer ${
+                      offerfilter == "All"
+                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                        : ""
+                    } `}
+                    onClick={() => {
+                      SetOfferFilter("All");
+                    }}
+                  >
+                    <p className="text-[1.3vw] text-[#1f487c] text-center">
+                      All
+                    </p>
+                  </div>
+                  <div
+                    className={` cursor-pointer ${
+                      offerfilter == "Pending"
+                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                        : ""
+                    } `}
+                    onClick={() => {
+                      SetOfferFilter("Pending");
+                    }}
+                  >
+                    <p className="text-[1.3vw] text-[#1f487c] text-center">
+                      Pending
+                    </p>
+                  </div>
+                  <div
+                    className={` cursor-pointer ${
+                      offerfilter == "Approved"
+                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                        : ""
+                    } `}
+                    onClick={() => {
+                      SetOfferFilter("Approved");
+                    }}
+                  >
+                    <p className="text-[1.3vw] text-[#1f487c] text-center">
+                      Approved
+                    </p>
+                  </div>
+                  <div
+                    className={` cursor-pointer ${
+                      offerfilter == "Rejected"
+                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                        : ""
+                    } `}
+                    onClick={() => {
+                      SetOfferFilter("Rejected");
+                    }}
+                  >
+                    <p className="text-[1.3vw] text-[#1f487c] text-center">
+                      Rejected
+                    </p>
+                  </div>
+                  <div
+                    className={` cursor-pointer ${
+                      offerfilter == "Under Review"
+                        ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                        : ""
+                    } `}
+                    onClick={() => {
+                      SetOfferFilter("Under Review");
+                    }}
+                  >
+                    <p className="text-[1.3vw] text-[#1f487c] text-center">
+                      Under Review
+                    </p>
+                  </div>
+                </div>
+              )}
               <div className="flex gap-x-[1vw]">
                 {/* <div className="flex border-[#1F4B7F] h-[2.5vw] border-l-[0.1vw] border-t-[0.1vw] rounded-l-[0.5vw] rounded-r-[0.5vw] border-r-[0.2vw] border-b-[0.2vw]">
                 <button
@@ -851,43 +1278,113 @@ export default function RequestManagement() {
                 </button>
               </div> */}
                 <div className="relative flex items-center">
-                  <Select
+                  {/* <Select
                     showSearch
                     placeholder="Select one"
-                    suffixIcon={<span style={{ fontSize: '1vw', color: '#1f487c' }}><IoMdArrowDropdown size="2vw" /></span>}
+                    suffixIcon={
+                      <span style={{ fontSize: "1vw", color: "#1f487c" }}>
+                        <IoMdArrowDropdown size="2vw" />
+                      </span>
+                    }
                     filterOption={(input, option) => {
                       const labelText = option?.label?.props.children || "";
-                      return labelText.toLowerCase().includes(input.toLowerCase());
+                      return labelText
+                        .toLowerCase()
+                        .includes(input.toLowerCase());
                     }}
                     onChange={onChange}
                     style={{
-                      width: 170,
+                      width: "15vw",
                     }}
                     defaultValue={{
                       value: 1,
-                      label: <div className="text-[1vw] font-semibold pl-[0.7vw] pb-[0.1vw]">Operator</div>,
+                      label: (
+                        <div className="text-[1vw] text-[#1f487c] font-semibold pl-[0.7vw] pb-[0.1vw]">
+                          Operator
+                        </div>
+                      ),
                     }}
                     className="text-blue-500 h-[2.5vw] w-[10vw] outline-none text border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.7vw] border-r-[0.2vw] border-b-[0.2vw]"
                     options={[
                       {
                         value: 1,
-                        label: <div className="text-[1vw] font-semibold pl-[0.7vw] pb-[0.1vw]">Operator</div>
+                        label: (
+                          <div className="text-[1vw] text-[#1f487c] font-semibold pl-[0.7vw] pb-[0.1vw]">
+                            Operator
+                          </div>
+                        ),
+                      },
+                      {
+                        value: 2,
+                        label: (
+                          <div className="text-[1vw] text-[#1f487c] font-semibold pl-[0.7vw] pb-[0.1vw]">
+                            Partner
+                          </div>
+                        ),
                       },
                       {
                         value: 3,
-                        label: <div className="text-[1vw] font-semibold pl-[0.7vw] pb-[0.1vw]">Promotion</div>
+                        label: (
+                          <div className="text-[1vw] text-[#1f487c] font-semibold pl-[0.7vw] pb-[0.1vw]">
+                            Promotion
+                          </div>
+                        ),
                       },
                       {
                         value: 4,
-                        label: <div className="text-[1vw] font-semibold pl-[0.7vw] pb-[0.1vw]">Advertisement</div>
+                        label: (
+                          <div className="text-[1vw] text-[#1f487c] font-semibold pl-[0.7vw] pb-[0.1vw]">
+                            Advertisement
+                          </div>
+                        ),
+                      },
+                      {
+                        value: 6,
+                        label: (
+                          <div className="text-[1vw] text-[#1f487c] font-semibold pl-[0.7vw] pb-[0.1vw]">
+                            Mobile Advertisement
+                          </div>
+                        ),
                       },
                       {
                         value: 5,
-                        label: <div className="text-[1vw] font-semibold pl-[0.7vw] pb-[0.1vw]">Offers</div>,
+                        label: (
+                          <div className="text-[1vw] text-[#1f487c] font-semibold pl-[0.7vw] pb-[0.1vw]">
+                            Offers
+                          </div>
+                        ),
                       },
                     ]}
-                  />
-
+                  /> */}
+                  <div className="relative flex items-center justify-center text-[1.1vw]">
+                    <div
+                      className={`${
+                        showtable === 1
+                          ? "bg-[#1F487C] text-white font-semibold "
+                          : "bg-white text-[#1F487C]"
+                      }  px-[0.5vw]  gap-[0.5vw] items-center rounded-tl-[0.75vw] rounded-bl-[0.75vw] border-[0.1vw] border-b-[0.25vw] border-r-0 border-[#1F487C] cursor-pointer w-[6vw] h-[5vh] flex item-center justify-center`}
+                      style={{
+                        transition: "all 0.5s",
+                      }}
+                      onClick={() => setShowTable(1)}
+                    >
+                      Operator
+                    </div>
+                    <div
+                      className={`${
+                        showtable === 2
+                          ? "bg-[#1F487C] text-white font-semibold "
+                          : "bg-white  text-[#1F487C]"
+                      }  px-[0.5vw]  gap-[0.5vw] items-center rounded-r-[0.75vw] border-[0.1vw] border-r-[0.25vw] border-b-[0.25vw] border-l-0 border-[#1F487C] cursor-pointer w-[6vw] h-[5vh] flex item-center justify-center`}
+                      style={{
+                        transition: "all 0.5s",
+                      }}
+                      onClick={() => setShowTable(2)}
+                    >
+                      Partner
+                    </div>
+                  </div>
+                  <div></div>
                 </div>
 
                 <div className="relative flex items-center">
@@ -899,14 +1396,33 @@ export default function RequestManagement() {
                 /> */}
                   <div className="reqman">
                     {/* <Space direction="vertical" size={8}> */}
-
-                    <RangePicker
-                      allowClear={true}
-                      autoFocus={false}
-                      onChange={datefilter}
-                      value={dateClear}
-                      className="text-blue-500 filterdate h-[2.5vw] w-[15vw] outline-none text border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] hover:border-[#1F4B7F] rounded-[0.5vw] border-r-[0.2vw] border-b-[0.2vw]"
-                    />
+                    <ConfigProvider
+                      theme={{
+                        token: {
+                          fontSize: ".9vw",
+                          lineHeight: 0,
+                          colorPrimary: "#1F487C",
+                        },
+                        components: {
+                          DatePicker: {
+                            activeBorderColor: "#1F487C",
+                            hoverBorderColor: "#1F487C",
+                            activeShadow: "#1F487C",
+                            cellWidth: 25,
+                            cellHeight: 20,
+                          },
+                        },
+                      }}
+                    >
+                      <RangePicker
+                        allowClear={true}
+                        autoFocus={false}
+                        onChange={datefilter}
+                        value={dateClear}
+                        className="ads-date1 border-r-[0.75vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-blue border-[#1F487C]
+                        text-[#1F487C] text-[0.8vw] h-[5vh] w-[100%] rounded-[0.5vw] outline-none px-[1vw] placeholder-[#1F487C]"
+                      />
+                    </ConfigProvider>
 
                     {/* </Space> */}
                   </div>
@@ -929,10 +1445,14 @@ export default function RequestManagement() {
               <Partner data={currentItems} columns={columns} />
             </>
           )} */}
-            {showtable == 1 ? (
-              <Operator data={currentItems} />
+            {/* {showtable == 1 ? (
+              <Operator data={currentItems} tabfilter={filter} />
             ) : showtable == 2 ? (
-              <Partner data={currentItems} columns={columns} />
+              <Partner
+                data={partnerCurrentItems}
+                columns={columns}
+                tabfilter={partnerFilter}
+              />
             ) : showtable == 3 ? (
               <ReqPromotion currentData={promocurrentItems} columns={columns} />
             ) : showtable == 4 ? (
@@ -940,16 +1460,36 @@ export default function RequestManagement() {
                 currentData={adscurrentItems}
                 columns={columns}
                 showtable={showtable}
+                adfilter={adfilter}
+              />
+            ) : showtable == 5 ? (
+              <ReqOffers currentData={offerCurrentItems} columns={columns} />
+            ) : showtable == 6 ? (
+              <ReqAdvertisement
+                currentData={adscurrentItems}
+                columns={columns}
+                showtable={showtable}
+                adfilter={adfilter}
               />
             ) : (
-              <ReqOffers currentData={offerCurrentItems} columns={columns} />
+              ""
+            )} */}
+            {showtable == 1 ? (
+              <Operator data={currentItems} tabfilter={filter} />
+            ) : (
+              <Partner
+                data={partnerCurrentItems}
+                columns={columns}
+                tabfilter={partnerFilter}
+              />
             )}
           </div>
-          <div className="w-full h-[8vh] flex justify-between items-center">
-            <div className="text-[#1f4b7f] flex text-[1.1vw] gap-[0.5vw]">
-              <span>Showing</span>
-              <span className="font-bold">
-                {/* 1 -{" "}
+          {showpaginate && (
+            <div className="w-full h-[8vh] flex justify-between items-center">
+              <div className="text-[#1f4b7f] flex text-[1.1vw] gap-[0.5vw]">
+                <span>Showing</span>
+                <span className="font-bold">
+                  {/* 1 -{" "}
                 {showtable == 1
                   ? currentItems?.length
                   : showtable == 3
@@ -957,33 +1497,54 @@ export default function RequestManagement() {
                   : showtable === 4
                   ? adscurrentItems?.length
                   : offerCurrentItems.length} */}
-                {/* {offerIndexOfFirstItem+1}
+                  {/* {offerIndexOfFirstItem+1}
                    -{" "} */}
-                {showtable == 1
-                  ? `${indexOfFirstItem + 1} - ${indexOfFirstItem + currentItems?.length}`
-                  : showtable == 3
-                    ? `${promoindexOfFirstItem + 1} - ${promoindexOfFirstItem + promocurrentItems?.length}`
+                  {showtable == 1
+                    ? `${indexOfFirstItem + 1} - ${
+                        indexOfFirstItem + currentItems?.length
+                      }`
+                    : showtable == 2
+                    ? `${partnerIndexOfFirtsItem + 1} - ${
+                        partnerIndexOfFirtsItem + partnerCurrentItems?.length
+                      }`
+                    : showtable == 3
+                    ? `${promoindexOfFirstItem + 1} - ${
+                        promoindexOfFirstItem + promocurrentItems?.length
+                      }`
                     : showtable === 4
-                      ? `${adsindexOfFirstItem + 1} - ${adsindexOfFirstItem + adscurrentItems?.length}`
-                      :
-                      `${offerIndexOfFirstItem + 1} - ${offerIndexOfFirstItem + offerCurrentItems?.length}`
-                }
-              </span>
-              <span>from</span>
-              <span className="font-bold">
-                {showtable == 1
-                  ? get_rq_man_data?.length > 0 ? get_rq_man_data?.length : 0
-                  : showtable == 3
-                    ? getpromotionlist?.length > 0 ? getpromotionlist?.length : 0
+                    ? `${adsindexOfFirstItem + 1} - ${
+                        adsindexOfFirstItem + adscurrentItems?.length
+                      }`
+                    : `${offerIndexOfFirstItem + 1} - ${
+                        offerIndexOfFirstItem + offerCurrentItems?.length
+                      }`}
+                </span>
+                <span>from</span>
+                <span className="font-bold">
+                  {showtable == 1
+                    ? get_rq_man_data?.length > 0
+                      ? get_rq_man_data?.length
+                      : 0
+                    : showtable == 2
+                    ? getPartnerList?.length > 0
+                      ? getPartnerList?.length
+                      : 0
+                    : showtable == 3
+                    ? getpromotionlist?.length > 0
+                      ? getpromotionlist?.length
+                      : 0
                     : showtable === 4
-                      ? getadslist?.length > 0 ? getadslist?.length : 0
-                      : get_req_man_offers?.length > 0 ? get_req_man_offers?.length : 0
-                }
-              </span>
-              <span>data</span>
-            </div>
-            <div>
-              {/* <Pagination
+                    ? getadslist?.length > 0
+                      ? getadslist?.length
+                      : 0
+                    : get_req_man_offers?.length > 0
+                    ? get_req_man_offers?.length
+                    : 0}
+                </span>
+                <span>data</span>
+              </div>
+              <div>
+                {/* <Pagination
                 current={currentPage}
                 pageSize={pageSize}
                 total={0}
@@ -991,62 +1552,69 @@ export default function RequestManagement() {
                 onShowSizeChange={handlePageChange}
                 // showSizeChanger
               /> */}
-              <ReactPaginate
-                activePage={
-                  showtable == 1
-                    ? activePage
-                    : showtable == 3
+                <ReactPaginate
+                  activePage={
+                    showtable == 1
+                      ? activePage
+                      : showtable == 2
+                      ? partnerActivePage
+                      : showtable == 3
                       ? promoactivePage
                       : showtable == 4
-                        ? adsactivePage
-                        : offerActivePage
-                }
-                itemsCountPerPage={
-                  showtable == 1
-                    ? itemsPerPage
-                    : showtable == 3
+                      ? adsactivePage
+                      : offerActivePage
+                  }
+                  itemsCountPerPage={
+                    showtable == 1
+                      ? itemsPerPage
+                      : showtable == 2
+                      ? partnerItemsPerPage
+                      : showtable == 3
                       ? promoitemsPerPage
                       : showtable == 4
-                        ? adsitemsPerPage
-                        : offerItemsPerPage
-                }
-                totalItemsCount={
-                  showtable == 1
-                    ? get_rq_man_data?.length
-                    : showtable == 3
+                      ? adsitemsPerPage
+                      : offerItemsPerPage
+                  }
+                  totalItemsCount={
+                    showtable == 1
+                      ? get_rq_man_data?.length
+                      : showtable == 2
+                      ? getPartnerList?.length
+                      : showtable == 3
                       ? getpromotionlist?.length
                       : showtable == 4
-                        ? getadslist?.length
-                        : get_req_man_offers.length
-                }
-                pageRangeDisplayed={3}
-                onChange={handlePageChange}
-                itemClass="page-item"
-                linkClass="page-link"
-                activeClass="active"
-                prevPageText={
-                  <FontAwesomeIcon icon={faChevronLeft} size="1vw" />
-                }
-                nextPageText={
-                  <FontAwesomeIcon icon={faChevronRight} size="1vw" />
-                }
-                firstPageText={
-                  <FontAwesomeIcon icon={faAngleDoubleLeft} size="1vw" />
-                }
-                lastPageText={
-                  <FontAwesomeIcon icon={faAngleDoubleRight} size="1vw" />
-                }
-              />
+                      ? getadslist?.length
+                      : get_req_man_offers.length
+                  }
+                  pageRangeDisplayed={3}
+                  onChange={handlePageChange}
+                  itemClass="page-item"
+                  linkClass="page-link"
+                  activeClass="active"
+                  prevPageText={
+                    <FontAwesomeIcon icon={faChevronLeft} size="1vw" />
+                  }
+                  nextPageText={
+                    <FontAwesomeIcon icon={faChevronRight} size="1vw" />
+                  }
+                  firstPageText={
+                    <FontAwesomeIcon icon={faAngleDoubleLeft} size="1vw" />
+                  }
+                  lastPageText={
+                    <FontAwesomeIcon icon={faAngleDoubleRight} size="1vw" />
+                  }
+                />
 
-              {/* <input
+                {/* <input
               type="file"
               // onChange={(e) => console.log(e.target.value, "datatatat")}
               onChange={(e) => handleSubmit(e)}
             /> */}
-            </div>
+              </div>
 
-            {/* ###################################################################### */}
-          </div>
+              {/* ###################################################################### */}
+            </div>
+          )}
         </div>
       </div>
     </>

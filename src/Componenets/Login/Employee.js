@@ -53,8 +53,8 @@ export default function Employee() {
             boxShadow:
               "0 -10px 6px rgba(0, 0, 0, 0.1), 0 10px 6px rgba(0, 0, 0, 0.1)",
           }}
-          // style={{ boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)' }}
-          // style={{ boxShadow: '0 -3px 6px rgba(0, 0, 0, 0.1), 0 3px 6px rgba(0, 0, 0, 0.1)' }}
+        // style={{ boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)' }}
+        // style={{ boxShadow: '0 -3px 6px rgba(0, 0, 0, 0.1), 0 3px 6px rgba(0, 0, 0, 0.1)' }}
         >
           <div className="absolute left-0 top-0 bg-[#ffffff] h-full w-[35vw] bg-opacity-90 flex flex-col items-center justify-center">
             <label className="text-[#1F487C] font-bold text-[2vw] ">
@@ -73,8 +73,8 @@ export default function Employee() {
               onSubmit={(values) => {
                 handleSubmit(values);
               }}
-              // validateOnChange={true}
-              // validateOnBlur={true}
+            // validateOnChange={true}
+            // validateOnBlur={true}
             >
               {({ isSubmitting }) => (
                 <Form>
@@ -130,13 +130,17 @@ export default function Employee() {
                       />
                     </div>
                     <div className="flex justify-between items-center">
-                      <div>
-                        <Checkbox
-                          onChange={(e) => {}}
-                          className="text-[#1F4B7F]  text-[1vw] "
+                      <div className="flex justify-between items-center gap-[1vw]">
+                        <input
+                          type="checkbox"
+                          onChange={(e) => { }}
+                          className="text-[#1F4B7F]  text-[1vw] cursor-pointer"
+                        />
+                        <span className="text-[#1F4B7F]  text-[1vw] "
                         >
                           Remember me
-                        </Checkbox>
+                        </span>
+                        {/* </Checkbox> */}
                       </div>
                       <div>
                         <p className="text-[#1F487C]  text-[1vw]">

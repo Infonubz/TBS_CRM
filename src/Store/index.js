@@ -6,9 +6,11 @@
 // };
 import { combineReducers } from "redux";
 import { crmreducer } from "./Reducer"; // Adjust the import path as per your folder structure
+import { bgImageReducer } from "./Reducer";
 
 const rootReducer = combineReducers({
   crm: crmreducer,
+  // bg: bgImageReducer,
   // Add other reducers here if needed
 });
 

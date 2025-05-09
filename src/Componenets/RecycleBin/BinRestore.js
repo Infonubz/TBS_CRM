@@ -21,7 +21,7 @@ const BinRestore = ({ SetRestoreModalOpen, title, id, tab }) => {
           <div className="items-center flex-col flex justify-center mt-[0.5vw]">
             <MdSettingsBackupRestore color="#1f4b7f" size={"5vw"} />
             <p className="text-[1.7vw] font-semibold text-[#1f4b7f] mt-[1vw]">
-              Are you Sure ?
+              Are You Sure ?
             </p>
             <p className="text-[1.1vw] text-[#1f4b7f] mt-[0.5vw]">{title}</p>
           </div>

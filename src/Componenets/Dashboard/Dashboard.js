@@ -1,127 +1,833 @@
-import { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import Backdrop from "../../asserts/CRMbg.png";
-import "./Dashboard.css";
-import { PowerBIEmbed } from "powerbi-client-react";
-import { models } from "powerbi-client";
-import PowerBi from "./PowerBi";
-import { useDispatch } from "react-redux";
-import { GetNotificationData, UnreadNotification } from "../../Api/Notification/Notification";
-import PowerBIReport from "./PowerBIReport";
-import NewPowerbi from "./NewPowerbi";
-// import NewPowerbi from "./NewPowerBi";
+import {
+  GetDashboardDetails,
+  handleBookingDetailsSearch,
+  handleCancellationDetailsSearch,
+  GetBookingDetailsByDate,
+  GetBookingDetails,
+  GetCancellationDetailsByDate,
+  GetCancellationDetails,
+  handlePassengerDetailsSearch,
+  handleBlockedDetailsSearch,
+  GetBlockedDetailsByDate,
+  GetBlockedDetails,
+} from "../../Api/Dashboard/Dashboard";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  Table,
+  Spin,
+  Tooltip,
+  Popover,
+  ConfigProvider,
+  DatePicker,
+} from "antd";
+import "../../App.css";
+import { IoMdTrendingUp, IoMdTrendingDown } from "react-icons/io";
+import {
+  TbReceiptRupee,
+  TbReceiptTax,
+  TbRosetteDiscount,
+} from "react-icons/tb";
+import { FaDesktop, FaPeopleGroup } from "react-icons/fa6";
+import { LiaSearchSolid } from "react-icons/lia";
+import { BsExclamationCircle } from "react-icons/bs";
+import BookingTable from "./BookingTable";
+import { DashTable } from "./DashTable";
+import CancelTable from "./CancelTable";
+import PassengerTable from "./PassengerTable";
+import moment from "moment";
+import BlockTable from "./BlockTable";
+import { IoGrid } from "react-icons/io5";
+import { TiThMenu } from "react-icons/ti";
+import { FaMobileAlt } from "react-icons/fa";
+import axios from "axios";
+import { DashTableNew } from "./DashTableNew";
+import { Formik, Field, Form, ErrorMessage } from "formik";
+import dayjs from "dayjs";
+import all1 from "../../asserts/all1.png";
+import all2 from "../../asserts/all2.png";
+import { MdCancel } from "react-icons/md";
 
-function Dashboard() {
+const apiUrl = process.env.REACT_APP_API_URL;
+
+const Dashboard = () => {
+  const location = useLocation();
+  const [spinning, setSpinning] = useState(false);
+  const [table, setTable] = useState(location?.state?.tabIndex || "dashboard");
+  console.log(table, "tableeeeeee");
+  const [activePage, setActivePage] = useState(1);
+  const [isDisabled, setIsDisabled] = useState(true);
+  const [isView, setIsView] = useState("All");
+  const [deviceid, setDeviceId] = useState(0);
+  const [activePicker, setActivePicker] = useState("Weekly");
+  const [swap, setSwap] = useState("amount");
+  const [dates, setDates] = useState()
+  const [inputValue, setInputValue] = useState('');
+  const [popoverVisible, setPopoverVisible] = useState(false);
+
+  const handleClear = () => {
+      setInputValue('');
+      if(table=="bookings"){
+        GetBookingDetails(dispatch, setSpinning,deviceid);
+      }else if(table=="cancellation"){
+        GetCancellationDetails(dispatch, setSpinning,deviceid);
+      }
+      // else if(table=="passengers"){
+      //   GetPassengerDetails(dispatch,setSpinning,deviceid);
+      // }else if(table=="blocked"){
+      //   GetBlockedDetails(dispatch, setSpinning,deviceid);
+      // }
+      
+      
+      
+    };
+
   const dispatch = useDispatch();
-  useEffect(() => {
-    UnreadNotification(dispatch);
-  }, []);
+  const getDashboardDetails =
+    useSelector((state) => state.crm.dashboard_details) || [];
+  console.log(getDashboardDetails, "DASHBOARD details dashboard");
+  // useEffect(() => {
+  //   setSpinning(true);
+  //   GetDashboardDetails(dispatch, setSpinning, 0, "null", "null", 1, 1);
+  // }, []);
 
-  useEffect(() => {
-    // Function to prevent zoom on touch events
-    const preventZoom = (e) => {
-      if (e.touches.length > 1) {
-        e.preventDefault();
+  const formatNumber = (value) => {
+    if (value === undefined || value === null || isNaN(value)) {
+      return "Invalid value";
+    }
+
+    if (value >= 1000000) {
+      return (value / 1000000).toFixed(1) + "m";
+    } else if (value >= 100000) {
+      return (value / 1000).toFixed(1) + "k";
+    } else if (value >= 1000) {
+      return (value / 1000).toFixed(1) + "k";
+    } else {
+      return value.toString();
+    }
+  };
+
+  const infos1 = [
+    {
+      title: "Ticket Number",
+    },
+    {
+      title: "PNR Number",
+    },
+    {
+      title: "Mobile Number",
+    },
+    // {
+    //   title: "Activated Date",
+    //   description: "DD MMM (e.g. 01 Jan) - Format",
+    // },
+    // {
+    //   title: "Expiry Date",
+    //   description: "DD MMM (e.g. 01 Jan) - Format",
+    // },
+  ];
+
+  const infos2 = [
+    {
+      title: "Mobile Number",
+    },
+    {
+      title: "Email",
+    },
+  ];
+
+  const infos3 = [
+    {
+      title: "Ticket Number",
+    },
+    {
+      title: "PNR Number",
+    },
+    {
+      title: "Mobile Number",
+    },
+    {
+      title: "Email",
+    },
+  ];
+
+  const Search = (e) => {
+    if (table == "bookings") {
+      handleBookingDetailsSearch(e, dispatch);
+      setActivePage(1);
+    } else if (table == "cancellation") {
+      handleCancellationDetailsSearch(e, dispatch);
+      setActivePage(1);
+    } else if (table == "passengers") {
+      handlePassengerDetailsSearch(e, dispatch);
+      setActivePage(1);
+    } else if (table == "blocked") {
+      handleBlockedDetailsSearch(e, dispatch);
+      setActivePage(1);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    // Allow control keys like Backspace, Delete, ArrowLeft, ArrowRight, Tab
+    const isControlKey = [
+      "Backspace",
+      "Tab",
+      "ArrowLeft",
+      "ArrowRight",
+      "Delete",
+    ].includes(e.key);
+
+    if (isControlKey) {
+      return; // If it's a control key, do nothing and allow it to execute
+    }
+
+    // Allow only alphabets (A-Z, a-z), numbers (0-9), and space
+    if (!/^[A-Za-z0-9\s]$/.test(e.key)) {
+      e.preventDefault(); // Prevent the key if it's not an alphabet, number, or space
+    }
+  };
+
+  const { RangePicker } = DatePicker;
+
+  // date picker
+  const changeDatePickerPlaceholder = () => {
+    const inputDiv = document.querySelector(".ant-picker-input");
+    if (inputDiv) {
+      const inputElement = inputDiv.querySelector("input");
+      if (inputElement) {
+        inputElement.placeholder = "Start Date";
+        inputElement.className = "text-center";
       }
-    };
+    }
+  };
 
-    // Function to prevent double tap zoom
-    const preventDoubleTapZoom = (e) => {
-      e.preventDefault();
-    };
-
-    // Add event listeners for touchstart and double tap
-    document.addEventListener("touchstart", preventZoom, { passive: false });
-    document.addEventListener("dblclick", preventDoubleTapZoom, {
-      passive: false,
-    });
-
-    // Add event listener for wheel event to prevent zoom on Ctrl + scroll
-    const handleWheel = (e) => {
-      if (e.ctrlKey || e.metaKey) {
-        e.preventDefault();
+  const changeDatePickerPlaceholder2 = () => {
+    const inputDiv = document.querySelector(".ant-picker");
+    if (inputDiv) {
+      const children = inputDiv.querySelectorAll("div");
+      if (children.length > 2) {
+        const thirdChild = children[2];
+        const inputElement = thirdChild.querySelector("input");
+        if (inputElement) {
+          inputElement.placeholder = "End Date";
+          inputElement.className = "text-center";
+        }
       }
-    };
-    window.addEventListener("wheel", handleWheel, { passive: false });
+    }
+  };
 
-    // Add event listeners for gesture events on Safari
-    const preventGestureZoom = (e) => {
-      e.preventDefault();
-    };
-    document.addEventListener("gesturestart", preventGestureZoom);
-    document.addEventListener("gesturechange", preventGestureZoom);
-    document.addEventListener("gestureend", preventGestureZoom);
-
-    // Clean up event listeners on component unmount
-    return () => {
-      document.removeEventListener("touchstart", preventZoom);
-      document.removeEventListener("dblclick", preventDoubleTapZoom);
-      window.removeEventListener("wheel", handleWheel);
-      document.removeEventListener("gesturestart", preventGestureZoom);
-      document.removeEventListener("gesturechange", preventGestureZoom);
-      document.removeEventListener("gestureend", preventGestureZoom);
-    };
-  }, []);
   useEffect(() => {
-    const metaTag = document.createElement("meta");
-    metaTag.name = "viewport";
-    metaTag.content =
-      "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no";
-    document.getElementsByTagName("head")[0].appendChild(metaTag);
+    changeDatePickerPlaceholder();
+    changeDatePickerPlaceholder2();
+  }, [table]);
 
-    // Disable pinch-to-zoom
-    const preventZoom = (e) => {
-      if (e.ctrlKey) {
-        e.preventDefault();
+  const [dateClear, setDateClear] = useState();
+  const datefilter = async (values) => {
+    try {
+      setDates(values)
+      setDateClear(values);
+      console.log(values, "date values");
+      if (table == "bookings") {
+        await GetBookingDetailsByDate(
+          dispatch,
+          moment(values[0].$d).format("YYYY-MM-DD"),
+          moment(values[1].$d).format("YYYY-MM-DD")
+        );
+      } else if (table == "cancellation") {
+        await GetCancellationDetailsByDate(
+          dispatch,
+          moment(values[0].$d).format("YYYY-MM-DD"),
+          moment(values[1].$d).format("YYYY-MM-DD")
+        );
+      } else if (table == "blocked") {
+        await GetBlockedDetailsByDate(
+          dispatch,
+          moment(values[0].$d).format("YYYY-MM-DD"),
+          moment(values[1].$d).format("YYYY-MM-DD")
+        );
+      } else if (table == "dashboard") {
+        if(isView === "All") {
+          if(swap==="amount") {
+            await GetDashboardDetails(
+              dispatch,
+              setSpinning,
+              0,
+              moment(values[0].$d).format("YYYY-MM-DD"),
+              moment(values[1].$d).format("YYYY-MM-DD"),
+              1,
+              1
+            );
+          } else if (swap==="count") {
+            await GetDashboardDetails(
+              dispatch,
+              setSpinning,
+              0,
+              moment(values[0].$d).format("YYYY-MM-DD"),
+              moment(values[1].$d).format("YYYY-MM-DD"),
+              1,
+              2
+            );
+          }
+        } else if (isView === "Desktop") {
+          if(swap==="amount"){
+            await GetDashboardDetails(
+              dispatch,
+              setSpinning,
+              1,
+              moment(values[0].$d).format("YYYY-MM-DD"),
+              moment(values[1].$d).format("YYYY-MM-DD"),
+              1,
+              1
+            );
+          } else if (swap==="count") {
+            await GetDashboardDetails(
+              dispatch,
+              setSpinning,
+              1,
+              moment(values[0].$d).format("YYYY-MM-DD"),
+              moment(values[1].$d).format("YYYY-MM-DD"),
+              1,
+              2
+            );
+          }
+        } else if (isView === "Mobile") {
+          if(swap==="amount") {
+            await GetDashboardDetails(
+              dispatch,
+              setSpinning,
+              2,
+              moment(values[0].$d).format("YYYY-MM-DD"),
+              moment(values[1].$d).format("YYYY-MM-DD"),
+              1,
+              1
+            );
+          } else if (swap==="count"){
+            await GetDashboardDetails(
+              dispatch,
+              setSpinning,
+              2,
+              moment(values[0].$d).format("YYYY-MM-DD"),
+              moment(values[1].$d).format("YYYY-MM-DD"),
+              1,
+              2
+            );
+          }
+        }
       }
-    };
+      setActivePage(1);
+    } catch (err) {
+      console.log(err, "error");
+      if (table == "bookings") {
+        GetBookingDetails(dispatch, setSpinning, 0);
+      } else if (table == "cancellation") {
+        GetCancellationDetails(dispatch, setSpinning, 0);
+      } else if (table == "blocked") {
+        GetBlockedDetails(dispatch, setSpinning, 0);
+      } else if (table == "dashboard") {
+        setActivePicker("Weekly")
+        if(isView==="All"){
+          if(swap==="amount"){
+            GetDashboardDetails(dispatch, setSpinning, 0, "null", "null", 1, 1);
+          } else if(swap==="count"){
+            GetDashboardDetails(dispatch, setSpinning, 0, "null", "null", 1, 2);
+          }
+        } else if(isView==="Desktop"){
+          if(swap==="amount"){
+            GetDashboardDetails(dispatch, setSpinning, 1, "null", "null", 1, 1);
+          } else if(swap==="count"){
+            GetDashboardDetails(dispatch, setSpinning, 1, "null", "null", 1, 2);
+          }
+        } else if(isView==="Mobile"){
+          if (swap==="amount"){
+            GetDashboardDetails(dispatch, setSpinning, 2, "null", "null", 1, 1);
+          } else if(swap==="count"){
+            GetDashboardDetails(dispatch, setSpinning, 2, "null", "null", 1, 2);
+          }
+        }
+      }
+    }
+  };
 
-    document.addEventListener("wheel", preventZoom, { passive: false });
-
-    return () => {
-      document.removeEventListener("wheel", preventZoom);
-    };
-  }, []);
   useEffect(() => {
-    GetNotificationData(dispatch);
-  }, []);
+    setTable(location?.state?.tabIndex);
+  }, [location.state]);
+  useEffect(() => {
+    if (table === "dashboard") {
+      setTable(
+        location?.state?.tabIndex ? location?.state?.tabIndex : "dashboard"
+      );
+    }
+  }, [table]);
 
-  const reportId = 'f8b29529-d035-4c97-ad20-b2d85cfe1151';
-  const height = "500px";
-  const width = "100%";
-  const embedUrl =
-  "https://app.powerbi.com/reportEmbed?reportId=f8b29529-d035-4c97-ad20-b2d85cfe1151&groupId=59e770fb-a36e-4bb8-be19-4d0c182c99dd&w=2&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly9XQUJJLUlORElBLUNFTlRSQUwtQS1QUklNQVJZLXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0IiwiZW1iZWRGZWF0dXJlcyI6eyJ1c2FnZU1ldHJpY3NWTmV4dCI6dHJ1ZX19";
-  const accessToken ="eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Ikg5bmo1QU9Tc3dNcGhnMVNGeDdqYVYtbEI5dyIsImtpZCI6Ikg5bmo1QU9Tc3dNcGhnMVNGeDdqYVYtbEI5dyJ9.eyJhdWQiOiJodHRwczovL2FuYWx5c2lzLndpbmRvd3MubmV0L3Bvd2VyYmkvYXBpIiwiaXNzIjoiaHR0cHM6Ly9zdHMud2luZG93cy5uZXQvMDdiYjM5ZWQtOWM5MC00ZjRmLThlYTctZGFlNWFiNTAwNmQ0LyIsImlhdCI6MTcyNjIwNjI1NywibmJmIjoxNzI2MjA2MjU3LCJleHAiOjE3MjYyMTAxNTcsImFpbyI6IkUyZGdZQkIydnRtVW1MWHBuQVAzQzVHbktVd25BQT09IiwiYXBwaWQiOiI1ZGJkODFiZC0yNGMyLTQwYmMtYmVlNi1iZjBlMzQ1Mjk0OTEiLCJhcHBpZGFjciI6IjEiLCJpZHAiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC8wN2JiMzllZC05YzkwLTRmNGYtOGVhNy1kYWU1YWI1MDA2ZDQvIiwiaWR0eXAiOiJhcHAiLCJvaWQiOiI1ZTNiMTE4Ny0yOGFjLTRiOWMtYThkZC03MmE0YmY2NzQ1NDMiLCJyaCI6IjAuQVZZQTdUbTdCNUNjVDAtT3A5cmxxMUFHMUFrQUFBQUFBQUFBd0FBQUFBQUFBQUNmQUFBLiIsInN1YiI6IjVlM2IxMTg3LTI4YWMtNGI5Yy1hOGRkLTcyYTRiZjY3NDU0MyIsInRpZCI6IjA3YmIzOWVkLTljOTAtNGY0Zi04ZWE3LWRhZTVhYjUwMDZkNCIsInV0aSI6Ikw1UzVIX09VTjB5X0pCYlY5TE1nQUEiLCJ2ZXIiOiIxLjAiLCJ4bXNfaWRyZWwiOiI3IDI2In0.Ofc3nHFtY_dc0RpyVUQ90a7jXdkxOvQMMllVaOLiyCzhYqNA5gs2zN-XfLSppEcpbt424f_qO6RNRzdRPjYGl4tQuiWAvJ5Chs_34HzQ_-MKhkgYfYBPCFjNDRY8ZnAc1_DaF-0oeS4xJew3L2ML_bO87bVtv6Epp9-ihSo2eOdECojyV7MWd9CKCxCW0DN4UbfIjMj6ZrR_wgmgk6UBZFT-KJ4sIyo-08Q6iCJ0kPaxavm1CdSsHRfj2jQyVgch7BIFdciyv2dkD3Ed1xAwNtUsfCHr2zrN5GZri9J8zUwp9fe803-1uBFk324l4vbRwOXhSQIYpPe-4wmJU2_BJg"
+  useEffect(() => {
+    if (deviceid) {
+      console.log("deviceId updated:", deviceid);
+    }
+  }, [deviceid]);
+
   return (
-    <div className="">
-      <div
-        className="h-screen w-screen pl-[10vw] pr-[2vw] pt-[2vw]"
-        style={{
-          backgroundImage: `url(${Backdrop})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        {/* <h1 className="text-[3vw]">Dashboard</h1> */}
-        <div className="h-[85vh] w-[100%] rounded-[2vw] relative">
-          <div className=" absolute w-[87.8vw] h-[85vw] top-[0.1vw] pr-[2vw]">
-            {/* <h1>hello</h1> */}
-            {/* <PowerBi /> */}
-            {/* <PowerBIReport embedUrl={embedUrl} accessToken={accessToken} /> */}
-            
-            <NewPowerbi embedUrl={embedUrl} accessToken={accessToken} />
-            {/* <PowerBIReport
-              embedUrl={embedUrl}
-              accessToken={accessToken}
-              reportId={reportId}
-              height={height}
-              width={width}
-            /> */}
-          </div>
-        {/* <div className="bg-[#99a1ac] h-[70vh] w-[15%] absolute left-[-6vw] top-[3.5vw] rounded-[2vw]"></div> */}
+    <div
+      className={`h-screen w-screen px-[2.5vw]`}
+      style={{
+        backgroundImage: `url(${Backdrop})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      <h1 className="text-[#1F4B7F] pt-[0.5vw] text-[1.5vw] font-bold">
+        {table == "dashboard"
+          ? "DASHBOARD"
+          : table == "bookings"
+          ? "BOOKED TICKETS"
+          : table == "cancellation"
+          ? "CANCELLED TICKETS"
+          : table == "passengers"
+          ? "PASSENGERS"
+          : table == "blocked"
+          ? "BLOCKED HISTORY"
+          : "DASHBOARD"}
+      </h1>
+
+      <div className="flex justify-between items-start">
+        <div className="relative flex items-center pb-[0.5vw]">
+          <LiaSearchSolid
+            className="absolute left-[0.5vw] inline-block "
+            size={"1vw"}
+            color="#9CA3AF"
+          />
+          <input
+            type="text"
+            className={`${
+              table === "dashboard"
+                ? "cursor-not-allowed hover:bg-zinc-500"
+                : ""
+            } bg-white outline-none pt-[0.25vw] pl-[2vw] w-[17vw] text-[#1f487c] h-[5vh] text-[1vw] border-[#1F4B7F] border-l-[0.1vw] border-t-[0.1vw] rounded-[0.75vw] border-r-[0.25vw] border-b-[0.25vw]`}
+            placeholder="Search..."
+            value={inputValue}
+            onKeyDown={handleKeyDown}
+            onChange={(e) => {
+              Search(e);
+              setInputValue(e.target.value)
+            }}
+            disabled={isDisabled}
+          />
+          <span
+            className={`inline-block ${
+              table === "dashboard" ? "cursor-not-allowed" : "cursor-pointer"
+            } text-[#1F4B7F] text-[1vw] align-text-bottom absolute right-[1vw]`}
+          >
+            {" "}
+            {/* {table === "bookings" ||
+        table === "cancellation" ||
+        table === "blocked" ||table==="passengers"?(<div
+          className="absolute right-[-0.1vw] top-1/2 -translate-y-1/2 cursor-pointer text-gray-400"
+          
+          
+        > */}
+            {inputValue ? (
+                        <MdCancel size="1.3vw" className="text-[#1f487c] cursor-pointer   " onClick={() => {
+                          handleClear(); 
+                          // setPopoverVisible(false); 
+                        }} />
+                      ) : (
+            <Popover
+              color="white"
+              title={
+                table == "dashboard" ? (
+                  ""
+                ) : (
+                  <div className=" text-[#1F4B7F] p-[1vw] max-h-[20vw] overflow-auto ">
+                    <span className="font-bold">SEARCH BY...</span>
+                    {table == "passengers"
+                      ? infos2.map((info, index) => (
+                          <div key={index} className="flex flex-col">
+                            <ul
+                              className="pl-[1vw]"
+                              style={{ listStyleType: "disc" }}
+                            >
+                              <li className="text-[0.8vw] ">
+                                <p className="">{info.title}</p>
+                              </li>
+                            </ul>
+                            <span className="text-[.7vw] pl-[1vw] text-[#9CA3AF]">
+                              {info.description}
+                            </span>
+                          </div>
+                        ))
+                      : table == "bookings"
+                      ? infos3.map((info, index) => (
+                          <div key={index} className="flex flex-col">
+                            <ul
+                              className="pl-[1vw]"
+                              style={{ listStyleType: "disc" }}
+                            >
+                              <li className="text-[0.8vw] ">
+                                <p className="">{info.title}</p>
+                              </li>
+                            </ul>
+                            <span className="text-[.7vw] pl-[1vw] text-[#9CA3AF]">
+                              {info.description}
+                            </span>
+                          </div>
+                        ))
+                      : infos1.map((info, index) => (
+                          <div key={index} className="flex flex-col">
+                            <ul
+                              className="pl-[1vw]"
+                              style={{ listStyleType: "disc" }}
+                            >
+                              <li className="text-[0.8vw] ">
+                                <p className="">{info.title}</p>
+                              </li>
+                            </ul>
+                            <span className="text-[.7vw] pl-[1vw] text-[#9CA3AF]">
+                              {info.description}
+                            </span>
+                          </div>
+                        ))}
+                  </div>
+                )
+              }
+              placement="bottom"
+            >
+              <BsExclamationCircle size={"1vw"} color="#9CA3AF" />
+            </Popover>)}
+            {/* </div>):(" ")} */}
+          </span>
         </div>
+
+        {/* <Link to="/dashboard/booking_table" className="text-[1.3vw] text-[#1f487c] text-center">Bookings</Link>
+          <Link to="/dashboard/cancellation_table" className="text-[1.3vw] text-[#1f487c] text-center">Cancellation</Link>
+          <Link to="" className="text-[1.3vw] text-[#1f487c] text-center">Passengers</Link> */}
+        <div className="flex items-start pl-[1vw] gap-x-[3vw] -ml-[8.5vw]">
+          <div
+            className={` cursor-pointer ${
+              table == "dashboard"
+                ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                : ""
+            } `}
+            onClick={() => {
+              setTable("dashboard");
+              setIsDisabled(true);
+              setDeviceId(0);
+              setIsView("All");
+              setInputValue('');
+            }}
+          >
+            <p className="text-[1.3vw] text-[#1f487c] text-center">Dashboard</p>
+          </div>
+          <div
+            className={` cursor-pointer ${
+              table == "bookings"
+                ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                : ""
+            } `}
+            onClick={() => {
+              setTable("bookings");
+              setIsDisabled(false);
+              setActivePage(1);
+              setDeviceId(0);
+              setIsView("All");
+              setInputValue('');
+            }}
+          >
+            <div className="text-[1.3vw] text-[#1f487c] text-center">
+              Bookings
+            </div>
+          </div>
+
+          <div
+            className={` cursor-pointer ${
+              table == "cancellation"
+                ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                : ""
+            } `}
+            onClick={() => {
+              setTable("cancellation");
+              setIsDisabled(false);
+              setActivePage(1);
+              setDeviceId(0);
+              setIsView("All");
+              setInputValue('');
+            }}
+          >
+            <div className="text-[1.3vw] text-[#1f487c] text-center">
+              Cancellation
+            </div>
+          </div>
+
+          {/* <div
+            className={` cursor-pointer ${
+              table == "passengers"
+                ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                : ""
+            } `}
+            onClick={() => {
+              setTable("passengers");
+              setIsDisabled(false);
+              setActivePage(1);
+              setDeviceId(0)
+              setIsView("All")
+              setInputValue('');
+            }}
+          >
+            <div className="text-[1.3vw] text-[#1f487c] text-center">
+              Passengers
+            </div>
+          </div> */}
+
+          {/* <div
+            className={` cursor-pointer ${
+              table == "blocked"
+                ? "border-b-[0.25vw] font-bold border-[#1f487c]"
+                : ""
+            } `}
+            onClick={() => {
+              setTable("blocked");
+              setIsDisabled(false);
+              setActivePage(1);
+              setDeviceId(0)
+              setIsView("All")
+              setInputValue('');
+            }}
+          >
+            <div className="text-[1.3vw] text-[#1f487c] text-center">
+              Blocked History
+            </div>
+          </div> */}
+        </div>
+
+        <div className="flex col-span-2">
+          {table === "dashboard" ||
+          table === "bookings" ||
+          table === "cancellation" ||
+          table === "blocked" ? (
+            <div className="flex items-center -mr-[8.5vw]">
+              <div className="reqman">
+                <ConfigProvider
+                  theme={{
+                    token: {
+                      fontSize: ".9vw",
+                      lineHeight: 0,
+                      colorPrimary: "#1F487C",
+                    },
+                    components: {
+                      DatePicker: {
+                        activeBorderColor: "#1F487C",
+                        hoverBorderColor: "#1F487C",
+                        activeShadow: "#1F487C",
+                        cellWidth: 25,
+                        cellHeight: 20,
+                      },
+                    },
+                  }}
+                >
+                  <RangePicker
+                    allowClear={true}
+                    autoFocus={false}
+                    onChange={datefilter}
+                    value={dateClear}
+                    className="ads-date1 border-r-[0.75vw] border-l-[0.1vw] border-t-[0.1vw] border-b-[0.25vw] placeholder-blue border-[#1F487C]
+                        text-[#1F487C] text-[0.8vw] h-[5vh] w-[100%] rounded-[0.5vw] outline-none px-[1vw] placeholder-[#1F487C]"
+                    // className="custom-range-picker bg-white outline-none pl-[1.5vw] w-[17vw] h-[2.5vw] text-[0.9vw] border-[#1F4B7F] border-l-[0.1vw] px-[1vw] border-t-[0.1vw] rounded-[0.75vw] border-r-[0.2vw] border-b-[0.2vw]"
+                    // disabledDate={(current) => current < dayjs().startOf("day")}
+                  />
+                </ConfigProvider>
+              </div>
+            </div>
+          ) : (
+            <div className="w-[20vw]"></div>
+          )}
+        </div>
+        {table === "dashboard" ||
+        table === "bookings" ||
+        table === "cancellation" ||
+        table === "passengers" ||
+        table === "blocked" ? (
+          <div className="flex border-[#1F487C] h-[5vh] ">
+            {/* <Tooltip
+              placement="top"
+              title={
+                <div className="flex items-center gap-x-[0.5vw] justify-center">
+                  <FaDesktop color={"#1F487C"} size={"1vw"} />
+                  <label className="text-[1vw] font-semibold">All</label>
+                </div>
+              }
+              className="cursor-pointer"
+              color="white"
+              overlayInnerStyle={{
+                color: "#1F487C",
+              }}
+            > */}
+            <button
+              className={`${
+                isView === "All" ? "bg-[#1F487C]" : "bg-[white]"
+              } px-[0.75vw] rounded-l-[0.75vw] border-[0.1vw] border-b-[0.25vw] border-r-0  border-[#1F487C] flex items-center gap-[0.5vw]`}
+              style={{
+                transition: "all 1s",
+              }}
+              onClick={() => {
+                setIsView("All");
+                setDeviceId(0);
+                setActivePage(1);
+                setActivePicker("Weekly")
+                setDates()
+                setDateClear()
+                setSwap("amount")
+                //  GetBookingDetails(dispatch, setSpinning, 1);
+              }}
+            >
+              {/* <FaDesktop
+                  color={`${isView === "Desktop" ? "white" : "#1F487C"}`}
+                /> */}
+              {isView === "All" ? (
+                <img src={all1} className="w-[1.25vw]" />
+              ) : (
+                <img src={all2} className="w-[1.25vw]" />
+              )}
+              <p
+                className={`text-[1vw] font-semibold ${
+                  isView === "All" ? "text-white" : "text-[#1F487C]"
+                }`}
+              >
+                All
+              </p>
+            </button>
+            {/* </Tooltip> */}
+            {/* <Tooltip
+              placement="top"
+              title={
+                <div className="flex items-center gap-x-[0.5vw] justify-center">
+                  <FaDesktop color={"#1F487C"} size={"1vw"} />
+                  <label className="text-[1vw] font-semibold">Website</label>
+                </div>
+              }
+              className="cursor-pointer"
+              color="white"
+              overlayInnerStyle={{
+                color: "#1F487C",
+              }}
+            > */}
+            <button
+              className={`${
+                isView === "Desktop" ? "bg-[#1F487C]" : "bg-[white]"
+              } px-[0.75vw] border-[0.1vw] border-b-[0.25vw] border-r-0  border-[#1F487C] flex items-center gap-[0.5vw]`}
+              style={{
+                transition: "all 1s",
+              }}
+              onClick={() => {
+                setIsView("Desktop");
+                setDeviceId(1);
+                setActivePage(1);
+                setActivePicker("Weekly")
+                setDates()
+                setDateClear()
+                setSwap("amount")
+                //  GetBookingDetails(dispatch, setSpinning, 1);
+              }}
+            >
+              <FaDesktop
+                color={`${isView === "Desktop" ? "white" : "#1F487C"}`}
+                className="text-[1.25vw]"
+              />
+              <p
+                className={`text-[1vw] font-semibold ${
+                  isView === "Desktop" ? "text-white" : "text-[#1F487C]"
+                }`}
+              >
+                Website
+              </p>
+            </button>
+            {/* </Tooltip> */}
+            {/* <Tooltip
+              placement="top"
+              title={
+                <div className="flex items-center gap-x-[0.5vw] justify-center">
+                  <FaMobileAlt color={"#1F487C"} size={"1vw"} />
+                  <label className="text-[1vw] font-semibold">Mobile</label>
+                </div>
+              }
+              className="cursor-pointer"
+              color="white"
+              overlayInnerStyle={{
+                color: "#1F487C",
+              }}
+            > */}
+            <button
+              className={`${
+                isView === "Mobile" ? "bg-[#1F487C]" : "bg-[white]"
+              } px-[0.75vw] rounded-r-[0.75vw] border-[0.1vw] border-b-[0.25vw] border-r-[0.25vw] border-l-0  border-[#1F487C] flex items-center gap-[0.5vw]`}
+              style={{
+                transition: "all 1s",
+              }}
+              onClick={() => {
+                setIsView("Mobile");
+                setDeviceId(2);
+                setActivePage(1);
+                setActivePicker("Weekly")
+                setDates()
+                setDateClear()
+                setSwap("amount")
+              }}
+            >
+              <FaMobileAlt
+                color={`${isView === "Mobile" ? "white" : "#1F487C"}`}
+                className="text-[1.25vw]"
+              />
+              <p
+                className={`text-[1vw] font-semibold ${
+                  isView === "Mobile" ? "text-white" : "text-[#1F487C]"
+                }`}
+              >
+                Mobile
+              </p>
+            </button>
+            {/* </Tooltip> */}
+          </div>
+        ) : (
+          <div className="w-[1vw]"></div>
+        )}
       </div>
+
+      {table == "dashboard" ? (
+        <DashTableNew setTable={setTable} deviceid={deviceid} activePicker={activePicker} setActivePicker={setActivePicker} swap={swap} setSwap={setSwap} dates={dates} isView={isView}/>
+      ) : // <DashTable/>
+      table == "bookings" ? (
+        <BookingTable
+          activePage={activePage}
+          setActivePage={setActivePage}
+          deviceid={deviceid}
+        />
+      ) : table == "cancellation" ? (
+        <CancelTable
+          activePage={activePage}
+          setActivePage={setActivePage}
+          deviceid={deviceid}
+        />
+        // <ChartFun isSidebarOpen={activePage} selectedModule={setActivePage}/>
+      ) : table == "passengers" ? (
+        <PassengerTable
+          activePage={activePage}
+          setActivePage={setActivePage}
+          deviceid={deviceid}
+        />
+      ) : table == "blocked" ? (
+        <BlockTable
+          activePage={activePage}
+          setActivePage={setActivePage}
+          deviceid={deviceid}
+        />
+      ) : (
+        // <DashTable/>
+        <DashTableNew setTable={setTable} deviceid={deviceid} activePicker={activePicker} setActivePicker={setActivePicker} swap={swap} setSwap={setSwap} dates={dates} isView={isView}/>
+        // <DashTable/>
+      )}
+      {/* <Link to="/dashboard/booking_table">Component 1</Link> */}
+      {/* <Outlet /> */}
     </div>
   );
-}
+};
 
 export default Dashboard;
